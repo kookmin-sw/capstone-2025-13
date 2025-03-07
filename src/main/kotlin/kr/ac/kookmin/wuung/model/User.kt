@@ -1,0 +1,43 @@
+package kr.ac.kookmin.wuung.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+
+
+@Entity
+@Table(name = "users")
+data class User(
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    var id: String? = null,
+
+    @Column(nullable = false, length = 32, name = "username")
+    var userName: String? = null,
+
+    @Column(nullable = false, length = 255)
+    var email: String? = null,
+
+    @Column(nullable = false, length = 255, name = "password")
+    var _password: String? = null,
+
+    @Column(nullable = false)
+    var roles: String? = null
+): UserDetails {
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
+            ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
+    }
+
+    override fun getPassword(): String = _password ?: ""
+    override fun isEnabled(): Boolean = true
+    override fun isCredentialsNonExpired(): Boolean = true
+    override fun isAccountNonExpired(): Boolean = true
+    override fun getUsername(): String = email ?: ""
+}
