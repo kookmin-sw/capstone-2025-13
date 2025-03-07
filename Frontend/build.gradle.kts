@@ -7,7 +7,7 @@ plugins {
 
 node {
     download.set(true)
-    version.set("23.6.0")
+    version.set("23.9.0")
     nodeProjectDir.set(file("${projectDir}/src/"))
 }
 
