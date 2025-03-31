@@ -1,0 +1,21 @@
+services:
+  pgvector:
+    image: 'pgvector/pgvector:pg16'
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
+    ports:
+      - target: 5432
+        published: 55432
+        protocol: tcp
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379'
+volumes:
+  postgresql:

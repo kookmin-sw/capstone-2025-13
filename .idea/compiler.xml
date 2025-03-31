@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="ohmyllm" target="23" />
+      <module name="ohmyllm.aot" target="23" />
+      <module name="ohmyllm.aotTest" target="23" />
+      <module name="ohmyllm.test" target="23" />
+      <module name="space.ohmyllm.ohmyllm.main" target="23" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
