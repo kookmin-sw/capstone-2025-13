@@ -9,6 +9,7 @@ import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import java.time.LocalDateTime
 
 
 @Entity
@@ -28,7 +29,26 @@ data class User(
     var _password: String? = null,
 
     @Column(nullable = false)
-    var roles: String? = null
+    var roles: String? = null,
+
+    @Column(nullable = false)
+    var sex : Boolean? = null, 
+    // false : male, 
+    // true : female
+
+    @Column(nullable = false)
+    var age: Long? = null,
+
+    @Column(nullable = false)
+    var birthDate : LocalDateTime? = null,
+
+    //@Column(nullable = false)
+    //var userType : Long? = null
+    // check classification rule and group name again, it is example that i made. not real, think about it again.
+    // 0 ~ 3 : Normal User
+    // 4 ~ 6 : User who feel week depression
+    // 7  ~ 9 : User who feel strong depression
+
 ): UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
