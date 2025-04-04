@@ -8,7 +8,7 @@ import {
     TouchableWithoutFeedback,
     Platform
 } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import signUpStyles from "../../styles/signUpStyles";
 
 interface SignInProps {
@@ -20,26 +20,16 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
     const [date, setDate] = useState(new Date());
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-    const showDatePicker = () => {
-        setDatePickerVisibility(true);
-    };
+    const showDatePicker = () => setDatePickerVisibility(true);
+    const hideDatePicker = () => setDatePickerVisibility(false);
 
-    const hideDatePicker = () => {
-        setDatePickerVisibility(false);
-    };
-
-    const handleConfirm = (selectedDate: Date) => {
-        setDate(selectedDate);
-        hideDatePicker();
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        if (Platform.OS === "android") hideDatePicker();
+        if (selectedDate) setDate(selectedDate);
     };
 
     return (
-        <Modal
-            visible={isVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}
-        >
+        <Modal visible={isVisible} transparent animationType="fade" onRequestClose={onClose}>
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={signUpStyles.overlay}>
                     <TouchableWithoutFeedback>
@@ -57,12 +47,15 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
                                         pointerEvents="none"
                                     />
                                 </TouchableOpacity>
-                                <DateTimePickerModal
-                                    isVisible={isDatePickerVisible}
-                                    mode="date"
-                                    onConfirm={handleConfirm}
-                                    onCancel={hideDatePicker}
-                                />
+
+                                {isDatePickerVisible && (
+                                    <DateTimePicker
+                                        value={date}
+                                        mode="date"
+                                        onChange={handleDateChange}
+                                        display="spinner"
+                                    />
+                                )}
                             </View>
 
                             <View style={signUpStyles.inputContainer}>
