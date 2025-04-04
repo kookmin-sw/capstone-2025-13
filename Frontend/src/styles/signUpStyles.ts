@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import colors from "../constants/colors";
 import fonts from "../constants/fonts";
 
-const signInStyles = StyleSheet.create({
+const signUpStyles = StyleSheet.create({
     overlay: {
         flex: 1,
         justifyContent: "center",
@@ -66,7 +66,7 @@ const signInStyles = StyleSheet.create({
         color: colors.white,
         fontFamily: fonts.bold,
     },
-    signInButton: {
+    signUpButton: {
         paddingVertical: 10,
         paddingHorizontal: 20,
         backgroundColor: colors.lightGreen,
@@ -81,10 +81,40 @@ const signInStyles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    signInText: {
+    maleButton:{
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        backgroundColor: "#BFC8FF",
+        borderRadius: 20,
+        width: "45%",
+        height: 45,
+        alignItems: "center", 
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    femaleButton:{
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        backgroundColor: "#FDBABA",
+        borderRadius: 20,
+        width: "45%",
+        height: 45,
+        alignItems: "center", 
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    signUpText: {
         color: colors.white,
         fontFamily: fonts.bold,
     },
 });
 
-export default signInStyles;
+export default signUpStyles;

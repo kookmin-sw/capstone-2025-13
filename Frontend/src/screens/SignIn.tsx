@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
-import signInStyles from "../../styles/signInStyles";
+import signInStyles from "../styles/signInStyles";
 
 interface SignInProps {
     isVisible: boolean;
