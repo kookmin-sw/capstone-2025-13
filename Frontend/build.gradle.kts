@@ -34,7 +34,7 @@ tasks.register<NpmTask>("run") {
 }
 
 tasks.register<NpmTask>("build") {
-    npmCommand.set(listOf("run", "build"))
+    npmCommand.set(listOf("run", "test"))
     dependsOn("npmInstall")
 
     outputs.upToDateWhen { true }
