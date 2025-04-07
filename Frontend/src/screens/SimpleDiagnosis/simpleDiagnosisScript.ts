@@ -367,5 +367,10 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
         name: "나나",
         text: "클로버 마을...\n여기 마음에 드는 것 같아\n조금 더 돌아보고 싶어",
     },
+    {
+      index: 45,
+      type:"navigate",
+      navigateTo: "Home",
+    }
   ];
   
