@@ -58,7 +58,7 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
                                 <TouchableOpacity style={signInStyles.backButton} onPress={goBack}>
                                     <Text style={signInStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={signInStyles.signInButton} onPress={() => { }}>
+                                <TouchableOpacity style={signInStyles.signInButton} onPress={() => navigation.navigate('Home')}>
                                     <Text style={signInStyles.signInText}>로그인</Text>
                                 </TouchableOpacity>
                             </View>
