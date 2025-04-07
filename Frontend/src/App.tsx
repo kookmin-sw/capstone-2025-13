@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Game">
+            <Stack.Navigator initialRouteName="SimpleDiagnosis">
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
                 <Stack.Screen name="SignIn" options={{ headerShown: false }}>
                     {() => <SignIn isVisible={true} onClose={() => { }} />}

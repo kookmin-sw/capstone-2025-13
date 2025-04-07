@@ -11,13 +11,13 @@ interface DialogueBoxProps {
 
 const DialogueBox = ({ name, text, onPress }: DialogueBoxProps) => {
     const fontsLoaded = useCustomFonts();
-    // if (!fontsLoaded) {
-    //     return (
-    //         <View>
-    //             <Text>로딩 중...</Text>
-    //         </View>
-    //     );
-    // }
+    if (!fontsLoaded) {
+        return (
+            <View>
+
+            </View>
+        );
+    }
 
 
     return (
