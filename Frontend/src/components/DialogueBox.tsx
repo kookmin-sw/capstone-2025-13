@@ -10,7 +10,14 @@ interface DialogueBoxProps {
 
 const DialogueBox = ({ name, text }: DialogueBoxProps) => {
     const fontsLoaded = useCustomFonts();
-    if (!fontsLoaded) return null;
+    // if (!fontsLoaded) {
+    //     return (
+    //         <View>
+    //             <Text>로딩 중...</Text>
+    //         </View>
+    //     );
+    // }
+
 
     return (
         <View style={dialogueBoxStyles.dialogueBox}>
