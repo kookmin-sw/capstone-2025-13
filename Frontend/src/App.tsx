@@ -20,12 +20,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="SignUpStep1">
+            <Stack.Navigator initialRouteName="SimpleDiagnosis">
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
                 <Stack.Screen name="SignIn" options={{ headerShown: false }}>
                     {() => <SignIn isVisible={true} onClose={() => { }} />}
                 </Stack.Screen>
-
                 <Stack.Screen name="SignUpStep1" options={{ headerShown: false }} component={SignUpStep1} />
                 <Stack.Screen name="SignUpStep2" options={{ headerShown: false }}>
                     {() => <SignUpStep2 isVisible={true} onClose={() => { }} />}

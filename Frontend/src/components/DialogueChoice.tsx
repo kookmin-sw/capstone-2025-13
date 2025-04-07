@@ -4,14 +4,15 @@ import dialogueChoiceStyles from "../styles/dialogueChoiceStyles";
 
 interface DialogueChoiceProps {
     text: string;
+    onPress: () => void;
 }
 
-const DialogueChoice = ({ text }: DialogueChoiceProps) => {
+const DialogueChoice = ({ text, onPress }: DialogueChoiceProps) => {
     return (
         <View style={dialogueChoiceStyles.dialogueBox} >
             <View style={dialogueChoiceStyles.dialogueTextBox}>
                 <Text style={dialogueChoiceStyles.dialogueText}>{text}</Text>
-                <TouchableOpacity style={dialogueChoiceStyles.button} onPress={() => alert("눌렀다!")}>
+                <TouchableOpacity style={dialogueChoiceStyles.button} onPress={onPress}>
                     <View style={dialogueChoiceStyles.triangle} />
                 </TouchableOpacity>
             </View>

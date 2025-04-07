@@ -5,28 +5,27 @@ import fonts from "../constants/fonts";
 const dialogueChoiceStyles = StyleSheet.create({
     dialogueBox: {
         width: "100%",
-        height: "15%",
+        height: "12%",
         marginVertical: 20,
     },
     dialogueTextBox: {
-        position: "relative",
-        padding: 50,
+        justifyContent: "center",
+        padding: 20, 
         width: "100%",
         height: "100%",
         backgroundColor: colors.background,
         borderRadius: 20
-
+        
     },
     dialogueText: {
         fontSize: 16,
         color: "black",
         fontFamily: fonts.dialogue,
+        textAlign: "center",
     },
     button: {
-        alignContent: "center",
-        justifyContent: "center",
         position: "absolute",
-        bottom: 40,
+        bottom: 20,
         right: 20,
         zIndex: 10,
     },
