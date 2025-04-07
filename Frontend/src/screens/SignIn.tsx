@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
 import signInStyles from "../styles/signInStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +17,8 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
         navigation.navigate('SimpleDiagnosis', { initialIndex: 4 });
     };
 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     return (
         <Modal
@@ -33,12 +35,23 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
 
                             <View style={signInStyles.inputContainer}>
                                 <Text style={signInStyles.inputTitle}>이메일</Text>
-                                <TextInput placeholder="이메일" style={signInStyles.input} />
+                                <TextInput
+                                    placeholder="이메일"
+                                    style={signInStyles.input}
+                                    value={email}
+                                    onChangeText={setEmail}
+                                />
                             </View>
 
                             <View style={signInStyles.inputContainer}>
                                 <Text style={signInStyles.inputTitle}>비밀번호</Text>
-                                <TextInput placeholder="비밀번호" secureTextEntry style={signInStyles.input} />
+                                <TextInput
+                                    placeholder="비밀번호"
+                                    secureTextEntry
+                                    style={signInStyles.input}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
                             </View>
 
                             <View style={signInStyles.row}>

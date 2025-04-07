@@ -81,36 +81,42 @@ const signUpStyles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    maleButton:{
+    genderButton: {
         paddingVertical: 10,
         paddingHorizontal: 20,
+        borderRadius: 20,
+        width: "45%",
+        height: 45,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+      },
+      
+      maleSelected: {
+        backgroundColor: "#6E7EFF",
+      },
+      
+      maleUnselected: {
         backgroundColor: "#BFC8FF",
-        borderRadius: 20,
-        width: "45%",
-        height: 45,
-        alignItems: "center", 
-        justifyContent: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    femaleButton:{
-        paddingVertical: 10,
-        paddingHorizontal: 10,
+      },
+      
+      femaleSelected: {
+        backgroundColor: "#FF7C7C",
+      },
+      
+      femaleUnselected: {
         backgroundColor: "#FDBABA",
-        borderRadius: 20,
-        width: "45%",
-        height: 45,
-        alignItems: "center", 
-        justifyContent: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 5,
-    },
+      },
+      
+      genderText: {
+        color: "#fff",
+        fontWeight: "bold",
+      },
+      
     signUpText: {
         color: colors.white,
         fontFamily: fonts.bold,

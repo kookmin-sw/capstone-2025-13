@@ -25,6 +25,7 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
 
     const [date, setDate] = useState(new Date());
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [isMale, setIsMale] = useState(true);
 
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
@@ -67,11 +68,24 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
                             <View style={signUpStyles.inputContainer}>
                                 <Text style={signUpStyles.inputTitle}>성별</Text>
                                 <View style={signUpStyles.row}>
-                                    <TouchableOpacity style={signUpStyles.maleButton} onPress={onClose}>
-                                        <Text style={signUpStyles.backText}>남자</Text>
+                                    <TouchableOpacity
+                                        onPress={() => setIsMale(true)}
+                                        style={[
+                                            signUpStyles.genderButton,
+                                            isMale ? signUpStyles.maleSelected : signUpStyles.maleUnselected
+                                        ]}
+                                    >
+                                        <Text style={signUpStyles.genderText}>남자</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={signUpStyles.femaleButton} onPress={() => { }}>
-                                        <Text style={signUpStyles.signUpText}>여자</Text>
+
+                                    <TouchableOpacity
+                                        onPress={() => setIsMale(false)}
+                                        style={[
+                                            signUpStyles.genderButton,
+                                            !isMale ? signUpStyles.femaleSelected : signUpStyles.femaleUnselected
+                                        ]}
+                                    >
+                                        <Text style={signUpStyles.genderText}>여자</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
