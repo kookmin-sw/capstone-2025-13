@@ -24,13 +24,13 @@ const SignUpStep1 = () => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={signUpStyles.signUpButton}
-                        onPress={() => navigation.navigate("SimpleDiagnosis")}
+                        onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9 })}
                     >
                         <Text style={signUpStyles.signUpText}>확인</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </View >
     );
 };
 

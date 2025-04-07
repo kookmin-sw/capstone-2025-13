@@ -72,12 +72,23 @@ const SimpleDiagnosis = () => {
                     name={currentSegment.name || "Unknown"}
                     text={currentSegment.text || "No text available"}
                     onPress={() => {
-                        if (currentSegment.type === "navigate" && currentSegment.navigateTo) {
-                            navigation.navigate(currentSegment.navigateTo.screen, currentSegment.navigateTo.params);
+                        const nextSegment = simpleDiagnosisScript[currentSegmentIndex + 1];
+
+                        if (nextSegment?.type === "navigate" && nextSegment.navigateTo) {
+                            const navigateTo = nextSegment.navigateTo;
+                            if (typeof navigateTo === "string") {
+                                navigation.navigate(
+                                    navigateTo as "SimpleDiagnosis",
+                                    { initialIndex: currentSegmentIndex + 1 }
+                                );
+                            } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
+                                navigation.navigate((navigateTo as { screen: keyof RootStackParamList; params: any }).screen, (navigateTo as { screen: keyof RootStackParamList; params: any }).params);
+                            }
                         } else {
-                            setCurrentSegmentIndex(currentSegmentIndex + 1); // 다음 스토리로 이동
+                            setCurrentSegmentIndex(currentSegmentIndex + 1);
                         }
                     }}
+
                 />
             ) : (
                 <View
@@ -100,8 +111,6 @@ const SimpleDiagnosis = () => {
                                     );
                                 } else if (option.nextType === "story" && typeof option.nextIndex === "number") {
                                     setCurrentSegmentIndex(option.nextIndex);
-                                } else {
-                                    console.warn("잘못된 옵션 형식입니다.");
                                 }
                             }}
                         />
