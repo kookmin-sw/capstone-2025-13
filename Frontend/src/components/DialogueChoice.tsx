@@ -2,23 +2,40 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import dialogueChoiceStyles from "../styles/dialogueChoiceStyles";
 
-interface DialogueChoiceProps {
+type Option = {
     text: string;
-    onPress: () => void;
+    nextType?: "navigate" | "story";
+    nextIndex?: number;
+    navigateTo?: any;
+    score?: number;
+};
+
+interface DialogueChoiceProps {
+    options: Option[];
+    onSelect: (option: Option) => void;
 }
 
-const DialogueChoice = ({ text, onPress }: DialogueChoiceProps) => {
+const DialogueChoice = ({ options, onSelect }: DialogueChoiceProps) => {
     return (
-        <View style={dialogueChoiceStyles.dialogueBox} >
-            <View style={dialogueChoiceStyles.dialogueTextBox}>
-                <Text style={dialogueChoiceStyles.dialogueText}>{text}</Text>
-                <TouchableOpacity style={dialogueChoiceStyles.button} onPress={onPress}>
-                    <View style={dialogueChoiceStyles.triangle} />
-                </TouchableOpacity>
-            </View>
-        </View >
-
+        <>
+            {options.map((option, index) => (
+                <View key={index} style={dialogueChoiceStyles.dialogueBox}>
+                    <TouchableOpacity
+                        style={dialogueChoiceStyles.dialogueTextBox}
+                        onPress={() => onSelect(option)}
+                    >
+                        <Text style={dialogueChoiceStyles.dialogueText}>{option.text}</Text>
+                        <TouchableOpacity
+                            style={dialogueChoiceStyles.button}
+                            onPress={() => onSelect(option)}
+                        >
+                            <View style={dialogueChoiceStyles.triangle} />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </View>
+            ))}
+        </>
     );
-}
+};
 
 export default DialogueChoice;

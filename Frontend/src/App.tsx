@@ -5,15 +5,15 @@ import Home from './screens/Home';
 import SignIn from './screens/SignIn';
 import SignUpStep1 from './screens/SignUp/SignUpStep1';
 import SignUpStep2 from './screens/SignUp/SignUpStep2';
-import SimpleDiagnosis from './screens/SimpleDiagnosis/SimpleDiagnosis'; // 👈 추가
+import SimpleDiagnosis from './screens/SimpleDiagnosis/SimpleDiagnosis';
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     SignUpStep2: undefined;
-    SimpleDiagnosis: undefined;
-};
+    SimpleDiagnosis: { initialIndex?: number };
+}
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

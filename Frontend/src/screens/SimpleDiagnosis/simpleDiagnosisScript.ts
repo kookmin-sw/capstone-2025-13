@@ -1,4 +1,40 @@
-export const simpleDiagnosisScript = [
+import { RootStackParamList } from "../../App";
+
+type StorySegment = {
+    index: number;
+    type: "story";
+    name?: string;
+    text?: string;
+    backgroundImage?: any;
+  };
+  
+  type ChoiceOption = {
+    text: string;
+    nextType: "story" | "navigate"; 
+    nextIndex?: number;              
+    navigateTo?: keyof RootStackParamList; 
+    score?: number;
+  };
+  
+  
+  type ChoiceSegment = {
+    index: number;
+    type: "options";
+    options: ChoiceOption[];
+    backgroundImage?: any;
+  };
+  
+  type NavigateSegment = {
+    index: number;
+    type: "navigate";
+    navigateTo: keyof RootStackParamList;
+    backgroundImage?: any;
+  };
+  
+  type ScriptSegment = StorySegment | ChoiceSegment | NavigateSegment;
+  
+
+export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
       index: 0,
       type: "story",
@@ -28,14 +64,15 @@ export const simpleDiagnosisScript = [
       text: "(...끼익)\n어머 너 누구야?\n우리 어디서 본 적 있나?",
     },
     {
-      index: 4,
-      type: "options",
-      backgroundImage: require("../../assets/Images/simple-3.png"),
-      options: [
-        { text: "네", nextIndex: 5 },
-        { text: "아니요", nextIndex: 6 },
-      ],
-    },
+        index: 4,
+        type: "options",
+        backgroundImage: require("../../assets/Images/simple-3.png"),
+        options: [
+          { text: "네", nextType: "navigate", navigateTo: "SignIn" },
+          { text: "아니요", nextType: "story", nextIndex: 6 },
+        ],
+      },
+      
     {  index: 5,
         type: "navigate",
         navigateTo: "SignIn",
@@ -81,7 +118,7 @@ export const simpleDiagnosisScript = [
     {
       index: 12,
       type: "navigate",
-      navigateTo: "SignUpStep3",
+      navigateTo: "SignUpStep1", //수정
     },
     {
       index: 13,
@@ -102,9 +139,9 @@ export const simpleDiagnosisScript = [
       type: "options",
       backgroundImage: require("../../assets/Images/simple-3.png"),
       options: [
-        { text: "나를 찾으러 왔어 ", score: 0, nextIndex: 16 },
-        { text: "사랑 찾아 왔어 💕", score: 0, nextIndex: 16 },
-        { text: "요즘 다 재미가 없어서,,", score: 1, nextIndex: 16 },
+        { text: "나를 찾으러 왔어 ",nextType: "story", score: 0, nextIndex: 16 },
+        { text: "사랑 찾아 왔어 💕",nextType: "story", score: 0, nextIndex: 16 },
+        { text: "요즘 다 재미가 없어서,,", nextType: "story",score: 1, nextIndex: 16 },
       ],
     },
     {
@@ -126,15 +163,15 @@ export const simpleDiagnosisScript = [
       type: "options",
       backgroundImage: require("../../assets/Images/simple-3.png"),
       options: [
-        { text: "응!", score: 0, nextIndex: 19 },
-        { text: "아니, 그치만 새 관심사를 요즘 찾아가는 중이야", score: 0, nextIndex: 21 },
-        { text: "아니, 요즘 아무것도 안 하고 싶어..,", score: 2, nextIndex: 22 },
+        { text: "응!", nextType: "story",score: 0, nextIndex: 19 },
+        { text: "아니, 그치만 새 관심사를 요즘 찾아가는 중이야", nextType: "story",score: 0, nextIndex: 21 },
+        { text: "아니, 요즘 아무것도 안 하고 싶어..,", nextType: "story",score: 2, nextIndex: 22 },
       ],
     },
     {
       index: 19,
       type: "navigate",
-      navigateTo: "Interest",
+      navigateTo: "SignUpStep1", // 수정필요요
     },
     {
       index: 20,
@@ -169,9 +206,9 @@ export const simpleDiagnosisScript = [
         type: "options",
         backgroundImage: require("../../assets/Images/simple-5.png"),
         options: [
-            { text: "응 좋아 나도 배고팠어!", score: 0, nextIndex: 25 },
-            { text: "요즘 이상하게 계속 배가 고파,\n두 그릇도 가능해", score: 1, nextIndex: 25 },
-            { text: "나 요즘 입맛이 없어서 조금만 먹을게", score: 1, nextIndex: 25 },
+            { text: "응 좋아 나도 배고팠어!", nextType: "story",score: 0, nextIndex: 25 },
+            { text: "요즘 이상하게 계속 배가 고파,\n두 그릇도 가능해",nextType: "story", score: 1, nextIndex: 25 },
+            { text: "나 요즘 입맛이 없어서 조금만 먹을게", nextType: "story",score: 1, nextIndex: 25 },
         ],
     },
     {
@@ -200,8 +237,8 @@ export const simpleDiagnosisScript = [
     type: "options",
     backgroundImage: require("../../assets/Images/simple-6.png"),
     options: [
-        { text: "웅, 알겠어. 고마워", score: 0, nextIndex: 29 },
-        { text: "헐.. 감동이야 😭", score: 0, nextIndex: 29 },
+        { text: "웅, 알겠어. 고마워", nextType: "story",score: 0, nextIndex: 29 },
+        { text: "헐.. 감동이야 😭", nextType: "story",score: 0, nextIndex: 29 },
     ],
     },
     {
@@ -216,9 +253,9 @@ export const simpleDiagnosisScript = [
     type: "options",
     backgroundImage: require("../../assets/Images/simple-7.png"),
     options: [
-        { text: "나도 비오면 좀 센치해져", score: 0, nextIndex: 31 },
-        { text: "나는 비 오는 날 좋아!", score: 0, nextIndex: 31 },
-        { text: "난 비 오지 않아도 우울해...", score: 2, nextIndex: 31 },
+        { text: "나도 비오면 좀 센치해져", nextType: "story",score: 0, nextIndex: 31 },
+        { text: "나는 비 오는 날 좋아!", nextType: "story",score: 0, nextIndex: 31 },
+        { text: "난 비 오지 않아도 우울해...", nextType: "story",score: 2, nextIndex: 31 },
         ],
     },
     {
@@ -231,7 +268,7 @@ export const simpleDiagnosisScript = [
     {
         index: 32,
         type: "navigate",
-        navigateTo: "Game",
+        navigateTo: "Home",
     },
     {
         index: 33,
@@ -252,9 +289,9 @@ export const simpleDiagnosisScript = [
         type: "options",
         backgroundImage: require("../../assets/Images/simple-8.png"),
         options: [
-            { text: "아무생각이 없다", score: 0, nextIndex: 36 },
-            { text: "아니, 나 오늘 정말 알찬 하루였어! 재밌다,,", score: 0, nextIndex: 36 },
-            { text: "내가 오늘 혹시 뭐 실수하진 않았을까?\n걱정이야", score: 1, nextIndex: 36 },
+            { text: "아무생각이 없다", nextType: "story",score: 0, nextIndex: 36 },
+            { text: "아니, 나 오늘 정말 알찬 하루였어! 재밌다,,", nextType: "story",score: 0, nextIndex: 36 },
+            { text: "내가 오늘 혹시 뭐 실수하진 않았을까?\n걱정이야", nextType: "story",score: 1, nextIndex: 36 },
         ],
     },
     {
@@ -276,9 +313,9 @@ export const simpleDiagnosisScript = [
         type: "options",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
-            { text: "완전 푹 잤어!", score: 0, nextIndex: 39 },
-            { text: "아니, 요즘 잠을 잘 못 자", score: 1, nextIndex: 39 },
-            { text: "요즘 잠에서 깨는 게 너무 어려워,,", score: 1, nextIndex: 39 },
+            { text: "완전 푹 잤어!",nextType: "story", score: 0, nextIndex: 39 },
+            { text: "아니, 요즘 잠을 잘 못 자",nextType: "story", score: 1, nextIndex: 39 },
+            { text: "요즘 잠에서 깨는 게 너무 어려워,,", nextType: "story",score: 1, nextIndex: 39 },
         ],
     },
     {
@@ -293,9 +330,9 @@ export const simpleDiagnosisScript = [
         type: "options",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
-            { text: "나도 완전 기대돼 ~", score: 0, nextIndex: 41 },
-            { text: "그게 그거지 뭐...", score: 1, nextIndex: 41 },
-            { text: "벌써 피곤한 기분이야", score: 2, nextIndex: 41 },
+            { text: "나도 완전 기대돼 ~", nextType: "story",score: 0, nextIndex: 41 },
+            { text: "그게 그거지 뭐...", nextType: "story",score: 1, nextIndex: 41 },
+            { text: "벌써 피곤한 기분이야", nextType: "story",score: 2, nextIndex: 41 },
         ],
     },
     {

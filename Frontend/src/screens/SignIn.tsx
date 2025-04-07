@@ -1,6 +1,9 @@
 import React from "react";
 import { Text, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
 import signInStyles from "../styles/signInStyles";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 
 interface SignInProps {
     isVisible: boolean;
@@ -8,6 +11,13 @@ interface SignInProps {
 }
 
 const SignIn = ({ isVisible, onClose }: SignInProps) => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+    const goBack = () => {
+        navigation.navigate('SimpleDiagnosis', { initialIndex: 4 });
+    };
+
+
     return (
         <Modal
             visible={isVisible}
@@ -32,7 +42,7 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
                             </View>
 
                             <View style={signInStyles.row}>
-                                <TouchableOpacity style={signInStyles.backButton} onPress={onClose}>
+                                <TouchableOpacity style={signInStyles.backButton} onPress={goBack}>
                                     <Text style={signInStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={signInStyles.signInButton} onPress={() => { }}>
