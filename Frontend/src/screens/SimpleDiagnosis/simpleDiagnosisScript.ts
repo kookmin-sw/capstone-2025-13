@@ -6,33 +6,37 @@ type StorySegment = {
     name?: string;
     text?: string;
     backgroundImage?: any;
+    options?: ChoiceOption[]
   };
   
   type ChoiceOption = {
     text: string;
-    nextType: "story" | "navigate"; 
-    nextIndex?: number;              
-    navigateTo?: keyof RootStackParamList; 
+    nextType: "story" | "navigate" | "options";
+    nextIndex?: number;
+    navigateTo?: {
+        screen: keyof RootStackParamList;
+        params?: any;
+    };
     score?: number;
-  };
-  
-  
-  type ChoiceSegment = {
-    index: number;
-    type: "options";
-    options: ChoiceOption[];
-    backgroundImage?: any;
-  };
-  
-  type NavigateSegment = {
-    index: number;
-    type: "navigate";
-    navigateTo: keyof RootStackParamList;
-    backgroundImage?: any;
-  };
-  
-  type ScriptSegment = StorySegment | ChoiceSegment | NavigateSegment;
-  
+};
+
+
+type ChoiceSegment = {
+  index: number;
+  type: "options";
+  options: ChoiceOption[];
+  backgroundImage?: any;
+};
+
+type NavigateSegment = {
+  index: number;
+  type: "navigate";
+  navigateTo: keyof RootStackParamList;
+  backgroundImage?: any;
+};
+
+type ScriptSegment = StorySegment | ChoiceSegment | NavigateSegment;
+
 
 export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
@@ -68,7 +72,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
         type: "options",
         backgroundImage: require("../../assets/Images/simple-3.png"),
         options: [
-          { text: "네", nextType: "navigate", navigateTo: "SignIn" },
+          { text: "네", nextType: "navigate", navigateTo: { screen: "SignIn" } },
           { text: "아니요", nextType: "story", nextIndex: 6 },
         ],
       },
@@ -118,7 +122,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
       index: 12,
       type: "navigate",
-      navigateTo: "SignUpStep1", //수정
+      navigateTo: "SignUpStep3", 
     },
     {
       index: 13,

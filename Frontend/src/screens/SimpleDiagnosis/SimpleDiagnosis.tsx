@@ -15,6 +15,9 @@ const SimpleDiagnosis = () => {
     const route = useRoute<SimpleDiagnosisRouteProp>();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+    const nickname = route.params?.nickname ?? null;
+    const birthdate = route.params?.birthdate ?? null;
+    const gender = route.params?.gender ?? null;
 
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
     const [score, setScore] = useState(0);
@@ -25,15 +28,21 @@ const SimpleDiagnosis = () => {
         }
     }, [route.params?.initialIndex]);
 
-
     const currentSegment = simpleDiagnosisScript[currentSegmentIndex] as {
         type: "navigate" | "story";
         navigateTo?: { screen: keyof RootStackParamList; params: any };
-        options?: { text: string; score?: number; nextIndex?: number }[];
+        options?: { text: string; score?: number; nextIndex?: number; nextType?: "navigate" | "story" | "options"; navigateTo?: any }[];
         backgroundImage?: any;
         name?: string;
         text?: string;
     };
+
+    const buildParams = (baseParams: any = {}) => ({
+        ...baseParams,
+        ...(nickname && { nickname }),
+        ...(birthdate && { birthdate }),
+        ...(gender && { gender }),
+    });
 
     useEffect(() => {
         if (
@@ -43,29 +52,30 @@ const SimpleDiagnosis = () => {
             'screen' in currentSegment.navigateTo &&
             'params' in currentSegment.navigateTo
         ) {
-            navigation.navigate(currentSegment.navigateTo.screen, currentSegment.navigateTo.params);
+            navigation.navigate(
+                currentSegment.navigateTo.screen,
+                buildParams(currentSegment.navigateTo.params)
+            );
         }
-
     }, [currentSegment]);
 
     const handleChoice = (choiceIndex: number) => {
         const selectedChoice = currentSegment.options?.[choiceIndex];
 
-        // 점수 누적
         if (selectedChoice && 'score' in selectedChoice) {
             setScore(prevScore => prevScore + (selectedChoice.score ?? 0));
         }
 
-        // 다음으로 이동
         if (selectedChoice && selectedChoice.nextIndex !== undefined) {
             setCurrentSegmentIndex(selectedChoice.nextIndex);
         }
     };
+
     return (
         <ImageBackground
             source={currentSegment.backgroundImage || require("../../assets/Images/simple-1.png")}
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-            resizeMode="cover" // 이미지 크기 조절 (cover, contain 등 가능)
+            resizeMode="cover"
         >
             {currentSegment.type === "story" ? (
                 <DialogueBox
@@ -79,16 +89,17 @@ const SimpleDiagnosis = () => {
                             if (typeof navigateTo === "string") {
                                 navigation.navigate(
                                     navigateTo as "SimpleDiagnosis",
-                                    { initialIndex: currentSegmentIndex + 1 }
+                                    buildParams({ initialIndex: currentSegmentIndex + 1 })
                                 );
                             } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
-                                navigation.navigate((navigateTo as { screen: keyof RootStackParamList; params: any }).screen, (navigateTo as { screen: keyof RootStackParamList; params: any }).params);
+                                const to = navigateTo as { screen: keyof RootStackParamList; params?: any };
+                                navigation.navigate(to.screen, buildParams(to.params));
                             }
+
                         } else {
                             setCurrentSegmentIndex(currentSegmentIndex + 1);
                         }
                     }}
-
                 />
             ) : (
                 <View
@@ -106,8 +117,8 @@ const SimpleDiagnosis = () => {
                             onSelect={(option) => {
                                 if (option.nextType === "navigate" && option.navigateTo) {
                                     navigation.navigate(
-                                        (option.navigateTo as any).screen || option.navigateTo,
-                                        (option.navigateTo as any).params || undefined
+                                        option.navigateTo.screen || option.navigateTo,
+                                        buildParams(option.navigateTo.params || {})
                                     );
                                 } else if (option.nextType === "story" && typeof option.nextIndex === "number") {
                                     setCurrentSegmentIndex(option.nextIndex);
@@ -117,10 +128,8 @@ const SimpleDiagnosis = () => {
                     )}
                 </View>
             )}
-
-
         </ImageBackground>
-    )
-}
+    );
+};
 
 export default SimpleDiagnosis;

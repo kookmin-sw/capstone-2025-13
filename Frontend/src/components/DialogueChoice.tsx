@@ -1,12 +1,16 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import dialogueChoiceStyles from "../styles/dialogueChoiceStyles";
+import { RootStackParamList } from "../App";
 
 type Option = {
     text: string;
-    nextType?: "navigate" | "story";
+    nextType?: "navigate" | "story" | "options";
     nextIndex?: number;
-    navigateTo?: any;
+    navigateTo?: {
+        screen: keyof RootStackParamList;
+        params?: any;
+    };
     score?: number;
 };
 

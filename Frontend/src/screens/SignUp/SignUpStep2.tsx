@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import signUpStyles from "../../styles/signUpStyles";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 
@@ -19,6 +19,7 @@ interface SignInProps {
     onClose: () => void;
 }
 type SignUpStep2NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep2">;
+type SignUpStep2RouteProp = RouteProp<RootStackParamList, "SignUpStep2">;
 
 const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
     const navigation = useNavigation<SignUpStep2NavigationProp>();
@@ -26,7 +27,10 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
     const [date, setDate] = useState(new Date());
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isMale, setIsMale] = useState(true);
+    const route = useRoute<SignUpStep2RouteProp>();
 
+    const { nickname } = route.params;
+    console.log("nickname", nickname);
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
 
@@ -94,7 +98,12 @@ const SignUpStep2 = ({ isVisible, onClose }: SignInProps) => {
                                 <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9 })}>
                                     <Text style={signUpStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={signUpStyles.signUpButton} onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 11 })}>
+                                <TouchableOpacity style={signUpStyles.signUpButton}
+                                    onPress={() => navigation.navigate('SimpleDiagnosis', {
+                                        initialIndex: 11, nickname, birthdate: date.toISOString().slice(0, 10),
+                                        gender: isMale ? "남자" : "여자",
+                                    })}
+                                >
                                     <Text style={signUpStyles.signUpText}>확인</Text>
                                 </TouchableOpacity>
                             </View>

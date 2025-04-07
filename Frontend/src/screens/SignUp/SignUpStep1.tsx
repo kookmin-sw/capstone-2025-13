@@ -7,6 +7,7 @@ import type { RootStackParamList } from "../../App";
 
 type SignUpStep1NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep1">;
 
+
 const SignUpStep1 = () => {
     const navigation = useNavigation<SignUpStep1NavigationProp>();
     const [nickname, setNickname] = useState("");
@@ -30,7 +31,7 @@ const SignUpStep1 = () => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={signUpStyles.signUpButton}
-                        onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9 })}
+                        onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9, nickname })}
                     >
                         <Text style={signUpStyles.signUpText}>확인</Text>
                     </TouchableOpacity>
