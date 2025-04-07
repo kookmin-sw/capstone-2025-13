@@ -13,6 +13,10 @@ const SignUpStep3 = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const isCorrectPassword = password === confirmPassword;
+    const isValidEmail = email.includes("@") && email.includes(".");
+    const isFormValid = isValidEmail && isCorrectPassword && email && password && confirmPassword;
+
     return (
         <View style={signUpStyles.overlay}>
             <View style={signUpStyles.container}>
@@ -46,16 +50,24 @@ const SignUpStep3 = () => {
                         onChangeText={setConfirmPassword}
                     />
                 </View>
+                <Text style={signUpStyles.errorText}>
+                    {isCorrectPassword ? "" : "비밀번호가 일치하지 않습니다."}
+                </Text>
                 <View style={signUpStyles.row}>
                     <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
                         <Text style={signUpStyles.backText}>뒤로가기</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={signUpStyles.signUpButton}
-                        onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9 })}
+                        style={[
+                            signUpStyles.signUpButton,
+                            !isFormValid && { opacity: 0.5 }
+                        ]}
+                        onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 13 })}
+                        disabled={!isFormValid}
                     >
                         <Text style={signUpStyles.signUpText}>확인</Text>
                     </TouchableOpacity>
+
                 </View>
             </View>
         </View >

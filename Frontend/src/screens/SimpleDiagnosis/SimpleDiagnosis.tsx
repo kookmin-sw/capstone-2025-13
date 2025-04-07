@@ -8,6 +8,7 @@ import { simpleDiagnosisScript } from "./simpleDiagnosisScript";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import DialogueQuestionBox from "../../components/DialogueQuestionBox";
 
 type SimpleDiagnosisRouteProp = RouteProp<RootStackParamList, 'SimpleDiagnosis'>;
 
@@ -111,6 +112,8 @@ const SimpleDiagnosis = () => {
                         width: "100%",
                     }}
                 >
+                    {currentSegmentIndex === 35 ?
+                        <DialogueQuestionBox /> : <></>}
                     {currentSegment.options && (
                         <DialogueChoice
                             options={currentSegment.options || []}

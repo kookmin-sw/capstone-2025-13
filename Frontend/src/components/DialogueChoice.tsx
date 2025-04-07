@@ -21,7 +21,7 @@ interface DialogueChoiceProps {
 
 const DialogueChoice = ({ options, onSelect }: DialogueChoiceProps) => {
     return (
-        <>
+        <View style={dialogueChoiceStyles.container}>
             {options.map((option, index) => (
                 <View key={index} style={dialogueChoiceStyles.dialogueBox}>
                     <TouchableOpacity
@@ -38,7 +38,7 @@ const DialogueChoice = ({ options, onSelect }: DialogueChoiceProps) => {
                     </TouchableOpacity>
                 </View>
             ))}
-        </>
+        </View>
     );
 };
 

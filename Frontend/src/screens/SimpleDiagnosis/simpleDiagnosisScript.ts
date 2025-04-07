@@ -141,7 +141,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
       index: 15,
       type: "options",
-      backgroundImage: require("../../assets/Images/simple-3.png"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       options: [
         { text: "나를 찾으러 왔어 ",nextType: "story", score: 0, nextIndex: 16 },
         { text: "사랑 찾아 왔어 💕",nextType: "story", score: 0, nextIndex: 16 },
@@ -272,7 +272,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
         index: 32,
         type: "navigate",
-        navigateTo: "Home",
+        navigateTo: "Game",
     },
     {
         index: 33,
@@ -295,7 +295,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
         options: [
             { text: "아무생각이 없다", nextType: "story",score: 0, nextIndex: 36 },
             { text: "아니, 나 오늘 정말 알찬 하루였어! 재밌다,,", nextType: "story",score: 0, nextIndex: 36 },
-            { text: "내가 오늘 혹시 뭐 실수하진 않았을까?\n걱정이야", nextType: "story",score: 1, nextIndex: 36 },
+            { text: "내가 오늘 혹시 뭐 실수하진\n 않았을까?걱정이야", nextType: "story",score: 1, nextIndex: 36 },
         ],
     },
     {
@@ -313,48 +313,55 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
         text: "(아침이 밝았다)",
     },
     {
-        index: 38,
+      index:38,
+      type: "story",
+      backgroundImage: require("../../assets/Images/simple-10.png"),
+      name: "세잎이",
+      text: "잘잤어?",
+  },
+    {
+        index: 39,
         type: "options",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
-            { text: "완전 푹 잤어!",nextType: "story", score: 0, nextIndex: 39 },
-            { text: "아니, 요즘 잠을 잘 못 자",nextType: "story", score: 1, nextIndex: 39 },
-            { text: "요즘 잠에서 깨는 게 너무 어려워,,", nextType: "story",score: 1, nextIndex: 39 },
+            { text: "완전 푹 잤어!",nextType: "story", score: 0, nextIndex: 40 },
+            { text: "아니, 요즘 잠을 잘 못 자",nextType: "story", score: 1, nextIndex: 40 },
+            { text: "요즘 잠에서 깨는 게 너무 어려워,,", nextType: "story",score: 1, nextIndex: 40 },
         ],
     },
     {
-        index:39,
+        index:40,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "세잎이",
         text: "그렇구나!\n나는 오늘 하루 너무 기대 돼\n너는 어때?",
     },
     {
-        index: 40,
+        index: 41,
         type: "options",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
-            { text: "나도 완전 기대돼 ~", nextType: "story",score: 0, nextIndex: 41 },
-            { text: "그게 그거지 뭐...", nextType: "story",score: 1, nextIndex: 41 },
-            { text: "벌써 피곤한 기분이야", nextType: "story",score: 2, nextIndex: 41 },
+            { text: "나도 완전 기대돼 ~", nextType: "story",score: 0, nextIndex: 42 },
+            { text: "그게 그거지 뭐...", nextType: "story",score: 1, nextIndex: 42 },
+            { text: "벌써 피곤한 기분이야", nextType: "story",score: 2, nextIndex: 42 },
         ],
     },
     {
-        index:41,
+        index:42,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "세잎이",
         text: "그렇구나!\n그럼 이제 다시 여행 떠나는 거야?",
     },
     {
-        index: 42,
+        index: 43,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "나",
         text: "엉\n재워줘서 고마워 안녕!\n또 보자!",
     },
     {
-        index: 43,
+        index: 44,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-1.png"),
         name: "나나",

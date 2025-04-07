@@ -7,6 +7,7 @@ import SignUpStep1 from './screens/SignUp/SignUpStep1';
 import SignUpStep2 from './screens/SignUp/SignUpStep2';
 import SimpleDiagnosis from './screens/SimpleDiagnosis/SimpleDiagnosis';
 import SignUpStep3 from './screens/SignUp/SignUpStep3';
+import Game from './screens/Game';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -15,6 +16,7 @@ export type RootStackParamList = {
     SimpleDiagnosis: { initialIndex: number; nickname?: string; birthdate?: string; gender?: string };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthdate: string; gender: string };
+    Game: undefined
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -22,7 +24,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="SimpleDiagnosis">
+            <Stack.Navigator initialRouteName="Game">
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
                 <Stack.Screen name="SignIn" options={{ headerShown: false }}>
                     {() => <SignIn isVisible={true} onClose={() => { }} />}
@@ -35,6 +37,9 @@ export default function App() {
                     {() => <SignUpStep3 />}
                 </Stack.Screen>
                 <Stack.Screen name="SimpleDiagnosis" options={{ headerShown: false }} component={SimpleDiagnosis} />
+                <Stack.Screen name="Game" options={{ headerShown: false }}>
+                    {() => <Game />}
+                </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
     );
