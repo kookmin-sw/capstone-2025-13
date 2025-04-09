@@ -26,7 +26,7 @@ data class User(
     var email: String? = null,
 
     @Column(nullable = false, length = 255, name = "password")
-    var _password: String? = null,
+    private var password: String? = null,
 
     @Column(nullable = false)
     var roles: String? = null,
@@ -55,7 +55,12 @@ data class User(
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 
-    override fun getPassword(): String = _password ?: ""
+    override fun getPassword(): String {
+        return password ?: ""
+    }
+    fun setPassword(password: String) {
+        this.password = password
+    }
     override fun isEnabled(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isAccountNonExpired(): Boolean = true
