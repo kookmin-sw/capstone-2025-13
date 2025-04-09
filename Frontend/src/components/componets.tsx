@@ -1,1 +1,1 @@
-const componets = {}
+const componets = {};
