@@ -27,11 +27,11 @@ export default function App() {
             <Stack.Navigator initialRouteName="SimpleDiagnosis">
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
                 <Stack.Screen name="SignIn" options={{ headerShown: false }}>
-                    {() => <SignIn isVisible={true} onClose={() => { }} />}
+                    {() => <SignIn/>}
                 </Stack.Screen>
                 <Stack.Screen name="SignUpStep1" options={{ headerShown: false }} component={SignUpStep1} />
                 <Stack.Screen name="SignUpStep2" options={{ headerShown: false }}>
-                    {() => <SignUpStep2 isVisible={true} onClose={() => { }} />}
+                    {() => <SignUpStep2 />}
                 </Stack.Screen>
                 <Stack.Screen name="SignUpStep3" options={{ headerShown: false }}>
                     {() => <SignUpStep3 />}
