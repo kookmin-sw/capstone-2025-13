@@ -1,16 +1,22 @@
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
+import {
+    Text,
+    View,
+    TouchableOpacity,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Keyboard,
+    ImageBackground
+} from "react-native";
 import signInStyles from "../styles/signInStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 
-interface SignInProps {
-    isVisible: boolean;
-    onClose: () => void;
-}
-
-const SignIn = ({ isVisible, onClose }: SignInProps) => {
+const SignIn = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const goBack = () => {
@@ -21,15 +27,17 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
     const [password, setPassword] = useState("");
 
     return (
-        <Modal
-            visible={isVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-            <TouchableWithoutFeedback onPress={onClose}>
-                <View style={signInStyles.overlay}>
-                    <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <ImageBackground
+                    source={require("../assets/Images/simple-3.png")}
+                    style={{ flex: 1 }}
+                    resizeMode="cover"
+                >
+                    <ScrollView contentContainerStyle={signInStyles.overlay}>
                         <View style={signInStyles.container}>
                             <Text style={signInStyles.title}>로그인</Text>
 
@@ -63,10 +71,10 @@ const SignIn = ({ isVisible, onClose }: SignInProps) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </TouchableWithoutFeedback>
-                </View>
-            </TouchableWithoutFeedback >
-        </Modal >
+                    </ScrollView>
+                </ImageBackground>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 };
 
