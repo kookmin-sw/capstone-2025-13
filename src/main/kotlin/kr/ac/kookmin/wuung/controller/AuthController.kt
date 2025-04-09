@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
+import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -42,6 +44,7 @@ data class SignUpResponse(val accessToken: String, val refreshToken: String)
 class AuthController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
+    @Autowired private val refreshTokenRepository: RefreshTokenRepository,
     @Autowired private val jwtProvider: JwtProvider,
     @Autowired private val tokenService: TokenService,
     @Autowired private val passwordEncoder: PasswordEncoder
@@ -68,6 +71,12 @@ class AuthController(
        val accessToken = jwtProvider.generateAccessToken(user)
        val refreshToken = jwtProvider.generateRefreshToken(user)
 
+       refreshTokenRepository.save(RefreshToken(
+           token = refreshToken,
+           user = user,
+           expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
+       ))
+
        return ResponseEntity.ok(LoginResponse(accessToken, refreshToken))
    }
 
@@ -89,14 +98,19 @@ class AuthController(
         return tokenService.findByToken(requestRefreshToken).map { refreshToken ->
             try {
                 tokenService.verifyExpiration(refreshToken)
-                val user = refreshToken.user ?: return@map ResponseEntity.badRequest().build()
-                val accessToken = jwtProvider.generateAccessToken(user)
+                val user = refreshToken.user
 
-                ResponseEntity.ok(TokenRefreshResponse(accessToken, requestRefreshToken))
+                println(user)
+
+                user?.let {
+                    val accessToken = jwtProvider.generateAccessToken(it)
+
+                    ResponseEntity.ok(TokenRefreshResponse(accessToken, requestRefreshToken))
+                } ?: ResponseEntity.badRequest().body<TokenRefreshResponse>(null)
             } catch(e: Exception) {
                 ResponseEntity.badRequest().body<TokenRefreshResponse>(null)
             }
-        }.orElse(ResponseEntity.badRequest().build())
+        }.orElse(ResponseEntity.status(403).build())
     }
 
     @PostMapping("/logout")
@@ -167,6 +181,12 @@ class AuthController(
         // 사용자가 회원가입과 동시에 로그인한 것처럼 JWT 토큰 생성 (필요에 따라 토큰 발급 여부 조정)
         val accessToken = jwtProvider.generateAccessToken(newUser)
         val refreshToken = jwtProvider.generateRefreshToken(newUser)
+
+        refreshTokenRepository.save(RefreshToken(
+            token = refreshToken,
+            user = newUser,
+            expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
+        ))
 
         // 생성된 토큰을 포함한 응답 전송
         return ResponseEntity.ok(SignUpResponse(accessToken, refreshToken))
