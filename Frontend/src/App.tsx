@@ -33,7 +33,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "SignIn"}>
+            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}>
                 <Stack.Screen
                     name="Home"
                     component={Home}
