@@ -6,11 +6,19 @@ import { useCustomFonts } from "../hooks/useCustomFonts";
 interface DialogueBoxProps {
     name: string;
     text: string;
+    onPress: () => void;
 }
 
-const DialogueBox = ({ name, text }: DialogueBoxProps) => {
+const DialogueBox = ({ name, text, onPress }: DialogueBoxProps) => {
     const fontsLoaded = useCustomFonts();
-    if (!fontsLoaded) return null;
+    if (!fontsLoaded) {
+        return (
+            <View>
+
+            </View>
+        );
+    }
+
 
     return (
         <View style={dialogueBoxStyles.dialogueBox}>
@@ -19,7 +27,7 @@ const DialogueBox = ({ name, text }: DialogueBoxProps) => {
             </View>
             <View style={dialogueBoxStyles.dialogueTextBox}>
                 <Text style={dialogueBoxStyles.dialogueText}>{text}</Text>
-                <TouchableOpacity style={dialogueBoxStyles.button} onPress={() => alert("눌렀다!")}>
+                <TouchableOpacity style={dialogueBoxStyles.button} onPress={onPress}>
                     <View style={dialogueBoxStyles.triangle} />
                 </TouchableOpacity>
             </View>

@@ -3,30 +3,32 @@ import colors from "../constants/colors";
 import fonts from "../constants/fonts";
 
 const dialogueChoiceStyles = StyleSheet.create({
-    dialogueBox: {
+    container: {
         width: "100%",
-        height: "15%",
-        marginVertical: 20,
+        position: "absolute",
+        bottom: 0,
+        paddingBottom: 30,
+        alignItems: "center",
+    },
+    dialogueBox: {
+        width: "90%",
+        marginVertical: 10,
     },
     dialogueTextBox: {
-        position: "relative",
-        padding: 50,
-        width: "100%",
-        height: "100%",
+        justifyContent: "center",
+        padding: 20,
         backgroundColor: colors.background,
-        borderRadius: 20
-
+        borderRadius: 20,
     },
     dialogueText: {
         fontSize: 16,
         color: "black",
         fontFamily: fonts.dialogue,
+        textAlign: "center",
     },
     button: {
-        alignContent: "center",
-        justifyContent: "center",
         position: "absolute",
-        bottom: 40,
+        bottom: 20,
         right: 20,
         zIndex: 10,
     },

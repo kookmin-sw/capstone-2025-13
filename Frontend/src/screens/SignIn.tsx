@@ -1,49 +1,80 @@
-import React from "react";
-import { Text, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
+import React, { useState } from "react";
+import {
+    Text,
+    View,
+    TouchableOpacity,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Keyboard,
+    ImageBackground
+} from "react-native";
 import signInStyles from "../styles/signInStyles";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 
-interface SignInProps {
-    isVisible: boolean;
-    onClose: () => void;
-}
+const SignIn = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-const SignIn = ({ isVisible, onClose }: SignInProps) => {
+    const goBack = () => {
+        navigation.navigate('SimpleDiagnosis', { initialIndex: 4 });
+    };
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
     return (
-        <Modal
-            visible={isVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-            <TouchableWithoutFeedback onPress={onClose}>
-                <View style={signInStyles.overlay}>
-                    <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <ImageBackground
+                    source={require("../assets/Images/simple-3.png")}
+                    style={{ flex: 1 }}
+                    resizeMode="cover"
+                >
+                    <ScrollView contentContainerStyle={signInStyles.overlay}>
                         <View style={signInStyles.container}>
                             <Text style={signInStyles.title}>로그인</Text>
 
                             <View style={signInStyles.inputContainer}>
                                 <Text style={signInStyles.inputTitle}>이메일</Text>
-                                <TextInput placeholder="이메일" style={signInStyles.input} />
+                                <TextInput
+                                    placeholder="이메일"
+                                    style={signInStyles.input}
+                                    value={email}
+                                    onChangeText={setEmail}
+                                />
                             </View>
 
                             <View style={signInStyles.inputContainer}>
                                 <Text style={signInStyles.inputTitle}>비밀번호</Text>
-                                <TextInput placeholder="비밀번호" secureTextEntry style={signInStyles.input} />
+                                <TextInput
+                                    placeholder="비밀번호"
+                                    secureTextEntry
+                                    style={signInStyles.input}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
                             </View>
 
                             <View style={signInStyles.row}>
-                                <TouchableOpacity style={signInStyles.backButton} onPress={onClose}>
+                                <TouchableOpacity style={signInStyles.backButton} onPress={goBack}>
                                     <Text style={signInStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={signInStyles.signInButton} onPress={() => { }}>
+                                <TouchableOpacity style={signInStyles.signInButton} onPress={() => navigation.navigate('Home')}>
                                     <Text style={signInStyles.signInText}>로그인</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </TouchableWithoutFeedback>
-                </View>
-            </TouchableWithoutFeedback >
-        </Modal >
+                    </ScrollView>
+                </ImageBackground>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 };
 
