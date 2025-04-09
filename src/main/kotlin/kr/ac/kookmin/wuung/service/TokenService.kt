@@ -8,7 +8,7 @@ import kr.ac.kookmin.wuung.jwt.JwtProvider
 import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
-import java.time.Instant
+import java.time.LocalDateTime
 import java.util.Optional
 
 @Service
@@ -26,7 +26,7 @@ class TokenService(
         val newRefreshToken = RefreshToken(
             token = refreshToken,
             user = user,
-            expiryDate = Instant.now().plusSeconds(refreshTokenValidity)
+            expiryDate = LocalDateTime.now().plusSeconds(refreshTokenValidity)
         )
 
         refreshTokenRepository.findByUser(user).ifPresent {
@@ -38,7 +38,7 @@ class TokenService(
 
     @Transactional
     fun verifyExpiration(token: RefreshToken): RefreshToken {
-        if(token.expiryDate.isBefore(Instant.now())) {
+        if(token.expiryDate.isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token)
             throw RuntimeException("Refresh token was expired.")
         }
@@ -52,5 +52,9 @@ class TokenService(
 
     fun deleteByUser(user: User) {
         refreshTokenRepository.deleteByUser(user)
+    }
+
+    fun getRefreshTokenValidity(): Long {
+        return refreshTokenValidity
     }
 }
