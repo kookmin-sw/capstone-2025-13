@@ -20,6 +20,7 @@ import kr.ac.kookmin.wuung.jwt.JwtProvider
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.TokenService
+import java.time.LocalDateTime
 
 data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val accessToken: String, val refreshToken: String)
@@ -29,6 +30,10 @@ data class TokenRefreshResponse(val accessToken: String, val refreshToken: Strin
 data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
+
+data class SignUpRequest( val userName: String, val email: String, val _password: String, val sex: Boolean, val age: Long, val birthDate: LocalDateTime)
+
+data class SignUpResponse(val accessToken: String, val refreshToken: String)
 
 @RestController
 @RequestMapping("/auth")
@@ -112,6 +117,58 @@ class AuthController(
         return ResponseEntity.ok("Success")
     }
 
+    @PostMapping("/signup")
+    @Operation(
+        summary = "Sign up new user and generate new tokens",
+        description = "Create new user provided credentials with additional fields and generate tokens for access"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "sign up user",
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = SignUpResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "sign up failed",
+                content = [Content(schema = Schema(implementation = java.lang.Exception::class))]
+            )
+        ]
+    )
+    fun signUpUser(
+        @RequestBody signUpRequest: SignUpRequest
+    ): ResponseEntity<SignUpResponse>{
+
+        // 이메일 중복 여부 검사
+        if (userRepository.findByEmail(signUpRequest.email).isPresent) {
+            return ResponseEntity.badRequest().build()  // 혹은 적절한 오류 메시지를 반환
+        }
+
+        // userName을 UK로 취급할 건가?
+        // 할꺼면 중복 검사 루틴 추가
+
+        // 새 사용자 생성
+        val newUser = User(
+            userName = signUpRequest.userName,
+            email = signUpRequest.email,
+            _password = signUpRequest._password, // 패스워드를 인코딩하는 요소를 뭔가 만들어야할 것 같은데 ... 로그인에서 이걸 고려하는지 모르겠네...? getPassword보니까 아무런 decode 로직도 없는 것 같은데 평문으로 관리하는건가?
+            roles = "ROLE_USER",  // 이게 역할이 뭐가 있는지? 유져랑 마스터, 이런거? 아니면 미정?
+            sex = signUpRequest.sex,
+            age = signUpRequest.age,
+            birthDate = signUpRequest.birthDate
+        )
+
+        // 데이터베이스에 사용자 저장
+        userRepository.save(newUser)
+
+        // 사용자가 회원가입과 동시에 로그인한 것처럼 JWT 토큰 생성 (필요에 따라 토큰 발급 여부 조정)
+        val accessToken = jwtProvider.generateAccessToken(newUser)
+        val refreshToken = jwtProvider.generateRefreshToken(newUser)
+
+        // 생성된 토큰을 포함한 응답 전송
+        return ResponseEntity.ok(SignUpResponse(accessToken, refreshToken))
+    }
 
     @GetMapping("/me")
     @Operation(
