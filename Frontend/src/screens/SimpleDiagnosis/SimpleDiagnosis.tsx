@@ -21,7 +21,7 @@ const SimpleDiagnosis = () => {
     const gender = route.params?.gender ?? null;
 
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
-    const [score, setScore] = useState(0);
+    const [score, setScore] = useState(route.params?.score ?? 0);
 
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
@@ -43,6 +43,7 @@ const SimpleDiagnosis = () => {
         ...(nickname && { nickname }),
         ...(birthdate && { birthdate }),
         ...(gender && { gender }),
+        ...(score !== undefined && { score }),
     });
 
     useEffect(() => {
@@ -60,17 +61,14 @@ const SimpleDiagnosis = () => {
         }
     }, [currentSegment]);
 
-    const handleChoice = (choiceIndex: number) => {
-        const selectedChoice = currentSegment.options?.[choiceIndex];
-
-        if (selectedChoice && 'score' in selectedChoice) {
-            setScore(prevScore => prevScore + (selectedChoice.score ?? 0));
+    useEffect(() => {
+        if (route.params?.initialIndex !== undefined) {
+            setCurrentSegmentIndex(route.params.initialIndex);
         }
-
-        if (selectedChoice && selectedChoice.nextIndex !== undefined) {
-            setCurrentSegmentIndex(selectedChoice.nextIndex);
+        if (route.params?.score !== undefined) {
+            setScore(route.params.score);
         }
-    };
+    }, [route.params?.initialIndex, route.params?.score]);
 
     return (
         <ImageBackground
@@ -94,13 +92,16 @@ const SimpleDiagnosis = () => {
                                 );
                             } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
                                 const to = navigateTo as { screen: keyof RootStackParamList; params?: any };
-                                navigation.navigate(to.screen, buildParams(to.params));
+                                navigation.navigate(to.screen, buildParams({
+                                    ...(to.params || {}),
+                                    score: score,
+                                }));
                             }
-
                         } else {
                             setCurrentSegmentIndex(currentSegmentIndex + 1);
                         }
-                    }}
+                    }
+                    }
                 />
             ) : (
                 <View
@@ -118,6 +119,9 @@ const SimpleDiagnosis = () => {
                         <DialogueChoice
                             options={currentSegment.options || []}
                             onSelect={(option) => {
+                                if (typeof option.score === "number") {
+                                    setScore(prev => prev + (option.score ?? 0));
+                                }
                                 if (option.nextType === "navigate" && option.navigateTo) {
                                     navigation.navigate(
                                         option.navigateTo.screen || option.navigateTo,

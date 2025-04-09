@@ -13,10 +13,10 @@ export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
-    SimpleDiagnosis: { initialIndex: number; nickname?: string; birthdate?: string; gender?: string };
+    SimpleDiagnosis: { initialIndex: number; score?: number; nickname?: string; birthdate?: string; gender?: string };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthdate: string; gender: string };
-    Game: undefined
+    Game: { score?: number };
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
