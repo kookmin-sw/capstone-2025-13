@@ -5,5 +5,5 @@ import kr.ac.kookmin.wuung.model.DiagnosisType
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface DiagnosisRepository : JpaRepository<Diagnosis, Long> {
-    fun findAllByTokenWithType(token: String, type : Long): List<Diagnosis>
+    //fun findByToken(token: String, type : Long): List<Diagnosis>
 }
