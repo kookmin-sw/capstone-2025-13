@@ -165,7 +165,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
     {
       index: 18,
       type: "options",
-      backgroundImage: require("../../assets/Images/simple-3.png"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       options: [
         { text: "응!", nextType: "story",score: 0, nextIndex: 19 },
         { text: "아니, 그치만 새 관심사를 요즘 찾아가는 중이야", nextType: "story",score: 0, nextIndex: 21 },
