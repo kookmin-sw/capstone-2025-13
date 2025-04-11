@@ -1,5 +1,3 @@
-// Header_sky.tsx
-
 import React from "react";
 import { View, Text, StyleSheet, ImageBackground, Dimensions } from "react-native";
 
@@ -8,7 +6,7 @@ interface HeaderSkyProps {
   subtitle?: string;
 }
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default function Header_sky({ title = "퀘스트", subtitle }: HeaderSkyProps) {
   return (
@@ -28,24 +26,25 @@ export default function Header_sky({ title = "퀘스트", subtitle }: HeaderSkyP
 
 const styles = StyleSheet.create({
   background: {
-    width: width,
-    height: 200,
-    paddingLeft:40,
+    width: '100%',
+    height: width * 0.5,               // 반응형 높이 (예: iPhone 기준 약 200)    
     justifyContent: "center",
-    alignItems: "baseline", 
+    alignItems: "flex-start",          // baseline → flex-start로 명확히
   },
   container: {
-    alignItems: "center",
-    justifyContent: "center", 
+    alignItems: "flex-start",
+    justifyContent: "center",
   },
   title: {
-    fontSize: 32,
+    fontSize: width * 0.08,  
+    paddingLeft: width * 0.07,           
     fontWeight: "bold",
     color: "#fff",
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: width * 0.035,
+    paddingLeft: width * 0.07,    
     color: "#fff",
-    marginTop: 4,
+    marginTop: width * 0.01,
   },
 });

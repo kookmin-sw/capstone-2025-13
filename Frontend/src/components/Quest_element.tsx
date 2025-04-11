@@ -1,5 +1,7 @@
 import React from "react";
-import { StyleSheet, Image, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, View, Text, TouchableOpacity, Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 interface QuestElementProps {
   name: string;
@@ -34,9 +36,9 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 8,
+    width: width * 0.25,       // 전체 화면 너비의 25%
+    height: width * 0.25,
+    marginBottom: width * 0.02,
   },
   nameContainer: {
     position: "relative",
@@ -44,14 +46,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   name: {
-    width: 120,
-    height: 40,
+    width: width * 0.3,
+    height: width * 0.1,
     resizeMode: "contain",
   },
   nameText: {
     position: "absolute",
     color: "#fff",
-    fontSize: 16,
+    fontSize: width * 0.04,     // 화면 너비 기준 폰트 크기 (약 15~18 정도)
     fontWeight: "bold",
   },
 });
