@@ -1,7 +1,5 @@
 import org.gradle.kotlin.dsl.withType
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 plugins {
 	kotlin("jvm") version "2.1.10"
@@ -77,27 +75,22 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-val datetimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
-
 tasks.withType<BootBuildImage> {
 	val dockerId = env.DOCKER_USERNAME.orElse("nrt.vultrcr.com/chibot")
-	val dockerPw = env.DOCKER_PASSWORD.orElse("")
+	val buildNumber = env.BUILD_NUMBER.orElse("")
+
 	val dockerName = "wuung-backend"
 	imagePlatform = "linux/amd64"
 
 	docker {
-		publish = true
-		publishRegistry {
-			username = dockerId
-			password = dockerPw
-		}
+		publish = false
 	}
 
 	imageName.set("$dockerId/$dockerName")
 	tags.set(
 		setOf(
 			"$dockerId/$dockerName:latest",
-			"$dockerId/$dockerName:${datetimeFormatter.format(LocalDateTime.now())}"
+			"$dockerId/$dockerName:${buildNumber}"
 		)
 	)
 	buildpacks.set(setOf("docker.io/paketobuildpacks/oracle", "urn:cnb:builder:paketo-buildpacks/java-native-image"))
