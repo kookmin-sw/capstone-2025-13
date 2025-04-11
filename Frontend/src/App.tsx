@@ -8,11 +8,13 @@ import SignUpStep2 from "./screens/SignUp/SignUpStep2";
 import SimpleDiagnosis from "./screens/SimpleDiagnosis/SimpleDiagnosis";
 import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game";
+import Quest from "./screens/Quest";
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
+    Quest: undefined;
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -67,6 +69,11 @@ export default function App() {
                 <Stack.Screen name="Game" options={{ headerShown: false }}>
                     {() => <Game />}
                 </Stack.Screen>
+                <Stack.Screen
+                    name="Quest"
+                    component={Quest}
+                    options={{ headerShown: false }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
