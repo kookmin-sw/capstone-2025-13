@@ -8,8 +8,6 @@ plugins {
 	id("org.springframework.boot") version "3.4.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
-
-	id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
 
 group = "kr.ac.kookmin"
@@ -77,7 +75,7 @@ tasks.withType<Test> {
 
 tasks.withType<BootBuildImage> {
 	val dockerId =
-		System.getenv("DOCKER_USERNAME") ?: env.DOCKER_USERNAME ?: "nrt.vultrcr.com/chibot"
+		System.getenv("DOCKER_USERNAME") ?: "nrt.vultrcr.com/chibot"
 	val buildNumber =
 		System.getenv("BUILD_NUMBER") ?: "test"
 
