@@ -76,8 +76,16 @@ tasks.withType<Test> {
 }
 
 tasks.withType<BootBuildImage> {
-	val dockerId = env.DOCKER_USERNAME.orElse("nrt.vultrcr.com/chibot")
-	val buildNumber = env.BUILD_NUMBER.orElse("")
+	val dockerId = try {
+		env.DOCKER_USERNAME
+	} catch(_: Exception) {
+		System.getenv("DOCKER_USERNAME") ?: "nrt.vultrcr.com/chibot"
+	}
+	val buildNumber = try {
+		env.BUILD_NUMBER
+	} catch(_: Exception) {
+		System.getenv("BUILD_NUMBER") ?: "test"
+	}
 
 	val dockerName = "wuung-backend"
 	imagePlatform = "linux/amd64"
