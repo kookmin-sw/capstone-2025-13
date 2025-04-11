@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width } = Dimensions.get("window");
 
@@ -15,13 +16,14 @@ const headerSkyStyles = StyleSheet.create({
     },
     title: {
       fontSize: width * 0.08,  
-      paddingLeft: width * 0.07,           
-      fontWeight: "bold",
+      paddingLeft: width * 0.07,
+      fontFamily: fonts.extraBold,
       color: "#fff",
     },
     subtitle: {
       fontSize: width * 0.035,
-      paddingLeft: width * 0.07,    
+      paddingLeft: width * 0.07, 
+      fontFamily: fonts.bold,   
       color: "#fff",
       marginTop: width * 0.01,
     },

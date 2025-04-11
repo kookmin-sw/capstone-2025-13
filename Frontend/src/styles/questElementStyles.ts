@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width } = Dimensions.get("window");
 
@@ -25,9 +26,9 @@ const questElementStyles = StyleSheet.create({
     },
     nameText: {
       position: "absolute",
+      fontFamily: fonts.medium,
       color: "#fff",
-      fontSize: width * 0.04,     // 화면 너비 기준 폰트 크기 (약 15~18 정도)
-      fontWeight: "bold",
+      fontSize: width * 0.04,
     },
   });
   
