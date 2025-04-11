@@ -12,7 +12,7 @@ export default function Quest_circle({ style }: QuestCircleProps) {
     <View style={[questCircleStyles .imageContainer, style]}>
       <Image
         source={require("../assets/Images/quest_circle.png")}
-        style={questCircleStyles .image}
+        style={questCircleStyles.image}
         resizeMode="cover"
       />
     </View>
