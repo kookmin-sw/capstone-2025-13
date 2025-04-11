@@ -75,7 +75,7 @@ tasks.withType<Test> {
 
 tasks.withType<BootBuildImage> {
 	val dockerId =
-		System.getenv("DOCKER_USERNAME") ?: "nrt.vultrcr.com/admin"
+		System.getenv("DOCKER_USERNAME") ?: "docker.mori.space"
 	val buildNumber =
 		System.getenv("BUILD_NUMBER") ?: "test"
 
