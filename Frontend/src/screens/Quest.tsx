@@ -61,13 +61,13 @@ export default function Quest() {
           {/* 퀘스트 요소들 */}
           <View style={questStyles.elementsOverlay}>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-start" }]}>
-              <Quest_element name="날 돌아보기" />
+                <Quest_element name="날 돌아보기" subtitle="스스로를 돌아보는 시간이에요." />
             </View>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-end" }]}>
-              <Quest_element name="명상" />
+                <Quest_element name="명상" subtitle="조용한 마음을 가져봐요." />
             </View>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-start" }]}>
-              <Quest_element name="운동" />
+                <Quest_element name="운동" subtitle="몸을 움직여볼까요?" />
             </View>
           </View>
         </View>
