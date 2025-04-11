@@ -100,6 +100,7 @@ tasks.withType<BootBuildImage> {
 		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
 		"BP_JVM_TYPE" to "JDK",
 		"BP_JVM_VERSION" to "21",
+        "SPRING_PROFILES_ACTIVE" to "dev"
 	)
 }
 
