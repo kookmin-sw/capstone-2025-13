@@ -22,13 +22,10 @@ export default function Home() {
                 subtitle="PHQ-9 기반 설문 자가 진단하기"
                 onPress={() => {}}
             />
-            <MenuButton title="일기" onPress={() => {
-                console.log("퀘스트 버튼 눌림!");
-            }} />
+            <MenuButton title="일기" onPress={() => {}} />
             <MenuButton
                 title="퀘스트"
                 onPress={() => {
-                    console.log("퀘스트 버튼 눌림!");
                     navigation.navigate("Quest");
                 }}
             />
