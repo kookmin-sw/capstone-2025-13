@@ -1,19 +1,20 @@
 // Header_sky.tsx
 
 import React from "react";
-import { View, Text, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, Dimensions } from "react-native";
 
 interface HeaderSkyProps {
   title?: string;
   subtitle?: string;
 }
 
+const { width, height } = Dimensions.get("window");
+
 export default function Header_sky({ title = "퀘스트", subtitle }: HeaderSkyProps) {
   return (
     <ImageBackground
       source={require("../assets/Images/header_sky.png")}
       style={styles.background}
-      imageStyle={styles.imageStyle}
     >
       <View style={styles.container}>
         <View>
@@ -27,26 +28,15 @@ export default function Header_sky({ title = "퀘스트", subtitle }: HeaderSkyP
 
 const styles = StyleSheet.create({
   background: {
-    height: 160,
-    paddingTop: 50,
-    paddingHorizontal: 24,
+    width: width,
+    height: 200,
+    paddingLeft:40,
     justifyContent: "center",
-    alignItems: "center", 
-  },
-  imageStyle: {
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    alignItems: "baseline", 
   },
   container: {
-    paddingTop: 50,
-    paddingHorizontal: 24,
-    height: 160,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "100%",
+    alignItems: "center",
+    justifyContent: "center", 
   },
   title: {
     fontSize: 32,
