@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
@@ -10,13 +10,14 @@ import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game";
 import Quest from "./screens/Quest";
 import Quest_stage from "./screens/Quest_stage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { subtitle?: string }; 
+    Quest_stage: { subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -33,7 +34,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
     // 하드코딩된 로그인 상태
-    const [isLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = await AsyncStorage.getItem('accessToken');
+            if (token) {
+                setIsLoggedIn(true);
+                setLoading(false);
+            }
+        };
+        checkToken();
+    }, []);
 
     return (
         <NavigationContainer>

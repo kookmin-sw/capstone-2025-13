@@ -85,6 +85,12 @@ const signInStyles = StyleSheet.create({
         color: colors.white,
         fontFamily: fonts.bold,
     },
+    errorText: {
+        color: colors.red,
+        fontFamily: fonts.light,
+        marginTop: 5,
+        textAlign: "center",
+    },
 });
 
 export default signInStyles;
