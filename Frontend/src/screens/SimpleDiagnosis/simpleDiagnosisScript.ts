@@ -37,8 +37,11 @@ type NavigateSegment = {
 
 type ScriptSegment = StorySegment | ChoiceSegment | NavigateSegment;
 
+interface SimpleDiagnosisScriptProp {
+  nickname: string | null;
+}
 
-export const simpleDiagnosisScript: ScriptSegment[]  = [
+export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): ScriptSegment[] => [
     {
       index: 0,
       type: "story",
@@ -105,7 +108,7 @@ export const simpleDiagnosisScript: ScriptSegment[]  = [
       type: "story",
       backgroundImage: require("../../assets/Images/simple-3.png"),
       name: "세잎이",
-      text: "아 이름이 ~~구나!\n멋진 이름이야!\n너에 대해서 조금 더 알려줘!",
+      text: `아 이름이 ${nickname}(이)구나!\n멋진 이름이야!\n너에 대해서 조금 더 알려줘!`,
     },
     {
       index: 10,

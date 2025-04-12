@@ -4,7 +4,7 @@ import DialogueChoice from "../../components/DialogueChoice";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-import { simpleDiagnosisScript } from "./simpleDiagnosisScript";
+import { SimpleDiagnosisScript } from "./simpleDiagnosisScript";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -23,13 +23,16 @@ const SimpleDiagnosis = () => {
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
     const [score, setScore] = useState(route.params?.score ?? 0);
 
+    const script = SimpleDiagnosisScript({ nickname });
+
+
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
             setCurrentSegmentIndex(route.params.initialIndex);
         }
     }, [route.params?.initialIndex]);
 
-    const currentSegment = simpleDiagnosisScript[currentSegmentIndex] as {
+    const currentSegment = script[currentSegmentIndex] as {
         type: "navigate" | "story";
         navigateTo?: { screen: keyof RootStackParamList; params: any };
         options?: { text: string; score?: number; nextIndex?: number; nextType?: "navigate" | "story" | "options"; navigateTo?: any }[];
@@ -82,7 +85,7 @@ const SimpleDiagnosis = () => {
                     text={currentSegment.text || "No text available"}
                     onPress={() => {
                         const nextIndex = currentSegmentIndex === 21 ? 23 : currentSegmentIndex + 1;
-                        const nextSegment = simpleDiagnosisScript[nextIndex];
+                        const nextSegment = script[nextIndex];
 
                         if (nextSegment?.type === "navigate" && nextSegment.navigateTo) {
                             const navigateTo = nextSegment.navigateTo;
