@@ -1,29 +1,20 @@
+// Quest_circle.tsx
 import React from "react";
-import { StyleSheet, View, Image, Dimensions } from "react-native";
+import { View, Image, ViewStyle } from "react-native";
+import questCircleStyles from "../styles/questCircleStyles";
 
-const { width, height } = Dimensions.get("window");
+interface QuestCircleProps {
+  style?: ViewStyle;
+}
 
-export default function Quest_circle() {
+export default function Quest_circle({ style }: QuestCircleProps) {
   return (
-    <View style={styles.imageContainer}>
+    <View style={[questCircleStyles .imageContainer, style]}>
       <Image
         source={require("../assets/Images/quest_circle.png")}
-        style={styles.image}
+        style={questCircleStyles.image}
         resizeMode="cover"
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-    imageContainer: {
-        width: width,
-        height: 900,
-        alignItems: "center",
-        justifyContent: "flex-end",
-      },
-      image: {
-        width: width,
-        height: height,
-      },
-  });
