@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
 		"DB_PASSWORD" to dotenv["DB_PASSWORD"],
 		"JWT_SIGNING_KEY" to dotenv["JWT_SIGNING_KEY"],
 		"JWT_VALIDATE_KEY" to dotenv["JWT_VALIDATE_KEY"],
+		"HOST_NAME" to dotenv["HOST_NAME"]
 	)
 
 	runApplication<WuungApplication>(*args) {

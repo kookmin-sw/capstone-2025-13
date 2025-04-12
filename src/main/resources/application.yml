@@ -21,3 +21,5 @@ jwt:
   validate-key: ${JWT_VALIDATE_KEY}
   access-token-validity: 900
   refresh-token-validity: 604800
+etc:
+  host: ${HOST_NAME}

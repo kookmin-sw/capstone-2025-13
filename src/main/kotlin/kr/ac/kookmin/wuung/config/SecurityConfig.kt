@@ -17,13 +17,16 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import kr.ac.kookmin.wuung.security.JwtAuthenticationFilter
 import kr.ac.kookmin.wuung.service.UserService
+import org.springframework.beans.factory.annotation.Value
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfig(
     private val userService: UserService,
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    @Value("\${etc.host}")
+    private val host: String
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): DefaultSecurityFilterChain {
@@ -34,7 +37,10 @@ class SecurityConfig(
             .cors {
                 val configuration = CorsConfiguration()
 
-                configuration.allowedOrigins = listOf("http://localhost:3000")
+                val origins = mutableListOf("http://localhost:3000")
+                origins.addAll(host.split(",").mapNotNull { it.trim() })
+
+                configuration.allowedOrigins = origins
                 configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 configuration.allowedHeaders = listOf("Authorization", "Content-Type", "X-CSRF-TOKEN")
                 configuration.allowCredentials = true
