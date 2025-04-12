@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class SwaggerConfig(
-    @Value("\${etc.host")
+    @Value("\${etc.host}")
     private val host: String
 ) {
     private val securitySchemeName = "api token"
