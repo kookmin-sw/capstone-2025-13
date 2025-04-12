@@ -93,11 +93,11 @@ tasks.withType<BootBuildImage> {
 			"$dockerId/$dockerName:${buildNumber}"
 		)
 	)
-	//buildpacks.set(setOf("docker.io/paketobuildpacks/oracle", "urn:cnb:builder:paketo-buildpacks/java-native-image"))
+	buildpacks.set(setOf("docker.io/paketobuildpacks/oracle", "urn:cnb:builder:paketo-buildpacks/java-native-image"))
 
 	environment = mapOf(
-		//"BP_NATIVE_IMAGE" to "true",
-		//"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
+		"BP_NATIVE_IMAGE" to "true",
+		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
 		"BP_JVM_TYPE" to "JDK",
 		"BP_JVM_VERSION" to "21",
         "SPRING_PROFILES_ACTIVE" to "dev"
