@@ -7,4 +7,4 @@ WORKDIR /app
 COPY build/libs/wuung-*-SNAPSHOT.jar app.jar
 
 # Set the entry point
-ENTRYPOINT ["java", "-jar", "app.jar", ""]
+ENTRYPOINT ["java", "-jar", "app.jar"]
