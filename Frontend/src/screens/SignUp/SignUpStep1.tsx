@@ -21,6 +21,7 @@ type SignUpStep1NavigationProp = NativeStackNavigationProp<RootStackParamList, "
 const SignUpStep1 = () => {
     const navigation = useNavigation<SignUpStep1NavigationProp>();
     const [nickname, setNickname] = useState("");
+    const [showError, setShowError] = useState(false);
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -42,16 +43,31 @@ const SignUpStep1 = () => {
                                     onChangeText={setNickname}
                                 />
                             </View>
+                            <Text style={signUpStyles.errorText}>
+                                {showError && !nickname.trim() ? "닉네임을 입력하세요." : ""}
+                            </Text>
+
                             <View style={signUpStyles.row}>
                                 <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
                                     <Text style={signUpStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={signUpStyles.signUpButton}
-                                    onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 9, nickname })}
+                                    onPress={() => {
+                                        if (!nickname.trim()) {
+                                            setShowError(true);
+                                            return;
+                                        }
+                                        setShowError(false);
+                                        navigation.navigate('SimpleDiagnosis', {
+                                            initialIndex: 9,
+                                            nickname,
+                                        });
+                                    }}
                                 >
                                     <Text style={signUpStyles.signUpText}>확인</Text>
                                 </TouchableOpacity>
+
                             </View>
                         </View>
                     </ScrollView>

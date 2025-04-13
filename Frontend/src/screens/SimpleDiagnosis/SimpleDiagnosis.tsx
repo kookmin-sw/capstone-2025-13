@@ -18,13 +18,12 @@ const SimpleDiagnosis = () => {
 
     const nickname = route.params?.nickname ?? null;
     const birthdate = route.params?.birthdate ?? null;
-    const gender = route.params?.gender ?? null;
+    const isMale = route.params?.isMale ?? null;
 
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
     const [score, setScore] = useState(route.params?.score ?? 0);
 
     const script = SimpleDiagnosisScript({ nickname });
-
 
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
@@ -45,7 +44,7 @@ const SimpleDiagnosis = () => {
         ...baseParams,
         ...(nickname && { nickname }),
         ...(birthdate && { birthdate }),
-        ...(gender && { gender }),
+        ...(isMale !== null && { isMale }),
         ...(score !== undefined && { score }),
     });
 

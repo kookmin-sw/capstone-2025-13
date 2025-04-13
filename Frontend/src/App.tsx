@@ -23,10 +23,10 @@ export type RootStackParamList = {
         score?: number;
         nickname?: string;
         birthdate?: string;
-        gender?: string;
+        isMale?: boolean;
     };
     SignUpStep2: { nickname: string };
-    SignUpStep3: { nickname: string; birthdate: string; gender: string };
+    SignUpStep3: { nickname: string; birthdate: string; isMale: boolean };
     Game: { score?: number };
 };
 

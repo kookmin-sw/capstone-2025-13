@@ -1,21 +1,60 @@
 import React, { useState } from "react";
 import { Text, View, TouchableOpacity, TextInput, ImageBackground } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
+import { signUp } from "../../API";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;
+type SignUpStep3RouteProp = RouteProp<RootStackParamList, "SignUpStep3">;
 
 const SignUpStep3 = () => {
     const navigation = useNavigation<SignUpStep3NavigationProp>();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const isCorrectPassword = password === confirmPassword;
-    const isValidEmail = email.includes("@") && email.includes(".");
-    const isFormValid = isValidEmail && isCorrectPassword && email && password && confirmPassword;
+    const route = useRoute<SignUpStep3RouteProp>();
+
+    const { nickname, isMale, birthdate } = route.params;
+
+    const handleSignUp = async () => {
+        if (!email.trim()) {
+            setErrorMessage("이메일을 입력하세요.");
+            return;
+        }
+        if (!email.includes("@") || !email.includes(".")) {
+            setErrorMessage("유효한 이메일 형식을 입력하세요.");
+            return;
+        }
+        if (!password) {
+            setErrorMessage("비밀번호를 입력하세요.");
+            return;
+        }
+        if (!confirmPassword) {
+            setErrorMessage("비밀번호 확인을 입력하세요.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            setErrorMessage("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        // 모든 유효성 검사 통과 시
+       try {
+        await signUp(email, password, nickname, birthdate, isMale);
+        navigation.navigate('SimpleDiagnosis', { initialIndex: 13 });
+    } catch (error) {
+        console.error("회원가입 실패:", error);
+        if ((error as any).response && (error as any).response.status === 400) {
+            setErrorMessage("이미 사용 중인 이메일입니다.");
+        } else {
+            setErrorMessage("회원가입에 실패했습니다. 다시 시도해주세요.");
+        }
+    }
+};
 
     return (
         <ImageBackground
@@ -58,9 +97,10 @@ const SignUpStep3 = () => {
                         />
                     </View>
 
-                    <Text style={signUpStyles.errorText}>
-                        {isCorrectPassword ? "" : "비밀번호가 일치하지 않습니다."}
-                    </Text>
+
+                    {errorMessage !== "" && (
+                        <Text style={signUpStyles.errorText}>{errorMessage}</Text>
+                    )}
 
                     <View style={signUpStyles.row}>
                         <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
@@ -69,10 +109,8 @@ const SignUpStep3 = () => {
                         <TouchableOpacity
                             style={[
                                 signUpStyles.signUpButton,
-                                !isFormValid && { opacity: 0.5 }
                             ]}
-                            onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 13 })}
-                            disabled={!isFormValid}
+                            onPress={handleSignUp}
                         >
                             <Text style={signUpStyles.signUpText}>확인</Text>
                         </TouchableOpacity>
