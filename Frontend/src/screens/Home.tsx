@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
 import { View, ScrollView } from "react-native";
-import HomeCircle from "../components/Home_circle"; // HomeCircle 추가
+import HomeCircle from "../components/Home_circle";
 import HeaderForest from "../components/Header_forest";
 import StatusBox from "../components/StatusBox";
 import HomeButton from "../components/HomeButton";
@@ -29,7 +29,7 @@ export default function Home() {
                         icon="heart-pulse"
                         title="마음 건강 진단"
                         subtitle="PHQ-9 기반 설문 자가 진단하기"
-                        onPress={() => console.log("진단")}
+                        onPress={() => navigation.navigate("FormalDiagnosis")}
                     />
                     <HomeButton
                         icon="book-heart"

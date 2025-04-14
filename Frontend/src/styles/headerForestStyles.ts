@@ -9,9 +9,9 @@ export default StyleSheet.create({
     },
     background: {
         width: "100%",
-        height: 240,
-        resizeMode: "cover",
-        justifyContent: "flex-end",
+        height: width * 0.5,
+        justifyContent: "center",
+        alignItems: "flex-start",
     },
     container: {
         paddingHorizontal: 24,
@@ -19,6 +19,7 @@ export default StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        overflow: "hidden", // 추가
     },
     title: {
         fontSize: 32,
@@ -57,6 +58,17 @@ export default StyleSheet.create({
         position: "relative",
         alignItems: "center",
         justifyContent: "flex-start",
-        overflow: "visible", // ✅ 추가
+        overflow: "visible",
+    },
+    circle: {
+        position: "absolute",
+        bottom: -40,
+        alignSelf: "center",
+        width: width * 1.2,
+        height: 160,
+        backgroundColor: "#FDFCEC",
+        borderTopLeftRadius: width,
+        borderTopRightRadius: width,
+        zIndex: 2,
     },
 });

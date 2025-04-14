@@ -13,6 +13,7 @@ const headerSkyStyles = StyleSheet.create({
     container: {
         alignItems: "flex-start",
         justifyContent: "center",
+        overflow: "hidden", // 추가
     },
     title: {
         fontSize: width * 0.08,
