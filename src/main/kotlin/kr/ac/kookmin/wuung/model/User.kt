@@ -32,12 +32,7 @@ data class User(
     var roles: String? = null,
 
     @Column(nullable = false)
-    var sex : Boolean? = null, 
-    // false : male, 
-    // true : female
-
-    @Column(nullable = false)
-    var age: Long? = null,
+    var isMale : Boolean? = null,
 
     @Column(nullable = false)
     var birthDate : LocalDateTime? = null,
