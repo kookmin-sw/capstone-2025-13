@@ -1,7 +1,5 @@
 import org.gradle.kotlin.dsl.withType
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 plugins {
 	kotlin("jvm") version "2.1.10"
@@ -10,8 +8,6 @@ plugins {
 	id("org.springframework.boot") version "3.4.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
-
-	id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
 
 group = "kr.ac.kookmin"
@@ -77,27 +73,24 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-val datetimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
-
 tasks.withType<BootBuildImage> {
-	val dockerId = env.DOCKER_USERNAME.orElse("nrt.vultrcr.com/chibot")
-	val dockerPw = env.DOCKER_PASSWORD.orElse("")
+	val dockerId =
+		System.getenv("DOCKER_USERNAME") ?: "docker.mori.space"
+	val buildNumber =
+		System.getenv("BUILD_TAG") ?: "test"
+
 	val dockerName = "wuung-backend"
 	imagePlatform = "linux/amd64"
 
 	docker {
-		publish = true
-		publishRegistry {
-			username = dockerId
-			password = dockerPw
-		}
+		publish = false
 	}
 
 	imageName.set("$dockerId/$dockerName")
 	tags.set(
 		setOf(
 			"$dockerId/$dockerName:latest",
-			"$dockerId/$dockerName:${datetimeFormatter.format(LocalDateTime.now())}"
+			"$dockerId/$dockerName:${buildNumber}"
 		)
 	)
 	buildpacks.set(setOf("docker.io/paketobuildpacks/oracle", "urn:cnb:builder:paketo-buildpacks/java-native-image"))
@@ -107,6 +100,7 @@ tasks.withType<BootBuildImage> {
 		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
 		"BP_JVM_TYPE" to "JDK",
 		"BP_JVM_VERSION" to "21",
+        "SPRING_PROFILES_ACTIVE" to "dev"
 	)
 }
 
