@@ -10,11 +10,15 @@ import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
 
-type SimpleDiagnosisRouteProp = RouteProp<RootStackParamList, 'SimpleDiagnosis'>;
+type SimpleDiagnosisRouteProp = RouteProp<
+    RootStackParamList,
+    "SimpleDiagnosis"
+>;
 
 const SimpleDiagnosis = () => {
     const route = useRoute<SimpleDiagnosisRouteProp>();
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const nickname = route.params?.nickname ?? null;
     const birthdate = route.params?.birthdate ?? null;
@@ -25,7 +29,6 @@ const SimpleDiagnosis = () => {
 
     const script = SimpleDiagnosisScript({ nickname });
 
-
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
             setCurrentSegmentIndex(route.params.initialIndex);
@@ -35,7 +38,13 @@ const SimpleDiagnosis = () => {
     const currentSegment = script[currentSegmentIndex] as {
         type: "navigate" | "story";
         navigateTo?: { screen: keyof RootStackParamList; params: any };
-        options?: { text: string; score?: number; nextIndex?: number; nextType?: "navigate" | "story" | "options"; navigateTo?: any }[];
+        options?: {
+            text: string;
+            score?: number;
+            nextIndex?: number;
+            nextType?: "navigate" | "story" | "options";
+            navigateTo?: any;
+        }[];
         backgroundImage?: any;
         name?: string;
         text?: string;
@@ -53,9 +62,9 @@ const SimpleDiagnosis = () => {
         if (
             currentSegment.type === "navigate" &&
             currentSegment.navigateTo &&
-            typeof currentSegment.navigateTo === 'object' &&
-            'screen' in currentSegment.navigateTo &&
-            'params' in currentSegment.navigateTo
+            typeof currentSegment.navigateTo === "object" &&
+            "screen" in currentSegment.navigateTo &&
+            "params" in currentSegment.navigateTo
         ) {
             navigation.navigate(
                 currentSegment.navigateTo.screen,
@@ -75,7 +84,10 @@ const SimpleDiagnosis = () => {
 
     return (
         <ImageBackground
-            source={currentSegment.backgroundImage || require("../../assets/Images/simple-1.png")}
+            source={
+                currentSegment.backgroundImage ||
+                require("../../assets/Images/simple-1.png")
+            }
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
             resizeMode="cover"
         >
@@ -84,22 +96,37 @@ const SimpleDiagnosis = () => {
                     name={currentSegment.name || "Unknown"}
                     text={currentSegment.text || "No text available"}
                     onPress={() => {
-                        const nextIndex = currentSegmentIndex === 21 ? 23 : currentSegmentIndex + 1;
+                        const nextIndex =
+                            currentSegmentIndex === 21
+                                ? 23
+                                : currentSegmentIndex + 1;
                         const nextSegment = script[nextIndex];
 
-                        if (nextSegment?.type === "navigate" && nextSegment.navigateTo) {
+                        if (
+                            nextSegment?.type === "navigate" &&
+                            nextSegment.navigateTo
+                        ) {
                             const navigateTo = nextSegment.navigateTo;
                             if (typeof navigateTo === "string") {
                                 navigation.navigate(
                                     navigateTo as "SimpleDiagnosis",
                                     buildParams({ initialIndex: nextIndex })
                                 );
-                            } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
-                                const to = navigateTo as { screen: keyof RootStackParamList; params?: any };
-                                navigation.navigate(to.screen, buildParams({
-                                    ...(to.params || {}),
-                                    score: score,
-                                }));
+                            } else if (
+                                typeof navigateTo === "object" &&
+                                "screen" in navigateTo
+                            ) {
+                                const to = navigateTo as {
+                                    screen: keyof RootStackParamList;
+                                    params?: any;
+                                };
+                                navigation.navigate(
+                                    to.screen,
+                                    buildParams({
+                                        ...(to.params || {}),
+                                        score: score,
+                                    })
+                                );
                             }
                         } else {
                             setCurrentSegmentIndex(nextIndex);
@@ -116,28 +143,46 @@ const SimpleDiagnosis = () => {
                         width: "100%",
                     }}
                 >
-                    {currentSegmentIndex === 35 ?
-                        <DialogueQuestionBox /> : <></>}
+                    {currentSegmentIndex === 35 ? (
+                        <DialogueQuestionBox />
+                    ) : (
+                        <></>
+                    )}
                     {currentSegment.options && (
                         <DialogueChoice
                             options={currentSegment.options || []}
                             onSelect={(option) => {
                                 if (typeof option.score === "number") {
-                                    setScore(prev => prev + (option.score !== undefined ? option.score : 0));
+                                    setScore(
+                                        (prev) =>
+                                            prev +
+                                            (option.score !== undefined
+                                                ? option.score
+                                                : 0)
+                                    );
                                 }
 
-                                if (option.nextType === "navigate" && option.navigateTo) {
+                                if (
+                                    option.nextType === "navigate" &&
+                                    option.navigateTo
+                                ) {
                                     navigation.navigate(
-                                        option.navigateTo.screen || option.navigateTo,
-                                        buildParams(option.navigateTo.params || {})
+                                        option.navigateTo.screen ||
+                                            option.navigateTo,
+                                        buildParams(
+                                            option.navigateTo.params || {}
+                                        )
                                     );
-                                } else if (typeof option.nextIndex === "number") {
+                                } else if (
+                                    typeof option.nextIndex === "number"
+                                ) {
                                     setCurrentSegmentIndex(option.nextIndex);
                                 } else {
-                                    setCurrentSegmentIndex(currentSegmentIndex + 1);
+                                    setCurrentSegmentIndex(
+                                        currentSegmentIndex + 1
+                                    );
                                 }
                             }}
-
                         />
                     )}
                 </View>

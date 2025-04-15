@@ -10,13 +10,15 @@ import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game";
 import Quest from "./screens/Quest";
 import Quest_stage from "./screens/Quest_stage";
+import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
+import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { subtitle?: string }; 
+    Quest_stage: { subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -27,17 +29,21 @@ export type RootStackParamList = {
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthdate: string; gender: string };
     Game: { score?: number };
+    FormalDiagnosis: undefined; // FormalDiagnosis 추가
+    FormalDiagnosisSurvey: undefined; // FormalDiagnosisSurvey 추가
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
     // 하드코딩된 로그인 상태
-    const [isLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [isLoggedIn] = useState<boolean>(true); // ← true면 Home, false면 SignIn
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}>
+            <Stack.Navigator
+                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
+            >
                 <Stack.Screen
                     name="Home"
                     component={Home}
@@ -79,6 +85,16 @@ export default function App() {
                 <Stack.Screen
                     name="Quest_stage"
                     component={Quest_stage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="FormalDiagnosis" // FormalDiagnosis 화면 추가
+                    component={FormalDiagnosis}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
+                    component={FormalDiagnosisSurvey}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
