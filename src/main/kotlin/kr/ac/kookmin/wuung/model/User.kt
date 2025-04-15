@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Entity
 @Table(name = "users")
@@ -31,14 +32,10 @@ data class User(
     var roles: String? = null,
 
     @Column(nullable = false)
-    var sex : Boolean? = null,
+    var isMale : Boolean? = null,
 
     @Column(nullable = false)
-    var age: Long? = null,
-
-    @Column(nullable = false)
-    var birthDate : LocalDateTime? = null
-
+    var birthDate : LocalDateTime? = null,
 ): UserDetails {
 
     // 남녀 구분을 위한 정적으로 선언된 상수
@@ -62,4 +59,7 @@ data class User(
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isAccountNonExpired(): Boolean = true
     override fun getUsername(): String = email ?: ""
+
+    val age: Long?
+        get() = birthDate?.let { ChronoUnit.YEARS.between(it, LocalDateTime.now()) }
 }

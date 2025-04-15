@@ -1,6 +1,10 @@
+import org.gradle.kotlin.dsl.withType
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
 	kotlin("jvm") version "2.1.10"
 	kotlin("plugin.spring") version "2.1.10"
+	id("org.hibernate.orm") version "6.5.2.Final"
 	id("org.springframework.boot") version "3.4.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
@@ -11,7 +15,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -40,7 +44,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+	implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-gson
 	implementation("io.jsonwebtoken:jjwt-gson:0.12.6")
 
@@ -67,4 +71,41 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.withType<BootBuildImage> {
+	val dockerId =
+		System.getenv("DOCKER_USERNAME") ?: "docker.mori.space"
+	val buildNumber =
+		System.getenv("BUILD_TAG") ?: "test"
+
+	val dockerName = "wuung-backend"
+	imagePlatform = "linux/amd64"
+
+	docker {
+		publish = false
+	}
+
+	imageName.set("$dockerId/$dockerName")
+	tags.set(
+		setOf(
+			"$dockerId/$dockerName:latest",
+			"$dockerId/$dockerName:${buildNumber}"
+		)
+	)
+	buildpacks.set(setOf("docker.io/paketobuildpacks/oracle", "urn:cnb:builder:paketo-buildpacks/java-native-image"))
+
+	environment = mapOf(
+		"BP_NATIVE_IMAGE" to "true",
+		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
+		"BP_JVM_TYPE" to "JDK",
+		"BP_JVM_VERSION" to "21",
+        "SPRING_PROFILES_ACTIVE" to "dev"
+	)
+}
+
+hibernate {
+	enhancement {
+		enableAssociationManagement.set(true)
+	}
 }
