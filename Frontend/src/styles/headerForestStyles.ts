@@ -19,7 +19,7 @@ export default StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        overflow: "hidden", // 추가
+        overflow: "hidden",
     },
     title: {
         fontSize: 32,

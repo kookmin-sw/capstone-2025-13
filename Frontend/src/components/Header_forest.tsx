@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ImageBackground } from "react-native";
 import styles from "../styles/headerForestStyles";
+import CalendarBadge from "./CalendarBadge";
 
 export default function Header_forest() {
     const today = new Date();
@@ -14,16 +15,13 @@ export default function Header_forest() {
             <ImageBackground
                 source={require("../assets/Images/header_forest.png")}
                 style={styles.background}
+                imageStyle={styles.image}
                 resizeMode="cover"
-            >
-                <View style={styles.container}>
-                    <Text style={styles.title}>우웅</Text>
-                    <View style={styles.dateBox}>
-                        <Text style={styles.day}>{day}</Text>
-                        <Text style={styles.date}>{date}</Text>
-                    </View>
-                </View>
-            </ImageBackground>
+            />
+            <View style={styles.container}>
+                <Text style={styles.title}>우웅</Text>
+                <CalendarBadge day={day} date={date} />
+            </View>
         </View>
     );
 }
