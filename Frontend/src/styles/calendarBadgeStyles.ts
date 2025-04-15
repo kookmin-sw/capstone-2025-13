@@ -1,21 +1,30 @@
 import { StyleSheet } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export default StyleSheet.create({
     dateBox: {
-        backgroundColor: "#fff",
+        backgroundColor: "#F6914D",
+        width: 54,
+        height: 65,
         borderRadius: 12,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
         alignItems: "center",
+        justifyContent: "center",
+        borderColor: "#fff",
+        borderWidth: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 3,
     },
     day: {
-        fontSize: 12,
-        color: "#F17300",
+        fontSize: 14,
+        color: "#fff",
         fontWeight: "bold",
     },
     date: {
-        fontSize: 18,
-        color: "#F17300",
+        fontSize: 24,
+        color: "#fff",
         fontWeight: "bold",
     },
 });

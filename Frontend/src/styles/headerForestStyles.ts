@@ -12,6 +12,7 @@ export default StyleSheet.create({
         height: width * 0.5,
         justifyContent: "center",
         alignItems: "flex-start",
+        marginTop: 16, // ✅ 이미지 위치를 조금 아래로 내림. 숫자를 조정해서 더 미세하게 제어 가능
     },
     container: {
         paddingHorizontal: 24,
@@ -20,6 +21,7 @@ export default StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         overflow: "hidden",
+        paddingTop: 12, // ✅ 텍스트 위치를 조금 아래로 내림
     },
     title: {
         fontSize: 32,

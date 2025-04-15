@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/calendarBadgeStyles";
 
 export default function CalendarBadge({
@@ -10,9 +10,9 @@ export default function CalendarBadge({
     date: number;
 }) {
     return (
-        <View style={styles.dateBox}>
+        <TouchableOpacity style={styles.dateBox} onPress={() => {}}>
             <Text style={styles.day}>{day}</Text>
             <Text style={styles.date}>{date}</Text>
-        </View>
+        </TouchableOpacity>
     );
 }

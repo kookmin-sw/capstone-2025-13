@@ -1,13 +1,15 @@
 import { StyleSheet, Dimensions } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FDFCEC",
+        backgroundColor: "#0A814C",
     },
     scroll: {
+        paddingTop: height * 0.08,
         paddingBottom: 100,
     },
     headerWrapper: {
@@ -17,15 +19,45 @@ const styles = StyleSheet.create({
     },
     circle: {
         position: "absolute",
-        bottom: -40,
-        zIndex: -1,
-        width: width * 1.2,
-        height: height * 0.5,
+        top: height * 0.2,
+        alignSelf: "center",
+        zIndex: 0,
     },
     buttonGroup: {
-        marginTop: 24,
+        marginTop: 28,
         paddingHorizontal: 20,
-        gap: 12,
+        gap: 20,
+    },
+    calendarBadgeWrapper: {
+        position: "absolute",
+        top: 100, // Adjust this value to align with the HomeCircle and HeaderForest overlap
+        right: 20,
+        zIndex: 3,
+    },
+    dateBox: {
+        backgroundColor: "#F6914D",
+        width: 56,
+        height: 80,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        borderColor: "#fff",
+        borderWidth: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 3,
+    },
+    day: {
+        fontSize: 14,
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    date: {
+        fontSize: 22,
+        color: "#fff",
+        fontWeight: "bold",
     },
 });
 
