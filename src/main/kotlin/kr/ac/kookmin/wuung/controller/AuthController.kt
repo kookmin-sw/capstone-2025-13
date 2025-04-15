@@ -34,7 +34,7 @@ data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
 
-data class SignUpRequest(val userName: String, val email: String, val password: String, val sex: Boolean, val age: Long, val birthDate: LocalDateTime)
+data class SignUpRequest(val userName: String, val email: String, val password: String, val isMale: Boolean, val birthDate: LocalDateTime)
 
 data class SignUpResponse(val accessToken: String, val refreshToken: String)
 
@@ -168,10 +168,9 @@ class AuthController(
         val newUser = User(
             userName = signUpRequest.userName,
             email = signUpRequest.email,
-            password = passwordEncoder.encode(signUpRequest.password), // 패스워드를 인코딩하는 요소를 뭔가 만들어야할 것 같은데 ... 로그인에서 이걸 고려하는지 모르겠네...? getPassword보니까 아무런 decode 로직도 없는 것 같은데 평문으로 관리하는건가?
-            roles = "ROLE_USER",  // 이게 역할이 뭐가 있는지? 유져랑 마스터, 이런거? 아니면 미정?
-            sex = signUpRequest.sex,
-            age = signUpRequest.age,
+            password = passwordEncoder.encode(signUpRequest.password),
+            roles = "ROLE_USER",
+            isMale = signUpRequest.isMale, // 코드 수정
             birthDate = signUpRequest.birthDate
         )
 
