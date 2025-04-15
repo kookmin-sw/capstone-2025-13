@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-
 @Entity
 @Table(name = "users")
 data class User(
@@ -37,8 +36,14 @@ data class User(
 
     @Column(nullable = false)
     var birthDate : LocalDateTime? = null,
-
 ): UserDetails {
+
+    // 남녀 구분을 위한 정적으로 선언된 상수
+    companion object {
+        const val male : Boolean = false
+        const val female : Boolean = true
+    }
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
