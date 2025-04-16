@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game";
 import Quest from "./screens/Quest";
 import Quest_stage from "./screens/Quest_stage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
 
@@ -25,11 +26,11 @@ export type RootStackParamList = {
         initialIndex: number;
         score?: number;
         nickname?: string;
-        birthdate?: string;
+        birthDate?: string;
         gender?: string;
     };
     SignUpStep2: { nickname: string };
-    SignUpStep3: { nickname: string; birthdate: string; gender: string };
+    SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined; // FormalDiagnosis 추가
     FormalDiagnosisSurvey: undefined; // FormalDiagnosisSurvey 추가
@@ -39,7 +40,21 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
     // 하드코딩된 로그인 상태
-    const [isLoggedIn] = useState<boolean>(true); // ← true면 Home, false면 SignIn
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = await AsyncStorage.getItem('accessToken');
+            if (token) {
+                setIsLoggedIn(true);
+                setLoading(false);
+            }
+        };
+        checkToken();
+    }, []);
 
     const [fontsLoaded] = useFonts({
         "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),

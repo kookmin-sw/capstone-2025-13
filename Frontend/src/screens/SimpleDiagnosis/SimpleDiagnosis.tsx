@@ -21,9 +21,8 @@ const SimpleDiagnosis = () => {
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const nickname = route.params?.nickname ?? null;
-    const birthdate = route.params?.birthdate ?? null;
+    const birthDate = route.params?.birthDate ?? null;
     const gender = route.params?.gender ?? null;
-
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
     const [score, setScore] = useState(route.params?.score ?? 0);
 
@@ -53,8 +52,8 @@ const SimpleDiagnosis = () => {
     const buildParams = (baseParams: any = {}) => ({
         ...baseParams,
         ...(nickname && { nickname }),
-        ...(birthdate && { birthdate }),
-        ...(gender && { gender }),
+        ...(birthDate && { birthDate }),
+        ...(gender !== null && { gender }),
         ...(score !== undefined && { score }),
     });
 
