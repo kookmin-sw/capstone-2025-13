@@ -2,6 +2,8 @@ package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -32,18 +34,12 @@ data class User(
     var roles: String? = null,
 
     @Column(nullable = false)
-    var isMale : Boolean? = null,
+    @Enumerated(EnumType.STRING)
+    var gender: GenderEnum? = null,
 
     @Column(nullable = false)
     var birthDate : LocalDateTime? = null,
 ): UserDetails {
-
-    // 남녀 구분을 위한 정적으로 선언된 상수
-    companion object {
-        const val male : Boolean = false
-        const val female : Boolean = true
-    }
-
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
@@ -62,4 +58,9 @@ data class User(
 
     val age: Long?
         get() = birthDate?.let { ChronoUnit.YEARS.between(it, LocalDateTime.now()) }
+}
+
+enum class GenderEnum(val value: String) {
+    MALE("MALE"),
+    FEMALE("FEMALE");
 }
