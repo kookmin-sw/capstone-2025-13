@@ -2,12 +2,13 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
-import { View, ScrollView } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import HomeCircle from "../components/Home_circle";
 import HeaderForest from "../components/Header_forest";
 import StatusBox from "../components/StatusBox";
 import HomeButton from "../components/HomeButton";
 import FloatingButton from "../components/FloatingButton";
+import CalendarBadge from "../components/CalendarBadge";
 import styles from "../styles/homeStyles";
 
 export default function Home() {
@@ -15,13 +16,30 @@ export default function Home() {
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     return (
         <View style={styles.container}>
-            {/* 헤더와 타원을 ScrollView 바깥에 위치 */}
+            {}
             <View style={styles.headerWrapper}>
+                <View
+                    style={{
+                        position: "absolute",
+                        top: 155,
+                        right: 55,
+                        zIndex: 3,
+                    }}
+                >
+                    <CalendarBadge
+                        day={
+                            ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][
+                                new Date().getDay()
+                            ]
+                        }
+                        date={new Date().getDate()}
+                    />
+                </View>
                 <HeaderForest />
                 <HomeCircle style={styles.circle} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scroll}>
+            <View style={styles.scroll}>
                 <StatusBox />
 
                 <View style={styles.buttonGroup}>
@@ -43,7 +61,7 @@ export default function Home() {
                         onPress={() => navigation.navigate("Quest")}
                     />
                 </View>
-            </ScrollView>
+            </View>
 
             <FloatingButton />
         </View>
