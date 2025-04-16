@@ -37,7 +37,7 @@ class SecurityConfig(
             .cors {
                 val configuration = CorsConfiguration()
 
-                val origins = mutableListOf("http://localhost:3000")
+                val origins = mutableListOf("http://localhost:3000", "http://localhost:8080")
                 origins.addAll(host.split(",").mapNotNull { it.trim() })
 
                 configuration.allowedOrigins = origins

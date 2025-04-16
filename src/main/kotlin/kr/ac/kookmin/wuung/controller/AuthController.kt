@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.lib.datetimeParser
+import kr.ac.kookmin.wuung.model.GenderEnum
 import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
@@ -34,7 +37,17 @@ data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
 
-data class SignUpRequest(val userName: String, val email: String, val password: String, val isMale: Boolean, val birthDate: LocalDateTime)
+data class SignUpRequest(
+    @field:JsonProperty("user_name")
+    val userName: String,
+    val email: String,
+    val password: String,
+    val gender: GenderEnum,
+
+    @field:Schema(description = "Birth date in format yyyy-MM-dd", example = "2000-01-01")
+    @field:JsonProperty("birth_date")
+    val birthDate: String
+)
 
 data class SignUpResponse(val accessToken: String, val refreshToken: String)
 
@@ -170,8 +183,8 @@ class AuthController(
             email = signUpRequest.email,
             password = passwordEncoder.encode(signUpRequest.password),
             roles = "ROLE_USER",
-            isMale = signUpRequest.isMale, // 코드 수정
-            birthDate = signUpRequest.birthDate
+            gender = signUpRequest.gender, // 코드 수정
+            birthDate = signUpRequest.birthDate.datetimeParser()
         )
 
         // 데이터베이스에 사용자 저장
