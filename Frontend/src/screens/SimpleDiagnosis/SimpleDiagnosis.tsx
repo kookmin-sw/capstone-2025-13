@@ -17,9 +17,8 @@ const SimpleDiagnosis = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const nickname = route.params?.nickname ?? null;
-    const birthdate = route.params?.birthdate ?? null;
-    const isMale = route.params?.isMale ?? null;
-
+    const birthDate = route.params?.birthDate ?? null;
+    const gender = route.params?.gender ?? null;
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
     const [score, setScore] = useState(route.params?.score ?? 0);
 
@@ -43,8 +42,8 @@ const SimpleDiagnosis = () => {
     const buildParams = (baseParams: any = {}) => ({
         ...baseParams,
         ...(nickname && { nickname }),
-        ...(birthdate && { birthdate }),
-        ...(isMale !== null && { isMale }),
+        ...(birthDate && { birthDate }),
+        ...(gender !== null && { gender }),
         ...(score !== undefined && { score }),
     });
 
@@ -115,8 +114,9 @@ const SimpleDiagnosis = () => {
                         width: "100%",
                     }}
                 >
-                    {currentSegmentIndex === 35 ?
-                        <DialogueQuestionBox /> : <></>}
+                    {currentSegmentIndex === 35 ? (
+                        <DialogueQuestionBox />
+                    ) : null}
                     {currentSegment.options && (
                         <DialogueChoice
                             options={currentSegment.options || []}
@@ -136,7 +136,6 @@ const SimpleDiagnosis = () => {
                                     setCurrentSegmentIndex(currentSegmentIndex + 1);
                                 }
                             }}
-
                         />
                     )}
                 </View>

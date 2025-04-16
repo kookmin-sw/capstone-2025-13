@@ -18,8 +18,8 @@ const SignUpStep3 = () => {
 
     const route = useRoute<SignUpStep3RouteProp>();
 
-    const { nickname, isMale, birthdate } = route.params;
-
+    const { nickname, gender, birthDate } = route.params;
+   
     const handleSignUp = async () => {
         if (!email.trim()) {
             setErrorMessage("이메일을 입력하세요.");
@@ -43,18 +43,19 @@ const SignUpStep3 = () => {
         }
 
         // 모든 유효성 검사 통과 시
-       try {
-        await signUp(email, password, nickname, birthdate, isMale);
-        navigation.navigate('SimpleDiagnosis', { initialIndex: 13 });
-    } catch (error) {
-        console.error("회원가입 실패:", error);
-        if ((error as any).response && (error as any).response.status === 400) {
-            setErrorMessage("이미 사용 중인 이메일입니다.");
-        } else {
-            setErrorMessage("회원가입에 실패했습니다. 다시 시도해주세요.");
+        try {
+            console.log(email, nickname, password, birthDate, gender)
+            await signUp(email, password, nickname, birthDate, gender);
+            navigation.navigate('SimpleDiagnosis', { initialIndex: 13 });
+        } catch (error) {
+            console.error("회원가입 실패:", error);
+            if ((error as any).response && (error as any).response.status === 400) {
+                setErrorMessage("이미 사용 중인 이메일입니다.");
+            } else {
+                setErrorMessage("회원가입에 실패했습니다. 다시 시도해주세요.");
+            }
         }
-    }
-};
+    };
 
     return (
         <ImageBackground

@@ -43,7 +43,7 @@ export const signOut = async (accessToken: string, refreshToken: string) => {
     }
 }
 
-export const signUp = async (email: string, password: string, nickname: string, birthDate:string, isMale: boolean) => {
+export const signUp = async (email: string, password: string, nickname: string, birthDate:string, gender: string) => {
     try {
         const response = await fetch("https://wuung.mori.space/auth/signup", {
             method: "POST",
@@ -51,7 +51,12 @@ export const signUp = async (email: string, password: string, nickname: string, 
                 "Content-Type": "application/json",
                 "accept": "application/json",
             },
-            body: JSON.stringify({ email, password, nickname, birthDate, isMale }),
+            body: JSON.stringify({  
+                email,
+                password,
+                gender: gender.toUpperCase(), 
+                user_name: nickname,
+                birth_date: birthDate, }),
         });
 
         if (!response.ok) {

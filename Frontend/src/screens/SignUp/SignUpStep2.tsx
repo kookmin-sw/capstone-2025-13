@@ -28,7 +28,7 @@ const SignUpStep2 = () => {
 
     const [date, setDate] = useState<Date | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [isMale, setIsMale] = useState<boolean | null>(null);
+    const [gender, setGender] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
 
     const showDatePicker = () => setDatePickerVisibility(true);
@@ -37,14 +37,15 @@ const SignUpStep2 = () => {
     const handleDateChange = (event: any, selectedDate?: Date) => {
         if (Platform.OS === "android") hideDatePicker();
         if (selectedDate) setDate(selectedDate);
+
     };
 
     const handleSignUp = () => {
-        if (isMale === null && !date) {
+        if (!gender && !date) {
             setErrorMessage("정보를 입력하세요.");
             return;
         }
-        if (isMale === null) {
+        if (!gender) {
             setErrorMessage("성별을 선택하세요.");
             return;
         }
@@ -52,13 +53,15 @@ const SignUpStep2 = () => {
             setErrorMessage("생년월일을 입력하세요.");
             return;
         }
-        console.log(isMale)
+
+        // 날짜를 YYYY-MM-DD 형식으로 변환
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
         setErrorMessage("");
         navigation.navigate("SimpleDiagnosis", {
             initialIndex: 11,
             nickname,
-            birthdate: date.toISOString().slice(0, 10),
-            isMale
+            birthDate: formattedDate,
+            gender,
         });
     };
 
@@ -100,10 +103,10 @@ const SignUpStep2 = () => {
                                 <Text style={signUpStyles.inputTitle}>성별</Text>
                                 <View style={signUpStyles.row}>
                                     <TouchableOpacity
-                                        onPress={() => setIsMale(true)}
+                                        onPress={() => setGender("male")}
                                         style={[
                                             signUpStyles.genderButton,
-                                            isMale === true
+                                            gender === "male"
                                                 ? signUpStyles.maleSelected
                                                 : signUpStyles.maleUnselected
                                         ]}
@@ -112,10 +115,10 @@ const SignUpStep2 = () => {
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
-                                        onPress={() => setIsMale(false)}
+                                        onPress={() => setGender("female")}
                                         style={[
                                             signUpStyles.genderButton,
-                                            isMale === false
+                                            gender === "female"
                                                 ? signUpStyles.femaleSelected
                                                 : signUpStyles.femaleUnselected
                                         ]}
