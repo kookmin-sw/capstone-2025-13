@@ -16,12 +16,10 @@ export default function FormalDiagnosis() {
 
     return (
         <View style={styles.container}>
+            <HeaderTitle title="마음 건강 진단" />
+            <EmotionChartBox subtitle="지난 2주 간 나의 마음 변화 흐름" />
             <ScrollView contentContainerStyle={styles.scroll}>
-                <HeaderTitle title="마음 건강 진단" />
-                <EmotionChartBox subtitle="지난 2주 간 나의 마음 변화 흐름" />
-
-                <SectionLabel text="이런 방법들이 있어요!" />
-
+                <SectionLabel text="이런 방법들이 있어요" />
                 <MethodCard
                     label="BDI 기반 정식 검사"
                     onPress={() => {

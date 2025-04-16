@@ -1,5 +1,5 @@
-// styles/formalDialogueStyles.ts
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width } = Dimensions.get("window");
 
@@ -10,6 +10,21 @@ const styles = StyleSheet.create({
     },
     scroll: {
         paddingBottom: 40,
+        paddingTop: 5,
+    },
+    sectionLabelText: {
+        fontSize: 20,
+        fontFamily: fonts.bold,
+        color: "#444",
+        marginBottom: 60,
+        paddingHorizontal: 24,
+    },
+    chartSubtitle: {
+        fontSize: 16,
+        fontFamily: fonts.semiBold,
+        color: "#fff",
+        paddingHorizontal: 24,
+        marginTop: 10,
     },
 });
 
