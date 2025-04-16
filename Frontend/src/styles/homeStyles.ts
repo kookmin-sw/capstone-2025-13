@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     },
     calendarBadgeWrapper: {
         position: "absolute",
-        top: 100, // Adjust this value to align with the HomeCircle and HeaderForest overlap
+        top: 100,
         right: 20,
         zIndex: 3,
     },

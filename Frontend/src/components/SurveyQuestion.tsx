@@ -34,7 +34,7 @@ export default function SurveyQuestion({
                                     selected === index && styles.circleSelected,
                                 ]}
                                 onPress={() => setSelected(index)}
-                            />
+                            ></TouchableOpacity>
                             <Text
                                 style={[
                                     styles.choiceLabel,

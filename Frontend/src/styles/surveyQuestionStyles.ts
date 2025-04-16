@@ -8,10 +8,10 @@ const styles = StyleSheet.create({
         marginTop: 24,
     },
     questionBox: {
-        backgroundColor: "#F4F2DA",
+        backgroundColor: "#F9FAEC",
         borderRadius: 16,
         marginHorizontal: width * 0.05,
-        marginBottom: 20,
+        marginTop: 25,
         paddingTop: 4,
         paddingBottom: 30,
     },
@@ -55,7 +55,9 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     circleSelected: {
-        backgroundColor: "#3CB46E",
+        backgroundColor: "transparent",
+        borderWidth: 8,
+        borderColor: "#3CB46E",
     },
     choiceLabel: {
         fontSize: 12,

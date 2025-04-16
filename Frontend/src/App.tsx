@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import * as Font from "expo-font";
+import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
@@ -38,6 +40,23 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
     // 하드코딩된 로그인 상태
     const [isLoggedIn] = useState<boolean>(true); // ← true면 Home, false면 SignIn
+
+    const [fontsLoaded] = useFonts({
+        "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),
+        "Pretendard-Bold": require("./assets/fonts/Pretendard-Bold.otf"),
+        "Pretendard-SemiBold": require("./assets/fonts/Pretendard-SemiBold.otf"),
+        "Pretendard-Medium": require("./assets/fonts/Pretendard-Medium.otf"),
+        "Pretendard-Light": require("./assets/fonts/Pretendard-Light.otf"),
+        "Pretendard-ExtraLight": require("./assets/fonts/Pretendard-ExtraLight.otf"),
+        "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
+        "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
+        "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
+        DungGeunMo: require("./assets/fonts/DungGeunMo.ttf"),
+        "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
+        "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
+    });
+
+    if (!fontsLoaded) return null;
 
     return (
         <NavigationContainer>
