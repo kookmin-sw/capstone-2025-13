@@ -16,11 +16,14 @@ class SwaggerConfig(
 ) {
     private val securitySchemeName = "api token"
 
+    val hosts = "http://localhost:8080, $host"
+    val servers = hosts.split(",").mapNotNull { it.trim() }.map { io.swagger.v3.oas.models.servers.Server().url(it) }
+
     @Bean
     fun openAPI(): OpenAPI {
         return OpenAPI()
             .info(Info().title("Wuung API Server").version("v1.0.0"))
-            .servers(host.split(",").mapNotNull { it.trim() }.map { io.swagger.v3.oas.models.servers.Server().url(it) })
+            .servers(servers)
             .addSecurityItem(SecurityRequirement().addList(securitySchemeName))
             .components(Components()
                 .addSecuritySchemes(securitySchemeName,
