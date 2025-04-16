@@ -82,3 +82,8 @@ enum class GenderEnum(val value: String) {
     THIRD_GENDER("THIRD_GENDER"),
     UNKNOWN("UNKNOWN")
 }
+
+enum class GenderEnum(val value: String) {
+    MALE("MALE"),
+    FEMALE("FEMALE");
+}

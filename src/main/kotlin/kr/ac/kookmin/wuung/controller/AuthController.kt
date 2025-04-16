@@ -516,6 +516,7 @@ class AuthController(
             required = true,
             schema = Schema(type = "string", format = "binary")
         )
+        return ResponseEntity.ok(userInfo)
         @RequestPart("multipartFile", required = true)
         multipartFile: MultipartFile,
     ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
