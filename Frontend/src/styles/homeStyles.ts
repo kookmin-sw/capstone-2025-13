@@ -1,62 +1,65 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+import { TouchableOpacity } from "react-native";
+import fonts from "../constants/fonts";
 
-const homeStyles = StyleSheet.create({
+const { width, height } = Dimensions.get("window");
+
+const styles = StyleSheet.create({
     container: {
-        paddingTop: 60,
-        paddingHorizontal: 20,
+        flex: 1,
+        backgroundColor: "#0A814C",
+    },
+    scroll: {
+        paddingTop: height * 0.08,
         paddingBottom: 100,
-        backgroundColor: "#f3f4f6",
     },
-    title: {
-        fontSize: 32,
-        fontWeight: "bold",
-        marginBottom: 6,
+    headerWrapper: {
+        position: "relative",
+        alignItems: "center",
+        justifyContent: "flex-start",
     },
-    subtitle: {
-        fontSize: 16,
-        color: "#666",
-        marginBottom: 20,
+    circle: {
+        position: "absolute",
+        top: height * 0.2,
+        alignSelf: "center",
+        zIndex: 0,
     },
-    card: {
-        backgroundColor: "#fff",
-        padding: 20,
+    buttonGroup: {
+        marginTop: 28,
+        paddingHorizontal: 20,
+        gap: 20,
+    },
+    calendarBadgeWrapper: {
+        position: "absolute",
+        top: 100,
+        right: 20,
+        zIndex: 3,
+    },
+    dateBox: {
+        backgroundColor: "#F6914D",
+        width: 56,
+        height: 80,
         borderRadius: 12,
-        marginBottom: 20,
+        alignItems: "center",
+        justifyContent: "center",
+        borderColor: "#fff",
+        borderWidth: 2,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4,
+        shadowRadius: 3,
+        elevation: 3,
     },
-    cardTitle: {
-        fontSize: 20,
-        fontWeight: "600",
-        marginBottom: 10,
-    },
-    cardText: {
-        fontSize: 16,
-        marginBottom: 4,
-    },
-    button: {
-        marginTop: 12,
-        backgroundColor: "#3b82f6",
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: "center",
-    },
-    buttonText: {
+    day: {
+        fontSize: 14,
         color: "#fff",
-        fontWeight: "600",
-        fontSize: 16,
+        fontWeight: "bold",
     },
-    outlineButton: {
-        backgroundColor: "#fff",
-        borderWidth: 1,
-        borderColor: "#ccc",
-    },
-    outlineButtonText: {
-        color: "#333",
+    date: {
+        fontSize: 22,
+        color: "#fff",
+        fontWeight: "bold",
     },
 });
 
-export default homeStyles;
+export default styles;
