@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.lib.toLocalDateTime
 import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
@@ -24,6 +25,7 @@ import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
+import java.util.Date
 
 data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val accessToken: String, val refreshToken: String)
@@ -34,7 +36,14 @@ data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
 
-data class SignUpRequest(val userName: String, val email: String, val password: String, val isMale: Boolean, val birthDate: LocalDateTime)
+data class SignUpRequest(
+    val userName: String,
+    val email: String,
+    val password: String,
+    @JsonProperty("is_male")
+    val isMale: Boolean,
+    val birthDate: Date,
+)
 
 data class SignUpResponse(val accessToken: String, val refreshToken: String)
 
@@ -171,7 +180,7 @@ class AuthController(
             password = passwordEncoder.encode(signUpRequest.password),
             roles = "ROLE_USER",
             isMale = signUpRequest.isMale, // 코드 수정
-            birthDate = signUpRequest.birthDate
+            birthDate = signUpRequest.birthDate.toLocalDateTime()
         )
 
         // 데이터베이스에 사용자 저장
