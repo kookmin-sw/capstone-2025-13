@@ -1,0 +1,89 @@
+name: 코드 리팩토링 (Code Refactoring)
+description: 더 나은 코드 구조나 성능 개선을 위한 리팩토링을 제안해주세요.
+title: "[REFACTOR] "
+labels: [refactor]
+assignees: []
+
+body:
+  - type: input
+    id: target-code
+    attributes:
+      label: 🔄 어떤 코드인가요? (Which part of the code?)
+      description: 예: HomeScreen.tsx, UserController.kt, preprocess.py
+      placeholder: HomeScreen.tsx
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: 🤔 어떤 문제가 있나요? (What’s the issue?)
+      description: 현재 코드에서 구조나 유지보수 측면에서 문제가 되는 점을 설명해주세요.
+      placeholder: 현재 너무 많은 책임을 가지고 있어 구조가 복잡합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 💡 개선 아이디어 (Suggested improvement)
+      description: 어떻게 개선하면 좋을지 구체적인 리팩토링 제안을 적어주세요.
+      placeholder: 컴포넌트를 나누거나, 비즈니스 로직을 분리하는 방식 제안합니다.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 💻 예시 코드 스타일 (참고용)
+
+        #### TypeScript (React Native)
+        ```tsx
+        // 기존
+        <Button onPress={() => {
+          console.log("Clicked");
+          doSomething();
+        }} />
+
+        // 제안
+        const handleClick = () => {
+          console.log("Clicked");
+          doSomething();
+        };
+        <Button onPress={handleClick} />
+        ```
+
+        #### Kotlin (Spring Boot)
+        ```kotlin
+        // 기존
+        if (user.role == "ADMIN") {
+            // ...
+        }
+
+        // 제안
+        fun User.isAdmin() = this.role == "ADMIN"
+        if (user.isAdmin()) { ... }
+        ```
+
+        #### Python (TensorFlow/OpenCV)
+        ```python
+        # 기존
+        model = load_model("model.h5")
+        result = model.predict(x.reshape(1, 28, 28, 1))
+
+        # 제안
+        def load_and_predict(model_path: str, x):
+            model = load_model(model_path)
+            return model.predict(x.reshape(1, 28, 28, 1))
+
+        result = load_and_predict("model.h5", x)
+        ```
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 💬 추가 내용 (Additional context)
+      description: 리팩토링과 관련된 기타 참고 자료나 배경이 있다면 여기에 작성해주세요.
+      placeholder: 예) 리팩토링이 필요한 이유, 성능 개선 기대 등
+    validations:
+      required: false
