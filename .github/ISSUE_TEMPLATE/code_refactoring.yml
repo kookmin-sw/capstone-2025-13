@@ -9,7 +9,7 @@ body:
     id: target-code
     attributes:
       label: 🔄 어떤 코드인가요? (Which part of the code?)
-      description: 예: HomeScreen.tsx, UserController.kt, preprocess.py
+      description: 예) HomeScreen.tsx, UserController.kt, preprocess.py
       placeholder: HomeScreen.tsx
     validations:
       required: true

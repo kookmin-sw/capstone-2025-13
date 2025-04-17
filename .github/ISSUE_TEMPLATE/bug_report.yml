@@ -45,7 +45,7 @@ body:
     id: environment-os
     attributes:
       label: 🧾 운영체제 (OS)
-      description: 예: Windows 11, macOS 14, Android 13 등
+      description: 예) Windows 11, macOS 14, Android 13 등
       placeholder: Windows 11
     validations:
       required: false
@@ -54,7 +54,7 @@ body:
     id: environment-app
     attributes:
       label: 앱 또는 브라우저 버전
-      description: 예: Chrome 120, Expo Go 2.31.12 등
+      description: 예) Chrome 120, Expo Go 2.31.12 등
       placeholder: Chrome 120
     validations:
       required: false
