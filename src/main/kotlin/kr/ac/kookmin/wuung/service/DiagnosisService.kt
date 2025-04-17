@@ -18,7 +18,7 @@ class DiagnosisService(
     }*/
 
     @Transactional
-    fun createDiagnosis(type : Long, result : Long, createAt : LocalDateTime): Diagnosis {
+    fun createDiagnosis(type : String, result : Long, createAt : LocalDateTime): Diagnosis {
         val diagnosis = Diagnosis(
             type = type,
             result = result,
