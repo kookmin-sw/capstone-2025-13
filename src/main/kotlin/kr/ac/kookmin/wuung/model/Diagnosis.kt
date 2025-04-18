@@ -29,7 +29,13 @@ data class Diagnosis(
     var result : Long? = null, // 검사 결과를 나타내주는 필드
 
     @Column(nullable = false)
-    var createAt : LocalDateTime? = null, // 검사 시간을 나타내주는 필드
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @Column(nullable = false)
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    @PreUpdate
+    private fun onUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
 }

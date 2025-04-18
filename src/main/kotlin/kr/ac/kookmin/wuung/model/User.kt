@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -39,6 +40,12 @@ data class User(
 
     @Column(nullable = false)
     var birthDate : LocalDateTime? = null,
+
+    @Column(nullable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = false)
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 ): UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
@@ -58,6 +65,11 @@ data class User(
 
     val age: Long?
         get() = birthDate?.let { ChronoUnit.YEARS.between(it, LocalDateTime.now()) }
+
+    @PreUpdate
+    private fun onUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
 }
 
 enum class GenderEnum(val value: String) {

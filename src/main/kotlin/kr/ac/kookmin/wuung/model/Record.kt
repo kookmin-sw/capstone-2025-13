@@ -16,12 +16,18 @@ data class Record (
     @Column(nullable = false)
     var tansformed : String? = null,
 
-    @Column(nullable = false)
-    var creationTime : LocalDateTime? = null,
-
     @OneToOne
     @JoinColumn(nullable = false)
     val user: User? = null,
-) {
 
+    @Column(nullable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = false)
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+) {
+    @PreUpdate
+    private fun onUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
 }
