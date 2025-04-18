@@ -63,7 +63,7 @@ class DiagnosisController(
 
         // 날짜 파싱 (형식: yyyy-MM-dd HH:mm:ss)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val createAt: LocalDateTime = try {
+        val createdAt: LocalDateTime = try {
             LocalDateTime.parse(request.createAt, formatter)
         } catch (e: Exception) {
             return ResponseEntity.badRequest().body(
@@ -72,7 +72,7 @@ class DiagnosisController(
         }
 
         // 데이터 추가
-        diagnosisService.createDiagnosis(request.type, request.result, createAt)
+        diagnosisService.createDiagnosis(request.type, request.result, createdAt)
 
         // 결과 반환
         return ResponseEntity.ok(CreateDiagnosisResponse("ok"))
