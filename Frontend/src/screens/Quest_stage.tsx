@@ -13,7 +13,7 @@ export default function Quest_stage() {
   const { subtitle } = route.params as { subtitle: string };
 
   return (
-    <View style={[questStyles.container, { flex: 1}]}>
+    <View style={[questStyles.container]}>
       {/* ScrollView는 위 콘텐츠만 스크롤 */}
       <ScrollView contentContainerStyle={questStyles.scrollContainer}>
         <View style={questStyles.headerWrapper}>
@@ -41,6 +41,12 @@ export default function Quest_stage() {
           </View>
         </View>
       </ScrollView>
+
+      <View style={questStageStyles.missionWrapper}>
+        <Quest_mission
+          missiontitle="명상"
+        />
+      </View>
       </View>
     );
   }
