@@ -2,8 +2,10 @@ import React from "react";
 import { View, ScrollView, Dimensions } from "react-native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
-import Quest_element from "../components/Quest_element";
-import Quest_street from "../components/Quest_street";
+import Apple_tree from "../components/Apple_tree";
+import Street_right_down from "../components/Street_right_down";
+import Street_basic from "../components/Street_basic";
+import Street_left_down from "../components/Street_left_down";
 import questStyles from "../styles/questStyles";
 
 const { width, height } = Dimensions.get("window");
@@ -18,55 +20,33 @@ export default function Quest() {
         </View>
 
         <View style={questStyles.questSection}>
-          <Quest_street
+          <Street_right_down
             style={[
                 questStyles.street,
               {
-                left: width * 0.28,
-                top: height * 0.025,
-                transform: [{ rotate: "-15deg" }],
+                left: width * 0.25,
+                top: height * 0.15,
               },
             ]}
           />
-          <Quest_street
+          <Street_left_down
             style={[
                 questStyles.street,
               {
-                left: width * 0.47,
-                top: height * 0.11,
-                transform: [{ rotate: "23deg" }],
-              },
-            ]}
-          />
-          <Quest_street
-            style={[
-                questStyles.street,
-              {
-                top: height * 0.28,
-                transform: [{ rotate: "-75deg" }],
-              },
-            ]}
-          />
-          <Quest_street
-            style={[
-                questStyles.street,
-              {
-                left: width * 0.08,
-                top: height * 0.38,
-                transform: [{ rotate: "-110deg" }],
+                top: height * 0.4,
               },
             ]}
           />
           
           <View style={questStyles.elementsOverlay}>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-start" }]}>
-                <Quest_element name="날 돌아보기" subtitle="스스로를 돌아보는 시간이에요." />
+                <Apple_tree name="날 돌아보기" subtitle="스스로를 돌아보는 시간이에요." />
             </View>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-end" }]}>
-                <Quest_element name="명상" subtitle="조용한 마음을 가져봐요." />
+                <Apple_tree name="명상" subtitle="조용한 마음을 가져봐요." />
             </View>
             <View style={[questStyles.elementWrapper, { alignSelf: "flex-start" }]}>
-                <Quest_element name="운동" subtitle="몸을 움직여볼까요?" />
+                <Apple_tree name="운동" subtitle="몸을 움직여볼까요?" />
             </View>
           </View>
         </View>

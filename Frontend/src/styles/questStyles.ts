@@ -25,18 +25,17 @@ const questStyles = StyleSheet.create({
     },
     street: {
       position: "absolute",
-      width: width * 0.5,
-      height: width * 0.5,
+      width: width * 0.66,
+      height: width * 0.4,
       alignSelf: "center",
-      opacity: 0.8,
       zIndex: 2,
     },
     elementsOverlay: {
         position: "absolute",
-        top: height * 0.07,
+        top: height * 0.05,
         width: "100%",
-        paddingHorizontal: width * 0.1,
-        gap: height * 0.06,
+        paddingHorizontal: width * 0.03,
+        gap: height * 0.05,
         zIndex: 3,
       },
     elementWrapper: {

@@ -2,10 +2,10 @@ import { StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-const questStreetStyles = StyleSheet.create({
+const appleTreeStyles = StyleSheet.create({
     image: {
-      width: width * 0.3,
-      height: width * 0.3,
+      width: width * 0.5,
+      height: width * 0.5,
       position: "absolute",
       alignSelf: "center",
       zIndex: -1,
@@ -14,4 +14,4 @@ const questStreetStyles = StyleSheet.create({
   });
   
 
-export default questStreetStyles;
+export default appleTreeStyles;

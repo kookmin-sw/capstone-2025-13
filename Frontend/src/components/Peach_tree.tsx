@@ -1,23 +1,23 @@
 import React from "react";
 import {  Image, View, Text, TouchableOpacity} from "react-native";
-import questElementStyles from "../styles/appleElementStyles";
+import peachElementStyles from "../styles/peachElementStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 
 
-interface QuestElementProps {
+interface PeachTreeProps {
   name: string;
   subtitle?: string;
   onPress?: () => void;
 }
 
-export default function Quest_element({ name, subtitle }: QuestElementProps) {
+export default function Peach_tree({ name, subtitle }: PeachTreeProps ) {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   
   return (
-    <View style={questElementStyles.container}>
+    <View style={peachElementStyles.container}>
        <TouchableOpacity
         onPress={() => {
           if (subtitle) {
@@ -28,17 +28,17 @@ export default function Quest_element({ name, subtitle }: QuestElementProps) {
         }}
       >
         <Image
-          source={require("../assets/Images/quest_icon.png")}
-          style={questElementStyles.icon}
+          source={require("../assets/Images/peach_tree.png")}
+          style={peachElementStyles.icon}
         />
       </TouchableOpacity>
 
-      <View style={questElementStyles.nameContainer}>
+      <View style={peachElementStyles.nameContainer}>
         <Image
-          source={require("../assets/Images/quest_title.png")}
-          style={questElementStyles.name}
+          source={require("../assets/Images/title.png")}
+          style={peachElementStyles.name}
         />
-        <Text style={questElementStyles.nameText}>{name}</Text>
+        <Text style={peachElementStyles.nameText}>{name}</Text>
       </View>
     </View>
   );
