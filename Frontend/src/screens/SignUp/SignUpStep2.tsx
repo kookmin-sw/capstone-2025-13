@@ -26,9 +26,10 @@ const SignUpStep2 = () => {
     const route = useRoute<SignUpStep2RouteProp>();
     const { nickname } = route.params;
 
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState<Date | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [isMale, setIsMale] = useState(true);
+    const [gender, setGender] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
@@ -36,6 +37,32 @@ const SignUpStep2 = () => {
     const handleDateChange = (event: any, selectedDate?: Date) => {
         if (Platform.OS === "android") hideDatePicker();
         if (selectedDate) setDate(selectedDate);
+
+    };
+
+    const handleSignUp = () => {
+        if (!gender && !date) {
+            setErrorMessage("정보를 입력하세요.");
+            return;
+        }
+        if (!gender) {
+            setErrorMessage("성별을 선택하세요.");
+            return;
+        }
+        if (!date) {
+            setErrorMessage("생년월일을 입력하세요.");
+            return;
+        }
+
+        // 날짜를 YYYY-MM-DD 형식으로 변환
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        setErrorMessage("");
+        navigation.navigate("SimpleDiagnosis", {
+            initialIndex: 11,
+            nickname,
+            birthDate: formattedDate,
+            gender,
+        });
     };
 
     return (
@@ -56,7 +83,7 @@ const SignUpStep2 = () => {
                                     <TextInput
                                         style={signUpStyles.input}
                                         placeholder="YYYY-MM-DD"
-                                        value={date.toISOString().slice(0, 10)}
+                                        value={date ? date.toISOString().slice(0, 10) : ""}
                                         editable={false}
                                         pointerEvents="none"
                                     />
@@ -64,7 +91,7 @@ const SignUpStep2 = () => {
 
                                 {isDatePickerVisible && (
                                     <DateTimePicker
-                                        value={date}
+                                        value={date ?? new Date()}
                                         mode="date"
                                         onChange={handleDateChange}
                                         display="spinner"
@@ -76,26 +103,34 @@ const SignUpStep2 = () => {
                                 <Text style={signUpStyles.inputTitle}>성별</Text>
                                 <View style={signUpStyles.row}>
                                     <TouchableOpacity
-                                        onPress={() => setIsMale(true)}
+                                        onPress={() => setGender("male")}
                                         style={[
                                             signUpStyles.genderButton,
-                                            isMale ? signUpStyles.maleSelected : signUpStyles.maleUnselected
+                                            gender === "male"
+                                                ? signUpStyles.maleSelected
+                                                : signUpStyles.maleUnselected
                                         ]}
                                     >
                                         <Text style={signUpStyles.genderText}>남자</Text>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
-                                        onPress={() => setIsMale(false)}
+                                        onPress={() => setGender("female")}
                                         style={[
                                             signUpStyles.genderButton,
-                                            !isMale ? signUpStyles.femaleSelected : signUpStyles.femaleUnselected
+                                            gender === "female"
+                                                ? signUpStyles.femaleSelected
+                                                : signUpStyles.femaleUnselected
                                         ]}
                                     >
                                         <Text style={signUpStyles.genderText}>여자</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
+
+                            {errorMessage !== "" && (
+                                <Text style={signUpStyles.errorText}>{errorMessage}</Text>
+                            )}
 
                             <View style={signUpStyles.row}>
                                 <TouchableOpacity
@@ -106,12 +141,7 @@ const SignUpStep2 = () => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={signUpStyles.signUpButton}
-                                    onPress={() => navigation.navigate('SimpleDiagnosis', {
-                                        initialIndex: 11,
-                                        nickname,
-                                        birthdate: date.toISOString().slice(0, 10),
-                                        gender: isMale ? "남자" : "여자",
-                                    })}
+                                    onPress={handleSignUp}
                                 >
                                     <Text style={signUpStyles.signUpText}>확인</Text>
                                 </TouchableOpacity>

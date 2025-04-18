@@ -15,6 +15,8 @@ import signInStyles from "../styles/signInStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
+import { signIn } from "../API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -25,6 +27,30 @@ const SignIn = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSignIn = async () => {
+        if (!email || !password) {
+            alert("이메일과 비밀번호를 입력해주세요.");
+            return;
+        }
+        setLoading(true);
+        setError(null);
+
+        try {
+            console.log("로그인 시도:", { email, password });
+            const response = await signIn(email, password);
+            console.log("로그인 성공:", response.accessToken);
+            await AsyncStorage.setItem('accessToken', response.accessToken);
+            await AsyncStorage.setItem('refreshToken', response.refreshToken);
+            navigation.navigate('Home')
+        } catch (error) {
+            console.error("로그인 실패:", error);
+            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+        }
+
+    };
 
     return (
         <KeyboardAvoidingView
@@ -61,12 +87,18 @@ const SignIn = () => {
                                     onChangeText={setPassword}
                                 />
                             </View>
-
+                            {
+                                (!email || !password) ? (
+                                    <Text style={signInStyles.errorText}>
+                                        이메일과 비밀번호를 입력해주세요.
+                                    </Text>
+                                ) : null
+                            }
                             <View style={signInStyles.row}>
                                 <TouchableOpacity style={signInStyles.backButton} onPress={goBack}>
                                     <Text style={signInStyles.backText}>뒤로가기</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={signInStyles.signInButton} onPress={() => navigation.navigate('Home')}>
+                                <TouchableOpacity style={signInStyles.signInButton} onPress={handleSignIn}>
                                     <Text style={signInStyles.signInText}>로그인</Text>
                                 </TouchableOpacity>
                             </View>
