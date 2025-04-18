@@ -2,12 +2,10 @@ package kr.ac.kookmin.wuung.service
 
 import jakarta.transaction.Transactional
 import kr.ac.kookmin.wuung.model.Diagnosis
-import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.repository.DiagnosisRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class DiagnosisService(
@@ -18,11 +16,12 @@ class DiagnosisService(
     }*/
 
     @Transactional
-    fun createDiagnosis(type : String, result : Long, createAt : LocalDateTime): Diagnosis {
+    fun createDiagnosis(type : String, result : Long, createdAt: LocalDateTime): Diagnosis {
         val diagnosis = Diagnosis(
             type = type,
             result = result,
-            createAt = createAt
+            createdAt = createdAt,
+            updatedAt = createdAt
         )
 
         return diagnosisRepository.save(diagnosis)
