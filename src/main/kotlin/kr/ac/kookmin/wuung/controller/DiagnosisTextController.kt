@@ -7,16 +7,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.service.DiagnosisTextService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 data class ReadDiagnosisTextRequest(
-    val accessToken: String,
     val type: String
 )
 
@@ -37,13 +38,11 @@ class DiagnosisTextController(
     )
     fun readDiagnosisText(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "access token to read diagnosis text")
-        @RequestBody readDiagnosisTextRequest: ReadDiagnosisTextRequest
+        @RequestBody readDiagnosisTextRequest: ReadDiagnosisTextRequest,
+        @AuthenticationPrincipal userDetails: User?
     ): ResponseEntity<Any> {
-
-        // JWT 토큰 검증
-        if (!jwtProvider.validateToken(readDiagnosisTextRequest.accessToken)) {
+        if(userDetails == null)
             return ResponseEntity.badRequest().body("Invalid JWT")
-        }
 
         val type = readDiagnosisTextRequest.type
 
