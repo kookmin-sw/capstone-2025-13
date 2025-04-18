@@ -1,7 +1,7 @@
 import { View, ScrollView, Image } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import Header_sky from "../components/Header_sky";
-import Quest_circle from "../components/Quest_circle";
+import Quest_circle from "../components/Darkgreen_circle";
 import Quest_street from "../components/Quest_street";
 import Quest_mission from "../components/Quest_mission";
 import questStyles from "../styles/questStyles";

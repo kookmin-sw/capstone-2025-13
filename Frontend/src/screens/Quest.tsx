@@ -1,7 +1,7 @@
 import React from "react";
 import { View, ScrollView, Dimensions } from "react-native";
 import Header_sky from "../components/Header_sky";
-import Quest_circle from "../components/Quest_circle";
+import Quest_circle from "../components/Darkgreen_circle";
 import Quest_element from "../components/Quest_element";
 import Quest_street from "../components/Quest_street";
 import questStyles from "../styles/questStyles";
