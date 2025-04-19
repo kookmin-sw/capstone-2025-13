@@ -23,3 +23,7 @@ jwt:
   refresh-token-validity: 604800
 etc:
   host: ${HOST_NAME}
+logging:
+  level:
+    root: INFO
+    kr.ac.kookmin.wuung.security: OFF

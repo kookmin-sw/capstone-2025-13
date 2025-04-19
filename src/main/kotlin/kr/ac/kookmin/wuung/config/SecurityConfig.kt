@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.config
 
+import kr.ac.kookmin.wuung.security.ExceptionHandlerFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -18,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import kr.ac.kookmin.wuung.security.JwtAuthenticationFilter
 import kr.ac.kookmin.wuung.service.UserService
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.web.authentication.logout.LogoutFilter
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value
 class SecurityConfig(
     private val userService: UserService,
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val exceptionHandlerFilter: ExceptionHandlerFilter,
     @Value("\${etc.host}")
     private val host: String
 ) {
@@ -67,8 +70,10 @@ class SecurityConfig(
                 ).permitAll()
                 it.anyRequest().authenticated()
             }
-            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(exceptionHandlerFilter, LogoutFilter::class.java)
+            // JWT 인증 필터는 예외 처리 필터 다음에 배치
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .authenticationProvider(authenticationProvider())
             .build()
     }
 
