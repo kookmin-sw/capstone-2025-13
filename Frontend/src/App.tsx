@@ -9,12 +9,13 @@ import SignUpStep1 from "./screens/SignUp/SignUpStep1";
 import SignUpStep2 from "./screens/SignUp/SignUpStep2";
 import SimpleDiagnosis from "./screens/SimpleDiagnosis/SimpleDiagnosis";
 import SignUpStep3 from "./screens/SignUp/SignUpStep3";
-import Game from "./screens/Game";
+import Game from "./screens/Game/Game";
 import Quest from "./screens/Quest";
 import Quest_stage from "./screens/Quest_stage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
+import GameScreen from "./screens/Game/GameScreen";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -32,8 +33,9 @@ export type RootStackParamList = {
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
-    FormalDiagnosis: undefined; // FormalDiagnosis 추가
-    FormalDiagnosisSurvey: undefined; // FormalDiagnosisSurvey 추가
+    FormalDiagnosis: undefined;
+    FormalDiagnosisSurvey: undefined;
+    GameScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -129,6 +131,11 @@ export default function App() {
                 <Stack.Screen
                     name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
                     component={FormalDiagnosisSurvey}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="GameScreen" // GameScreen 화면 추가
+                    component={GameScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

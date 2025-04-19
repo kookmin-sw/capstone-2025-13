@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { RootStackParamList } from "../App";
+import { RootStackParamList } from "../../App";
 
 type GameNavigationProp = NativeStackNavigationProp<RootStackParamList, "Game">;
 
@@ -14,7 +14,7 @@ const Game = () => {
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('SimpleDiagnosis', { initialIndex: 33, score: score, })}
+                onPress={() => navigation.navigate("GameScreen")}
             >
                 <Text style={styles.buttonText}>게임 스타트</Text>
             </TouchableOpacity>
