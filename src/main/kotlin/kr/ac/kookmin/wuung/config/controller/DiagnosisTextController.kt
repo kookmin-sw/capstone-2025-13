@@ -1,4 +1,4 @@
-package kr.ac.kookmin.wuung.controller
+package kr.ac.kookmin.wuung.config.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.Exception
 
 data class ReadDiagnosisTextRequest(
     val type: String
@@ -33,7 +34,7 @@ class DiagnosisTextController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successfully read diagnosis text", content = [Content(mediaType = "application/json", schema = Schema(implementation = Object::class))]),
-            ApiResponse(responseCode = "400", description = "Failed to read diagnosis text", content = [Content(mediaType = "application/json", schema = Schema(implementation = java.lang.Exception::class))])
+            ApiResponse(responseCode = "400", description = "Failed to read diagnosis text", content = [Content(mediaType = "application/json", schema = Schema(implementation = Exception::class))])
         ]
     )
     fun readDiagnosisText(
