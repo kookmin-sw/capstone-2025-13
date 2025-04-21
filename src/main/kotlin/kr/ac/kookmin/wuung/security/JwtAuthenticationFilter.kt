@@ -44,7 +44,7 @@ class JwtAuthenticationFilter(
                         details = WebAuthenticationDetailsSource().buildDetails(request)
                     }
                 SecurityContextHolder.getContext().authentication = authentication
-            } ?: throw UnauthorizedException()
+            }
         } catch (e: UsernameNotFoundException) {
             logger.error("User not found: ${e.message}")
             throw UnauthorizedException()

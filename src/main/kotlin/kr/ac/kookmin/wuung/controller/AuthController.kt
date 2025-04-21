@@ -1,4 +1,4 @@
-package kr.ac.kookmin.wuung.config.controller
+package kr.ac.kookmin.wuung.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation

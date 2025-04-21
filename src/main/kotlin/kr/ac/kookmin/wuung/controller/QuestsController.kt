@@ -1,4 +1,4 @@
-package kr.ac.kookmin.wuung.config.controller
+package kr.ac.kookmin.wuung.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -15,12 +15,14 @@ import kr.ac.kookmin.wuung.repository.QuestsRepository
 import kr.ac.kookmin.wuung.repository.UserQuestsRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
+import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -57,6 +59,13 @@ data class CreateQuestRequest(
     val id: Long,
 )
 data class CreateQuestResponse(
+    val data: UserQuestsDTO,
+)
+data class UpdateQuestRequest(
+    val id: String,
+    val current: Int,
+)
+data class UpdateQuestResponse(
     val data: UserQuestsDTO,
 )
 
@@ -157,6 +166,63 @@ class QuestsController(
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = CreateQuestResponse(data.toDTO()))
+        )
+    }
+
+    @PostMapping("")
+    @Operation(
+        summary = "Update quest progress",
+        description = "Updates the progress of a quest for the authenticated user"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Successfully updated quest",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Quest not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500", description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun updateQuests(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestBody request: UpdateQuestRequest,
+    ): ResponseEntity<ApiResponseDTO<UpdateQuestResponse>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val quest = userQuestsRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
+
+        if(quest.target < request.current) {
+            throw ServerErrorException()
+        }
+
+        quest.progress = request.current
+        userQuestsRepository.save(quest)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = UpdateQuestResponse(quest.toDTO()))
         )
     }
 }
