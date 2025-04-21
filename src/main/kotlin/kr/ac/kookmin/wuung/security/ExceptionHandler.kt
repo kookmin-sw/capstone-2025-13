@@ -33,7 +33,8 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         val errorResponse = ApiResponseDTO<String>(
             error = true,
-            message = error.message
+            message = error.message,
+            code = error.status
         )
 
         try {

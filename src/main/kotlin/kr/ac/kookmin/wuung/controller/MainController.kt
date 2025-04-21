@@ -1,4 +1,4 @@
-package kr.ac.kookmin.wuung.config.controller
+package kr.ac.kookmin.wuung.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
