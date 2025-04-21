@@ -1,12 +1,7 @@
 package kr.ac.kookmin.wuung.model
 
-import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
-import kr.ac.kookmin.wuung.controller.CreateDiagnosisResponse
-import org.springframework.cglib.core.Local
 import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 // 약식 검사와 정식 검사 종류를 표현한 클래스
 enum class DiagnosisType(val value : String) {

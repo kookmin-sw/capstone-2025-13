@@ -1,6 +1,5 @@
 package kr.ac.kookmin.wuung.controller
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -11,7 +10,6 @@ import kr.ac.kookmin.wuung.jwt.JwtProvider
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.service.DiagnosisService
-import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 data class CreateDiagnosisRequest(

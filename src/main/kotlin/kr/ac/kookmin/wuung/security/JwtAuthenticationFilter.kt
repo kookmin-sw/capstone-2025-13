@@ -4,6 +4,9 @@ import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kr.ac.kookmin.wuung.exceptions.JwtExpiredException
+import kr.ac.kookmin.wuung.exceptions.ServerErrorException
+import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -21,7 +24,6 @@ class JwtAuthenticationFilter(
     @Autowired private val userService: UserService,
     @Autowired private val revokedTokenService: RevokedTokenService
 ) : OncePerRequestFilter() {
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -32,8 +34,7 @@ class JwtAuthenticationFilter(
                 val claims = jwtProvider.parseJwts(token) ?: return
                 if (revokedTokenService.isTokenRevoked(token)) {
                     logger.warn("Token has been revoked. Token hash: ${token.hashCode()}")
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been revoked")
-                    return
+                    throw JwtExpiredException()
                 }
 
                 val userId = claims["userId"] as String
@@ -46,16 +47,13 @@ class JwtAuthenticationFilter(
             }
         } catch (e: UsernameNotFoundException) {
             logger.error("User not found: ${e.message}")
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found")
-            return
+            throw UnauthorizedException()
         } catch (e: JwtException) {
             logger.error("Invalid JWT: ${e.message}")
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT")
-            return
+            throw JwtExpiredException()
         } catch (e: Exception) {
             logger.error("Unexpected error during authentication", e)
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred")
-            return
+            throw ServerErrorException()
         }
         filterChain.doFilter(request, response)
     }
