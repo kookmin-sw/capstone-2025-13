@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.ac.kookmin.wuung.exceptions.ServerErrorException
+import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.GenderEnum
 import kr.ac.kookmin.wuung.model.RefreshToken
@@ -66,15 +69,15 @@ class AuthController(
    @Operation(summary = "Authenticate user and generate JWT tokens", description = "Validates user credentials and provides access and refresh tokens.")
    @ApiResponses(
        value = [
-           ApiResponse(responseCode = "200", description = "Successfully authenticated", content = [Content(mediaType = "application/json", schema = Schema(implementation = LoginResponse::class))]),
-           ApiResponse(responseCode = "401", description = "Invalid credentials", content = [Content(schema=Schema(implementation=java.lang.Exception::class))]),
-           ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema=Schema(implementation=java.lang.Exception::class))]),
+           ApiResponse(responseCode = "200", description = "Successfully authenticated", useReturnTypeSchema = true),
+           ApiResponse(responseCode = "401", description = "Invalid credentials", content = [Content(schema=Schema(implementation=ApiResponseDTO::class))]),
+           ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema=Schema(implementation=ApiResponseDTO::class))]),
        ]
    )
    fun authenticateUser(
        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email and password for authentication") 
        @RequestBody loginRequest: LoginRequest
-   ): ResponseEntity<LoginResponse> {
+   ): ResponseEntity<ApiResponseDTO<LoginResponse>> {
        val authentication = authenticationManager.authenticate(
            UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)
        )
@@ -90,7 +93,7 @@ class AuthController(
            expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
        ))
 
-       return ResponseEntity.ok(LoginResponse(accessToken, refreshToken))
+       return ResponseEntity.ok(ApiResponseDTO(data = LoginResponse(accessToken, refreshToken)))
    }
 
 
@@ -98,14 +101,14 @@ class AuthController(
     @Operation(summary = "Refresh JWT tokens", description = "Generates new access and refresh tokens from a valid refresh token.")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully refreshed tokens", content = [Content(mediaType = "application/json", schema = Schema(implementation = TokenRefreshResponse::class))]),
+            ApiResponse(responseCode = "200", description = "Successfully refreshed tokens", useReturnTypeSchema = true),
             ApiResponse(responseCode = "400", description = "Invalid or expired refresh token", content = [Content(schema=Schema(implementation=java.lang.Exception::class))])
         ]
     )
     fun refreshToken(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token to generate new tokens")
         @RequestBody tokenRefreshRequest: TokenRefreshRequest
-    ): ResponseEntity<TokenRefreshResponse> {
+    ): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
         val requestRefreshToken = tokenRefreshRequest.refreshToken
 
         return tokenService.findByToken(requestRefreshToken).map { refreshToken ->
@@ -113,37 +116,36 @@ class AuthController(
                 tokenService.verifyExpiration(refreshToken)
                 val user = refreshToken.user
 
-                println(user)
-
                 user?.let {
                     val accessToken = jwtProvider.generateAccessToken(it)
 
-                    ResponseEntity.ok(TokenRefreshResponse(accessToken, requestRefreshToken))
-                } ?: ResponseEntity.badRequest().body<TokenRefreshResponse>(null)
+                    ResponseEntity.ok(ApiResponseDTO(data = TokenRefreshResponse(accessToken, requestRefreshToken)))
+                } ?: throw UnauthorizedException()
             } catch(e: Exception) {
-                ResponseEntity.badRequest().body<TokenRefreshResponse>(null)
+                throw ServerErrorException()
             }
-        }.orElse(ResponseEntity.status(403).build())
+        }.orElse(throw ServerErrorException())
     }
 
     @PostMapping("/logout")
     @Operation(summary = "Logout user", description = "Invalidates refresh tokens for the user.")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully logged out", content = [Content(schema=Schema(implementation=Object::class))]),
+            ApiResponse(responseCode = "200", description = "Successfully logged out", useReturnTypeSchema = true),
             ApiResponse(responseCode = "400", description = "Invalid refresh token", content = [Content(schema=Schema(implementation=java.lang.Exception::class))])
         ]
     )
     fun logoutUser(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token to invalidate")
         @RequestBody tokenRevokeRequest: LogoutRequest
-    ): ResponseEntity<String> {
+    ): ResponseEntity<ApiResponseDTO<String>> {
         val requestRefreshToken = tokenRevokeRequest.refreshToken
+
         tokenService.findByToken(requestRefreshToken).ifPresent {refreshToken ->
             refreshToken.user?.let { tokenService.deleteByUser(it) }
         }
 
-        return ResponseEntity.ok("Success")
+        return ResponseEntity.ok(ApiResponseDTO(data = "Success"))
     }
 
     @PostMapping("/signup")
@@ -156,7 +158,7 @@ class AuthController(
             ApiResponse(
                 responseCode = "200",
                 description = "sign up user",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = SignUpResponse::class))]
+                useReturnTypeSchema = true,
             ),
             ApiResponse(
                 responseCode = "400",
@@ -167,12 +169,11 @@ class AuthController(
     )
     fun signUpUser(
         @RequestBody signUpRequest: SignUpRequest
-    ): ResponseEntity<SignUpResponse>{
+    ): ResponseEntity<ApiResponseDTO<SignUpResponse>>{
 
         // 이메일 중복 여부 검사
-        if (userRepository.findByEmail(signUpRequest.email).isPresent) {
-            return ResponseEntity.badRequest().build()  // 혹은 적절한 오류 메시지를 반환
-        }
+        if (userRepository.findByEmail(signUpRequest.email).isPresent)
+            throw ServerErrorException()
 
         // userName을 UK로 취급할 건가?
         // 할꺼면 중복 검사 루틴 추가
@@ -201,7 +202,7 @@ class AuthController(
         ))
 
         // 생성된 토큰을 포함한 응답 전송
-        return ResponseEntity.ok(SignUpResponse(accessToken, refreshToken))
+        return ResponseEntity.ok(ApiResponseDTO(data = SignUpResponse(accessToken, refreshToken)))
     }
 
     @GetMapping("/me")
@@ -214,7 +215,7 @@ class AuthController(
             ApiResponse(
                 responseCode = "200",
                 description = "Successfully retrieved user information",
-                content = [Content(schema = Schema(implementation = UserInfoResponse::class), mediaType = "application/json")]
+                useReturnTypeSchema = true,
             ),
             ApiResponse(
                 responseCode = "401",
@@ -225,8 +226,8 @@ class AuthController(
     )
     fun getUserInfo(
         @AuthenticationPrincipal userDetails: User?,
-    ): ResponseEntity<UserInfoResponse> {
-        if(userDetails?.id == null) return ResponseEntity.badRequest().body(null)
+    ): ResponseEntity<ApiResponseDTO<UserInfoResponse>> {
+        if(userDetails?.id == null) throw UnauthorizedException()
 
         val user = userRepository.findById(userDetails.id ?: "").get()
 
@@ -235,6 +236,6 @@ class AuthController(
             user.authorities.map { it.authority },
             user.userName!!
         )
-        return ResponseEntity.ok(userInfo)
+        return ResponseEntity.ok(ApiResponseDTO(data = userInfo))
     }
 }

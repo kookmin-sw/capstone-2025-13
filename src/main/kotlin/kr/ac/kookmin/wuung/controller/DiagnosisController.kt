@@ -41,7 +41,7 @@ class DiagnosisController(
     @Operation()
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))]),
+            ApiResponse(responseCode = "200", description = "Successfully create diagnosis", useReturnTypeSchema = true),
             ApiResponse(responseCode = "400", description = "Failed to create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))]),
             ApiResponse(responseCode = "403", description = "Exception raised while create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))])
     ]

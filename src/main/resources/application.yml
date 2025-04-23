@@ -15,7 +15,6 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
-  enable-native-support: true
 jwt:
   signing-key: ${JWT_SIGNING_KEY}
   validate-key: ${JWT_VALIDATE_KEY}

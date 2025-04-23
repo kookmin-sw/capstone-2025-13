@@ -51,22 +51,12 @@ fun UserQuests.toDTO() = UserQuestsDTO(
     this.createdAt,
     this.updatedAt
 )
-
-data class MyQuestsResponse(
-    val quests: List<UserQuestsDTO>
-)
 data class CreateQuestRequest(
     val id: Long,
-)
-data class CreateQuestResponse(
-    val data: UserQuestsDTO,
 )
 data class UpdateQuestRequest(
     val id: String,
     val current: Int,
-)
-data class UpdateQuestResponse(
-    val data: UserQuestsDTO,
 )
 
 @RestController
@@ -85,8 +75,7 @@ class QuestsController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully retrieved quests",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
+            ApiResponse(responseCode = "200", description = "Successfully retrieved quests", useReturnTypeSchema = true),
             ApiResponse(responseCode = "403", description = "Invalid request",
                 content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
             ApiResponse(responseCode = "500", description = "Internal server error",
@@ -97,7 +86,7 @@ class QuestsController(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Start date in format yyyy-MM-dd", example = "2000-01-01")
         @RequestParam(required = false) start: String?,
-    ): ResponseEntity<ApiResponseDTO<MyQuestsResponse>> {
+    ): ResponseEntity<ApiResponseDTO<List<UserQuestsDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quests = start?.let {
@@ -106,7 +95,7 @@ class QuestsController(
         } ?: userQuestsRepository.findByUser(userDetails)
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = MyQuestsResponse(quests.map { it.toDTO() }))
+            ApiResponseDTO(data = quests.map { it.toDTO() })
         )
     }
 
@@ -118,11 +107,7 @@ class QuestsController(
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Successfully created quest",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
+                responseCode = "200", description = "Successfully created quest", useReturnTypeSchema = true
             ),
             ApiResponse(
                 responseCode = "403", description = "Unauthorized access",
@@ -149,7 +134,7 @@ class QuestsController(
     fun createQuests(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: CreateQuestRequest,
-    ): ResponseEntity<ApiResponseDTO<CreateQuestResponse>> {
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = questsRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
@@ -165,7 +150,7 @@ class QuestsController(
         userQuestsRepository.save(data)
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = CreateQuestResponse(data.toDTO()))
+            ApiResponseDTO(data = data.toDTO())
         )
     }
 
@@ -177,11 +162,7 @@ class QuestsController(
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Successfully updated quest",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
+                responseCode = "200", description = "Successfully updated quest", useReturnTypeSchema = true
             ),
             ApiResponse(
                 responseCode = "403", description = "Unauthorized access",
@@ -209,7 +190,7 @@ class QuestsController(
     fun updateQuests(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: UpdateQuestRequest,
-    ): ResponseEntity<ApiResponseDTO<UpdateQuestResponse>> {
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
@@ -222,7 +203,7 @@ class QuestsController(
         userQuestsRepository.save(quest)
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = UpdateQuestResponse(quest.toDTO()))
+            ApiResponseDTO(data = quest.toDTO())
         )
     }
 }
