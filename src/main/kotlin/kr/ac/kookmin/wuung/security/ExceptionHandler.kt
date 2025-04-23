@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kr.ac.kookmin.wuung.exceptions.CustomException
+import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -22,6 +23,8 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
             filterChain.doFilter(request, response)
         } catch (e: CustomException) {
             handleCustomException(response, e)
+        } catch (e: RuntimeException) {
+            handleCustomException(response, ServerErrorException())
         }
     }
 
