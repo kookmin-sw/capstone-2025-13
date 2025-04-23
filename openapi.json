@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "Wuung API Server",
     "version": "v1.0.0"
@@ -28,9 +28,182 @@
     {
       "name": "Auth API",
       "description": "Endpoints for authentication and token management"
+    },
+    {
+      "name": "Quests API",
+      "description": "Endpoints for quests"
+    },
+    {
+      "name": "Diagnosis Text API",
+      "description": "Endpoints for read diagnosis text"
     }
   ],
   "paths": {
+    "/quests": {
+      "put": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Create a new quest",
+        "description": "Creates a new quest instance for the authenticated user",
+        "operationId": "createQuests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created quest",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quest not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Update quest progress",
+        "description": "Updates the progress of a quest for the authenticated user",
+        "operationId": "updateQuests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated quest",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quest not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/daignosisText/read": {
+      "post": {
+        "tags": [
+          "Diagnosis Text API"
+        ],
+        "summary": "read diagnosis text list",
+        "description": "read diagnosis text list specific type",
+        "operationId": "readDiagnosisText",
+        "requestBody": {
+          "description": "access token to read diagnosis text",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadDiagnosisTextRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully read diagnosis text",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListString"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to read diagnosis text",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/daignosis/create": {
       "post": {
         "tags": [
@@ -48,6 +221,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Successfully create diagnosis",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateDiagnosisResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Failed to create diagnosis",
             "content": {
@@ -58,8 +241,8 @@
               }
             }
           },
-          "200": {
-            "description": "Successfully create diagnosis",
+          "403": {
+            "description": "Exception raised while create diagnosis",
             "content": {
               "application/json": {
                 "schema": {
@@ -93,9 +276,9 @@
           "200": {
             "description": "sign up user",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SignUpResponse"
+                  "$ref": "#/components/schemas/ApiResponseDTOSignUpResponse"
                 }
               }
             }
@@ -133,22 +316,22 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Successfully refreshed tokens",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOTokenRefreshResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Invalid or expired refresh token",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successfully refreshed tokens",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenRefreshResponse"
                 }
               }
             }
@@ -181,7 +364,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApiResponseDTOString"
                 }
               }
             }
@@ -222,9 +405,9 @@
           "200": {
             "description": "Successfully authenticated",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/ApiResponseDTOLoginResponse"
                 }
               }
             }
@@ -234,7 +417,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponseDTO"
                 }
               }
             }
@@ -244,7 +427,63 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/me": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Get my quests",
+        "description": "Get my quests",
+        "operationId": "getQuests",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date in format yyyy-MM-dd",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Start date in format yyyy-MM-dd",
+              "example": "2000-01-01"
+            },
+            "example": "2000-01-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved quests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
                 }
               }
             }
@@ -261,22 +500,22 @@
         "description": "Retrieves the logged-in user's information using a valid access token.",
         "operationId": "getUserInfo",
         "responses": {
+          "200": {
+            "description": "Successfully retrieved user information",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserInfoResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized - Invalid or missing access token",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successfully retrieved user information",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfoResponse"
                 }
               }
             }
@@ -296,7 +535,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiResponseDTOString"
                 }
               }
             }
@@ -307,19 +546,139 @@
   },
   "components": {
     "schemas": {
+      "CreateQuestRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ApiResponseDTOUserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserQuestsDTO"
+          }
+        }
+      },
+      "UserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MEDITATE",
+              "ACTIVITY",
+              "EMOTION"
+            ]
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "target": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateQuestRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReadDiagnosisTextRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOListString": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "CreateDiagnosisRequest": {
         "type": "object",
         "properties": {
-          "accessToken": {
-            "type": "string"
-          },
           "result": {
             "type": "integer",
             "format": "int64"
           },
           "type": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "createAt": {
             "type": "string"
@@ -360,6 +719,24 @@
           }
         }
       },
+      "ApiResponseDTOSignUpResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SignUpResponse"
+          }
+        }
+      },
       "SignUpResponse": {
         "type": "object",
         "properties": {
@@ -376,6 +753,24 @@
         "properties": {
           "refreshToken": {
             "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOTokenRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TokenRefreshResponse"
           }
         }
       },
@@ -401,6 +796,24 @@
           }
         }
       },
+      "ApiResponseDTOString": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "properties": {
@@ -412,6 +825,24 @@
           }
         }
       },
+      "ApiResponseDTOLoginResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginResponse"
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "properties": {
@@ -420,6 +851,45 @@
           },
           "refreshToken": {
             "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOListUserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserQuestsDTO"
+            }
+          }
+        }
+      },
+      "ApiResponseDTOUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserInfoResponse"
           }
         }
       },
@@ -444,6 +914,7 @@
     "securitySchemes": {
       "api token": {
         "type": "http",
+        "name": "api token",
         "scheme": "bearer"
       }
     }
