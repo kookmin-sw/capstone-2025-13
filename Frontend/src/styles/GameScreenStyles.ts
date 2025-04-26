@@ -13,4 +13,11 @@ export const gameScreenstyles = StyleSheet.create({
     },
     result: { marginBottom: 70},
     success: { fontSize: 22, color: 'green', marginBottom: 10 },
+    timeTaken: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: 'green',
+      marginTop: 10,
+    },
+    
   });
