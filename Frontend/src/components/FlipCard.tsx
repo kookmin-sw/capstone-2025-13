@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Text, Pressable, View } from 'react-native';
+import { Audio } from 'expo-av';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -7,6 +8,7 @@ import Animated, {
     interpolate,
 } from 'react-native-reanimated';
 import { cardStyles } from '../styles/FlipCardStyles';
+
 interface Props {
     symbol: string;
     isFlipped: boolean;
@@ -16,19 +18,49 @@ interface Props {
 
 const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
     const rotation = useSharedValue(0);
+    const flipSound = useRef<Audio.Sound | null>(null);
 
     useEffect(() => {
+        // 컴포넌트가 처음 마운트 될 때만 사운드 로드
+        const loadSound = async () => {
+            const { sound } = await Audio.Sound.createAsync(
+                require('../assets/flip-card.mp3')
+            );
+            flipSound.current = sound;
+            await flipSound.current.setVolumeAsync(0.3);
+        };
+
+        loadSound();
+
+        // 컴포넌트가 사라질 때 사운드 정리
+        return () => {
+            if (flipSound.current) {
+                flipSound.current.unloadAsync();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+
+        const playSound = async () => {
+            if (isFlipped && !isMatched && flipSound.current) {
+                await flipSound.current.replayAsync();
+            }
+        };
+
+        playSound();
+
         rotation.value = withTiming(isFlipped || isMatched ? 180 : 0, { duration: 300 });
     }, [isFlipped, isMatched]);
 
     const frontAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ rotateY: `${interpolate(rotation.value, [0, 180], [0, 180])}deg` }], // 카드 회전
-        opacity: interpolate(rotation.value, [0, 90], [0, 1]), // 앞면의 투명도 조정
+        transform: [{ rotateY: `${interpolate(rotation.value, [0, 180], [0, 180])}deg` }],
+        opacity: interpolate(rotation.value, [0, 90], [0, 1]),
     }));
 
     const backAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ rotateY: `${interpolate(rotation.value, [0, 180], [0, 180])}deg` }], // 카드 회전
-        opacity: interpolate(rotation.value, [0, 90], [1, 0]), // 뒷면의 투명도 조정
+        transform: [{ rotateY: `${interpolate(rotation.value, [0, 180], [0, 180])}deg` }],
+        opacity: interpolate(rotation.value, [0, 90], [1, 0]),
     }));
 
     return (
@@ -44,6 +76,5 @@ const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
         </Pressable>
     );
 };
-
 
 export default FlipCard;
