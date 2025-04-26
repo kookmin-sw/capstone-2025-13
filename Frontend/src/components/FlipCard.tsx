@@ -24,7 +24,7 @@ const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
         // 컴포넌트가 처음 마운트 될 때만 사운드 로드
         const loadSound = async () => {
             const { sound } = await Audio.Sound.createAsync(
-                require('../assets/flip-card.mp3')
+                require('../assets/sounds/flip-card.mp3')
             );
             flipSound.current = sound;
             await flipSound.current.setVolumeAsync(0.3);
