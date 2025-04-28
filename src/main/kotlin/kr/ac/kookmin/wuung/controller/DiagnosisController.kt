@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.service.DiagnosisService
@@ -42,8 +43,10 @@ class DiagnosisController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successfully create diagnosis", useReturnTypeSchema = true),
-            ApiResponse(responseCode = "400", description = "Failed to create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))]),
-            ApiResponse(responseCode = "403", description = "Exception raised while create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))])
+            ApiResponse(responseCode = "400", description = "Failed to create diagnosis",
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
+            ApiResponse(responseCode = "403", description = "Exception raised while create diagnosis",
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
     ]
     )
     fun createDiagnosis(
@@ -71,7 +74,8 @@ class DiagnosisController(
         }
 
         // 데이터 추가
-        diagnosisService.createDiagnosis(request.type, request.result, createdAt)
+        // diagnosisService.createDiagnosis(request.type, request.result, createdAt)
+        // service method deleted...
 
         // 결과 반환
         return ResponseEntity.ok(CreateDiagnosisResponse("ok"))

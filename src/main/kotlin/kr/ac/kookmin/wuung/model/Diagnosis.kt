@@ -20,8 +20,14 @@ data class Diagnosis(
     @Column(nullable = false)
     var type : String? = null, // 검사 종류를 나타내주는 필드
 
-    @Column(nullable = false)
-    var result : Long? = null, // 검사 결과를 나타내주는 필드
+    @Column(nullable = false, length = 128)
+    var title: String? = null,
+
+    @Column(nullable = false, length = 1024)
+    var description: String? = null,
+
+    @OneToMany
+    var diagnosisTexts: List<DiagnosisText> = listOf(),
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
