@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
 import GameScreen from "./screens/Game/GameScreen";
+import DailyTopic from "./screens/DailyTopic";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -36,6 +37,7 @@ export type RootStackParamList = {
     FormalDiagnosis: undefined;
     FormalDiagnosisSurvey: undefined;
     GameScreen: undefined;
+    DailyTopic: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -136,6 +138,11 @@ export default function App() {
                 <Stack.Screen
                     name="GameScreen" // GameScreen 화면 추가
                     component={GameScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="DailyTopic" // DailyTopic 화면 추가
+                    component={DailyTopic}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
