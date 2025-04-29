@@ -15,59 +15,76 @@ import { useState, useRef, useEffect } from "react";
 
 export default function DailyTopic() {
     const [answer, setAnswer] = useState<string>("");
-    const [answerList, setAnswerList] = useState<string[]>([]);
-    const [questionList, setQuestionList] = useState<string[]>([]);
+    const [chatHistory, setChatHistory] = useState<{ type: "question" | "answer"; text: string }[]>([]); 
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);  
     const scrollRef = useRef<ScrollView>(null);
 
-    const questionCnt = 3;
+    const questionList = [
+        "질문 1", "질문 2", "질문 3", "질문 4", "질문 5"
+    ]; 
+
+    useEffect(() => {
+        if (questionList.length > 0) {
+            setChatHistory(prevHistory => [
+                ...prevHistory,
+                { type: "question", text: questionList[0] }
+            ]);
+        }
+    }, []);
 
     const handleSend = () => {
         if (answer.trim() === "") return;
-        setAnswerList([...answerList, answer]);
-        setAnswer("");
+
+        setChatHistory(prevHistory => [
+            ...prevHistory,
+            { type: "answer", text: answer }
+        ]);
+        setAnswer("");  
+
+        setTimeout(() => {
+            setCurrentQuestionIndex(prev => prev + 1);
+
+            if (currentQuestionIndex + 1 < questionList.length) {
+                setChatHistory(prevHistory => [
+                    ...prevHistory,
+                    { type: "question", text: questionList[currentQuestionIndex + 1] }
+                ]);
+            }
+        }, 500); 
     };
 
     useEffect(() => {
         scrollRef.current?.scrollToEnd({ animated: true });
-    }, [answerList]);
+    }, [chatHistory]);
 
-    const questions = () => (
-        <View style={dailyTopicstyles.questionContainer}>
-            <Image
-                source={require("../assets/Images/cloverProfile.png")}
-                style={dailyTopicstyles.cloverProfileImage}
-            />
-            <View style={dailyTopicstyles.contentContainer}>
-                <Text>세잎이 ☘️</Text>
-                {Array.from({ length: questionCnt }).map((_, index) => (
-                    <View key={index} style={dailyTopicstyles.itemContainer}>
-                        <Question
-                            question={`질문 ${index + 1} aaaaaaaaaaaaadddddddddddddddcffffffffffffff`}
+    const renderChat = () => {
+        return chatHistory.map((item, index) => (
+            <View key={index} style={dailyTopicstyles.itemContainer}>
+                {item.type === "question" ? (
+                    <View style={dailyTopicstyles.questionContainer}>
+                        <Image
+                            source={require("../assets/Images/cloverProfile.png")}
+                            style={dailyTopicstyles.cloverProfileImage}
+                        />
+                        <View style={dailyTopicstyles.contentContainer}>
+                            <Text>세잎이 ☘️</Text>
+                            <Question question={item.text} />
+                        </View>
+                    </View>
+                ) : (
+                    <View style={dailyTopicstyles.answerContainer}>
+                        <View style={dailyTopicstyles.contentContainer}>
+                            <Answer answer={item.text} />
+                        </View>
+                        <Image
+                            source={require("../assets/Images/cloverProfile.png")}
+                            style={dailyTopicstyles.userProfileImage}
                         />
                     </View>
-                ))}
+                )}
             </View>
-        </View>
-    );
-
-    const answers = () => (
-        <View style={dailyTopicstyles.answerContainer}>
-            <View style={dailyTopicstyles.contentContainer}>
-                {answerList.map((ans, index) => (
-                    <View key={index} style={dailyTopicstyles.itemContainer}>
-                        <Answer answer={ans} />
-                    </View>
-                ))}
-            </View>
-            {answerList.length > 0 && (
-                <Image
-                    source={require("../assets/Images/cloverProfile.png")}
-                    style={dailyTopicstyles.userProfileImage}
-                />
-            )}
-
-        </View>
-    );
+        ));
+    };
 
     return (
         <KeyboardAvoidingView
@@ -81,8 +98,8 @@ export default function DailyTopic() {
                     ref={scrollRef}
                     showsVerticalScrollIndicator={false}
                 >
-                    {questions()}
-                    {answers()}
+                    {/* 채팅 기록 렌더링 */}
+                    {renderChat()}
                 </ScrollView>
                 <View style={dailyTopicstyles.inputContainer}>
                     <TextInput
