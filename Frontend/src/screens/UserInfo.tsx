@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
-import { launchCamera, launchImageLibrary, ImagePickerResponse } from "react-native-image-picker";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Modal } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
 
-// 이미지 경로 수정: require 방식으로 이미지 가져오기
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
 type UserData = {
@@ -12,7 +11,7 @@ type UserData = {
   birthDate: string;
   gender: string;
   secondPassword: string;
-  profilePic: string | null;  // profilePic은 string | null 타입으로 유지
+  profilePic: string | null;
 };
 
 export default function UserInfo() {
@@ -23,12 +22,13 @@ export default function UserInfo() {
     birthDate: "1990-01-01",
     gender: "남성",
     secondPassword: "second123",
-    profilePic: null, // 기본값은 null
+    profilePic: null,
   });
 
   const [editMode, setEditMode] = useState(false);
   const [originalData, setOriginalData] = useState<UserData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,11 +39,22 @@ export default function UserInfo() {
         birthDate: "1990-01-01",
         gender: "남성",
         secondPassword: "second123",
-        profilePic: null, // 기본 프로필 이미지 설정을 null로
+        profilePic: null,
       };
       setUserData(initialData);
       setOriginalData(initialData);
+
+      const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (galleryStatus.granted) {
+        console.log("갤러리 권한이 허용되었습니다.");
+      }
+      if (cameraStatus.granted) {
+        console.log("카메라 권한이 허용되었습니다.");
+      }
     };
+
     fetchData();
   }, []);
 
@@ -59,42 +70,57 @@ export default function UserInfo() {
     setHasChanges(false);
   };
 
-  const handlePickImage = () => {
-    const options = {
-      mediaType: 'photo' as const,  // 'photo'로 타입 지정
-      includeBase64: false,
-    };
-  
-    launchImageLibrary(options, (response: ImagePickerResponse) => {
-      if (response.assets && response.assets[0]) {
-        const imageUri = response.assets[0].uri;
-        setUserData({
-          ...userData,
-          profilePic: imageUri ?? null, // uri가 없을 경우 null 처리
-        });
-        setHasChanges(true);
-      }
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("권한이 필요합니다", "갤러리 접근 권한을 허용해주세요.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
     });
+
+    if (!result.canceled && result.assets?.length > 0) { // `canceled` 확인 및 assets 배열에 값이 있는지 확인
+      setUserData({
+        ...userData,
+        profilePic: result.assets[0].uri, // 첫 번째 이미지의 URI
+      });
+      setHasChanges(true);
+    }
   };
-  
-  const handleTakePhoto = () => {
-    const options = {
-      mediaType: 'photo' as const,  // 'photo'로 타입 지정
-      includeBase64: false,
-    };
-  
-    launchCamera(options, (response: ImagePickerResponse) => {
-      if (response.assets && response.assets[0]) {
-        const imageUri = response.assets[0].uri;
-        setUserData({
-          ...userData,
-          profilePic: imageUri ?? null, // uri가 없을 경우 null 처리
-        });
-        setHasChanges(true);
-      }
+
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("권한이 필요합니다", "카메라 접근 권한을 허용해주세요.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
     });
+
+    if (!result.canceled && result.assets?.length > 0) { // `canceled` 확인 및 assets 배열에 값이 있는지 확인
+      setUserData({
+        ...userData,
+        profilePic: result.assets[0].uri, // 첫 번째 이미지의 URI
+      });
+      setHasChanges(true);
+    }
   };
-  
+
+  const handleResetProfilePic = () => {
+    setUserData({
+      ...userData,
+      profilePic: null,
+    });
+    setHasChanges(true);
+  };
+
   const renderProfilePic = () => {
     return userData.profilePic ? (
       <Image source={{ uri: userData.profilePic }} style={styles.avatar} />
@@ -107,13 +133,33 @@ export default function UserInfo() {
     <View style={styles.container}>
       <Text style={styles.header}>My Profile</Text>
       <View style={styles.whiteBox}>
-        {renderProfilePic()}
-        <TouchableOpacity onPress={handlePickImage} style={styles.button}>
-          <Text>사진 갤러리에서 선택</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          {renderProfilePic()}
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleTakePhoto} style={styles.button}>
-          <Text>카메라로 찍기</Text>
-        </TouchableOpacity>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity onPress={handlePickImage} style={styles.button}>
+                <Text>갤러리에서 선택</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleTakePhoto} style={styles.button}>
+                <Text>카메라로 찍기</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleResetProfilePic} style={styles.button}>
+                <Text>기본 이미지로 설정</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.button}>
+                <Text>닫기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
 
       <Text style={styles.nickname}>{userData.nickname}</Text>
@@ -229,61 +275,62 @@ const styles = StyleSheet.create({
   whiteBox: {
     backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 10,
     marginBottom: 20,
+    borderRadius: 10,
     alignItems: "center",
   },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#ccc",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
   },
-  avatarText: { color: "#fff", textAlign: "center" },
-  nickname: { fontSize: 20, textAlign: "center", marginBottom: 20 },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 8,
-  },
-  label: { width: 100 },
+  nickname: { fontSize: 20, fontWeight: "bold", textAlign: "center" },
+  row: { flexDirection: "row", justifyContent: "space-between", marginVertical: 10 },
+  label: { fontSize: 16, color: "#333" },
   input: {
-    flex: 1,
     borderBottomWidth: 1,
-    borderColor: "#ccc",
-    padding: 4,
+    borderBottomColor: "#ccc",
+    width: 200,
+    padding: 5,
+    fontSize: 16,
   },
-  genderOptions: { flexDirection: "row", gap: 10 },
+  genderOptions: { flexDirection: "row" },
   genderButton: {
-    padding: 6,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-  },
-  genderSelected: { backgroundColor: "#ffdb99" },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
-  cancelButton: {
     padding: 10,
-    backgroundColor: "#fbe9e7",
-    borderRadius: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    backgroundColor: "#f0f0f0",
+  },
+  genderSelected: {
+    backgroundColor: "#4CAF50",
+  },
+  buttonRow: { flexDirection: "row", justifyContent: "space-between" },
+  cancelButton: {
+    backgroundColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
   },
   editButton: {
+    backgroundColor: "#4CAF50",
     padding: 10,
-    backgroundColor: "#ffb74d",
+    borderRadius: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
     borderRadius: 10,
+    alignItems: "center",
   },
   button: {
+    marginVertical: 10,
     padding: 10,
-    backgroundColor: "#ffb74d",
+    backgroundColor: "#4CAF50",
     borderRadius: 5,
-    marginBottom: 10,
   },
 });
