@@ -2,11 +2,13 @@ import React from "react";
 import { View, ScrollView, Dimensions } from "react-native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
-import Apple_tree from "../components/Apple_tree";
 import Street from "../components/Street";
 import questStyles from "../styles/questStyles";
+import Tree from "../components/Tree"; // 추가
 
-const { width, height } = Dimensions.get("window");
+const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
+
+const { height } = Dimensions.get("window");
 
 const questData = [
   { name: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
@@ -45,7 +47,10 @@ export default function Quest() {
                 {index !== 0 && (
                   <Street
                     direction={isLeft ? "left" : "right"}
-                    style={[questStyles.street, { top: topOffset - height * 0.175,}]} 
+                    style={[questStyles.street, { top:
+                      index === 1
+                        ? topOffset - height * 0.18
+                        : topOffset - height * 0.16,}]} 
                   />
                 )}
 
@@ -54,14 +59,15 @@ export default function Quest() {
                     questStyles.elementWrapper,
                     {
                       alignSelf: isLeft ? "flex-start" : "flex-end",
-                      marginTop: treeVerticalMargin + height * 0.025,
+                      marginTop: treeVerticalMargin + (index === 0 ? height * 0.022 : height * 0.001),
                     },
                   ]}
                 >
-                  <Apple_tree
-                    name={isFirst ? `${nickname}의 숲` : quest.name}
-                    subtitle={quest.subtitle}
-                  />
+                <Tree
+                  type={treeTypes[index % treeTypes.length]}
+                  name={isFirst ? `${nickname}의 숲` : quest.name}
+                  subtitle={quest.subtitle}
+                />
                 </View>
               </React.Fragment>
             );

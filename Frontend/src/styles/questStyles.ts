@@ -28,7 +28,7 @@ const questStyles = StyleSheet.create({
   },
   elementWrapper: {
     width: width * 0.4,
-    marginVertical: height * 0.001,
+    marginVertical: height * 0.002,
     zIndex: 4,
   },
   street: {
