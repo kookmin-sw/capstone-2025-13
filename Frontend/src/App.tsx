@@ -22,7 +22,7 @@ export type RootStackParamList = {
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { subtitle?: string };
+    Quest_stage: { title:string; subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
