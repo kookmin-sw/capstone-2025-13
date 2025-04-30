@@ -3,46 +3,48 @@ import { StyleSheet, Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 const questStyles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    scrollContainer: {
-      paddingBottom: height * 0.1,
-    },
-    headerWrapper: {
-      position: "relative",
-      height: height * 0.20,
-    },
-    circle: {
-      position: "absolute",
-      top: height * 0.20,
-      alignSelf: "center",
-      zIndex: 2,
-    },
-    questSection: {
-      minHeight: height * 0.6,
-      position: "relative",
-    },
-    street: {
-      position: "absolute",
-      width: width * 0.5,
-      height: width * 0.5,
-      alignSelf: "center",
-      opacity: 0.8,
-      zIndex: 2,
-    },
-    elementsOverlay: {
-        position: "absolute",
-        top: height * 0.07,
-        width: "100%",
-        paddingHorizontal: width * 0.1,
-        gap: height * 0.06,
-        zIndex: 3,
-      },
-    elementWrapper: {
-        marginHorizontal: width * 0.025,
-    },
-});  
-  
+  container: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "#17B96D",
+  },
+  scrollContainer: {
+    width: "100%",
+    paddingBottom: height * 0.2,
+  },
+  headerWrapper: {
+    height: height * 0.2,
+    position: "relative",
+  },
+  circle: {
+    position: "absolute",
+    top: height * 0.20,
+    alignSelf: "center",
+    zIndex: 2,
+  },
+  elementsOverlay: {
+    position: "relative",
+    width: "100%",
+  },
+  elementWrapper: {
+    width: width * 0.4,
+    marginVertical: height * 0.002,
+    zIndex: 4,
+  },
+  street: {
+    position: "absolute",
+    width: width * 0.66,
+    height: width * 0.4,
+    alignSelf: "center",
+    zIndex: 3,
+  },
+  street_basic: {
+    position: "absolute",
+    width: width * 0.75,
+    height: width * 0.5,
+    alignSelf: "center",
+    zIndex: 3,
+  },
+});
 
 export default questStyles;

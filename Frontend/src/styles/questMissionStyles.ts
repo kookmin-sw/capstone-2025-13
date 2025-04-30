@@ -32,12 +32,12 @@ const questMissionStyles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: fonts.bold,
+    fontFamily: fonts.extraBold,
   },
   missionText: {
     color: "black",
     fontSize: width * 0.03,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.bold,
   },
 });
 

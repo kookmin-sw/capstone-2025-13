@@ -4,8 +4,8 @@ const { width } = Dimensions.get("window");
 
 const questStreetStyles = StyleSheet.create({
     image: {
-      width: width * 0.5,
-      height: width * 0.5,
+      width: width * 0.3,
+      height: width * 0.3,
       position: "absolute",
       alignSelf: "center",
       zIndex: -1,

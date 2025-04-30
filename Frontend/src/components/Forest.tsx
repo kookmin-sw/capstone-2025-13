@@ -1,23 +1,23 @@
 import React from "react";
 import {  Image, View, Text, TouchableOpacity} from "react-native";
-import questElementStyles from "../styles/questElementStyles";
+import appleElementStyles from "../styles/forestElementStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 
 
-interface QuestElementProps {
+interface ForestProps {
   name: string;
   subtitle?: string;
   onPress?: () => void;
 }
 
-export default function Quest_element({ name, subtitle }: QuestElementProps) {
+export default function Forest({ name, subtitle }: ForestProps ) {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   
   return (
-    <View style={questElementStyles.container}>
+    <View style={appleElementStyles .container}>
        <TouchableOpacity
         onPress={() => {
           if (subtitle) {
@@ -28,17 +28,17 @@ export default function Quest_element({ name, subtitle }: QuestElementProps) {
         }}
       >
         <Image
-          source={require("../assets/Images/quest_icon.png")}
-          style={questElementStyles.icon}
+          source={require("../assets/Images/forest.png")}
+          style={appleElementStyles.icon}
         />
       </TouchableOpacity>
 
-      <View style={questElementStyles.nameContainer}>
+      <View style={appleElementStyles .nameContainer}>
         <Image
-          source={require("../assets/Images/quest_title.png")}
-          style={questElementStyles.name}
+          source={require("../assets/Images/title.png")}
+          style={appleElementStyles .name}
         />
-        <Text style={questElementStyles.nameText}>{name}</Text>
+        <Text style={appleElementStyles .nameText}>{name}</Text>
       </View>
     </View>
   );

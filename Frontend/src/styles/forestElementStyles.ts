@@ -3,16 +3,15 @@ import fonts from "../constants/fonts";
 
 const { width } = Dimensions.get("window");
 
-const questElementStyles = StyleSheet.create({
+const forestElementStyles = StyleSheet.create({
     container: {
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "column",
     },
     icon: {
-      width: width * 0.25,
-      height: width * 0.25,
-      marginBottom: width * 0.02,
+      width: width * 0.38, 
+      height: width * 0.35,
     },
     nameContainer: {
       position: "relative",
@@ -20,16 +19,16 @@ const questElementStyles = StyleSheet.create({
       alignItems: "center",
     },
     name: {
-      width: width * 0.3,
+      width: width * 0.35,
       height: width * 0.1,
       resizeMode: "contain",
     },
     nameText: {
       position: "absolute",
-      fontFamily: fonts.medium,
-      color: "#fff",
+      fontFamily: fonts.bold,
+      color: "#543A1B",
       fontSize: width * 0.04,
     },
   });
   
-export default questElementStyles;
+export default forestElementStyles;

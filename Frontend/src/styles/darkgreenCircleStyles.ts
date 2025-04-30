@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from "react-native";
 
 const { height } = Dimensions.get("window");
 
-const questCircleStyles = StyleSheet.create({
+const darkgreenCircleStyles = StyleSheet.create({
     imageContainer: {
       width: '100%',
       height: height * 0.8,
@@ -15,4 +15,4 @@ const questCircleStyles = StyleSheet.create({
     },
   });
 
-export default questCircleStyles;
+export default darkgreenCircleStyles;

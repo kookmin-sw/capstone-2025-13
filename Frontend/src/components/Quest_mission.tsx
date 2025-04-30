@@ -25,7 +25,7 @@ export default function Quest_mission({ missiontitle, onPress }: QuestMissionPro
             imageStyle={{ resizeMode: "contain" }}
           >
             <View style={questMissionStyles.missionTextContainer}>
-              <Text style={questMissionStyles.missionText}>카메라로 나를 돌아볼까요?</Text>
+              <Text style={questMissionStyles.missionText}>조용한 마음을 가져봐요.</Text>
             </View>
           </ImageBackground>
         </TouchableOpacity>

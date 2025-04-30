@@ -2,14 +2,15 @@ import React from "react";
 import { Image, ImageStyle } from "react-native";
 import questStreetStyles from "../styles/questStreetStyles";
 
-interface QuestStreetProps {
+interface StreetBasicProps {
   style?: ImageStyle | ImageStyle[];
 }
 
-export default function Quest_street({ style }: QuestStreetProps) {
+export default function Street_basic ({ style }: StreetBasicProps) {
   return (
     <Image
-      source={require("../assets/Images/quest_street.png")}
+      source={require("../assets/Images/street_basic.png")}
+      resizeMode="contain"
       style={[questStreetStyles.image, style]}
     />
   );
