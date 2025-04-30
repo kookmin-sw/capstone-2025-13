@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "diagnosisResults")
+@Table(name = "diagnosis_results")
 data class DiagnosisResults(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

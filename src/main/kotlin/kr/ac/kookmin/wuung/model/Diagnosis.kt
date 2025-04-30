@@ -27,7 +27,7 @@ data class Diagnosis(
     var description: String? = null,
 
     @OneToMany
-    var diagnosisTexts: List<DiagnosisText> = listOf(),
+    var diagnosisQuestions: List<DiagnosisQuestions> = listOf(),
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
