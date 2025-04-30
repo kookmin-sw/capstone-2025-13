@@ -1,4 +1,3 @@
-// components/Tree.tsx
 import React from "react";
 import { Image, View, Text, TouchableOpacity } from "react-native";
 import treeElementStyles, { baseWidth } from "../styles/treeElementStyles";
@@ -25,42 +24,41 @@ export default function Tree({ type, title, subtitle }: TreeProps) {
   };
 
   const sizeStyles = {
-    apple: { width: 0.3, height: 0.33,},
+    apple: { width: 0.3, height: 0.33 },
     peach: { width: 0.37, height: 0.38 },
     forest: { width: 0.38, height: 0.35 },
+  };
+
+  const handlePress = () => {
+    navigation.navigate("Quest_stage", { title, subtitle });
   };
 
   return (
     <View style={treeElementStyles.container}>
       <TouchableOpacity
-      activeOpacity={1}
-        onPress={() => {
-          if (title && subtitle) {
-            navigation.navigate("Quest_stage", {
-              title,
-              subtitle,
-            });
-          } else {
-            console.warn("title 또는 subtitle이 없습니다!");
-          }
-        }}
+        activeOpacity={1}
+        onPress={handlePress}
+        style={{ alignItems: 'center' }}
       >
         <Image
           source={treeImages[type]}
           style={[
             treeElementStyles.icon,
-            { width: sizeStyles[type].width * baseWidth, height: sizeStyles[type].height * baseWidth },
+            {
+              width: sizeStyles[type].width * baseWidth,
+              height: sizeStyles[type].height * baseWidth,
+            },
           ]}
         />
-      </TouchableOpacity>
 
-      <View style={treeElementStyles.nameContainer}>
-        <Image
-          source={require("../assets/Images/title.png")}
-          style={treeElementStyles.name}
-        />
-        <Text style={treeElementStyles.nameText}>{title}</Text>
-      </View>
+        <View style={treeElementStyles.nameContainer}>
+          <Image
+            source={require("../assets/Images/title.png")}
+            style={treeElementStyles.name}
+          />
+          <Text style={treeElementStyles.nameText}>{title}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
