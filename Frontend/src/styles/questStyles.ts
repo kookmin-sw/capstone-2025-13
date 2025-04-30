@@ -23,7 +23,6 @@ const questStyles = StyleSheet.create({
     zIndex: 2,
   },
   elementsOverlay: {
-    position: "relative",
     width: "100%",
   },
   elementWrapper: {
@@ -35,13 +34,6 @@ const questStyles = StyleSheet.create({
     position: "absolute",
     width: width * 0.66,
     height: width * 0.4,
-    alignSelf: "center",
-    zIndex: 3,
-  },
-  street_basic: {
-    position: "absolute",
-    width: width * 0.75,
-    height: width * 0.5,
     alignSelf: "center",
     zIndex: 3,
   },
