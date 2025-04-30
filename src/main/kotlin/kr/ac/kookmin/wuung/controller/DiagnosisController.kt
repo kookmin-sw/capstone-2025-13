@@ -41,14 +41,14 @@ data class DiagnosisDTO(
     val type: DiagnosisType,
     val title: String,
     val description: String,
-    val diagnosisQuestions: List<DiagnosisQuestionDTO> = listOf(),
+    val questions: List<DiagnosisQuestionDTO> = listOf(),
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
 data class DiagnosisQuestionDTO(
     val seq: Int,
     val text: String,
-    val diagnosisText: List<DiagnosisTextDTO> = listOf()
+    val answers: List<DiagnosisTextDTO> = listOf()
 )
 data class DiagnosisTextDTO(
     val text: String,
@@ -62,11 +62,11 @@ fun Diagnosis.toDTO() = DiagnosisDTO(
     description = this.description ?: "",
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
-    diagnosisQuestions = this.diagnosisQuestions.map { question ->
+    questions = this.diagnosisQuestions.map { question ->
         DiagnosisQuestionDTO(
             seq = question.seq ?: 0,
             text = question.text ?: "",
-            diagnosisText = question.diagnosisText.map { text ->
+            answers = question.diagnosisText.map { text ->
                 DiagnosisTextDTO(
                     text = text.text ?: "",
                     score = text.score,
@@ -129,8 +129,34 @@ class DiagnosisController(
      */
 
     @GetMapping("/{id}")
-    @Operation()
+    @Operation(
+        summary = "Get diagnosis by ID",
+        description = "Retrieve diagnosis details for the specified ID"
+    )
     @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Diagnosis not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
     )
     fun getDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
