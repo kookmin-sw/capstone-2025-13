@@ -2,7 +2,6 @@ import { View, ScrollView, Image } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
-import Quest_street from "../components/Quest_street";
 import Stage_street from "../components/Stage_street";
 import Quest_mission from "../components/Quest_mission";
 import questStyles from "../styles/questStyles";
@@ -14,7 +13,6 @@ export default function Quest_stage() {
 
   return (
     <View style={[questStyles.container]}>
-      {/* ScrollView는 위 콘텐츠만 스크롤 */}
       <ScrollView contentContainerStyle={questStyles.scrollContainer}>
         <View style={questStyles.headerWrapper}>
           <Header_sky subtitle={subtitle} />
