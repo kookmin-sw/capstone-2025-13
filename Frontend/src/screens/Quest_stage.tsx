@@ -9,13 +9,17 @@ import questStageStyles from "../styles/questStageStyles";
 
 export default function Quest_stage() {
   const route = useRoute();
-  const { subtitle } = route.params as { subtitle: string };
+  const { title, subtitle } = route.params as {
+    title: string;
+    subtitle: string;
+  };
 
   return (
     <View style={[questStyles.container]}>
+
       <ScrollView contentContainerStyle={questStyles.scrollContainer}>
         <View style={questStyles.headerWrapper}>
-          <Header_sky subtitle={subtitle} />
+          <Header_sky title={title} subtitle={subtitle} />
           <Quest_circle style={questStyles.circle} />
           <Stage_street style={questStageStyles.street} />
           <Image
@@ -42,18 +46,11 @@ export default function Quest_stage() {
 
       <View style={questStageStyles.missionWrapper}>
         <Quest_mission
-          missiontitle="명상"
+          missiontitle={title}
         />
       </View>
       </View>
     );
   }
      
-     {/* 
-     <View style={questStageStyles.missionWrapper}>
-        <Quest_mission
-          missiontitle="나를 돌아보기"
-        />
-      </View>
-    </View>
-    */}
+     

@@ -12,9 +12,9 @@ const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"]
 const { height } = Dimensions.get("window");
 
 const questData = [
-  { name: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
-  { name: "명상", subtitle: "조용한 마음을 가져봐요." },
-  { name: "운동", subtitle: "몸을 움직여볼까요?" },
+  { title: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
+  { title: "명상", subtitle: "조용한 마음을 가져봐요." },
+  { title: "운동", subtitle: "몸을 움직여볼까요?" },
 ];
 
 //예시 닉네임
@@ -30,7 +30,7 @@ export default function Quest() {
       >
         
         <View style={questStyles.headerWrapper}>
-          <Header_sky subtitle="미션을 완료해보세요!" />
+          <Header_sky title= "퀘스트" subtitle="미션을 완료해보세요!" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
@@ -64,7 +64,7 @@ export default function Quest() {
       >
         <Tree
           type={treeTypes[index % treeTypes.length]}
-          name={isFirst ? `${nickname}의 숲` : quest.name}
+          title={isFirst ? `${nickname}의 숲` : quest.title}
           subtitle={quest.subtitle}
         />
       </View>
