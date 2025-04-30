@@ -1,6 +1,6 @@
 import React from "react";
 import {  Image, View, Text, TouchableOpacity} from "react-native";
-import appleElementStyles from "../styles/appleElementStyles";
+import appleElementStyles from "../styles/forestElementStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
