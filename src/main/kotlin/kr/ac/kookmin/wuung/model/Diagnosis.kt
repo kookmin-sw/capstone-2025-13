@@ -29,6 +29,9 @@ data class Diagnosis(
     @OneToMany
     var diagnosisQuestions: List<DiagnosisQuestions> = listOf(),
 
+    @OneToMany
+    var diagnosisScale: List<DiagnosisScale> = listOf(),
+
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
