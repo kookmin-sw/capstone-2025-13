@@ -97,7 +97,6 @@ class AuthController(
        return ResponseEntity.ok(ApiResponseDTO(data = LoginResponse(accessToken, refreshToken)))
    }
 
-
     @PostMapping("/refresh")
     @Operation(summary = "Refresh JWT tokens", description = "Generates new access and refresh tokens from a valid refresh token.")
     @ApiResponses(
@@ -112,20 +111,35 @@ class AuthController(
     ): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
         val requestRefreshToken = tokenRefreshRequest.refreshToken
 
-        return tokenService.findByToken(requestRefreshToken).map { refreshToken ->
-            try {
-                tokenService.verifyExpiration(refreshToken)
-                val user = refreshToken.user
-
-                user?.let {
-                    val accessToken = jwtProvider.generateAccessToken(it)
-
-                    ResponseEntity.ok(ApiResponseDTO(data = TokenRefreshResponse(accessToken, requestRefreshToken)))
-                } ?: throw UnauthorizedException()
-            } catch(e: Exception) {
-                throw ServerErrorException()
+        return tokenService.findByToken(requestRefreshToken)
+            .map { refreshToken ->
+                try {
+                    processRefreshToken(refreshToken, requestRefreshToken)
+                } catch (e: UnauthorizedException) {
+                    throw e
+                } catch (e: Exception) {
+                    throw ServerErrorException()
+                }
             }
-        }.orElse(throw ServerErrorException())
+            .orElseThrow {
+                ServerErrorException()
+            }
+    }
+
+    private fun processRefreshToken(refreshToken: RefreshToken, requestRefreshToken: String): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
+        // 토큰 만료 검증
+        tokenService.verifyExpiration(refreshToken)
+
+        // 사용자 확인
+        val user = refreshToken.user ?: throw UnauthorizedException()
+
+        // 새 액세스 토큰 생성
+        val accessToken = jwtProvider.generateAccessToken(user)
+
+        // 응답 생성
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = TokenRefreshResponse(accessToken, requestRefreshToken))
+        )
     }
 
     @PostMapping("/logout")
