@@ -18,6 +18,7 @@ import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_sur
 import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
+import HelpCall from "./screens/HelpCall";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -40,6 +41,7 @@ export type RootStackParamList = {
     GameScreen: undefined;
     DailyTopic: undefined;
     Spinner: undefined;
+    HelpCall: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -151,7 +153,10 @@ export default function App() {
                     name="Spinner" // Spinner 화면 추가
                     component={Spinner}
                     options={{ headerShown: false }} />
-
+                <Stack.Screen
+                    name="HelpCall" // HelpCall 화면 추가
+                    component={HelpCall}
+                    options={{ headerShown: false }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
