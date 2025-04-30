@@ -27,6 +27,9 @@ data class DiagnosisResults(
     var result: Int? = 0,
 
     @Column(nullable = false)
+    var scale: Int? = 0,
+
+    @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(nullable = false)
