@@ -1,5 +1,4 @@
 import { StyleSheet, Dimensions } from "react-native";
-import Street_basic from "../components/Street_basic";
 
 const { width, height } = Dimensions.get("window");
 
