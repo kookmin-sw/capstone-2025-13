@@ -3,6 +3,7 @@ import { View, ScrollView, Dimensions } from "react-native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
 import Street from "../components/Street";
+import Street_basic from "../components/Street_basic";
 import questStyles from "../styles/questStyles";
 import Tree from "../components/Tree"; // 추가
 
@@ -72,6 +73,7 @@ export default function Quest() {
               </React.Fragment>
             );
           })}
+          <Street_basic style={[questStyles.street_basic, { marginTop: height * 0.48}]} />
         </View>
       </ScrollView>
     </View>

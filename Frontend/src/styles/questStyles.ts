@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import Street_basic from "../components/Street_basic";
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,6 +36,13 @@ const questStyles = StyleSheet.create({
     position: "absolute",
     width: width * 0.66,
     height: width * 0.4,
+    alignSelf: "center",
+    zIndex: 3,
+  },
+  street_basic: {
+    position: "absolute",
+    width: width * 0.75,
+    height: width * 0.5,
     alignSelf: "center",
     zIndex: 3,
   },

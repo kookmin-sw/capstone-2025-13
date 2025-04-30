@@ -10,6 +10,7 @@ export default function Street_basic ({ style }: StreetBasicProps) {
   return (
     <Image
       source={require("../assets/Images/street_basic.png")}
+      resizeMode="contain"
       style={[questStreetStyles.image, style]}
     />
   );
