@@ -57,6 +57,7 @@ export default function UserInfo() {
 
     const updatedUserData: UserData = { ...userData };
     Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
+    console.log(updatedUserData);
     setOriginalData(userData);
     setEditMode(false);
     setHasChanges(false);
@@ -70,7 +71,10 @@ export default function UserInfo() {
     });
 
     if (!result.canceled && result.assets?.length > 0) {
-      setUserData({ ...userData, profilePic: result.assets[0].uri });
+      setUserData({
+        ...userData,
+        profilePic: result.assets[0].uri,
+      });
       setHasChanges(true);
     }
   };
@@ -82,13 +86,19 @@ export default function UserInfo() {
     });
 
     if (!result.canceled && result.assets?.length > 0) {
-      setUserData({ ...userData, profilePic: result.assets[0].uri });
+      setUserData({
+        ...userData,
+        profilePic: result.assets[0].uri,
+      });
       setHasChanges(true);
     }
   };
 
   const handleResetProfilePic = () => {
-    setUserData({ ...userData, profilePic: null });
+    setUserData({
+      ...userData,
+      profilePic: null,
+    });
     setHasChanges(true);
   };
 
@@ -107,16 +117,19 @@ export default function UserInfo() {
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           {renderProfilePic()}
         </TouchableOpacity>
+
         <Text style={styles.nickname}>{userData.nickname}</Text>
 
         <InfoRow label="이메일" value={userData.email} editable={false} />
+
         <InfoRow
           label="비밀번호"
           value={userData.password}
           onChangeText={(text) => setUserData({ ...userData, password: text })}
-          secureTextEntry
+          secureTextEntry={!editMode}
           editable={editMode}
         />
+
         <InfoRow label="생년월일" value={userData.birthDate} editable={false} />
 
         <View style={styles.row}>
@@ -145,7 +158,7 @@ export default function UserInfo() {
           label="2차 비밀번호"
           value={userData.secondPassword}
           onChangeText={(text) => setUserData({ ...userData, secondPassword: text })}
-          secureTextEntry
+          secureTextEntry={!editMode}
           editable={editMode}
         />
 
@@ -235,16 +248,11 @@ function InfoRow({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#4CAF50",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { flex: 1, padding: 20, backgroundColor: "#4CAF50", justifyContent: "center" },
   header: {
     fontSize: 28,
     textAlign: "center",
-    marginVertical: 20,
+    marginBottom: 20,
     fontWeight: "bold",
     color: "#fff",
   },
@@ -252,7 +260,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: "90%",
     alignItems: "center",
   },
   avatar: {
@@ -265,7 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   row: {
     flexDirection: "row",
@@ -273,26 +280,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "100%",
   },
-  label: {
-    fontSize: 16,
-    color: "#333",
-    width: "40%",
-  },
+  label: { fontSize: 16, color: "#333" },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    width: "55%",
+    width: 200,
     padding: 5,
     fontSize: 16,
   },
-  genderOptions: {
-    flexDirection: "row",
-    width: "60%",
-    justifyContent: "space-between",
-  },
+  genderOptions: { flexDirection: "row" },
   genderButton: {
     padding: 10,
     borderRadius: 5,
+    marginHorizontal: 5,
     backgroundColor: "#f0f0f0",
   },
   genderSelected: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     marginTop: 20,
     width: "100%",
   },
@@ -308,14 +308,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     padding: 10,
     borderRadius: 5,
-    width: "40%",
+    width: "45%",
     alignItems: "center",
   },
   editButton: {
     backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
-    width: "40%",
+    width: "45%",
     alignItems: "center",
   },
   modalContainer: {
