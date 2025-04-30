@@ -2,13 +2,18 @@ import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import styles from "../styles/floatingButtonStyles";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 
 export default function FloatingButton() {
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     return (
         <>
             {/* 왼쪽 하단 버튼들 */}
             <View style={[styles.container, { left: 24, right: "auto" }]}>
-                <TouchableOpacity style={styles.bubble}>
+                <TouchableOpacity style={styles.bubble} onPress={() => { navigation.navigate("DailyTopic") }}>
                     <MaterialCommunityIcons
                         name="message-text"
                         size={24}
