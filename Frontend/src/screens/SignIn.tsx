@@ -41,16 +41,34 @@ const SignIn = () => {
         try {
             console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
-            console.log("로그인 성공:", response.accessToken);
-            await AsyncStorage.setItem('accessToken', response.accessToken);
-            await AsyncStorage.setItem('refreshToken', response.refreshToken);
-            navigation.navigate('Home')
+
+            if (response.error) {
+                throw new Error(response.message || '로그인에 실패했습니다.');
+            }
+
+            if (response.data && response.data.accessToken && response.data.refreshToken) {
+                console.log("로그인 성공:", response.data.accessToken);
+
+                await AsyncStorage.removeItem('accessToken');
+                await AsyncStorage.removeItem('refreshToken');
+
+                await AsyncStorage.setItem('accessToken', response.data.accessToken);
+                await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+
+                navigation.navigate('Home');
+            } else {
+                throw new Error('Missing tokens in response data');
+            }
         } catch (error) {
             console.error("로그인 실패:", error);
-            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+            if (error instanceof Error) {
+                setError(error.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+            } else {
+                setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+            }
         }
-
     };
+
 
     return (
         <KeyboardAvoidingView
