@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Alert, Text, Platform, Button } from "react-native";
+import {
+    View,
+    StyleSheet,
+    Alert,
+    Text,
+    Platform,
+    TouchableOpacity,
+    ScrollView,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
-import { ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import colors from "../constants/colors";
 
 export default function HelpCall() {
     const [location, setLocation] = useState<{
@@ -12,6 +20,8 @@ export default function HelpCall() {
         latitudeDelta: number;
         longitudeDelta: number;
     } | null>(null);
+
+    const [selected, setSelected] = useState("all");
 
     useEffect(() => {
         (async () => {
@@ -33,6 +43,12 @@ export default function HelpCall() {
 
     if (!location) return null;
 
+    const buttons = [
+        { id: "all", title: "전체보기" },
+        { id: "clinic", title: "정신건강진료" },
+        { id: "center", title: "정신건강복지센터" },
+    ];
+
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
@@ -40,14 +56,31 @@ export default function HelpCall() {
                 <Text style={styles.headerText}>마음 케어 정보 지도</Text>
                 <ScrollView
                     style={{ marginTop: 10 }}
-                    horizontal={true}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.scrollContainer}
                 >
-                    <Button title="Button 1" onPress={() => { }} />
-                    <Button title="Button 2" onPress={() => { }} />
-                    <Button title="Button 3" onPress={() => { }} />
-
+                    {buttons.map((btn) => (
+                        <TouchableOpacity
+                            key={btn.id}
+                            style={[
+                                styles.button,
+                                selected === btn.id ? styles.selectedButton : styles.unselectedButton,
+                            ]}
+                            onPress={() => setSelected(btn.id)}
+                        >
+                            <Text
+                                style={[
+                                    styles.buttonText,
+                                    selected === btn.id ? styles.selectedText : styles.unselectedText,
+                                ]}
+                            >
+                                {btn.title}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
                 </ScrollView>
+
             </View>
             <MapView
                 provider={PROVIDER_GOOGLE}
@@ -82,15 +115,39 @@ const styles = StyleSheet.create({
         zIndex: 10,
         paddingTop: 40,
     },
-
     headerText: {
         fontWeight: "bold",
-        fontSize: 16,
+        fontSize: 22,
         textAlign: "center",
     },
-
     scrollContainer: {
         flexDirection: "row",
         alignItems: "center",
+        paddingVertical: 10,
+    },
+    button: {
+        paddingVertical: 12,
+        paddingHorizontal: 18,
+        borderRadius: 40,
+        marginHorizontal: 5,
+        borderWidth: 1,
+    },
+    selectedButton: {
+        backgroundColor: colors.green,
+        borderColor: colors.green,
+    },
+    unselectedButton: {
+        backgroundColor: "white",
+        borderColor: colors.darkGrey,
+    },
+    buttonText: {
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    selectedText: {
+        color: "white",
+    },
+    unselectedText: {
+        color: colors.darkGrey,
     },
 });
