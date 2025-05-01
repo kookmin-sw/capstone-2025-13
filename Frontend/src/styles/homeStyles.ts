@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#0A814C",
     },
     scroll: {
-        paddingTop: hp(8),
+        paddingTop: hp(6),
     },
     headerWrapper: {
         position: "relative",
