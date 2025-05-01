@@ -17,11 +17,20 @@ data class Diagnosis(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id : Long? = null, // 필드의 데이터를 구분지어주는 구분자
 
-    @Column(nullable = false)
-    var type : String? = null, // 검사 종류를 나타내주는 필드
+    @Enumerated(EnumType.STRING)
+    var type : DiagnosisType? = null, // 검사 종류를 나타내주는 필드
 
-    @Column(nullable = false)
-    var result : Long? = null, // 검사 결과를 나타내주는 필드
+    @Column(nullable = false, length = 128)
+    var title: String? = null,
+
+    @Column(nullable = false, length = 1024)
+    var description: String? = null,
+
+    @OneToMany
+    var diagnosisQuestions: List<DiagnosisQuestions> = listOf(),
+
+    @OneToMany
+    var diagnosisScale: List<DiagnosisScale> = listOf(),
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
