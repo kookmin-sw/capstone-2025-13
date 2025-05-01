@@ -40,6 +40,24 @@ data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
 
+data class UpdateUserRequest(
+    @field:JsonProperty("user_name")
+    val userName: String? = null,
+    val password: String? = null,
+    val gender: GenderEnum? = null,
+
+    @field:Schema(description = "Birth date in format yyyy-MM-dd", example = "2000-01-01")
+    @field:JsonProperty("birth_date")
+    val birthDate: String? = null,
+)
+
+data class UpdateUserResponse(
+    val email: String,
+    val userName: String,
+    val gender: GenderEnum,
+    val birthDate: LocalDateTime,
+)
+
 data class SignUpRequest(
     @field:JsonProperty("user_name")
     val userName: String,
@@ -251,5 +269,51 @@ class AuthController(
             user.userName!!
         )
         return ResponseEntity.ok(ApiResponseDTO(data = userInfo))
+    }
+
+    @PostMapping("/update")
+    @Operation(
+        summary = "Update user information",
+        description = "Updates user information. Null fields will be ignored."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully updated user information",
+                useReturnTypeSchema = true,
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing access token",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            )
+        ]
+    )
+    fun updateUser(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestBody updateRequest: UpdateUserRequest,
+    ): ResponseEntity<ApiResponseDTO<UpdateUserResponse>> {
+        if (userDetails?.id == null) throw UnauthorizedException()
+
+        val user = userRepository.findById(userDetails.id!!).get()
+
+        updateRequest.userName?.let { user.userName = it }
+        updateRequest.password?.let { user.password = passwordEncoder.encode(it) }
+        updateRequest.gender?.let { user.gender = it }
+        updateRequest.birthDate?.let { user.birthDate = it.datetimeParser() }
+
+        val updatedUser = userRepository.save(user)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data = UpdateUserResponse(
+                    email = updatedUser.email!!,
+                    userName = updatedUser.userName!!,
+                    gender = updatedUser.gender!!,
+                    birthDate = updatedUser.birthDate!!
+                )
+            )
+        )
     }
 }

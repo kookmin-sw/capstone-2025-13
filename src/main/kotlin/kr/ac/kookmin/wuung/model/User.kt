@@ -74,5 +74,7 @@ data class User(
 
 enum class GenderEnum(val value: String) {
     MALE("MALE"),
-    FEMALE("FEMALE");
+    FEMALE("FEMALE"),
+    THIRD_GENDER("THIRD_GENDER"),
+    UNKNOWN("UNKNOWN")
 }
