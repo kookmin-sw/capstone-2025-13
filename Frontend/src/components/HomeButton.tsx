@@ -16,7 +16,7 @@ export default function HomeButton({ title, subtitle, icon, onPress }: Props) {
             <MaterialCommunityIcons
                 name={icon}
                 size={24}
-                color="#7A5F41"
+                color="#5D432C"
                 style={styles.icon}
             />
             <View>
