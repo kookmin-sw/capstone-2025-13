@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.media.Content
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
@@ -23,7 +24,10 @@ import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import java.time.LocalDate
+import kotlin.jvm.optionals.getOrNull
 
 data class RecordDTO(
     val id: Long,
@@ -45,6 +49,13 @@ data class CreateRecordRequest(
     val rate : Int,
     val data : String
 )
+
+data class RecordUpdateRequest(
+    val id: Long,
+    val rate: Int,
+    val data: String,
+)
+
 
 @RestController
 @RequestMapping("/records")
@@ -88,6 +99,56 @@ class RecordController(
             ?: throw NotFoundException()
 
         return ResponseEntity.ok(ApiResponseDTO(data = record.toDTO()))
+    }
+
+    @PutMapping("/create")
+    @Operation(summary = "Create new record", description = "Create a new record with rate and data")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "Successfully created record",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
+        ApiResponse(responseCode = "403", description = "Unauthorized",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
+    ])
+    fun createRecord(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestBody request: CreateRecordRequest
+    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val record = Record(
+            rate = request.rate,
+            data = request.data,
+            user = userDetails
+        )
+        val saved = recordRepository.save(record)
+        return ResponseEntity.ok(ApiResponseDTO(data = saved.toDTO()))
+    }
+
+    @PostMapping("/modify")
+    @Operation(summary = "Modify existing record", description = "Update rate and data of an existing record")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "Successfully updated record",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
+        ApiResponse(responseCode = "403", description = "Unauthorized",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
+        ApiResponse(responseCode = "404", description = "Record not found",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
+    ])
+    fun modifyRecord(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestBody request: RecordUpdateRequest
+    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val record = recordRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
+        if (record.user?.id != userDetails.id) throw UnauthorizedException()
+
+        record.rate = request.rate
+        record.data = request.data
+        // updatedAt은 @PreUpdate로 자동 갱신
+
+        val updated = recordRepository.save(record)
+        return ResponseEntity.ok(ApiResponseDTO(data = updated.toDTO()))
     }
 
 
