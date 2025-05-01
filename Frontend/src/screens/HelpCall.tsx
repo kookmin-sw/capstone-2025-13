@@ -12,6 +12,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import colors from "../constants/colors";
+import { Image } from "react-native";
 
 export default function HelpCall() {
     const [location, setLocation] = useState<{
@@ -90,6 +91,12 @@ export default function HelpCall() {
             >
                 <Marker coordinate={location} title="내 위치" />
             </MapView>
+            <TouchableOpacity>
+                <Image
+                    source={require("../assets/Images/call.png")}
+                    style={styles.callButton}
+                />
+            </TouchableOpacity>
         </View>
     );
 }
@@ -150,4 +157,13 @@ const styles = StyleSheet.create({
     unselectedText: {
         color: colors.darkGrey,
     },
+    callButton: {
+        position: "absolute",
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        justifyContent: "center",
+        alignItems: "center",
+    }
 });
