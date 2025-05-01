@@ -20,7 +20,7 @@ export default function FloatingButton() {
                         color="#fff"
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bubble}>
+                <TouchableOpacity style={styles.bubble} onPress={() => { navigation.navigate("HelpCall") }}>
                     <MaterialCommunityIcons
                         name="phone"
                         size={24}
