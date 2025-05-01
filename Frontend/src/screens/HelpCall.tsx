@@ -23,6 +23,25 @@ export default function HelpCall() {
     } | null>(null);
 
     const [selected, setSelected] = useState("all");
+    const [markers, setMarkers] = useState<
+        { id: string; latitude: number; longitude: number; title: string; type: string }[]
+    >([]);
+
+    const filteredMarkers =
+        selected === "all"
+            ? markers
+            : markers.filter((marker) => marker.type === selected);
+    const getMarkerImageByType = (type: string) => {
+        switch (type) {
+            case "clinic":
+                return require("../assets/Images/clinic.png");
+            case "center":
+                return require("../assets/Images/center.png");
+            case "counseling":
+                return require("../assets/Images/counseling.png");
+            // 기본 마커
+        }
+    };
 
     useEffect(() => {
         (async () => {
@@ -33,14 +52,42 @@ export default function HelpCall() {
             }
 
             const loc = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = loc.coords;
+
             setLocation({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
+                latitude,
+                longitude,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
             });
+
+            // 위치 기준 예시 마커 설정
+            setMarkers([
+                {
+                    id: "1",
+                    title: "서울정신건강의원",
+                    latitude: latitude + 0.001,
+                    longitude: longitude + 0.001,
+                    type: "clinic",
+                },
+                {
+                    id: "2",
+                    title: "강남정신건강복지센터",
+                    latitude: latitude - 0.0015,
+                    longitude: longitude + 0.001,
+                    type: "center",
+                },
+                {
+                    id: "3",
+                    title: "행복정신상담센터",
+                    latitude: latitude + 0.001,
+                    longitude: longitude - 0.0015,
+                    type: "counseling",
+                },
+            ]);
         })();
     }, []);
+
 
     if (!location) return null;
 
@@ -48,6 +95,7 @@ export default function HelpCall() {
         { id: "all", title: "전체보기" },
         { id: "clinic", title: "정신건강진료" },
         { id: "center", title: "정신건강복지센터" },
+        { id: "counseling", title: "정신상담센터" },
     ];
 
     return (
@@ -90,6 +138,19 @@ export default function HelpCall() {
                 showsUserLocation={true}
             >
                 <Marker coordinate={location} title="내 위치" />
+                {filteredMarkers.map((marker) => (
+                    <Marker
+                        key={marker.id}
+                        coordinate={{
+                            latitude: marker.latitude,
+                            longitude: marker.longitude,
+                        }}
+                        title={marker.title}
+                        image={getMarkerImageByType(marker.type)}
+                    />
+                ))}
+
+
             </MapView>
             <TouchableOpacity>
                 <Image
