@@ -39,11 +39,12 @@ const SignIn = () => {
         setError(null);
 
         try {
+
             console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
-            console.log("로그인 성공:", response.accessToken);
-            await AsyncStorage.setItem('accessToken', response.accessToken);
-            await AsyncStorage.setItem('refreshToken', response.refreshToken);
+            console.log("로그인 성공:", response.data.accessToken);
+            await AsyncStorage.setItem('accessToken', response.data.accessToken);
+            await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
             navigation.navigate('Home')
         } catch (error) {
             console.error("로그인 실패:", error);
