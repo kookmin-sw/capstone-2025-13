@@ -26,7 +26,7 @@ const treeElementStyles = StyleSheet.create({
   },
   nameText: {
     position: "absolute",
-    fontFamily: fonts.bold,
+    fontFamily: fonts.laundry,
     color: "#543A1B",
     fontSize: width * 0.04,
   },

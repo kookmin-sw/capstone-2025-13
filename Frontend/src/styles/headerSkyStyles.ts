@@ -18,13 +18,13 @@ const headerSkyStyles = StyleSheet.create({
     title: {
         fontSize: width * 0.08,
         paddingLeft: width * 0.07,
-        fontFamily: fonts.extraBold,
+        fontFamily: fonts.laundryBold,
         color: "#fff",
     },
     subtitle: {
         fontSize: width * 0.035,
         paddingLeft: width * 0.07,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
         color: "#fff",
         marginTop: width * 0.01,
     },
