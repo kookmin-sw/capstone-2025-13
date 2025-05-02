@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
     View,
-    StyleSheet,
     Alert,
     Text,
-    Platform,
     TouchableOpacity,
     ScrollView,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import colors from "../constants/colors";
 import { Image } from "react-native";
+import helpCallStyles from "../styles/helpCallStyles";
 
 export default function HelpCall() {
     const [location, setLocation] = useState<{
@@ -57,8 +55,8 @@ export default function HelpCall() {
             setLocation({
                 latitude,
                 longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
             });
 
             // 위치 기준 예시 마커 설정
@@ -89,6 +87,7 @@ export default function HelpCall() {
     }, []);
 
 
+
     if (!location) return null;
 
     const buttons = [
@@ -99,29 +98,29 @@ export default function HelpCall() {
     ];
 
     return (
-        <View style={styles.container}>
+        <View style={helpCallStyles.container}>
             <StatusBar style="auto" />
-            <View style={styles.headerBox}>
-                <Text style={styles.headerText}>마음 케어 정보 지도</Text>
+            <View style={helpCallStyles.headerBox}>
+                <Text style={helpCallStyles.headerText}>마음 케어 정보 지도</Text>
                 <ScrollView
                     style={{ marginTop: 10 }}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.scrollContainer}
+                    contentContainerStyle={helpCallStyles.scrollContainer}
                 >
                     {buttons.map((btn) => (
                         <TouchableOpacity
                             key={btn.id}
                             style={[
-                                styles.button,
-                                selected === btn.id ? styles.selectedButton : styles.unselectedButton,
+                                helpCallStyles.button,
+                                selected === btn.id ? helpCallStyles.selectedButton : helpCallStyles.unselectedButton,
                             ]}
                             onPress={() => setSelected(btn.id)}
                         >
                             <Text
                                 style={[
-                                    styles.buttonText,
-                                    selected === btn.id ? styles.selectedText : styles.unselectedText,
+                                    helpCallStyles.buttonText,
+                                    selected === btn.id ? helpCallStyles.selectedText : helpCallStyles.unselectedText,
                                 ]}
                             >
                                 {btn.title}
@@ -133,7 +132,7 @@ export default function HelpCall() {
             </View>
             <MapView
                 provider={PROVIDER_GOOGLE}
-                style={styles.map}
+                style={helpCallStyles.map}
                 region={location}
                 showsUserLocation={true}
             >
@@ -155,76 +154,10 @@ export default function HelpCall() {
             <TouchableOpacity>
                 <Image
                     source={require("../assets/Images/call.png")}
-                    style={styles.callButton}
+                    style={helpCallStyles.callButton}
                 />
             </TouchableOpacity>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    map: {
-        flex: 1,
-    },
-    headerBox: {
-        backgroundColor: "white",
-        paddingHorizontal: 10,
-        elevation: Platform.OS === "android" ? 10 : 5,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        width: "100%",
-        height: "20%",
-        justifyContent: "center",
-        zIndex: 10,
-        paddingTop: 40,
-    },
-    headerText: {
-        fontWeight: "bold",
-        fontSize: 22,
-        textAlign: "center",
-    },
-    scrollContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 10,
-    },
-    button: {
-        paddingVertical: 12,
-        paddingHorizontal: 18,
-        borderRadius: 40,
-        marginHorizontal: 5,
-        borderWidth: 1,
-    },
-    selectedButton: {
-        backgroundColor: colors.green,
-        borderColor: colors.green,
-    },
-    unselectedButton: {
-        backgroundColor: "white",
-        borderColor: colors.darkGrey,
-    },
-    buttonText: {
-        fontWeight: "bold",
-        textAlign: "center",
-    },
-    selectedText: {
-        color: "white",
-    },
-    unselectedText: {
-        color: colors.darkGrey,
-    },
-    callButton: {
-        position: "absolute",
-        bottom: 20,
-        right: 20,
-        width: 60,
-        height: 60,
-        justifyContent: "center",
-        alignItems: "center",
-    }
-});
