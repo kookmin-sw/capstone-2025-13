@@ -8,6 +8,9 @@ import Quest_title from "../components/Quest_title";
 
 const { height, width } = Dimensions.get("window");
 
+const currentStageIndex = 2; // 예: 0부터 시작해서 2까지는 unlock
+
+
 const lockPositions = [
   { top: height * 0.3, left: width * 0.24 },
   { top: height * 0.49, left: width * 0.35 },
@@ -53,16 +56,29 @@ export default function Quest_stage() {
           style={questStageStyles.questTitleTop}
         />
 
-        {lockPositions.map((pos, index) => (
-          <Image
-            key={index}
-            source={require("../assets/Images/stage_lock.png")}
-            style={[
-              questStageStyles.stage,
-              { top: pos.top, left: pos.left },
-            ]}
-          />
-        ))}
+
+        {lockPositions.map((pos, index) => {
+          let imageSource;
+
+          if (index === currentStageIndex) {
+            imageSource = require("../assets/Images/stage_current.png"); // 🔸 현재 스테이지 이미지
+          } else if (index < currentStageIndex) {
+            imageSource = require("../assets/Images/stage_lock.png");
+          } else {
+            imageSource = require("../assets/Images/stage_unlock.png");
+          }
+
+          return (
+            <Image
+              key={index}
+              source={imageSource}
+              style={[
+                questStageStyles.stage,
+                { top: pos.top, left: pos.left, resizeMode: "contain"},
+              ]}
+            />
+          );
+        })}
 
         <View style={{ height: height * 1 }} />
       </ScrollView>
