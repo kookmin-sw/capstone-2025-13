@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signOut } from "../API";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -51,6 +53,21 @@ export default function UserInfo() {
     fetchData();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem("accessToken");
+      const refreshToken = await AsyncStorage.getItem("refreshToken");
+      if (accessToken && refreshToken) {
+        await signOut(accessToken, refreshToken);
+      }
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
+      Alert.alert("로그아웃 완료", "성공적으로 로그아웃되었습니다.");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      Alert.alert("로그아웃 실패", "다시 시도해주세요.");
+    }
+  };
   const handleSave = () => {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
@@ -185,6 +202,12 @@ export default function UserInfo() {
           >
             <Text>{editMode ? "저장" : "수정"}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logOutButton}
+            onPress={() => handleLogout()}
+          >
+            <Text>로그아웃</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -308,14 +331,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     padding: 10,
     borderRadius: 5,
-    width: "45%",
+    width: "30%",
     alignItems: "center",
   },
   editButton: {
     backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
-    width: "45%",
+    width: "30%",
+    alignItems: "center",
+  },
+  logOutButton: {
+    backgroundColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    width: "30%",
     alignItems: "center",
   },
   modalContainer: {
