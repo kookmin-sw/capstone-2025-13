@@ -3,13 +3,23 @@ import { StyleSheet, Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 const questStageStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "#17B96D",
+  },
   street: {
     position: "absolute",
-    top: width / 1.7,
-    left: width / 7,
-    width: width * 0.8,
-    height: height * 0.59, 
-    zIndex: 2,
+    right: width / 16,
+    width: width,
+    height: height,
+    top: height * 0.25,
+    zIndex: 3,
+  },
+  questTitleTop: {
+    position: "absolute",
+    alignSelf: "center",
+    zIndex: 3 
   },
   goalImage: {
     position: "absolute",
@@ -24,22 +34,14 @@ const questStageStyles = StyleSheet.create({
     top: height * 0.38,
     left: height * 0.03,
     width: "100%",
-    paddingHorizontal: height* 0.0005,
+    paddingHorizontal: height * 0.0005,
     gap: height * 0.07,
     zIndex: 3,
   },
   stageWrapper: {
+    position: "absolute",
     marginHorizontal: width * 0.22,
   },
-  missionWrapper: {
-    position: "absolute",
-    bottom: height * 0.0003,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-    zIndex: 99,
-  },
 });
-
 
 export default questStageStyles;

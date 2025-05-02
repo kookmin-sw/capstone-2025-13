@@ -1,11 +1,13 @@
-import { View, ScrollView, Image } from "react-native";
+import { View, ScrollView, Image, Dimensions } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
-import Stage_street from "../components/Stage_street";
-import Quest_mission from "../components/Quest_mission";
 import questStyles from "../styles/questStyles";
 import questStageStyles from "../styles/questStageStyles";
+import Quest_title from "../components/Quest_title";
+
+const { height } = Dimensions.get("window");
+
 
 export default function Quest_stage() {
   const route = useRoute();
@@ -15,42 +17,33 @@ export default function Quest_stage() {
   };
 
   return (
-    <View style={[questStyles.container]}>
+    <View style={questStageStyles.container}>
+      <ScrollView
+        contentContainerStyle={[questStyles.scrollContainer]}
+        bounces={false}
+        overScrollMode="never"
+      >
 
-      <ScrollView contentContainerStyle={questStyles.scrollContainer}>
-        <View style={questStyles.headerWrapper}>
-          <Header_sky title={title} subtitle={subtitle} />
-          <Quest_circle style={questStyles.circle} />
-          <Stage_street style={questStageStyles.street} />
-          <Image
-            source={require("../assets/Images/goal.png")}
-            style={questStageStyles.goalImage}
-          />
-
-          <View style={questStageStyles.stageOverlay}>
-            <Image
-              source={require("../assets/Images/stage_lock.png")}
-              style={[questStageStyles.stageWrapper, { alignSelf: "flex-start" }]}
-            />
-            <Image
-              source={require("../assets/Images/stage_lock.png")}
-              style={[questStageStyles.stageWrapper, { alignSelf: "flex-end" }]}
-            />
-            <Image
-              source={require("../assets/Images/stage_lock.png")}
-              style={[questStageStyles.stageWrapper, { alignSelf: "flex-start" }]}
-            />
-          </View>
-        </View>
-      </ScrollView>
-
-      <View style={questStageStyles.missionWrapper}>
-        <Quest_mission
-          missiontitle={title}
+        <Image
+          source={require("../assets/Images/stage_street.png")}
+          style={[questStageStyles.street,]}
+          resizeMode="contain"
         />
-      </View>
-      </View>
-    );
-  }
-     
-     
+        <View style={questStyles.headerWrapper}>
+          <Header_sky title= "" subtitle="" />
+          <Quest_circle style={questStyles.circle} />
+        </View>
+
+
+        <Quest_title
+          text="조용한 마음을 가져봐요."
+          style={questStageStyles.questTitleTop}
+        />
+
+
+
+        <View style={{ height: height * 1}} />
+      </ScrollView>
+    </View>
+  );
+}
