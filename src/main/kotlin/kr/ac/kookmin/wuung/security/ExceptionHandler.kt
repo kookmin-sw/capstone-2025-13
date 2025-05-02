@@ -10,6 +10,7 @@ import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
@@ -49,7 +50,7 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
 
     private fun writeErrorResponse(
         response: HttpServletResponse,
-        error: CustomException
+        error: CustomException,
     ) {
         response.status = error.status
         response.contentType = JSON_MEDIA_TYPE
