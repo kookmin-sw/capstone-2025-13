@@ -125,6 +125,17 @@ const SignUpStep2 = () => {
                                     >
                                         <Text style={signUpStyles.genderText}>여자</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => setGender("secret")}
+                                        style={[
+                                            signUpStyles.genderButton,
+                                            gender === "secret"
+                                                ? signUpStyles.secretSelected
+                                                : signUpStyles.secretUnselected
+                                        ]}
+                                    >
+                                        <Text style={signUpStyles.genderText}>비밀</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
 

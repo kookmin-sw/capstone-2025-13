@@ -85,7 +85,7 @@ const signUpStyles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
-        width: "45%",
+        width: "30%",
         height: 45,
         alignItems: "center",
         justifyContent: "center",
@@ -110,6 +110,13 @@ const signUpStyles = StyleSheet.create({
       
       femaleUnselected: {
         backgroundColor: "#FDBABA",
+      },
+      secretSelected: {
+        backgroundColor: "#F8B12D",
+      },
+      
+      secretUnselected: {
+        backgroundColor: "#EFC371",
       },
       
       genderText: {
