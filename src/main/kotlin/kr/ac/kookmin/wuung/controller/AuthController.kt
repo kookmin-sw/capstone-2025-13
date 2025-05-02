@@ -1,7 +1,9 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -28,8 +30,14 @@ import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
+import kr.ac.kookmin.wuung.service.ProfileS3Service
 import kr.ac.kookmin.wuung.service.TokenService
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -40,12 +48,54 @@ data class TokenRefreshResponse(val accessToken: String, val refreshToken: Strin
 
 data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
-data class UserInfoResponse(
+data class UserInfoDTO(
+    val id: String,
     val email: String,
     val roles: List<String>,
     val username: String,
     val gender: GenderEnum = GenderEnum.UNKNOWN,
-    val birthDate: LocalDate = LocalDate.now()
+    val birthDate: LocalDate = LocalDate.now(),
+    @JsonIgnore
+    val profileSrc: String?,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+) {
+    @JsonIgnore
+    private var _profileEndpoint: String = ""
+    @JsonIgnore
+    private var _profileBucketName: String = ""
+
+    @get:JsonIgnore
+    var profileEndpoint: String
+        get() = _profileEndpoint
+        set(value) {
+            _profileEndpoint = value
+        }
+    @get:JsonIgnore
+    var profileBucketName: String
+        get() = _profileEndpoint
+        set(value) {
+            _profileBucketName = value
+        }
+
+    @get:JsonProperty("profile")
+    val profile: String?
+        get() {
+            return if (profileSrc?.isBlank() == true || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
+            else return "$_profileEndpoint/$_profileBucketName/$profileSrc"
+        }
+}
+
+fun User.toDTO() = UserInfoDTO(
+    id = id ?: "",
+    email = email ?: "",
+    roles = authorities.map { it.authority },
+    username = userName ?: "",
+    gender = gender ?: GenderEnum.UNKNOWN,
+    birthDate = birthDate?.toLocalDate() ?: LocalDate.now(),
+    profileSrc = profile ?: "",
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )
 
 data class SignUpRequest(
@@ -95,7 +145,10 @@ class AuthController(
     @Autowired private val refreshTokenRepository: RefreshTokenRepository,
     @Autowired private val jwtProvider: JwtProvider,
     @Autowired private val tokenService: TokenService,
-    @Autowired private val passwordEncoder: PasswordEncoder
+    @Autowired private val passwordEncoder: PasswordEncoder,
+    @Autowired private val profileS3Service: ProfileS3Service,
+    @Value("\${s3.public-endpoint}") private val s3PublicEndpoint: String,
+    @Value("\${s3.profile-bucket}") private val s3BucketName: String,
 ) {
    @PostMapping("/login")
    @Operation(summary = "Authenticate user and generate JWT tokens", description =
@@ -300,19 +353,16 @@ class AuthController(
     )
     fun getUserInfo(
         @AuthenticationPrincipal userDetails: User?,
-    ): ResponseEntity<ApiResponseDTO<UserInfoResponse>> {
+    ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
         if(userDetails?.id == null) throw UnauthorizedException()
 
         val user = userRepository.findById(userDetails.id ?: "").get()
 
-        val userInfo = UserInfoResponse(
-            user.email!!,
-            user.authorities.map { it.authority },
-            user.userName!!,
-            user.gender!!,
-            user.birthDate?.toLocalDate() ?: LocalDate.now()
-        )
-        return ResponseEntity.ok(ApiResponseDTO(data = userInfo))
+        val userDTO = user.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO ))
     }
 
     @PostMapping("/update")
@@ -364,5 +414,64 @@ class AuthController(
                 )
             )
         )
+    }
+
+    @PutMapping("/profile",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    @Operation(
+        summary = "Update user profile image",
+        description = """
+            Updates the user's profile image. The image will be uploaded to S3 storage.
+            The response will include the updated user's information including the new profile image URL.
+            Maximum file size is 5MB and only image files (jpg, jpeg, png) are allowed.
+            This endpoint is protected and requires a valid access token.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully updated profile image",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing access token",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid file format or size",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            )
+        ]
+    )
+    fun updateProfile(
+        @AuthenticationPrincipal userDetails: User?,
+        @Parameter(
+            name = "file",
+            description = "Profile image file to be uploaded",
+            required = true,
+            schema = Schema(type = "string", format = "binary")
+        )
+        @RequestPart("multipartFile", required = true)
+        multipartFile: MultipartFile,
+    ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
+        if(userDetails?.id == null) throw UnauthorizedException()
+
+        val file = profileS3Service.uploadProfile(userDetails, multipartFile)
+
+        val user = userRepository.findById(userDetails.id!!).get()
+        user.profile = file
+
+        val updatedUser = userRepository.save(user)
+
+        val userDTO = updatedUser.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO))
     }
 }
