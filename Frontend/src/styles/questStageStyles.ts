@@ -91,6 +91,13 @@ const questStageStyles = StyleSheet.create({
     fontSize: width * 0.06,
     fontFamily:fonts.laundryBold,
   },
+  fullSizeImage: {
+    width: "100%",
+    height: "100%",
+  },
+  scrollBottomSpacer: {
+    height: height * 1,
+  },
 });
 
 

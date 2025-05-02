@@ -54,7 +54,10 @@ export default function Quest_stage() {
         <Quest_title
           text="조용한 마음을 가져봐요."
           style={questStageStyles.questTitle}
-          
+          onPress={() => {
+            console.log("스테이지 터치됨!");
+            // 여기에 네비게이션이나 다른 동작 추가
+          }}
         />
 
         <View style={questStageStyles.textWrapper}>
@@ -97,12 +100,11 @@ export default function Quest_stage() {
                 }}
                 activeOpacity={0.8}
               >
-                <Image source={imageSource} style={{ width: "100%", height: "100%" }} resizeMode="contain" />
+                <Image source={imageSource} style={questStageStyles.fullSizeImage} resizeMode="contain" />
               </TouchableOpacity>
             );
           }
         
-          // 나머지 스테이지는 그냥 이미지로 표시
           return (
             <Image
               key={index}
@@ -113,7 +115,9 @@ export default function Quest_stage() {
           );
         })}
 
-        <View style={{ height: height * 1 }} />
+      
+      <View style={questStageStyles.scrollBottomSpacer} />
+
       </ScrollView>
     </View>
   );
