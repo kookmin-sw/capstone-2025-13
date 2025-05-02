@@ -271,49 +271,5 @@ class AuthController(
         return ResponseEntity.ok(ApiResponseDTO(data = userInfo))
     }
 
-    @PostMapping("/update")
-    @Operation(
-        summary = "Update user information",
-        description = "Updates user information. Null fields will be ignored."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Successfully updated user information",
-                useReturnTypeSchema = true,
-            ),
-            ApiResponse(
-                responseCode = "401",
-                description = "Unauthorized - Invalid or missing access token",
-                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
-            )
-        ]
-    )
-    fun updateUser(
-        @AuthenticationPrincipal userDetails: User?,
-        @RequestBody updateRequest: UpdateUserRequest,
-    ): ResponseEntity<ApiResponseDTO<UpdateUserResponse>> {
-        if (userDetails?.id == null) throw UnauthorizedException()
 
-        val user = userRepository.findById(userDetails.id!!).get()
-
-        updateRequest.userName?.let { user.userName = it }
-        updateRequest.password?.let { user.password = passwordEncoder.encode(it) }
-        updateRequest.gender?.let { user.gender = it }
-        updateRequest.birthDate?.let { user.birthDate = it.datetimeParser() }
-
-        val updatedUser = userRepository.save(user)
-
-        return ResponseEntity.ok(
-            ApiResponseDTO(
-                data = UpdateUserResponse(
-                    email = updatedUser.email!!,
-                    userName = updatedUser.userName!!,
-                    gender = updatedUser.gender!!,
-                    birthDate = updatedUser.birthDate!!
-                )
-            )
-        )
-    }
 }
