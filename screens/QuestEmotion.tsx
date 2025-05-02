@@ -1,12 +1,13 @@
-// main 얘를 쪼개고 있었어여여
-
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Camera as VisionCamera, Frame, useCameraDevice } from 'react-native-vision-camera';
 import { Camera, Face, FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
-import { useTensorflowModel } from 'react-native-fast-tflite';
-import ImageResizer from 'react-native-image-resizer';
-import RNFS from 'react-native-fs';
+
+import { capturePhotoIfReady } from '../utils/CapturePhoto';
+import { useEmotionModel } from '../hooks/useEmotionModel';
+import { imageToGrayscale } from '../utils/EmotionPreprocess';
+import { runEmotionModel } from '../utils/EmotionModelRun';
+import { checkHappy5Sec } from '../utils/emotion_quests/happy5Sec';
 
 export default function App() {
   const device = useCameraDevice('front');
@@ -17,13 +18,13 @@ export default function App() {
   const isPhotoTaken = useRef(false);
   const lastDetectedFaces = useRef<Face[]>([]);
 
-  const plugin = useTensorflowModel(require('./asset/models/emotion_model.tflite'));
+  const { model, isReady } = useEmotionModel();
 
-  const faceDetectionOptions = useRef<FaceDetectionOptions>({
+  const faceDetectionOptions: FaceDetectionOptions = {
     performanceMode: 'accurate',
     classificationMode: 'none',
     landmarkMode: 'all',
-  }).current;
+  };
 
   useEffect(() => {
     (async () => {
@@ -37,62 +38,21 @@ export default function App() {
     lastDetectedFaces.current = faces;
   };
 
-  const preprocessImageToGrayscale = async (uri: string) => {
-    try {
-      const resized = await ImageResizer.createResizedImage(
-        uri,
-        48,
-        48,
-        'PNG',
-        100,
-        0,
-        undefined,
-        false,
-        { mode: 'contain' }
-      );
-  
-      const base64 = await RNFS.readFile(resized.uri, 'base64');
-      const binary = atob(base64);
-      const grayscale = new Float32Array(48 * 48);
-  
-      for (let i = 0, j = 0; i < binary.length && j < grayscale.length; i += 4, j++) {
-        const r = binary.charCodeAt(i);
-        const g = binary.charCodeAt(i + 1);
-        const b = binary.charCodeAt(i + 2);
-        const gray = (r + g + b) / 3 / 255;
-        grayscale[j] = gray;
-      }
-  
-      return [grayscale];
-    } catch (err) {
-      console.error('이미지 전처리 실패:', err);
-      return [new Float32Array(48 * 48)]; // fallback
-    }
-  };
+  const quest_function = checkHappy5Sec
 
-  const capturePhoto = useCallback(async () => {
-    if (cameraRef.current && !isPhotoTaken.current && plugin.state === 'loaded') {
-      try {
-        isPhotoTaken.current = true;
-        const photo = await cameraRef.current.takePhoto();
-        const photoPath = `file://${photo.path}`;
-        setPhotoUri(photoPath);
+  const facedetection = useCallback(async () => {
+    const uri = await capturePhotoIfReady(cameraRef, isPhotoTaken, setPhotoUri, quest_function.phototime);
+    if (uri) {
+      console.log('✅ 사진 촬영 성공:', uri);
 
-        const input = await preprocessImageToGrayscale(photoPath);
-
-        const result = await plugin.model.run(input);
-
-        console.log('🧠 예측 결과:', result);
-
-        setTimeout(() => {
-          isPhotoTaken.current = false;
-        }, 5000);
-      } catch (err) {
-        console.error('📸 촬영 실패:', err);
-        isPhotoTaken.current = false;
+      const input = await imageToGrayscale(uri);
+      const result = await runEmotionModel(model, input);
+      if (result) {
+        quest_result = quest_function.check(label);
       }
     }
-  }, [plugin]);
+  }, [cameraRef, isPhotoTaken, model]);
+  return quest_result;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -107,14 +67,14 @@ export default function App() {
 
       if (width > 150 && height > 200) {
         console.log('✅ 얼굴 크기 충분함 → 촬영');
-        capturePhoto();
+        facedetection();
       } else {
         console.log('⚠️ 얼굴 작음 → 무시');
       }
     }, 500);
 
     return () => clearInterval(interval);
-  }, [capturePhoto]);
+  }, [facedetection]);
 
   if (!device || !hasPermission) {
     return (
