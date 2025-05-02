@@ -9,11 +9,12 @@ import { RootStackParamList } from "../App";
 export default function FloatingButton() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
     return (
         <>
             {/* 왼쪽 하단 버튼들 */}
             <View style={[styles.container, { left: 24, right: "auto" }]}>
-                <TouchableOpacity style={styles.bubble} onPress={() => { navigation.navigate("DailyTopic") }}>
+                <TouchableOpacity style={styles.bubble} onPress={() => navigation.navigate("DailyTopic")}>
                     <MaterialCommunityIcons
                         name="message-text"
                         size={24}
@@ -31,7 +32,10 @@ export default function FloatingButton() {
 
             {/* 오른쪽 하단 계정 버튼 */}
             <View style={[styles.container, { left: "auto", right: 24 }]}>
-                <TouchableOpacity style={styles.bubble}>
+                <TouchableOpacity
+                    style={styles.bubble}
+                    onPress={() => navigation.navigate("UserInfo")} // ← 이동
+                >
                     <MaterialCommunityIcons
                         name="account"
                         size={24}
