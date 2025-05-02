@@ -126,10 +126,10 @@ const SignUpStep2 = () => {
                                         <Text style={signUpStyles.genderText}>여자</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => setGender("secret")}
+                                        onPress={() => setGender("unknown")}
                                         style={[
                                             signUpStyles.genderButton,
-                                            gender === "secret"
+                                            gender === "unknown"
                                                 ? signUpStyles.secretSelected
                                                 : signUpStyles.secretUnselected
                                         ]}
