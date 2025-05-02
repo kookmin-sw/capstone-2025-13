@@ -48,13 +48,19 @@ data class CreateRecordRequest(
 
 @RestController
 @RequestMapping("/records")
-@Tag(name = "Record API", description = "Endpoints for records")
+@Tag(name = "Record API", description = """
+    Endpoints for records.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class RecordController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val recordRepository : RecordRepository
 ) {
     @GetMapping("/me")
-    @Operation(summary = "Get record by date", description = "Get a user's record for a specific date")
+    @Operation(summary = "Get record by date", description ="""
+        Get a user's record for a specific date.
+        AccessToken is required for all of this part of endpoints on Authorization header.
+    """)
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved record",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),

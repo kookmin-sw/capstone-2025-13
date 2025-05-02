@@ -884,6 +884,29 @@ Modify existing record information
             [en] Updates the emotional rate and content data of an existing record. Only the record owner can modify their records  
             [ko] 기존 기록의 감정 수치와 내용을 수정합니다. 기록 소유자만 수정할 수 있습니다  
         
+    userName?: string
+    gender?: enum[MALE, FEMALE, THIRD_GENDER, UNKNOWN]
+    birthDate?: string
+  }
+}
+```
+
+- 401 Unauthorized - Invalid or missing access token
+
+`*/*`
+
+```ts
+{
+  error?: boolean
+  message?: string
+  code?: integer
+  data: {
+  }
+}
+```
+
+***
+
 
 #### RequestBody
 
@@ -1020,6 +1043,46 @@ Update user information / 사용자 정보 업데이트
 
 ***
 
+### [POST]/auth/update
+
+- Summary  
+Update user information
+
+- Description  
+  
+            Updates user information. Null fields will be ignored.  
+            The response will include the updated user's email, username, gender, and birth date.  
+            The user's information will be updated in the database.  
+            This endpoint is protected and requires a valid access token.  
+        
+
+#### RequestBody
+
+- application/json
+
+```ts
+{
+  password?: string
+  gender?: enum[MALE, FEMALE, THIRD_GENDER, UNKNOWN]
+  user_name?: string
+  // Birth date in format yyyy-MM-dd
+  birth_date?: string
+}
+```
+
+#### Responses
+
+- 200 Successfully updated user information
+
+`*/*`
+
+```ts
+{
+  error?: boolean
+  message?: string
+  code?: integer
+  data: {
+    email?: string
 ### [POST]/auth/signup
 
 - Summary  
@@ -1543,6 +1606,8 @@ List all quests
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1555,6 +1620,8 @@ List all quests
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1567,6 +1634,7 @@ List quests by type
 
 - Description  
   
+           Get a list of quests filtered by type.  
            [en] Get a list of quests filtered by type.  
            AccessToken is required for all of this part of endpoints on Authorization header.  
              
@@ -1606,6 +1674,8 @@ List quests by type
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1618,6 +1688,8 @@ List quests by type
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1630,6 +1702,7 @@ List quests by type and step
 
 - Description  
   
+            Get a list of quests filtered by type and step number.  
             [en] Get a list of quests filtered by type and step number.  
             AccessToken is required for all of this part of endpoints on Authorization header.  
               
@@ -1669,6 +1742,8 @@ List quests by type and step
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1681,6 +1756,8 @@ List quests by type and step
   error?: boolean
   message?: string
   code?: integer
+  data: {
+  }
 }
 ```
 
@@ -1689,6 +1766,7 @@ List quests by type and step
 ### [GET]/diagnosis/{id}
 
 - Summary  
+Get diagnosis by ID
 Get diagnosis by ID / ID로 진단 조회
 
 - Description  
