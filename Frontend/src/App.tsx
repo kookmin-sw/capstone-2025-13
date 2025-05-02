@@ -18,8 +18,8 @@ import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_sur
 import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
+import HelpCall from "./screens/HelpCall";
 import UserInfo from "./screens/UserInfo";
-
 
 export type RootStackParamList = {
     Home: undefined;
@@ -42,6 +42,7 @@ export type RootStackParamList = {
     GameScreen: undefined;
     DailyTopic: undefined;
     Spinner: undefined;
+    HelpCall: undefined;
     UserInfo: undefined;
 };
 
@@ -85,7 +86,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
+                initialRouteName={isLoggedIn ? "Home" : "Home"}
             >
                 <Stack.Screen
                     name="Home"
@@ -155,11 +156,14 @@ export default function App() {
                     component={Spinner}
                     options={{ headerShown: false }} />
                 <Stack.Screen
+                    name="HelpCall" // HelpCall 화면 추가
+                    component={HelpCall}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
                     options={{ headerShown: false }}
                 />
-
 
             </Stack.Navigator>
         </NavigationContainer>

@@ -14,14 +14,22 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.wooong"
+      "bundleIdentifier": "com.anonymous.wooong",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.wooong"
+      "package": "com.anonymous.wooong",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
