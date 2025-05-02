@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -16,7 +17,7 @@ const questStageStyles = StyleSheet.create({
     top: height * 0.25,
     zIndex: 3,
   },
-  questTitleTop: {
+  questTitle: {
     position: "absolute",
     alignSelf: "center",
     zIndex: 3 
@@ -47,7 +48,50 @@ const questStageStyles = StyleSheet.create({
     width: width * 0.14,
     height: width * 0.14,
     zIndex: 4,
-  }
+  },
+  textWrapper: {
+    position: "absolute",
+    top: width * 0.8,
+    right: width * 0.1,
+    alignItems: "flex-end",
+    zIndex: 4,
+  },
+  lineLargeWrapper: {
+    position: "relative",
+  },
+  lineSmallWrapper: {
+    position: "relative",
+    marginTop: height * 0.005,
+  },
+  shadowTextLarge: {
+    position: "absolute",
+    color: "#18854B",
+    fontSize: width * 0.08,
+    textShadowColor: "#18854B",
+    textShadowOffset: { width: -width * 0.005, height: width * 0.005 },
+    textShadowRadius: width * 0.0025,
+    fontFamily:fonts.laundryBold,
+  },
+  mainTextLarge: {
+    color: "white",
+    fontSize: width * 0.08,
+    fontFamily:fonts.laundryBold,
+  },
+  shadowTextSmall: {
+    position: "absolute",
+    color: "#18854B",
+    fontSize: width * 0.06,
+    fontFamily:fonts.laundryBold,
+    textShadowColor: "#18854B",
+    textShadowOffset: { width: -width * 0.005, height: width * 0.005 },
+    textShadowRadius: width * 0.0025,
+  },
+  mainTextSmall: {
+    color: "white",
+    fontSize: width * 0.06,
+    fontFamily:fonts.laundryBold,
+  },
 });
+
 
 export default questStageStyles;

@@ -1,4 +1,4 @@
-import { View, ScrollView, Image, Dimensions } from "react-native";
+import { View, ScrollView, Image, Dimensions, Text, TouchableOpacity } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import Header_sky from "../components/Header_sky";
 import Quest_circle from "../components/Darkgreen_circle";
@@ -53,8 +53,21 @@ export default function Quest_stage() {
 
         <Quest_title
           text="조용한 마음을 가져봐요."
-          style={questStageStyles.questTitleTop}
+          style={questStageStyles.questTitle}
+          
         />
+
+        <View style={questStageStyles.textWrapper}>
+          <View style={questStageStyles.lineSmallWrapper}>
+            <Text style={questStageStyles.shadowTextSmall}>{title}</Text>
+            <Text style={questStageStyles.mainTextSmall}>{title}</Text>
+          </View>
+
+          <View style={questStageStyles.lineLargeWrapper}>
+            <Text style={questStageStyles.shadowTextLarge}>1-1</Text>
+            <Text style={questStageStyles.mainTextLarge}>1-1</Text>
+          </View>
+        </View>
 
 
         {lockPositions.map((pos, index) => {
@@ -68,14 +81,34 @@ export default function Quest_stage() {
             imageSource = require("../assets/Images/stage_unlock.png");
           }
 
+          const imageStyle = [
+            questStageStyles.stage,
+            { top: pos.top, left: pos.left},
+          ];
+
+          if (index === currentStageIndex) {
+            return (
+              <TouchableOpacity
+                key={index}
+                style={imageStyle}
+                onPress={() => {
+                  console.log("현재 스테이지 터치됨!");
+                  // 여기에 네비게이션이나 다른 동작 추가
+                }}
+                activeOpacity={0.8}
+              >
+                <Image source={imageSource} style={{ width: "100%", height: "100%" }} resizeMode="contain" />
+              </TouchableOpacity>
+            );
+          }
+        
+          // 나머지 스테이지는 그냥 이미지로 표시
           return (
             <Image
               key={index}
               source={imageSource}
-              style={[
-                questStageStyles.stage,
-                { top: pos.top, left: pos.left, resizeMode: "contain"},
-              ]}
+              style={[questStageStyles.stage, { top: pos.top, left: pos.left }]}
+              resizeMode="contain"
             />
           );
         })}
