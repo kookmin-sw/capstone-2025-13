@@ -113,10 +113,12 @@ export default function FormalDiagnosis() {
                         key={item.id}
                         label={item.title}
                         onPress={() => {
-                            console.log(`${item.title} 버튼 클릭됨`);
-                            if (item.title === "BDI 기반 정식 검사") {
-                                navigation.navigate("FormalDiagnosisSurvey");
-                            }
+                            console.log(
+                                `🟢 ${item.title} 버튼 클릭됨 (id: ${item.id})`
+                            );
+                            navigation.navigate("FormalDiagnosisSurvey", {
+                                diagnosisId: item.id,
+                            });
                         }}
                     />
                 ))}
