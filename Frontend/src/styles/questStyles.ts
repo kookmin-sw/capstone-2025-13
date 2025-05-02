@@ -13,12 +13,15 @@ const questStyles = StyleSheet.create({
     paddingBottom: height * 0.2,
   },
   headerWrapper: {
-    height: height * 0.2,
     position: "relative",
+    width: "100%",
+    height: height * 0.2,
+    zIndex: 1,
   },
   circle: {
     position: "absolute",
-    top: height * 0.20,
+    width: width,
+    top: height * 0.195,
     alignSelf: "center",
     zIndex: 2,
   },
