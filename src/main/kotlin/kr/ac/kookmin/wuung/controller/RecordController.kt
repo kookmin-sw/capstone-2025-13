@@ -144,7 +144,10 @@ class RecordController(
     }
 
     @PutMapping("/create")
-    @Operation(summary = "Create new record", description = "Create a new record with rate and data")
+    @Operation(summary = "Create new record", description = """
+        Create a new record with rate and data.
+        AccessToken is required for all of this part of endpoints on Authorization header.
+    """)
     @ApiResponses(
         value = [
             ApiResponse(
