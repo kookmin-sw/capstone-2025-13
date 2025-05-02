@@ -1,6 +1,6 @@
 package kr.ac.kookmin.wuung.service
 
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -8,6 +8,7 @@ import kr.ac.kookmin.wuung.jwt.JwtProvider
 import kr.ac.kookmin.wuung.model.RefreshToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
+import org.springframework.data.jpa.repository.Modifying
 import java.time.LocalDateTime
 import java.util.Optional
 
@@ -50,6 +51,8 @@ class TokenService(
         return refreshTokenRepository.findByToken(token)
     }
 
+    //@Modifying
+    @Transactional
     fun deleteByUser(user: User) {
         refreshTokenRepository.deleteByUser(user)
     }
