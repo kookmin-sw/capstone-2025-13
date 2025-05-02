@@ -17,8 +17,10 @@ data class Record(
     var data : String? = null,
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     val user: User? = null,
+
+    @OneToMany
+    val recordFeedback: List<RecordFeedback> = listOf(),
 
     @Column(nullable = false)
     val createdAt : LocalDateTime = LocalDateTime.now(),
