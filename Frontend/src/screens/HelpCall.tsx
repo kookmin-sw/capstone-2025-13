@@ -1,3 +1,4 @@
+// HelpCall.tsx
 import React, { useEffect, useState } from "react";
 import {
     View,
@@ -5,12 +6,17 @@ import {
     Text,
     TouchableOpacity,
     ScrollView,
+    TouchableWithoutFeedback,
+    Keyboard,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { Image } from "react-native";
 import helpCallStyles from "../styles/helpCallStyles";
+import { getCenters } from "../API";
+import Spinner from "./Spinner";
+import MarkerDetailCard from "../components/MarkerDetailCard";
 
 export default function HelpCall() {
     const [location, setLocation] = useState<{
@@ -21,14 +27,22 @@ export default function HelpCall() {
     } | null>(null);
 
     const [selected, setSelected] = useState("all");
-    const [markers, setMarkers] = useState<
-        { id: string; latitude: number; longitude: number; title: string; type: string }[]
-    >([]);
+    const [markers, setMarkers] = useState<{
+        id: string;
+        latitude: number;
+        longitude: number;
+        title: string;
+        type: string;
+        details: any;
+    }[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
     const filteredMarkers =
         selected === "all"
             ? markers
             : markers.filter((marker) => marker.type === selected);
+
     const getMarkerImageByType = (type: string) => {
         switch (type) {
             case "clinic":
@@ -37,15 +51,18 @@ export default function HelpCall() {
                 return require("../assets/Images/center.png");
             case "counseling":
                 return require("../assets/Images/counseling.png");
-            // 기본 마커
+            default:
+                return null;
         }
     };
 
     useEffect(() => {
         (async () => {
+            setIsLoading(true);
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
+                setIsLoading(false);
                 return;
             }
 
@@ -59,34 +76,43 @@ export default function HelpCall() {
                 longitudeDelta: 0.05,
             });
 
-            // 위치 기준 예시 마커 설정
-            setMarkers([
-                {
-                    id: "1",
-                    title: "서울정신건강의원",
-                    latitude: latitude + 0.001,
-                    longitude: longitude + 0.001,
-                    type: "clinic",
-                },
-                {
-                    id: "2",
-                    title: "강남정신건강복지센터",
-                    latitude: latitude - 0.0015,
-                    longitude: longitude + 0.001,
-                    type: "center",
-                },
-                {
-                    id: "3",
-                    title: "행복정신상담센터",
-                    latitude: latitude + 0.001,
-                    longitude: longitude - 0.0015,
-                    type: "counseling",
-                },
-            ]);
+            try {
+                const centerData = await getCenters();
+                const parsedMarkers = centerData
+                    .filter((item: any) => item.hpCnterSe === "정신보건")
+                    .map((item: any, index: number) => ({
+                        id: `${index}`,
+                        title: item.hpCnterNm ?? "정신건강센터",
+                        latitude: parseFloat(item.latitude),
+                        longitude: parseFloat(item.longitude),
+                        type: "center",
+                        details: {
+                            address: item.rdnmadr,
+                            phone: item.phoneNumber,
+                            openTime: item.operOpenHhmm,
+                            closeTime: item.operColseHhmm,
+                            restDays: item.rstdeInfo,
+                            area: item.hpCnterAr,
+                            doctors: item.doctrCo,
+                            nurses: item.nurseCo,
+                            psychologists: item.scrcsCo,
+                            jobDesc: item.hpCnterJob,
+                            etcStatus: item.etcHnfSttus,
+                            etcUseInfo: item.etcUseIfno,
+                            operator: item.operInstitutionNm,
+                            referenceDate: item.referenceDate,
+                            institution: item.institutionNm,
+                        },
+                    }));
+
+                setMarkers(parsedMarkers);
+            } catch (error) {
+                console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
+            } finally {
+                setIsLoading(false);
+            }
         })();
     }, []);
-
-
 
     if (!location) return null;
 
@@ -98,66 +124,84 @@ export default function HelpCall() {
     ];
 
     return (
-        <View style={helpCallStyles.container}>
-            <StatusBar style="auto" />
-            <View style={helpCallStyles.headerBox}>
-                <Text style={helpCallStyles.headerText}>마음 케어 정보 지도</Text>
-                <ScrollView
-                    style={{ marginTop: 10 }}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={helpCallStyles.scrollContainer}
-                >
-                    {buttons.map((btn) => (
-                        <TouchableOpacity
-                            key={btn.id}
-                            style={[
-                                helpCallStyles.button,
-                                selected === btn.id ? helpCallStyles.selectedButton : helpCallStyles.unselectedButton,
-                            ]}
-                            onPress={() => setSelected(btn.id)}
-                        >
-                            <Text
-                                style={[
-                                    helpCallStyles.buttonText,
-                                    selected === btn.id ? helpCallStyles.selectedText : helpCallStyles.unselectedText,
-                                ]}
+        <TouchableWithoutFeedback
+            onPress={() => setSelectedMarker(null)}
+        >
+            <View style={helpCallStyles.container}>
+                <StatusBar style="auto" />
+                {isLoading && <Spinner />}
+                {!isLoading && (
+                    <>
+                        <View style={helpCallStyles.headerBox}>
+                            <Text style={helpCallStyles.headerText}>마음 케어 정보 지도</Text>
+                            <ScrollView
+                                style={{ marginTop: 10 }}
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={helpCallStyles.scrollContainer}
                             >
-                                {btn.title}
-                            </Text>
+                                {buttons.map((btn) => (
+                                    <TouchableOpacity
+                                        key={btn.id}
+                                        style={[
+                                            helpCallStyles.button,
+                                            selected === btn.id
+                                                ? helpCallStyles.selectedButton
+                                                : helpCallStyles.unselectedButton,
+                                        ]}
+                                        onPress={() => setSelected(btn.id)}
+                                    >
+                                        <Text
+                                            style={[
+                                                helpCallStyles.buttonText,
+                                                selected === btn.id
+                                                    ? helpCallStyles.selectedText
+                                                    : helpCallStyles.unselectedText,
+                                            ]}
+                                        >
+                                            {btn.title}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                        <MapView
+                            provider={PROVIDER_GOOGLE}
+                            style={helpCallStyles.map}
+                            region={location}
+                            showsUserLocation={true}
+                        >
+                            <Marker coordinate={location} title="내 위치" />
+                            {filteredMarkers.map((marker) => (
+                                <Marker
+                                    key={marker.id}
+                                    coordinate={{
+                                        latitude: marker.latitude,
+                                        longitude: marker.longitude,
+                                    }}
+                                    title={marker.title}
+                                    image={getMarkerImageByType(marker.type)}
+                                    onCalloutPress={() => setSelectedMarker(marker.details)}
+                                />
+                            ))}
+                        </MapView>
+
+                        {selectedMarker && (
+                            <MarkerDetailCard
+                                details={selectedMarker}
+                                onClose={() => setSelectedMarker(null)}
+                            />
+                        )}
+
+                        <TouchableOpacity>
+                            <Image
+                                source={require("../assets/Images/call.png")}
+                                style={helpCallStyles.callButton}
+                            />
                         </TouchableOpacity>
-                    ))}
-                </ScrollView>
-
+                    </>
+                )}
             </View>
-            <MapView
-                provider={PROVIDER_GOOGLE}
-                style={helpCallStyles.map}
-                region={location}
-                showsUserLocation={true}
-            >
-                <Marker coordinate={location} title="내 위치" />
-                {filteredMarkers.map((marker) => (
-                    <Marker
-                        key={marker.id}
-                        coordinate={{
-                            latitude: marker.latitude,
-                            longitude: marker.longitude,
-                        }}
-                        title={marker.title}
-                        image={getMarkerImageByType(marker.type)}
-                    />
-                ))}
-
-
-            </MapView>
-            <TouchableOpacity>
-                <Image
-                    source={require("../assets/Images/call.png")}
-                    style={helpCallStyles.callButton}
-                />
-            </TouchableOpacity>
-        </View>
+        </TouchableWithoutFeedback>
     );
 }
-
