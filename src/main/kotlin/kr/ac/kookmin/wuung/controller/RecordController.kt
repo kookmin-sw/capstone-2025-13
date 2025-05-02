@@ -3,7 +3,6 @@ package kr.ac.kookmin.wuung.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.model.Record
-import kr.ac.kookmin.wuung.service.RecordService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.media.Content
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
@@ -26,6 +24,7 @@ import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
@@ -81,37 +80,48 @@ class RecordController(
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        // 요청된 날짜의 시작·끝 시각 계산
+// 요청된 날짜의 시작·끝 시각 계산 
         val targetDate: LocalDate = date.datetimeParser().toLocalDate()
         val startOfDay: LocalDateTime = targetDate.atStartOfDay()
         val endOfDay: LocalDateTime = targetDate.atTime(23, 59, 59)
 
-        // JPA 메서드로 날짜 범위 내 레코드 조회
+// JPA 메서드로 날짜 범위 내 레코드 조회
         val records: List<Record> = recordRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startOfDay,
             endOfDay
         )
 
+        if (records.isEmpty()) {
+            throw NotFoundException()
+        }
+
         // 가장 최신 생성 레코드 선택
-        val record = records
-            .maxByOrNull { it.createdAt }
-            ?: throw NotFoundException()
+        val record = records.maxByOrNull { it.createdAt } ?: throw NotFoundException()
 
         return ResponseEntity.ok(ApiResponseDTO(data = record.toDTO()))
     }
 
     @PutMapping("/create")
     @Operation(summary = "Create new record", description = "Create a new record with rate and data")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully created record",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
-        ApiResponse(responseCode = "403", description = "Unauthorized",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
-    ])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Successfully created record",
+                useReturnTypeSchema = true,
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun createRecord(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestBody request: CreateRecordRequest
+        @RequestBody request: CreateRecordRequest,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
