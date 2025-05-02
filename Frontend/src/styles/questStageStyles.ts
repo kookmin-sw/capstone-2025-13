@@ -23,8 +23,8 @@ const questStageStyles = StyleSheet.create({
   },
   goalImage: {
     position: "absolute",
-    top: width / 2.4,
-    left: width / 4,
+    top: width / 2.2,
+    left: width / 1.6,
     width: width * 0.25,
     height: width * 0.2,
     zIndex: 3,
@@ -42,6 +42,12 @@ const questStageStyles = StyleSheet.create({
     position: "absolute",
     marginHorizontal: width * 0.22,
   },
+  stage: {
+    position: "absolute",
+    width: width * 0.14,
+    height: width * 0.14,
+    zIndex: 4,
+  }
 });
 
 export default questStageStyles;

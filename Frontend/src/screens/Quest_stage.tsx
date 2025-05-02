@@ -6,8 +6,17 @@ import questStyles from "../styles/questStyles";
 import questStageStyles from "../styles/questStageStyles";
 import Quest_title from "../components/Quest_title";
 
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 
+const lockPositions = [
+  { top: height * 0.3, left: width * 0.24 },
+  { top: height * 0.49, left: width * 0.35 },
+  { top: height * 0.6, left: width * 0.72 },
+  { top: height * 0.72, left: width * 0.35 },
+  { top: height * 0.9, left: width * 0.24 },
+  { top: height * 1.00, left: width * 0.67 },
+  { top: height * 1.16, left: width * 0.4 },
+];
 
 export default function Quest_stage() {
   const route = useRoute();
@@ -26,23 +35,36 @@ export default function Quest_stage() {
 
         <Image
           source={require("../assets/Images/stage_street.png")}
-          style={[questStageStyles.street,]}
+          style={[questStageStyles.street]}
           resizeMode="contain"
         />
         <View style={questStyles.headerWrapper}>
-          <Header_sky title= "" subtitle="" />
+          <Header_sky title="" subtitle="" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
+        <Image
+          source={require("../assets/Images/goal.png")}
+          style={questStageStyles.goalImage}
+        />
 
         <Quest_title
           text="조용한 마음을 가져봐요."
           style={questStageStyles.questTitleTop}
         />
 
+        {lockPositions.map((pos, index) => (
+          <Image
+            key={index}
+            source={require("../assets/Images/stage_lock.png")}
+            style={[
+              questStageStyles.stage,
+              { top: pos.top, left: pos.left },
+            ]}
+          />
+        ))}
 
-
-        <View style={{ height: height * 1}} />
+        <View style={{ height: height * 1 }} />
       </ScrollView>
     </View>
   );
