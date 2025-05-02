@@ -159,6 +159,7 @@ export default function App() {
                     name="HelpCall" // HelpCall 화면 추가
                     component={HelpCall}
                     options={{ headerShown: false }} />
+                <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
                     options={{ headerShown: false }}
