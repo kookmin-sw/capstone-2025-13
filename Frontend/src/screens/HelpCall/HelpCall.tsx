@@ -7,18 +7,22 @@ import {
     TouchableOpacity,
     ScrollView,
     TouchableWithoutFeedback,
-    Keyboard,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { Image } from "react-native";
-import helpCallStyles from "../styles/helpCallStyles";
-import { getCenters } from "../API";
-import Spinner from "./Spinner";
-import MarkerDetailCard from "../components/MarkerDetailCard";
+import helpCallStyles from "../../styles/helpCallStyles";
+import { getCenters } from "../../API";
+import Spinner from "../Spinner";
+import MarkerDetailCard from "../../components/MarkerDetailCard";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../App";
 
 export default function HelpCall() {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
     const [location, setLocation] = useState<{
         latitude: number;
         longitude: number;
@@ -46,11 +50,11 @@ export default function HelpCall() {
     const getMarkerImageByType = (type: string) => {
         switch (type) {
             case "clinic":
-                return require("../assets/Images/clinic.png");
+                return require("../../assets/Images/clinic.png");
             case "center":
-                return require("../assets/Images/center.png");
+                return require("../../assets/Images/center.png");
             case "counseling":
-                return require("../assets/Images/counseling.png");
+                return require("../../assets/Images/counseling.png");
             default:
                 return null;
         }
@@ -192,13 +196,20 @@ export default function HelpCall() {
                                 onClose={() => setSelectedMarker(null)}
                             />
                         )}
-
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            style={helpCallStyles.callButton
+                            }
+                            onPress={() => {
+                                navigation.navigate("HelpCall2");
+                            }}
+                        >
                             <Image
-                                source={require("../assets/Images/call.png")}
-                                style={helpCallStyles.callButton}
+                                source={require("../../assets/Images/call.png")}
+                                style={{ width: 60, height: 60 }}
                             />
                         </TouchableOpacity>
+
+
                     </>
                 )}
             </View>

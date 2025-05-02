@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import * as Font from "expo-font";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -18,8 +17,9 @@ import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_sur
 import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
-import HelpCall from "./screens/HelpCall";
+import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -43,6 +43,7 @@ export type RootStackParamList = {
     DailyTopic: undefined;
     Spinner: undefined;
     HelpCall: undefined;
+    HelpCall2: undefined;
     UserInfo: undefined;
 };
 
@@ -86,7 +87,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "Home" : "Home"}
+                initialRouteName={isLoggedIn ? "HelpCall" : "HelpCall"}
             >
                 <Stack.Screen
                     name="Home"
@@ -158,6 +159,10 @@ export default function App() {
                 <Stack.Screen
                     name="HelpCall" // HelpCall 화면 추가
                     component={HelpCall}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
+                    name="HelpCall2" // HelpCall 화면 추가
+                    component={HelpCall2}
                     options={{ headerShown: false }} />
                 <Stack.Screen
                     name="UserInfo"

@@ -65,6 +65,28 @@ const helpCallStyles = StyleSheet.create({
         height: 60,
         justifyContent: "center",
         alignItems: "center",
-    }
+        zIndex: 999,
+    },
+    contentContainer: {
+        flex: 1,
+        backgroundColor: "white",
+    },
+    itemContainer: {
+        padding: 16,
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    
+    itemTitle: {
+        fontSize: 16,
+        fontWeight: "600",
+    },
+    itemPhone: {
+        color: colors.red
+    },
+    itemWebsite: {
+        color: "blue",
+        textDecorationLine: "underline",
+    },
 });
+
 export default helpCallStyles;
