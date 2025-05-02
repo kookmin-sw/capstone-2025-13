@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.media.Content
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import io.swagger.v3.oas.annotations.media.Schema
+import kr.ac.kookmin.wuung.exceptions.FeedBackProcessErrorException
+import kr.ac.kookmin.wuung.exceptions.FeedBackProcessingException
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
@@ -22,10 +24,15 @@ import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
+import kr.ac.kookmin.wuung.model.RecordFeedback
+import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
+import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.time.LocalDate
+import kotlin.collections.map
 import kotlin.jvm.optionals.getOrNull
 
 data class RecordDTO(
@@ -55,13 +62,28 @@ data class RecordUpdateRequest(
     val data: String,
 )
 
+data class RecordFeedbackDTO(
+    val id: String?,
+    val aiFeedback: String?,
+    val comment: String?,
+    val data: String?,
+    val status: RecordFeedbackStatus,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+
+data class UpdateFeedbackRequest(
+    val data: String,
+    val comment: String
+)
 
 @RestController
 @RequestMapping("/records")
 @Tag(name = "Record API", description = "Endpoints for records")
 class RecordController(
     @Autowired private val authenticationManager: AuthenticationManager,
-    @Autowired private val recordRepository : RecordRepository
+    @Autowired private val recordRepository : RecordRepository,
+    @Autowired private val recordFeedbackRepository: RecordFeedbackRepository
 ) {
     @GetMapping("/me")
     @Operation(summary = "Get record by date", description = "Get a user's record for a specific date")
@@ -161,5 +183,123 @@ class RecordController(
         return ResponseEntity.ok(ApiResponseDTO(data = updated.toDTO()))
     }
 
+    @PutMapping("/feedback")
+    @Operation(summary = "Create new feedback", description = "Create a new empty feedback for a record")
+    fun createFeedback(
+        @RequestParam recordId: Long
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        val feedback = RecordFeedback(record = record)
+        val saved = recordFeedbackRepository.save(feedback)
+        return ResponseEntity.ok(ApiResponseDTO(data = saved.id))
+    }
 
+    @PutMapping("/feedback/{id}")
+    @Operation(summary = "Update feedback status", description = "Update feedback status to PROCESSING")
+    fun updateFeedbackStatus(
+        @RequestParam id: String
+    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
+        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+        feedback.status = RecordFeedbackStatus.PROCESSING
+        val updated = recordFeedbackRepository.save(feedback)
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data = RecordFeedbackDTO(
+                    id = updated.id,
+                    aiFeedback = updated.aiFeedback,
+                    comment = updated.comment,
+                    data = updated.data,
+                    status = updated.status,
+                    createdAt = updated.createdAt,
+                    updatedAt = updated.updatedAt
+                )
+            )
+        )
+    }
+
+    @GetMapping("/feedback")
+    @Operation(summary = "Get feedbacks", description = "Get all feedbacks for a record")
+    fun getFeedbacks(
+        @RequestParam recordId: Long
+    ): ResponseEntity<ApiResponseDTO<List<RecordFeedbackDTO>>> {
+        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        val feedbacks = recordFeedbackRepository.findRecordFeedbackByRecord(record)
+            .filter { it.status == RecordFeedbackStatus.COMPLETED }
+        return ResponseEntity.ok(ApiResponseDTO(data = feedbacks.map {
+            RecordFeedbackDTO(
+                id = it.id,
+                aiFeedback = it.aiFeedback,
+                comment = it.comment,
+                data = it.data,
+                status = it.status,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt
+            )
+        }))
+    }
+
+    @GetMapping("/feedback/{id}")
+    @Operation(summary = "Get feedback", description = "Get feedback details by ID")
+    fun getFeedback(
+        @PathVariable id: String
+    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
+        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+        when (feedback.status) {
+            RecordFeedbackStatus.QUEUED -> return ResponseEntity.ok(
+                ApiResponseDTO(
+                    data = RecordFeedbackDTO(
+                        id = feedback.id,
+                        aiFeedback = feedback.aiFeedback,
+                        comment = feedback.comment,
+                        data = feedback.data,
+                        status = feedback.status,
+                        createdAt = feedback.createdAt,
+                        updatedAt = feedback.updatedAt
+                    )
+                )
+            )
+
+            RecordFeedbackStatus.PROCESSING -> throw FeedBackProcessingException()
+            RecordFeedbackStatus.PROCESSING_ERROR -> throw FeedBackProcessErrorException()
+            RecordFeedbackStatus.COMPLETED -> Unit
+        }
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data = RecordFeedbackDTO(
+                    id = feedback.id,
+                    aiFeedback = feedback.aiFeedback,
+                    comment = feedback.comment,
+                    data = feedback.data,
+                    status = feedback.status,
+                    createdAt = feedback.createdAt,
+                    updatedAt = feedback.updatedAt
+                )
+            )
+        )
+    }
+    @PostMapping("/feedback/{id}")
+    @Operation(summary = "Update feedback", description = "Update feedback data and comment")
+    fun updateFeedback(
+        @PathVariable id: String,
+        @RequestBody request: UpdateFeedbackRequest
+    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
+        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+        feedback.data = request.data
+        feedback.comment = request.comment
+        val updated = recordFeedbackRepository.save(feedback)
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data = RecordFeedbackDTO(
+                    id = updated.id,
+                    aiFeedback = updated.aiFeedback,
+                    comment = updated.comment,
+                    data = updated.data,
+                    status = updated.status,
+                    createdAt = updated.createdAt,
+                    updatedAt = updated.updatedAt
+                )
+            )
+        )
+    }
 }
