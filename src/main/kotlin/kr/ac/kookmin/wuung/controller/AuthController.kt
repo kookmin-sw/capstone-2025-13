@@ -30,7 +30,7 @@ import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class LoginRequest(val email: String, val password: String)
@@ -40,7 +40,13 @@ data class TokenRefreshResponse(val accessToken: String, val refreshToken: Strin
 
 data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
-data class UserInfoResponse(val email: String, val roles: List<String>, val username: String)
+data class UserInfoResponse(
+    val email: String,
+    val roles: List<String>,
+    val username: String,
+    val gender: GenderEnum = GenderEnum.UNKNOWN,
+    val birthDate: LocalDate = LocalDate.now()
+)
 
 data class SignUpRequest(
     @field:JsonProperty("user_name")
@@ -76,7 +82,13 @@ data class UpdateUserResponse(
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth API", description = "Endpoints for authentication and token management")
+@Tag(name = "Auth API", description = """
+    Endpoints for authentication and token management.
+    Tokens are valid for 15 minutes.
+    Refreshed tokens will be invalidated for the previous token.
+    The refresh token can be used to obtain new access tokens until they expire.
+    AccessToken is required for protected endpoints on Authorization header.
+""")
 class AuthController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
@@ -86,7 +98,15 @@ class AuthController(
     @Autowired private val passwordEncoder: PasswordEncoder
 ) {
    @PostMapping("/login")
-   @Operation(summary = "Authenticate user and generate JWT tokens", description = "Validates user credentials and provides access and refresh tokens.")
+   @Operation(summary = "Authenticate user and generate JWT tokens", description =
+    """
+        Validates user credentials and provides access and refresh tokens.
+        Tokens are valid for 15 minutes.
+        Refreshed tokens will be invalidated for the previous token.
+        The refresh token can be used to obtain new access tokens until they expire.
+        This endpoint is not protected and can be used by unauthenticated clients.
+    """
+   )
    @ApiResponses(
        value = [
            ApiResponse(responseCode = "200", description = "Successfully authenticated", useReturnTypeSchema = true),
@@ -117,7 +137,14 @@ class AuthController(
    }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh JWT tokens", description = "Generates new access and refresh tokens from a valid refresh token.")
+    @Operation(summary = "Refresh JWT tokens", description =
+    """
+        Generates new access and refresh tokens from a valid refresh token.
+        Tokens are valid for 15 minutes.
+        The refresh token can be used to obtain new access tokens until they expire.
+        This endpoint is not protected and can be used by unauthenticated clients.
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successfully refreshed tokens", useReturnTypeSchema = true),
@@ -162,7 +189,10 @@ class AuthController(
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Logout user", description = "Invalidates refresh tokens for the user.")
+    @Operation(summary = "Logout user", description = """
+        Invalidates refresh tokens for the user. The user will need to authenticate again to obtain new tokens.
+        This endpoint is protected and requires a valid access token.
+    """)
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successfully logged out", useReturnTypeSchema = true),
@@ -185,7 +215,12 @@ class AuthController(
     @PostMapping("/signup")
     @Operation(
         summary = "Sign up new user and generate new tokens",
-        description = "Create new user provided credentials with additional fields and generate tokens for access"
+        description = """
+            Create new user provided credentials with additional fields and generate tokens for access.
+            Tokens are valid for 15 minutes.
+            The refresh token can be used to obtain new access tokens until they expire.
+            This endpoint is not protected and can be used by unauthenticated clients.
+        """
     )
     @ApiResponses(
         value = [
@@ -242,7 +277,12 @@ class AuthController(
     @GetMapping("/me")
     @Operation(
         summary = "Get current user's information",
-        description = "Retrieves the logged-in user's information using a valid access token."
+        description = """
+            Retrieves the logged-in user's information using a valid access token.
+            The user's information will be returned in the response body.
+            The response will include the user's email, roles, and username, as well as their gender and birth date.
+            This endpoint is protected and requires a valid access token.
+        """
     )
     @ApiResponses(
         value = [
@@ -268,7 +308,9 @@ class AuthController(
         val userInfo = UserInfoResponse(
             user.email!!,
             user.authorities.map { it.authority },
-            user.userName!!
+            user.userName!!,
+            user.gender!!,
+            user.birthDate?.toLocalDate() ?: LocalDate.now()
         )
         return ResponseEntity.ok(ApiResponseDTO(data = userInfo))
     }
@@ -276,7 +318,12 @@ class AuthController(
     @PostMapping("/update")
     @Operation(
         summary = "Update user information",
-        description = "Updates user information. Null fields will be ignored."
+        description = """
+            Updates user information. Null fields will be ignored.
+            The response will include the updated user's email, username, gender, and birth date.
+            The user's information will be updated in the database.
+            This endpoint is protected and requires a valid access token.
+        """
     )
     @ApiResponses(
         value = [

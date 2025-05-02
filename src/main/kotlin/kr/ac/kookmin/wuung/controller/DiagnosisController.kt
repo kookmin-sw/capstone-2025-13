@@ -135,7 +135,10 @@ fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
 
 @RestController
 @RequestMapping("/diagnosis")
-@Tag(name = "Diagnosis API", description = "Endpoints for Diagnosis create and read data")
+@Tag(name = "Diagnosis API", description = """
+    Endpoints for Diagnosis create and read data.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class DiagnosisController(
     @Autowired private val diagnosisService: DiagnosisService,
     @Autowired private val jwtProvider: JwtProvider,
@@ -145,7 +148,10 @@ class DiagnosisController(
     @GetMapping("/{id}")
     @Operation(
         summary = "Get diagnosis by ID",
-        description = "Retrieve diagnosis details for the specified ID"
+        description = """
+            Retrieve diagnosis details for the specified ID.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -192,7 +198,10 @@ class DiagnosisController(
     @GetMapping("/list")
     @Operation(
         summary = "Get all diagnosis list",
-        description = "Retrieve a list of all available diagnoses"
+        description = """
+            Retrieve a list of all available diagnoses.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -226,7 +235,10 @@ class DiagnosisController(
     @PutMapping("/submit")
     @Operation(
         summary = "Submit diagnosis result",
-        description = "Submit a new diagnosis result for the authenticated user"
+        description = """
+            Submit a new diagnosis result for the authenticated user.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -279,7 +291,10 @@ class DiagnosisController(
     @GetMapping("/results")
     @Operation(
         summary = "Get diagnosis results",
-        description = "Retrieve diagnosis results for the authenticated user with optional date filtering"
+        description = """
+            Retrieve diagnosis results for the authenticated user with optional date filtering.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [

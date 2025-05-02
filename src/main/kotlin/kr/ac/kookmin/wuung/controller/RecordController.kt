@@ -58,13 +58,19 @@ data class RecordUpdateRequest(
 
 @RestController
 @RequestMapping("/records")
-@Tag(name = "Record API", description = "Endpoints for records")
+@Tag(name = "Record API", description = """
+    Endpoints for records.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class RecordController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val recordRepository : RecordRepository
 ) {
     @GetMapping("/me")
-    @Operation(summary = "Get record by date", description = "Get a user's record for a specific date")
+    @Operation(summary = "Get record by date", description ="""
+        Get a user's record for a specific date.
+        AccessToken is required for all of this part of endpoints on Authorization header.
+    """)
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved record",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
@@ -103,7 +109,10 @@ class RecordController(
     }
 
     @PutMapping("/create")
-    @Operation(summary = "Create new record", description = "Create a new record with rate and data")
+    @Operation(summary = "Create new record", description = """
+        Create a new record with rate and data.
+        AccessToken is required for all of this part of endpoints on Authorization header.
+    """)
     @ApiResponses(
         value = [
             ApiResponse(
@@ -135,7 +144,10 @@ class RecordController(
     }
 
     @PostMapping("/modify")
-    @Operation(summary = "Modify existing record", description = "Update rate and data of an existing record")
+    @Operation(summary = "Modify existing record", description = """
+        Update rate and data of an existing record.
+        AccessToken is required for all of this part of endpoints on Authorization header.
+    """)
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully updated record",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),

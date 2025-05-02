@@ -22,20 +22,20 @@
   ],
   "tags": [
     {
-      "name": "Diagnosis API",
-      "description": "Endpoints for Diagnosis create and read data"
-    },
-    {
-      "name": "Auth API",
-      "description": "Endpoints for authentication and token management"
+      "name": "Record API",
+      "description": "\n    Endpoints for records.\n    AccessToken is required for all of this part of endpoints on Authorization header.\n"
     },
     {
       "name": "Quests API",
-      "description": "Endpoints for quests"
+      "description": "\n    Endpoints for quests.\n    AccessToken is required for all of this part of endpoints on Authorization header.\n"
     },
     {
-      "name": "Record API",
-      "description": "Endpoints for records"
+      "name": "Auth API",
+      "description": "\n    Endpoints for authentication and token management.\n    Tokens are valid for 15 minutes.\n    Refreshed tokens will be invalidated for the previous token.\n    The refresh token can be used to obtain new access tokens until they expire.\n    AccessToken is required for protected endpoints on Authorization header.\n"
+    },
+    {
+      "name": "Diagnosis API",
+      "description": "\n    Endpoints for Diagnosis create and read data.\n    AccessToken is required for all of this part of endpoints on Authorization header.\n"
     }
   ],
   "paths": {
@@ -45,7 +45,7 @@
           "Record API"
         ],
         "summary": "Create new record",
-        "description": "Create a new record with rate and data",
+        "description": "\n        Create a new record with rate and data.\n        AccessToken is required for all of this part of endpoints on Authorization header.\n    ",
         "operationId": "createRecord",
         "requestBody": {
           "content": {
@@ -87,7 +87,7 @@
           "Quests API"
         ],
         "summary": "Create a new quest",
-        "description": "Creates a new quest instance for the authenticated user",
+        "description": "\n            Creates a new quest instance for the authenticated user.\n            Required parameter is quest (unique) id.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
         "operationId": "createQuests",
         "requestBody": {
           "content": {
@@ -147,7 +147,7 @@
           "Quests API"
         ],
         "summary": "Update quest progress",
-        "description": "Updates the progress of a quest for the authenticated user",
+        "description": "\n            Updates the progress of a quest for the authenticated user.\n            Required parameter is quest (unique) id.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
         "operationId": "updateQuests",
         "requestBody": {
           "content": {
@@ -203,13 +203,13 @@
         }
       }
     },
-    "/daignosis/submit": {
+    "/diagnosis/submit": {
       "put": {
         "tags": [
           "Diagnosis API"
         ],
         "summary": "Submit diagnosis result",
-        "description": "Submit a new diagnosis result for the authenticated user",
+        "description": "\n            Submit a new diagnosis result for the authenticated user.\n            AccessToken is required for this part of endpoints on Authorization header.\n        ",
         "operationId": "putDiagnosis",
         "requestBody": {
           "content": {
@@ -261,7 +261,7 @@
           "Record API"
         ],
         "summary": "Modify existing record",
-        "description": "Update rate and data of an existing record",
+        "description": "\n        Update rate and data of an existing record.\n        AccessToken is required for all of this part of endpoints on Authorization header.\n    ",
         "operationId": "modifyRecord",
         "requestBody": {
           "content": {
@@ -307,13 +307,55 @@
         }
       }
     },
+    "/auth/update": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Update user information",
+        "description": "\n            Updates user information. Null fields will be ignored.\n            The response will include the updated user's email, username, gender, and birth date.\n            The user's information will be updated in the database.\n            This endpoint is protected and requires a valid access token.\n        ",
+        "operationId": "updateUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated user information",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUpdateUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing access token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "tags": [
           "Auth API"
         ],
         "summary": "Sign up new user and generate new tokens",
-        "description": "Create new user provided credentials with additional fields and generate tokens for access",
+        "description": "\n            Create new user provided credentials with additional fields and generate tokens for access.\n            Tokens are valid for 15 minutes.\n            The refresh token can be used to obtain new access tokens until they expire.\n            This endpoint is not protected and can be used by unauthenticated clients.\n        ",
         "operationId": "signUpUser",
         "requestBody": {
           "content": {
@@ -355,7 +397,7 @@
           "Auth API"
         ],
         "summary": "Refresh JWT tokens",
-        "description": "Generates new access and refresh tokens from a valid refresh token.",
+        "description": "\n        Generates new access and refresh tokens from a valid refresh token.\n        Tokens are valid for 15 minutes.\n        The refresh token can be used to obtain new access tokens until they expire.\n        This endpoint is not protected and can be used by unauthenticated clients.\n    ",
         "operationId": "refreshToken",
         "requestBody": {
           "description": "Refresh token to generate new tokens",
@@ -398,7 +440,7 @@
           "Auth API"
         ],
         "summary": "Logout user",
-        "description": "Invalidates refresh tokens for the user.",
+        "description": "\n        Invalidates refresh tokens for the user. The user will need to authenticate again to obtain new tokens.\n        This endpoint is protected and requires a valid access token.\n    ",
         "operationId": "logoutUser",
         "requestBody": {
           "description": "Refresh token to invalidate",
@@ -441,7 +483,7 @@
           "Auth API"
         ],
         "summary": "Authenticate user and generate JWT tokens",
-        "description": "Validates user credentials and provides access and refresh tokens.",
+        "description": "\n        Validates user credentials and provides access and refresh tokens.\n        Tokens are valid for 15 minutes.\n        Refreshed tokens will be invalidated for the previous token.\n        The refresh token can be used to obtain new access tokens until they expire.\n        This endpoint is not protected and can be used by unauthenticated clients.\n    ",
         "operationId": "authenticateUser",
         "requestBody": {
           "description": "Email and password for authentication",
@@ -494,7 +536,7 @@
           "Record API"
         ],
         "summary": "Get record by date",
-        "description": "Get a user's record for a specific date",
+        "description": "\n        Get a user's record for a specific date.\n        AccessToken is required for all of this part of endpoints on Authorization header.\n    ",
         "operationId": "getRecordByDate",
         "parameters": [
           {
@@ -550,7 +592,7 @@
           "Quests API"
         ],
         "summary": "Get my quests",
-        "description": "Get my quests",
+        "description": "\n            Get my quests with optional filter by start date.\n            Start date is in format yyyy-MM-dd.\n            If start date is not provided, it will return all quests.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
         "operationId": "getQuests",
         "parameters": [
           {
@@ -600,13 +642,190 @@
         }
       }
     },
-    "/daignosis/{id}": {
+    "/quests/list": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List all quests",
+        "description": "\n            Get a list of all available quests.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
+        "operationId": "listQuests",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/list/{type}": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List quests by type",
+        "description": "\n           Get a list of quests filtered by type.\n           AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
+        "operationId": "listQuestsWithTypes",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Type of quest",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Type of quest",
+              "enum": [
+                "MEDITATE",
+                "ACTIVITY",
+                "EMOTION"
+              ],
+              "example": "ACTIVITY"
+            },
+            "example": "ACTIVITY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filtered quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/list/{type}/{step}": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List quests by type and step",
+        "description": "\n            Get a list of quests filtered by type and step number.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n        ",
+        "operationId": "listQuestsWithTypes_1",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Type of quest",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Type of quest",
+              "enum": [
+                "MEDITATE",
+                "ACTIVITY",
+                "EMOTION"
+              ],
+              "example": "ACTIVITY"
+            },
+            "example": "ACTIVITY"
+          },
+          {
+            "name": "step",
+            "in": "path",
+            "description": "Step of quest type",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Step of quest type",
+              "example": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filtered quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnosis/{id}": {
       "get": {
         "tags": [
           "Diagnosis API"
         ],
         "summary": "Get diagnosis by ID",
-        "description": "Retrieve diagnosis details for the specified ID",
+        "description": "\n            Retrieve diagnosis details for the specified ID.\n            AccessToken is required for this part of endpoints on Authorization header.\n        ",
         "operationId": "getDiagnosis",
         "parameters": [
           {
@@ -653,13 +872,13 @@
         }
       }
     },
-    "/daignosis/results": {
+    "/diagnosis/results": {
       "get": {
         "tags": [
           "Diagnosis API"
         ],
         "summary": "Get diagnosis results",
-        "description": "Retrieve diagnosis results for the authenticated user with optional date filtering",
+        "description": "\n            Retrieve diagnosis results for the authenticated user with optional date filtering.\n            AccessToken is required for this part of endpoints on Authorization header.\n        ",
         "operationId": "getDiagnosisResults",
         "parameters": [
           {
@@ -699,13 +918,13 @@
         }
       }
     },
-    "/daignosis/list": {
+    "/diagnosis/list": {
       "get": {
         "tags": [
           "Diagnosis API"
         ],
         "summary": "Get all diagnosis list",
-        "description": "Retrieve a list of all available diagnoses",
+        "description": "\n            Retrieve a list of all available diagnoses.\n            AccessToken is required for this part of endpoints on Authorization header.\n        ",
         "operationId": "getDiagnosisList",
         "responses": {
           "200": {
@@ -737,7 +956,7 @@
           "Auth API"
         ],
         "summary": "Get current user's information",
-        "description": "Retrieves the logged-in user's information using a valid access token.",
+        "description": "\n            Retrieves the logged-in user's information using a valid access token.\n            The user's information will be returned in the response body.\n            The response will include the user's email, roles, and username, as well as their gender and birth date.\n            This endpoint is protected and requires a valid access token.\n        ",
         "operationId": "getUserInfo",
         "responses": {
           "200": {
@@ -756,26 +975,6 @@
               "*/*": {
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/": {
-      "get": {
-        "tags": [
-          "main-controller"
-        ],
-        "operationId": "index",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseDTOString"
                 }
               }
             }
@@ -1014,6 +1213,73 @@
           }
         }
       },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "description": "Birth date in format yyyy-MM-dd",
+            "example": "2000-01-01"
+          }
+        }
+      },
+      "ApiResponseDTOUpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UpdateUserResponse"
+          }
+        }
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "SignUpRequest": {
         "type": "object",
         "properties": {
@@ -1027,7 +1293,9 @@
             "type": "string",
             "enum": [
               "MALE",
-              "FEMALE"
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
             ]
           },
           "user_name": {
@@ -1193,6 +1461,80 @@
             "items": {
               "$ref": "#/components/schemas/UserQuestsDTO"
             }
+          }
+        }
+      },
+      "ApiResponseDTOListQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestsDTO"
+            }
+          }
+        }
+      },
+      "QuestsDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MEDITATE",
+              "ACTIVITY",
+              "EMOTION"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "target": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseDTOQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/QuestsDTO"
           }
         }
       },
@@ -1376,6 +1718,19 @@
           },
           "username": {
             "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
           }
         }
       }

@@ -82,7 +82,10 @@ fun Quests.toDTO() = QuestsDTO(
 
 @RestController
 @RequestMapping("/quests")
-@Tag(name = "Quests API", description = "Endpoints for quests")
+@Tag(name = "Quests API", description = """
+    Endpoints for quests.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class QuestsController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
@@ -92,7 +95,12 @@ class QuestsController(
     @GetMapping("/me")
     @Operation(
         summary = "Get my quests",
-        description = "Get my quests"
+        description = """
+            Get my quests with optional filter by start date.
+            Start date is in format yyyy-MM-dd.
+            If start date is not provided, it will return all quests.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -123,7 +131,11 @@ class QuestsController(
     @PutMapping("")
     @Operation(
         summary = "Create a new quest",
-        description = "Creates a new quest instance for the authenticated user"
+        description = """
+            Creates a new quest instance for the authenticated user.
+            Required parameter is quest (unique) id.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -178,7 +190,11 @@ class QuestsController(
     @PostMapping("")
     @Operation(
         summary = "Update quest progress",
-        description = "Updates the progress of a quest for the authenticated user"
+        description = """
+            Updates the progress of a quest for the authenticated user.
+            Required parameter is quest (unique) id.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -231,7 +247,10 @@ class QuestsController(
     @GetMapping("/list")
     @Operation(
         summary = "List all quests",
-        description = "Get a list of all available quests"
+        description = """
+            Get a list of all available quests.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -273,7 +292,10 @@ class QuestsController(
     @GetMapping("/list/{type}")
     @Operation(
         summary = "List quests by type",
-        description = "Get a list of quests filtered by type"
+        description = """
+           Get a list of quests filtered by type.
+           AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -317,7 +339,10 @@ class QuestsController(
     @GetMapping("/list/{type}/{step}")
     @Operation(
         summary = "List quests by type and step",
-        description = "Get a list of quests filtered by type and step number"
+        description = """
+            Get a list of quests filtered by type and step number.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
