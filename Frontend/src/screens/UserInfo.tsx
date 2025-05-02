@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signOut } from "../API";
+import { signOut, userInfoUpdate } from "../API";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -68,17 +68,36 @@ export default function UserInfo() {
       Alert.alert("로그아웃 실패", "다시 시도해주세요.");
     }
   };
-  const handleSave = () => {
+  const handleSave = async () => {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
+    const transformedUserData = {
+      ...userData,
+      gender:
+        userData.gender === "남성"
+          ? "MALE"
+          : userData.gender === "여성"
+            ? "FEMALE"
+            : "UNKNOWN",
+    };
+    try {
+      await userInfoUpdate(
+        transformedUserData.password,
+        transformedUserData.nickname,
+        transformedUserData.birthDate,
+        transformedUserData.gender
+      );
 
-    const updatedUserData: UserData = { ...userData };
-    Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
-    console.log(updatedUserData);
-    setOriginalData(userData);
-    setEditMode(false);
-    setHasChanges(false);
+      Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
+      setOriginalData(userData);
+      setEditMode(false);
+      setHasChanges(false);
+    } catch (error) {
+      console.error("회원정보 업데이트 실패:", error);
+      Alert.alert("저장 실패", "정보 수정 중 문제가 발생했습니다.");
+    }
   };
+
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
