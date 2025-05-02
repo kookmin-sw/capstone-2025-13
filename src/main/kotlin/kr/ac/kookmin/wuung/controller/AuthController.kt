@@ -29,6 +29,7 @@ import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 data class LoginRequest(val email: String, val password: String)
