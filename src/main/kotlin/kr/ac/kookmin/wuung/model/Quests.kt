@@ -23,6 +23,9 @@ data class Quests(
     var type: QuestType? = null,
 
     @Column(nullable = false)
+    var step: Int = 0,
+
+    @Column(nullable = false)
     var name: String? = null,
 
     @Column(nullable = false, columnDefinition = "TEXT")
