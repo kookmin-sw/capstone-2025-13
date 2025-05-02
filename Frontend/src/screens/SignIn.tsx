@@ -39,6 +39,7 @@ const SignIn = () => {
         setError(null);
 
         try {
+
             console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
 
