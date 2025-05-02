@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
-import styles from "../styles/submitDiaryButtonStyles";
+import styles from "../styles/submitRecordButtonStyles";
 
 export default function SubmitDiaryButton() {
     const handlePress = () => {

@@ -1,8 +1,8 @@
 import React from "react";
 import { View, TextInput, Text } from "react-native";
-import styles from "../styles/diaryInputBoxStyles";
+import styles from "../styles/recordInputBoxStyles";
 
-export default function DiaryInputBox() {
+export default function RecordInputBox() {
     return (
         <View style={styles.wrapper}>
             <TextInput

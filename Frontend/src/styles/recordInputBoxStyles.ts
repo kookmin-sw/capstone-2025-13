@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     caption: {
         marginTop: 12,
         fontWeight: "bold",
-        color: "#fff",
+        color: "#000",
         textAlign: "center",
     },
 });
