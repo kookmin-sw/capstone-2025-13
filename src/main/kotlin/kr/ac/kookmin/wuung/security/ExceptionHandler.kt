@@ -9,6 +9,7 @@ import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
@@ -23,6 +24,18 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
             filterChain.doFilter(request, response)
         } catch (e: CustomException) {
             handleCustomException(response, e)
+        } catch (e: org.springframework.security.access.AccessDeniedException) {
+            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
+        } catch (e: org.springframework.security.core.AuthenticationException) {
+            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
+        } catch(e: org.springframework.security.authentication.BadCredentialsException) {
+            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
+        } catch(e: org.springframework.security.authentication.DisabledException) {
+            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
+        } catch(e: org.springframework.security.authentication.LockedException) {
+            handleCustomException(response, ServerErrorException())
+        } catch(e: HttpServerErrorException.InternalServerError) {
+            handleCustomException(response, ServerErrorException())
         } catch (e: RuntimeException) {
             handleCustomException(response, ServerErrorException())
         }
@@ -30,7 +43,7 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
 
     private fun handleCustomException(
         response: HttpServletResponse,
-        error: CustomException
+        error: CustomException,
     ) {
         response.status = error.status
         response.contentType = MediaType.APPLICATION_JSON_VALUE

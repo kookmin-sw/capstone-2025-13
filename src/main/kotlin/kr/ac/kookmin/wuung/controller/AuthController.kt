@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.ac.kookmin.wuung.exceptions.AlreadyExistException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import org.springframework.beans.factory.annotation.Autowired
@@ -188,7 +189,7 @@ class AuthController(
 
         // 이메일 중복 여부 검사
         if (userRepository.findByEmail(signUpRequest.email).isPresent)
-            throw ServerErrorException()
+            throw AlreadyExistException()
 
         // userName을 UK로 취급할 건가?
         // 할꺼면 중복 검사 루틴 추가
