@@ -10,6 +10,7 @@ import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
