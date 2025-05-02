@@ -26,7 +26,8 @@ fun main(args: Array<String>) {
 		"S3_URI" to dotenv["S3_URI"],
 		"S3_ACCESS_KEY" to dotenv["S3_ACCESS_KEY"],
 		"S3_SECRET_KEY" to dotenv["S3_SECRET_KEY"],
-		"S3_PROFILE_BUCKET" to dotenv["S3_PROFILE_BUCKET"]
+		"S3_PROFILE_BUCKET" to dotenv["S3_PROFILE_BUCKET"],
+		"S3_PUBLIC_ENDPOINT" to dotenv["S3_PUBLIC_ENDPOINT"],
 	)
 
 	runApplication<WuungApplication>(*args) {
