@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -31,10 +32,10 @@ import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
 import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.service.ProfileS3Service
 import kr.ac.kookmin.wuung.service.TokenService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
@@ -48,22 +49,51 @@ data class TokenRefreshResponse(val accessToken: String, val refreshToken: Strin
 data class LogoutRequest(val accessToken: String, val refreshToken: String)
 
 data class UserInfoDTO(
+    val id: String,
     val email: String,
     val roles: List<String>,
     val username: String,
     val gender: GenderEnum = GenderEnum.UNKNOWN,
     val birthDate: LocalDate = LocalDate.now(),
-    val profile: String? = null,
+    @JsonIgnore
+    val profileSrc: String?,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    @JsonIgnore
+    private var _profileEndpoint: String = ""
+    @JsonIgnore
+    private var _profileBucketName: String = ""
+
+    @get:JsonIgnore
+    var profileEndpoint: String
+        get() = _profileEndpoint
+        set(value) {
+            _profileEndpoint = value
+        }
+    @get:JsonIgnore
+    var profileBucketName: String
+        get() = _profileEndpoint
+        set(value) {
+            _profileBucketName = value
+        }
+
+    @get:JsonProperty("profile")
+    val profile: String?
+        get() {
+            return if (profileSrc?.isBlank() == true || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
+            else return "$_profileEndpoint/$_profileBucketName/$profileSrc"
+        }
+}
+
 fun User.toDTO() = UserInfoDTO(
-    email = email!!,
+    id = id ?: "",
+    email = email ?: "",
     roles = authorities.map { it.authority },
-    username = userName!!,
-    gender = gender!!,
+    username = userName ?: "",
+    gender = gender ?: GenderEnum.UNKNOWN,
     birthDate = birthDate?.toLocalDate() ?: LocalDate.now(),
-    profile = profile,
+    profileSrc = profile ?: "",
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
@@ -116,7 +146,9 @@ class AuthController(
     @Autowired private val jwtProvider: JwtProvider,
     @Autowired private val tokenService: TokenService,
     @Autowired private val passwordEncoder: PasswordEncoder,
-    @Autowired private val profileS3Service: ProfileS3Service
+    @Autowired private val profileS3Service: ProfileS3Service,
+    @Value("\${s3.public-endpoint}") private val s3PublicEndpoint: String,
+    @Value("\${s3.profile-bucket}") private val s3BucketName: String,
 ) {
    @PostMapping("/login")
    @Operation(summary = "Authenticate user and generate JWT tokens", description =
@@ -326,7 +358,11 @@ class AuthController(
 
         val user = userRepository.findById(userDetails.id ?: "").get()
 
-        return ResponseEntity.ok(ApiResponseDTO(data = user.toDTO()))
+        val userDTO = user.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO ))
     }
 
     @PostMapping("/update")
@@ -432,6 +468,10 @@ class AuthController(
 
         val updatedUser = userRepository.save(user)
 
-        return ResponseEntity.ok(ApiResponseDTO(data = updatedUser.toDTO()))
+        val userDTO = updatedUser.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO))
     }
 }
