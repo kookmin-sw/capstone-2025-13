@@ -134,7 +134,7 @@ fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
 )
 
 @RestController
-@RequestMapping("/daignosis")
+@RequestMapping("/diagnosis")
 @Tag(name = "Diagnosis API", description = "Endpoints for Diagnosis create and read data")
 class DiagnosisController(
     @Autowired private val diagnosisService: DiagnosisService,
