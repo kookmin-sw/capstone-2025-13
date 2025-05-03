@@ -35,7 +35,7 @@ const RecommendationList = ({ title, videos, backgroundColor, width, mainVideo }
       {videos.map((video) => (
         <TouchableOpacity
           key={video.id}
-          style={[styles.videoCard, { width: width * 0.9 }]}
+          style={[styles.videoCard, { width: width * 0.9, backgroundColor }]}
           onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
         >
           <Image source={{ uri: video.thumbnail }} style={[styles.thumbnail, { width: width * 0.25, height: width * 0.15 }]} />
@@ -53,9 +53,9 @@ const RecommendationList = ({ title, videos, backgroundColor, width, mainVideo }
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 20,
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 10,
   },
   youtubeWrapper: {
