@@ -50,13 +50,13 @@ fun Record.toDTO() = RecordDTO(
 )
 
 data class CreateRecordRequest(
-    val rate : Int,
-    val data : String
+    val rate: Int,
+    val data: String
 )
 
 
 data class RecordFeedbackRequest(
-    val data : String
+    val data: String
 )
 
 data class RecordUpdateRequest(
@@ -84,19 +84,36 @@ data class UpdateFeedbackRequest(
 @RequestMapping("/record")
 @Tag(name = "Record API", description = "Endpoints for record, feedback record")
 class RecordController(
-    @Autowired private val recordRepository : RecordRepository,
+    @Autowired private val recordRepository: RecordRepository,
     @Autowired private val recordFeedbackRepository: RecordFeedbackRepository
 ) {
     @GetMapping("/me")
     @Operation(summary = "Get record information for a specific date", description = "Get record id, data, rate, ...")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Get record successfully",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
-        ApiResponse(responseCode = "403", description = "Unauthorized",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
-        ApiResponse(responseCode = "404", description = "Record not found",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
-    ])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Get record successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "401", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun getRecordByDate(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01")
@@ -135,14 +152,14 @@ class RecordController(
                 useReturnTypeSchema = true,
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
                 )]
             ),
             ApiResponse(
-                responseCode = "411", description = "Record already created",
+                responseCode = "409", description = "Record already created",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -178,15 +195,35 @@ class RecordController(
     }
 
     @PostMapping("/modify")
-    @Operation(summary = "Modify existing record information", description = "Update rate and data of an existing record")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Update record successfully",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
-        ApiResponse(responseCode = "403", description = "Unauthorized",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
-        ApiResponse(responseCode = "404", description = "Record not found",
-            content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))])
-    ])
+    @Operation(
+        summary = "Modify existing record information",
+        description = "Update rate and data of an existing record"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Update record successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "401", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun modifyRecord(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: RecordUpdateRequest
@@ -216,7 +253,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -254,7 +291,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -338,7 +375,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -357,10 +394,10 @@ class RecordController(
         @AuthenticationPrincipal userDetails: User?,
         @RequestParam recordId: Long
     ): ResponseEntity<ApiResponseDTO<List<RecordFeedbackDTO>>> {
-        
+
         if (userDetails == null) throw UnauthorizedException()
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
-        
+
         val feedbacks = recordFeedbackRepository.findRecordFeedbackByRecord(record)
             .filter { it.status == RecordFeedbackStatus.COMPLETED }
         return ResponseEntity.ok(ApiResponseDTO(data = feedbacks.map {
@@ -388,7 +425,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -460,7 +497,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized",
+                responseCode = "401", description = "Unauthorized",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)

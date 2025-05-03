@@ -9,7 +9,7 @@ class ServerErrorException : CustomException("Internal Server Error", 500)
 
 class IllegalArgumentException: CustomException("Illegal Argument", 400)
 
-class AiFeedbackDuplicatedException : CustomException("Duplicated feedback requested", 408)
-class AiFeedbackNotCompleteException : CustomException("AI Feedback is not complete", 409)
-class AiFeedbackErrorException : CustomException("AI Feedback error raised", 410)
-class RecordAlreadyCreatedException : CustomException("Record already created", 411)
+class AiFeedbackDuplicatedException : CustomException("Duplicated feedback requested", 409)
+class AiFeedbackNotCompleteException : CustomException("AI Feedback is not complete", 202)
+class AiFeedbackErrorException : CustomException("AI Feedback error raised", 500)
+class RecordAlreadyCreatedException : CustomException("Record already created", 409)
