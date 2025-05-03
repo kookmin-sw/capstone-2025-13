@@ -5,6 +5,7 @@ import { ProgressChart } from 'react-native-chart-kit';
 import RecommendationList from "../components/RecommendationList";
 import { Pedometer } from 'expo-sensors';
 import fonts from '../constants/fonts';
+import { dynamic } from '../styles/questExerciseDynamicStyles';
 
 const { width } = Dimensions.get('window');
 
@@ -41,7 +42,6 @@ export default function QuestExercise() {
   const [steps, setSteps] = useState(0);
   const [image, setImage] = useState<string | null>(null);
 
-  // 권한 요청
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -49,7 +49,6 @@ export default function QuestExercise() {
     }
   };
 
-  // 이미지 선택 함수
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -63,7 +62,6 @@ export default function QuestExercise() {
     }
   };
 
-  // 걸음 수 추적
   useEffect(() => {
     const subscribe = async () => {
       const isAvailable = await Pedometer.isAvailableAsync();
@@ -72,7 +70,6 @@ export default function QuestExercise() {
         return;
       }
 
-      // 오늘 자정부터 현재까지의 누적 걸음 수 받아오기
       const end = new Date();
       const start = new Date();
       start.setHours(0, 0, 0, 0);
@@ -80,7 +77,6 @@ export default function QuestExercise() {
       const result = await Pedometer.getStepCountAsync(start, end);
       setSteps(result.steps);
 
-      // 실시간 업데이트
       const subscription = Pedometer.watchStepCount((result) => {
         setSteps((prevSteps) => prevSteps + result.steps);
       });
@@ -94,8 +90,8 @@ export default function QuestExercise() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>오늘의 미션 🔥</Text>
-        <Text style={styles.mission}>10000걸음 걷기</Text>
+        <Text style={[styles.title, dynamic.missionTitle]}>오늘의 미션 🔥</Text>
+        <Text style={[styles.mission, dynamic.mainText]}>10000걸음 걷기</Text>
 
         <View style={styles.chartContainer}>
           <ProgressChart
@@ -119,34 +115,38 @@ export default function QuestExercise() {
             style={styles.progressChart}
           />
           <View style={styles.centerTextContainer}>
-            <Text style={styles.stepCount}>{steps}</Text>
-            <Text style={styles.stepGoal}>/ 10000 걸음</Text>
+            <Text style={dynamic.stepCount}>{steps}</Text>
+            <Text style={dynamic.stepGoal}>/ 10000 걸음</Text>
           </View>
         </View>
 
-        <Text style={styles.sectionText}>오운완! 오늘 활동을 기록으로 남겨볼까? 💪</Text>
+        <Text style={[styles.sectionText, dynamic.missionTitle]}>
+          오운완! 오늘 활동을 기록으로 남겨볼까? 💪
+        </Text>
         <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
           {image ? (
             <Image source={{ uri: image }} style={styles.uploadedImage} />
           ) : (
-            <Text style={styles.uploadText}>📷 사진 업로드하기</Text>
+            <Text style={[styles.uploadText, dynamic.uploadText]}>📷 사진 업로드하기</Text>
           )}
         </TouchableOpacity>
 
-        <Text style={[styles.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
+        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>
+          오늘의 추천 플레이리스트 🎧
+        </Text>
 
-        <RecommendationList 
-          title="추천 플레이리스트" 
-          videos={exerciseVideos} 
-          backgroundColor="#222" 
-          width={width} 
+        <RecommendationList
+          title="추천 플레이리스트"
+          videos={exerciseVideos}
+          backgroundColor="#222"
+          width={width}
           mainVideo={mainVideo}
         />
       </ScrollView>
 
       <View style={styles.buttonWrapper}>
         <TouchableOpacity style={styles.completeButton}>
-          <Text style={styles.buttonText}>오늘 미션 끝!</Text>
+           <Text style={[dynamic.buttonText]}>오늘 미션 끝!</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -164,12 +164,10 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontSize: width * 0.045,
     marginTop: width * 0.03,
   },
   mission: {
     color: '#fff',
-    fontSize: width * 0.06,
     fontWeight: 'bold',
     marginVertical: width * 0.02,
   },
@@ -177,18 +175,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: width * 0.05,
   },
-  stepCount: {
-    fontSize: width * 0.12,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  stepGoal: {
-    fontSize: width * 0.04,
-    color: '#ccc',
-  },
   sectionText: {
     color: '#fff',
-    fontSize: width * 0.045,
     marginVertical: width * 0.04,
   },
   uploadBox: {
@@ -200,7 +188,6 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     color: '#ccc',
-    fontSize: width * 0.04,
   },
   uploadedImage: {
     width: '100%',
@@ -215,7 +202,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: fonts.laundryBold,
-    top: 20,
     color: "#fff94f",
     alignSelf: "flex-start",
   },
@@ -224,11 +210,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingVertical: width * 0.04,
     alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: width * 0.045,
-    fontWeight: 'bold',
   },
   chartContainer: {
     justifyContent: 'center',
