@@ -5,5 +5,9 @@ class JwtExpiredException : CustomException("Jwt Token Expired", 401)
 class NotFoundException :  CustomException("Resource not found", 404)
 class UnauthorizedException : CustomException("Unauthorized", 401)
 class ServerErrorException : CustomException("Internal Server Error", 500)
-class FeedBackProcessErrorException : CustomException("Feedback Process error raised", 409)
-class FeedBackProcessingException : CustomException("Feedback is processing", 410)
+
+
+class AiFeedbackDuplicatedException : CustomException("Duplicated feedback requested", 408)
+class AiFeedbackNotCompleteException : CustomException("AI Feedback is not complete", 409)
+class AiFeedbackErrorException : CustomException("AI Feedback error raised", 410)
+class RecordAlreadyCreatedException : CustomException("Record already created", 411)
