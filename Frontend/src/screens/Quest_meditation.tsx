@@ -13,8 +13,9 @@ import YoutubePlayer from "react-native-youtube-iframe";
 import fonts from "../constants/fonts";
 
 export default function Quest_meditation() {
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [isRunning, setIsRunning] = useState(false);
+  const [isMeditationDone, setIsMeditationDone] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { width, height } = useWindowDimensions();
 
@@ -27,17 +28,24 @@ export default function Quest_meditation() {
   const startTimer = () => {
     if (intervalRef.current) return;
     setIsRunning(true);
+    setIsMeditationDone(false);
     intervalRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(intervalRef.current!);
           intervalRef.current = null;
           setIsRunning(false);
+          setIsMeditationDone(true);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+  };
+
+  const handleComplete = () => {
+    alert("명상이 완료되었습니다! 🎉");
+    // 여기에 완료 처리 로직 추가 (예: 미션 완료 상태 저장, 화면 이동 등)
   };
 
   const mainVideo = {
@@ -69,6 +77,18 @@ export default function Quest_meditation() {
     },
   ];
 
+  const buttonText = isMeditationDone
+    ? "완 료 !"
+    : isRunning
+      ? "명상중 🧘🏻‍♀️"
+      : "시 - 작 !";
+
+  const buttonColor = isMeditationDone
+    ? "#ff4f4f"
+    : isRunning
+      ? "#aaa"
+      : "#6c63ff";
+
   const dynamicStyles = StyleSheet.create({
     timerText: {
       fontSize: width * 0.22,
@@ -87,7 +107,7 @@ export default function Quest_meditation() {
       overflow: "hidden",
     },
     button: {
-      backgroundColor: "#6c63ff",
+      backgroundColor: buttonColor,
       paddingHorizontal: width * 0.15,
       paddingVertical: width * 0.04,
       borderRadius: 20,
@@ -219,10 +239,10 @@ export default function Quest_meditation() {
 
       <TouchableOpacity
         style={dynamicStyles.button}
-        onPress={startTimer}
-        disabled={isRunning}
+        onPress={isMeditationDone ? handleComplete : startTimer}
+        disabled={isRunning && !isMeditationDone}
       >
-        <Text style={dynamicStyles.buttonText}>시 - 작 !</Text>
+        <Text style={dynamicStyles.buttonText}>{buttonText}</Text>
       </TouchableOpacity>
     </View>
   );
