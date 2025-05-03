@@ -14,8 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.media.Content
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import io.swagger.v3.oas.annotations.media.Schema
-import kr.ac.kookmin.wuung.exceptions.FeedBackProcessErrorException
-import kr.ac.kookmin.wuung.exceptions.FeedBackProcessingException
+import kr.ac.kookmin.wuung.exceptions.*
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
@@ -56,6 +55,11 @@ data class CreateRecordRequest(
     val data : String
 )
 
+
+data class RecordFeedbackRequest(
+    val data : String
+)
+
 data class RecordUpdateRequest(
     val id: Long,
     val rate: Int,
@@ -78,17 +82,16 @@ data class UpdateFeedbackRequest(
 )
 
 @RestController
-@RequestMapping("/records")
-@Tag(name = "Record API", description = "Endpoints for records")
+@RequestMapping("/record")
+@Tag(name = "Record API", description = "Endpoints for record, feedback record")
 class RecordController(
-    @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val recordRepository : RecordRepository,
     @Autowired private val recordFeedbackRepository: RecordFeedbackRepository
 ) {
     @GetMapping("/me")
-    @Operation(summary = "Get record by date", description = "Get a user's record for a specific date")
+    @Operation(summary = "Get record information for a specific date", description = "Get record id, data, rate, ...")
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully retrieved record",
+        ApiResponse(responseCode = "200", description = "Get record successfully",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
         ApiResponse(responseCode = "403", description = "Unauthorized",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
@@ -102,12 +105,12 @@ class RecordController(
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-// 요청된 날짜의 시작·끝 시각 계산 
+        // 요청된 날짜의 시작·끝 시각 계산
         val targetDate: LocalDate = date.datetimeParser().toLocalDate()
         val startOfDay: LocalDateTime = targetDate.atStartOfDay()
         val endOfDay: LocalDateTime = targetDate.atTime(23, 59, 59)
 
-// JPA 메서드로 날짜 범위 내 레코드 조회
+        // JPA 메서드로 날짜 범위 내 레코드 조회
         val records: List<Record> = recordRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startOfDay,
@@ -129,11 +132,18 @@ class RecordController(
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Successfully created record",
+                responseCode = "200", description = "Create record successfully",
                 useReturnTypeSchema = true,
             ),
             ApiResponse(
                 responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "411", description = "Record already created",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -147,6 +157,18 @@ class RecordController(
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
+        val today = LocalDate.now()
+        val startOfDay = today.atStartOfDay()
+        val endOfDay = today.atTime(23, 59, 59)
+
+        // 레코드 하루에 한 개 이상 생성하는 거 방지하려고 추가
+        val existingRecords = recordRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startOfDay,
+            endOfDay
+        )
+        if (existingRecords.isNotEmpty()) throw RecordAlreadyCreatedException()
+
         val record = Record(
             rate = request.rate,
             data = request.data,
@@ -157,9 +179,9 @@ class RecordController(
     }
 
     @PostMapping("/modify")
-    @Operation(summary = "Modify existing record", description = "Update rate and data of an existing record")
+    @Operation(summary = "Modify existing record information", description = "Update rate and data of an existing record")
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully updated record",
+        ApiResponse(responseCode = "200", description = "Update record successfully",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
         ApiResponse(responseCode = "403", description = "Unauthorized",
             content = [Content(mediaType = "application/json", schema = Schema(implementation = ApiResponseDTO::class))]),
@@ -184,10 +206,37 @@ class RecordController(
     }
 
     @PutMapping("/feedback")
-    @Operation(summary = "Create new feedback", description = "Create a new empty feedback for a record")
+    @Operation(summary = "Create new feedback record", description = "Create new empty feedback record for a record")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Create feedback record successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun createFeedback(
+        @AuthenticationPrincipal userDetails: User?,
         @RequestParam recordId: Long
     ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
         val feedback = RecordFeedback(record = record)
         val saved = recordFeedbackRepository.save(feedback)
@@ -195,34 +244,119 @@ class RecordController(
     }
 
     @PutMapping("/feedback/{id}")
-    @Operation(summary = "Update feedback status", description = "Update feedback status to PROCESSING")
-    fun updateFeedbackStatus(
-        @RequestParam id: String
-    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
-        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
-        feedback.status = RecordFeedbackStatus.PROCESSING
-        val updated = recordFeedbackRepository.save(feedback)
-        return ResponseEntity.ok(
-            ApiResponseDTO(
-                data = RecordFeedbackDTO(
-                    id = updated.id,
-                    aiFeedback = updated.aiFeedback,
-                    comment = updated.comment,
-                    data = updated.data,
-                    status = updated.status,
-                    createdAt = updated.createdAt,
-                    updatedAt = updated.updatedAt
-                )
+    @Operation(summary = "Request AI feedback", description = "Request AI feedback using record")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Feedback request successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Feedback record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "409", description = "AI feedback is still processing",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "412", description = "AI feedback already completed",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500", description = "AI feedback processing error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
             )
-        )
+        ]
+    )
+    fun updateFeedbackStatus(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestParam id: String,
+        @RequestBody request: RecordFeedbackRequest
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        // 일단 피드백 받도록 표시는 해두는 코드만 추가해둠.
+        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+
+        when (feedback.status) {
+            RecordFeedbackStatus.QUEUED -> Unit
+            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
+            RecordFeedbackStatus.COMPLETED -> throw AiFeedbackDuplicatedException()
+        }
+
+
+        feedback.status = RecordFeedbackStatus.PROCESSING
+        recordFeedbackRepository.save(feedback)
+
+        // 레코드 테이블의 유져 id나 아니면 사용자 엑세스토큰 조회해서 차감하는 로직만들면 될 것 같고
+
+        // request body에 피드백 원하는 내용 담을 수 있도록 만들어놨으니까 그거 이용해서 AI 피드백 받으면 될 듯?
+
+
+
+        // 차감을 요청만하는 거니까 따로 뭔가 밚환할 데이터 값은 없음.
+        return ResponseEntity.ok(ApiResponseDTO())
     }
 
     @GetMapping("/feedback")
-    @Operation(summary = "Get feedbacks", description = "Get all feedbacks for a record")
+    @Operation(summary = "Get all feedback record", description = "Get all feedback that ai feedback completed")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Get feedback records successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun getFeedbacks(
+        @AuthenticationPrincipal userDetails: User?,
         @RequestParam recordId: Long
     ): ResponseEntity<ApiResponseDTO<List<RecordFeedbackDTO>>> {
+        
+        if (userDetails == null) throw UnauthorizedException()
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        
         val feedbacks = recordFeedbackRepository.findRecordFeedbackByRecord(record)
             .filter { it.status == RecordFeedbackStatus.COMPLETED }
         return ResponseEntity.ok(ApiResponseDTO(data = feedbacks.map {
@@ -239,28 +373,58 @@ class RecordController(
     }
 
     @GetMapping("/feedback/{id}")
-    @Operation(summary = "Get feedback", description = "Get feedback details by ID")
+    @Operation(summary = "Get feedback record", description = "Get feedback details by feedback record ID")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Get feedback record successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Feedback record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "409", description = "AI feedback is still processing",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500", description = "AI feedback processing error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun getFeedback(
+        @AuthenticationPrincipal userDetails: User?,
         @PathVariable id: String
     ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
-        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
-        when (feedback.status) {
-            RecordFeedbackStatus.QUEUED -> return ResponseEntity.ok(
-                ApiResponseDTO(
-                    data = RecordFeedbackDTO(
-                        id = feedback.id,
-                        aiFeedback = feedback.aiFeedback,
-                        comment = feedback.comment,
-                        data = feedback.data,
-                        status = feedback.status,
-                        createdAt = feedback.createdAt,
-                        updatedAt = feedback.updatedAt
-                    )
-                )
-            )
 
-            RecordFeedbackStatus.PROCESSING -> throw FeedBackProcessingException()
-            RecordFeedbackStatus.PROCESSING_ERROR -> throw FeedBackProcessErrorException()
+        if (userDetails == null) throw UnauthorizedException()
+        val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+
+        when (feedback.status) {
+            RecordFeedbackStatus.QUEUED -> Unit
+            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
             RecordFeedbackStatus.COMPLETED -> Unit
         }
 
@@ -278,28 +442,71 @@ class RecordController(
             )
         )
     }
+
+
     @PostMapping("/feedback/{id}")
-    @Operation(summary = "Update feedback", description = "Update feedback data and comment")
+    @Operation(summary = "Update feedback record", description = "Update feedback record data and comment")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Update feedback successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Feedback record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "409", description = "AI feedback is still processing",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500", description = "AI feedback processing error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
     fun updateFeedback(
+        @AuthenticationPrincipal userDetails: User?,
         @PathVariable id: String,
         @RequestBody request: UpdateFeedbackRequest
-    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
+    ): ResponseEntity<ApiResponseDTO<String>> {
+
+        if (userDetails == null) throw UnauthorizedException()
         val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+
+        when (feedback.status) {
+            RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
+            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
+            RecordFeedbackStatus.COMPLETED -> Unit
+        }
+
+        // 데이터 업데이트
         feedback.data = request.data
         feedback.comment = request.comment
         val updated = recordFeedbackRepository.save(feedback)
-        return ResponseEntity.ok(
-            ApiResponseDTO(
-                data = RecordFeedbackDTO(
-                    id = updated.id,
-                    aiFeedback = updated.aiFeedback,
-                    comment = updated.comment,
-                    data = updated.data,
-                    status = updated.status,
-                    createdAt = updated.createdAt,
-                    updatedAt = updated.updatedAt
-                )
-            )
-        )
+
+        return ResponseEntity.ok(ApiResponseDTO())
+
     }
 }
