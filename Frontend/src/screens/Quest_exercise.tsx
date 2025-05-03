@@ -11,8 +11,38 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ProgressChart } from 'react-native-chart-kit';
+import RecommendationList from "../components/RecommendationList";
 
 const { width } = Dimensions.get('window');
+
+const mainVideo = {
+    id: "5qap5aO4i9A",
+    title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
+  };
+
+const exerciseVideos = [
+    {
+        id: "bZkNtE6F3yQ",
+        title: "운동 전 듣기 좋은 신나는 음악",
+        channel: "Fit Beats",
+        duration: "35:12",
+        thumbnail: "https://img.youtube.com/vi/bZkNtE6F3yQ/0.jpg",
+    },
+    {
+        id: "6zD3acN2RfY",
+        title: "마음이 차분해지는 피아노 선율 모음",
+        channel: "Healing Piano",
+        duration: "52:10",
+        thumbnail: "https://img.youtube.com/vi/6zD3acN2RfY/0.jpg",
+    },
+    {
+        id: "hHW1oY26kxQ",
+        title: "편안한 재즈로 명상 타임 즐기기",
+        channel: "Jazz Relax",
+        duration: "45:00",
+        thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/0.jpg",
+      },
+    ];
 
 export default function QuestExercise() {
   const [steps, setSteps] = useState(7342); // 샘플 데이터
@@ -80,18 +110,13 @@ export default function QuestExercise() {
           )}
         </TouchableOpacity>
 
-        <Text style={styles.sectionText}>오늘의 추천 플레이리스트 🎧</Text>
-        <View style={styles.videoCard}>
-          <Text style={styles.videoTitle}>[PLAYLIST] 명상하며 들으면 마음 🧘</Text>
-          <Text style={styles.videoDesc}>명상공간MeditationGeneral</Text>
-          <View style={styles.youtubeStub}>
-            <Text style={{ color: '#fff' }}>YouTube Stub</Text>
-          </View>
-        </View>
-
-        <Text style={styles.sectionText}>아니면 이런 콘텐츠들은 어때? 😺</Text>
-        <View style={styles.videoCard}><Text style={{ color: '#fff' }}>콘텐츠 카드 1</Text></View>
-        <View style={styles.videoCard}><Text style={{ color: '#fff' }}>콘텐츠 카드 2</Text></View>
+        <RecommendationList 
+          title="추천 플레이리스트" 
+          videos={exerciseVideos} 
+          backgroundColor="#1a1a40" 
+          width={width} 
+          mainVideo={mainVideo}
+        />
       </ScrollView>
 
       <View style={styles.buttonWrapper}>

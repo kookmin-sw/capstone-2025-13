@@ -1,17 +1,9 @@
 import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  useWindowDimensions,
-  Linking,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions, Linking, Image } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import fonts from "../constants/fonts";
 import styles from "../styles/questMeditationStyles";
+import RecommendationList from "../components/RecommendationList";  // 추가: RecommendationList 컴포넌트 import
 
 export default function Quest_meditation() {
   const [timeLeft, setTimeLeft] = useState(30);
@@ -53,7 +45,7 @@ export default function Quest_meditation() {
     title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
   };
 
-  const videoRecommendations = [
+  const meditationVideos= [
     {
       id: "DWcJFNfaw9c",
       title: "명상과 함께하는 자연 속 음악",
@@ -84,7 +76,7 @@ export default function Quest_meditation() {
       : "시 - 작 !";
 
   const buttonColor = isMeditationDone
-    ? "#E68E48"
+    ? "#ff4f4f"
     : isRunning
       ? "#aaa"
       : "#6c63ff";
@@ -129,15 +121,6 @@ export default function Quest_meditation() {
       marginTop: width * 0.15,
       marginBottom: width * 0.03,
     },
-    videoCard: {
-      marginBottom: width * 0.03,
-      padding: width * 0.03,
-    },
-    thumbnail: {
-      width: width * 0.25,
-      height: width * 0.15,
-      marginRight: width * 0.04,
-    },
   };
 
   return (
@@ -162,32 +145,13 @@ export default function Quest_meditation() {
 
         <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
 
-        <View style={[styles.youtubeWrapper, dynamic.youtubeWrapper]}>
-          <YoutubePlayer
-            height={dynamic.youtubeWrapper.height}
-            width={dynamic.youtubeWrapper.width}
-            videoId={mainVideo.id}
-            play={false}
-          />
-        </View>
-
-        {videoRecommendations.map((video) => (
-          <TouchableOpacity
-            key={video.id}
-            style={[styles.videoCard, dynamic.videoCard]}
-            onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
-          >
-            <Image source={{ uri: video.thumbnail }} style={[styles.thumbnail, dynamic.thumbnail]} />
-            <View style={styles.videoTextWrapper}>
-              <Text numberOfLines={2} style={styles.videoTitle}>
-                {video.title}
-              </Text>
-              <Text style={styles.videoMeta}>
-                {video.channel} · {video.duration}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <RecommendationList 
+          title="추천 플레이리스트" 
+          videos={meditationVideos} 
+          backgroundColor="#1a1a40" 
+          width={width} 
+          mainVideo={mainVideo}
+        />
       </ScrollView>
 
       <TouchableOpacity
