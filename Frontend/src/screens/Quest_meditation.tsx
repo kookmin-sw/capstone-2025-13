@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import fonts from "../constants/fonts";
+import styles from "../styles/questMeditationStyles";
 
 export default function Quest_meditation() {
   const [timeLeft, setTimeLeft] = useState(30);
@@ -45,7 +46,6 @@ export default function Quest_meditation() {
 
   const handleComplete = () => {
     alert("명상이 완료되었습니다! 🎉");
-    // 여기에 완료 처리 로직 추가 (예: 미션 완료 상태 저장, 화면 이동 등)
   };
 
   const mainVideo = {
@@ -89,105 +89,59 @@ export default function Quest_meditation() {
       ? "#aaa"
       : "#6c63ff";
 
-  const dynamicStyles = StyleSheet.create({
+  const dynamic = {
     timerText: {
       fontSize: width * 0.22,
-      color: "#fff94f",
-      fontFamily: fonts.laundryBold,
       marginVertical: width * 0.05,
-      textShadowColor: "#fff",
-      textShadowOffset: { width: 1, height: 1 },
-      textShadowRadius: 4,
     },
     youtubeWrapper: {
       width: width * 0.9,
       height: width * 0.5,
       marginBottom: width * 0.05,
-      borderRadius: 12,
-      overflow: "hidden",
     },
     button: {
-      backgroundColor: buttonColor,
       paddingHorizontal: width * 0.15,
       paddingVertical: width * 0.04,
-      borderRadius: 20,
-      alignSelf: "center",
-      position: "absolute",
       bottom: width * 0.1,
-      zIndex: 1,
     },
     buttonText: {
-      color: "#fff",
       fontSize: width * 0.045,
-      fontFamily: fonts.laundryBold,
     },
     missionTitle: {
       fontSize: width * 0.045,
-      fontFamily: fonts.laundryBold,
-      color: "#fff",
       marginTop: width * 0.03,
     },
     mainText: {
       fontSize: width * 0.06,
-      fontFamily: fonts.laundryBold,
-      color: "#fff",
       marginVertical: width * 0.02,
     },
     warningTitle: {
       fontSize: width * 0.045,
-      color: "#fff",
-      fontFamily: fonts.laundry,
       marginTop: width * 0.04,
       marginBottom: width * 0.02,
     },
     description: {
-      color: "#ccc",
       fontSize: width * 0.035,
-      fontFamily: fonts.laundry,
       marginBottom: width * 0.01,
-      textAlign: "center",
     },
     sectionTitle: {
       fontSize: width * 0.045,
-      fontFamily: fonts.laundryBold,
-      color: "#fff94f",
       marginTop: width * 0.15,
       marginBottom: width * 0.03,
-      alignSelf: "flex-start",
     },
     videoCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#1a1a40",
-      borderRadius: 12,
       marginBottom: width * 0.03,
       padding: width * 0.03,
-      width: "100%",
     },
     thumbnail: {
       width: width * 0.25,
       height: width * 0.15,
-      borderRadius: 8,
       marginRight: width * 0.04,
     },
-    videoTextWrapper: {
-      flexShrink: 1,
-    },
-    videoTitle: {
-      fontSize: width * 0.035,
-      color: "#fff",
-      fontFamily: fonts.laundryBold,
-      marginBottom: 2,
-    },
-    videoMeta: {
-      fontSize: width * 0.03,
-      color: "#ccc",
-      fontFamily: fonts.laundry,
-    },
-  });
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0e0033" }}>
+    <View style={styles.page}>
       <ScrollView
         contentContainerStyle={[
           styles.container,
@@ -196,23 +150,22 @@ export default function Quest_meditation() {
         bounces={false}
         overScrollMode="never"
       >
-        <Text style={dynamicStyles.missionTitle}>오늘의 미션 🔥</Text>
-        <Text style={dynamicStyles.mainText}>5분 간 명상하기</Text>
+        <Text style={[styles.missionTitle, dynamic.missionTitle]}>오늘의 미션 🔥</Text>
+        <Text style={[styles.mainText, dynamic.mainText]}>5분 간 명상하기</Text>
+        <Text style={[styles.timerText, dynamic.timerText]}>{formatTime(timeLeft)}</Text>
 
-        <Text style={dynamicStyles.timerText}>{formatTime(timeLeft)}</Text>
+        <Text style={[styles.warningTitle, dynamic.warningTitle]}>명상 타이머는 이렇게 작동해요 🧘🏻‍♀️</Text>
+        <Text style={[styles.description, dynamic.description]}>・ 시작 버튼을 누르면 타이머가 바로 시작돼요.</Text>
+        <Text style={[styles.description, dynamic.description]}>・ 앱을 강제로 종료하면 타이머가 초기화돼요.</Text>
+        <Text style={[styles.description, dynamic.description]}>・ 다른 화면으로 나가면 타이머가 멈춰요.</Text>
+        <Text style={[styles.description, dynamic.description]}>・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌</Text>
 
-        <Text style={dynamicStyles.warningTitle}>명상 타이머는 이렇게 작동해요 🧘🏻‍♀️</Text>
-        <Text style={dynamicStyles.description}>・ 시작 버튼을 누르면 타이머가 바로 시작돼요.</Text>
-        <Text style={dynamicStyles.description}>・ 앱을 강제로 종료하면 타이머가 초기화돼요.</Text>
-        <Text style={dynamicStyles.description}>・ 다른 화면으로 나가면 타이머가 멈춰요.</Text>
-        <Text style={dynamicStyles.description}>・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌</Text>
+        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
 
-        <Text style={dynamicStyles.sectionTitle}>오늘의 추천 플레이리스트 🎧</Text>
-
-        <View style={dynamicStyles.youtubeWrapper}>
+        <View style={[styles.youtubeWrapper, dynamic.youtubeWrapper]}>
           <YoutubePlayer
-            height={dynamicStyles.youtubeWrapper.height}
-            width={dynamicStyles.youtubeWrapper.width}
+            height={dynamic.youtubeWrapper.height}
+            width={dynamic.youtubeWrapper.width}
             videoId={mainVideo.id}
             play={false}
           />
@@ -221,15 +174,15 @@ export default function Quest_meditation() {
         {videoRecommendations.map((video) => (
           <TouchableOpacity
             key={video.id}
-            style={dynamicStyles.videoCard}
+            style={[styles.videoCard, dynamic.videoCard]}
             onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
           >
-            <Image source={{ uri: video.thumbnail }} style={dynamicStyles.thumbnail} />
-            <View style={dynamicStyles.videoTextWrapper}>
-              <Text numberOfLines={2} style={dynamicStyles.videoTitle}>
+            <Image source={{ uri: video.thumbnail }} style={[styles.thumbnail, dynamic.thumbnail]} />
+            <View style={styles.videoTextWrapper}>
+              <Text numberOfLines={2} style={styles.videoTitle}>
                 {video.title}
               </Text>
-              <Text style={dynamicStyles.videoMeta}>
+              <Text style={styles.videoMeta}>
                 {video.channel} · {video.duration}
               </Text>
             </View>
@@ -238,18 +191,12 @@ export default function Quest_meditation() {
       </ScrollView>
 
       <TouchableOpacity
-        style={dynamicStyles.button}
+        style={[styles.button, dynamic.button, { backgroundColor: buttonColor }]}
         onPress={isMeditationDone ? handleComplete : startTimer}
         disabled={isRunning && !isMeditationDone}
       >
-        <Text style={dynamicStyles.buttonText}>{buttonText}</Text>
+        <Text style={[styles.buttonText, dynamic.buttonText]}>{buttonText}</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-  },
-});
