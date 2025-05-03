@@ -15,11 +15,13 @@ export const styles = StyleSheet.create({
     title: {
     color: '#fff',
     marginTop: width * 0.03,
+    fontFamily: fonts.laundryBold,
     },
     mission: {
     color: '#fff',
     fontWeight: 'bold',
     marginVertical: width * 0.02,
+    fontFamily: fonts.laundryBold,
     },
     progressChart: {
     alignSelf: 'center',
@@ -28,6 +30,7 @@ export const styles = StyleSheet.create({
     sectionText: {
     color: '#fff',
     marginVertical: width * 0.04,
+    fontFamily: fonts.laundryBold,
     },
     uploadBox: {
     backgroundColor: '#333',
@@ -38,6 +41,7 @@ export const styles = StyleSheet.create({
     },
     uploadText: {
     color: '#ccc',
+    fontFamily: fonts.laundryBold,
     },
     uploadedImage: {
     width: '100%',
@@ -56,6 +60,7 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
     },
     completeButton: {
+    fontFamily: fonts.laundryBold,
     backgroundColor: '#FF3D89',
     borderRadius: 50,
     paddingVertical: width * 0.04,
@@ -70,5 +75,6 @@ export const styles = StyleSheet.create({
     centerTextContainer: {
     position: 'absolute',
     alignItems: 'center',
+    fontFamily: fonts.laundryBold,
     },
 });

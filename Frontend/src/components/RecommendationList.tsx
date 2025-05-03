@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Linking } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import fonts from '../constants/fonts';
 
 interface VideoItem {
   id: string;
@@ -78,12 +79,12 @@ const styles = StyleSheet.create({
   },
   videoTitle: {
     color: '#fff',
-    fontFamily: 'laundryBold',
+    fontFamily: fonts.laundryBold,
     marginBottom: 2,
   },
   videoMeta: {
     color: '#ccc',
-    fontFamily: 'laundry',
+    fontFamily: fonts.laundry,
     fontSize: 12,
   },
 });
