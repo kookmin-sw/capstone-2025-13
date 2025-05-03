@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, Dimensions, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ProgressChart } from 'react-native-chart-kit';
-import RecommendationList from "../components/RecommendationList";
+import Youtube_playlist from "../components/Youtube_playlist";
 import { Pedometer } from 'expo-sensors';
 import { dynamic } from '../styles/questExerciseDynamicStyles';
 import { styles } from '../styles/questExerciseStyles';
@@ -135,7 +135,7 @@ export default function QuestExercise() {
           오늘의 추천 플레이리스트 🎧
         </Text>
 
-        <RecommendationList
+        <Youtube_playlist 
           title="추천 플레이리스트"
           videos={exerciseVideos}
           backgroundColor="#222"

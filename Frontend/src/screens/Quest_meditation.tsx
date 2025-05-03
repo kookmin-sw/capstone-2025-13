@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
 import styles from "../styles/questMeditationStyles";
-import RecommendationList from "../components/RecommendationList";
+import Youtube_playlist from "../components/Youtube_playlist";
 import { dynamic } from '../styles/questMeditaionDynamicStyles';
 
 export default function Quest_meditation() {
@@ -102,7 +102,7 @@ export default function Quest_meditation() {
 
         <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
 
-        <RecommendationList 
+        <Youtube_playlist 
           title="추천 플레이리스트" 
           videos={meditationVideos} 
           backgroundColor="#1a1a40" 
