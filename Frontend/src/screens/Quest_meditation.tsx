@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   useWindowDimensions,
-  Image,
   Linking,
+  Image,
 } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import fonts from "../constants/fonts";
@@ -40,14 +40,12 @@ export default function Quest_meditation() {
     }, 1000);
   };
 
+  const mainVideo = {
+    id: "5qap5aO4i9A",
+    title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
+  };
+
   const videoRecommendations = [
-    {
-      id: "5qap5aO4i9A",
-      title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
-      channel: "오센트OHSCENT",
-      duration: "38:50",
-      thumbnail: "https://img.youtube.com/vi/5qap5aO4i9A/0.jpg",
-    },
     {
       id: "DWcJFNfaw9c",
       title: "명상과 함께하는 자연 속 음악",
@@ -55,7 +53,20 @@ export default function Quest_meditation() {
       duration: "1:03:22",
       thumbnail: "https://img.youtube.com/vi/DWcJFNfaw9c/0.jpg",
     },
-    // 추가 영상들 자유롭게 여기에 넣을 수 있음
+    {
+      id: "6zD3acN2RfY",
+      title: "마음이 차분해지는 피아노 선율 모음",
+      channel: "Healing Piano",
+      duration: "52:10",
+      thumbnail: "https://img.youtube.com/vi/6zD3acN2RfY/0.jpg",
+    },
+    {
+      id: "hHW1oY26kxQ",
+      title: "편안한 재즈로 명상 타임 즐기기",
+      channel: "Jazz Relax",
+      duration: "45:00",
+      thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/0.jpg",
+    },
   ];
 
   const dynamicStyles = StyleSheet.create({
@@ -123,33 +134,41 @@ export default function Quest_meditation() {
     },
     videoCard: {
       flexDirection: "row",
-      marginBottom: width * 0.04,
       alignItems: "center",
+      backgroundColor: "#1a1a40",
+      borderRadius: 12,
+      marginBottom: width * 0.03,
+      padding: width * 0.03,
+      width: "100%",
     },
     thumbnail: {
-      width: width * 0.28,
-      height: width * 0.16,
+      width: width * 0.25,
+      height: width * 0.15,
       borderRadius: 8,
-      marginRight: width * 0.03,
+      marginRight: width * 0.04,
     },
     videoTextWrapper: {
-      flex: 1,
+      flexShrink: 1,
     },
     videoTitle: {
-      color: "#fff",
       fontSize: width * 0.035,
+      color: "#fff",
       fontFamily: fonts.laundryBold,
+      marginBottom: 2,
     },
     videoMeta: {
-      color: "#bbb",
       fontSize: width * 0.03,
-      marginTop: width * 0.01,
+      color: "#ccc",
+      fontFamily: fonts.laundry,
     },
   });
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.container, { minHeight: height, padding: width * 0.15 }]}
+      contentContainerStyle={[
+        styles.container,
+        { minHeight: height, padding: width * 0.1 },
+      ]}
       bounces={false}
       overScrollMode="never"
     >
@@ -166,6 +185,17 @@ export default function Quest_meditation() {
 
       <Text style={dynamicStyles.sectionTitle}>오늘의 추천 플레이리스트 🎧</Text>
 
+      {/* 메인 유튜브 플레이어 */}
+      <View style={dynamicStyles.youtubeWrapper}>
+        <YoutubePlayer
+          height={dynamicStyles.youtubeWrapper.height}
+          width={dynamicStyles.youtubeWrapper.width}
+          videoId={mainVideo.id}
+          play={false}
+        />
+      </View>
+
+      {/* 추천 영상 리스트 */}
       {videoRecommendations.map((video) => (
         <TouchableOpacity
           key={video.id}
@@ -174,8 +204,12 @@ export default function Quest_meditation() {
         >
           <Image source={{ uri: video.thumbnail }} style={dynamicStyles.thumbnail} />
           <View style={dynamicStyles.videoTextWrapper}>
-            <Text numberOfLines={2} style={dynamicStyles.videoTitle}>{video.title}</Text>
-            <Text style={dynamicStyles.videoMeta}>{video.channel} · {video.duration}</Text>
+            <Text numberOfLines={2} style={dynamicStyles.videoTitle}>
+              {video.title}
+            </Text>
+            <Text style={dynamicStyles.videoMeta}>
+              {video.channel} · {video.duration}
+            </Text>
           </View>
         </TouchableOpacity>
       ))}
