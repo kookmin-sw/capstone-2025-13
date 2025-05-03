@@ -543,7 +543,7 @@ class RecordController(
             RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
             RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
             RecordFeedbackStatus.COMPLETED -> Unit
-        
+        }
 
         // 데이터 업데이트
         feedback.data = request.data
