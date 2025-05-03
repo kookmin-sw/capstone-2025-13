@@ -1,9 +1,8 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions, Linking, Image } from "react-native";
-import YoutubePlayer from "react-native-youtube-iframe";
-import fonts from "../constants/fonts";
+import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
 import styles from "../styles/questMeditationStyles";
-import RecommendationList from "../components/RecommendationList";  // 추가: RecommendationList 컴포넌트 import
+import RecommendationList from "../components/RecommendationList";
+import { dynamic } from '../styles/questMeditaionDynamicStyles';
 
 export default function Quest_meditation() {
   const [timeLeft, setTimeLeft] = useState(30);
@@ -80,48 +79,6 @@ export default function Quest_meditation() {
     : isRunning
       ? "#aaa"
       : "#6c63ff";
-
-  const dynamic = {
-    timerText: {
-      fontSize: width * 0.22,
-      marginVertical: width * 0.05,
-    },
-    youtubeWrapper: {
-      width: width * 0.9,
-      height: width * 0.5,
-      marginBottom: width * 0.05,
-    },
-    button: {
-      paddingHorizontal: width * 0.15,
-      paddingVertical: width * 0.04,
-      bottom: width * 0.1,
-    },
-    buttonText: {
-      fontSize: width * 0.045,
-    },
-    missionTitle: {
-      fontSize: width * 0.045,
-      marginTop: width * 0.03,
-    },
-    mainText: {
-      fontSize: width * 0.06,
-      marginVertical: width * 0.02,
-    },
-    warningTitle: {
-      fontSize: width * 0.045,
-      marginTop: width * 0.04,
-      marginBottom: width * 0.02,
-    },
-    description: {
-      fontSize: width * 0.035,
-      marginBottom: width * 0.01,
-    },
-    sectionTitle: {
-      fontSize: width * 0.045,
-      marginTop: width * 0.15,
-      marginBottom: width * 0.03,
-    },
-  };
 
   return (
     <View style={styles.page}>
