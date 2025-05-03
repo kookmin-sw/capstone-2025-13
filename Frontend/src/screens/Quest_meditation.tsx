@@ -84,7 +84,7 @@ export default function Quest_meditation() {
       : "시 - 작 !";
 
   const buttonColor = isMeditationDone
-    ? "#ff4f4f"
+    ? "#E68E48"
     : isRunning
       ? "#aaa"
       : "#6c63ff";
