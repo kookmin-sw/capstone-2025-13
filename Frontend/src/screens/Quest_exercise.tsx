@@ -4,7 +4,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { ProgressChart } from 'react-native-chart-kit';
 import RecommendationList from "../components/RecommendationList";
 import { Pedometer } from 'expo-sensors';
-import fonts from '../constants/fonts';
 import { dynamic } from '../styles/questExerciseDynamicStyles';
 import { styles } from '../styles/questExerciseStyles';
 
