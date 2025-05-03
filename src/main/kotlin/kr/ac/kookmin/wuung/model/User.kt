@@ -41,6 +41,9 @@ data class User(
     @Column(nullable = false)
     var birthDate : LocalDateTime? = null,
 
+    @Column(nullable = true, length = 512)
+    var profile: String? = null,
+
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
@@ -74,5 +77,7 @@ data class User(
 
 enum class GenderEnum(val value: String) {
     MALE("MALE"),
-    FEMALE("FEMALE");
+    FEMALE("FEMALE"),
+    THIRD_GENDER("THIRD_GENDER"),
+    UNKNOWN("UNKNOWN")
 }

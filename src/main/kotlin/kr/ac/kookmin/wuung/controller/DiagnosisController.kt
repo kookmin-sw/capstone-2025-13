@@ -6,19 +6,33 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.ac.kookmin.wuung.exceptions.NotFoundException
+import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.jwt.JwtProvider
+import kr.ac.kookmin.wuung.lib.ApiResponseDTO
+import kr.ac.kookmin.wuung.lib.datetimeParser
+import kr.ac.kookmin.wuung.model.Diagnosis
+import kr.ac.kookmin.wuung.model.DiagnosisResults
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.User
+import kr.ac.kookmin.wuung.repository.DiagnosisRepository
+import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
 import kr.ac.kookmin.wuung.service.DiagnosisService
+import org.hibernate.annotations.NotFound
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.jvm.optionals.getOrNull
 
 data class CreateDiagnosisRequest(
     val result: Long,
@@ -27,53 +41,292 @@ data class CreateDiagnosisRequest(
 )
 
 // message만 설정해놓긴 했음.
-data class CreateDiagnosisResponse(val message: String)
+data class DiagnosisDTO(
+    val id: Long,
+    val type: DiagnosisType,
+    val title: String,
+    val description: String,
+    val questions: List<DiagnosisQuestionDTO> = listOf(),
+    val scale: List<DiagnosisScaleDTO> = listOf(),
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+data class DiagnosisQuestionDTO(
+    val seq: Int,
+    val text: String,
+    val answers: List<DiagnosisTextDTO> = listOf()
+)
+data class DiagnosisTextDTO(
+    val text: String,
+    val score: Int,
+)
+data class DiagnosisScaleDTO(
+    val start: Int,
+    val scaleName: String,
+    val description: String,
+)
+
+fun Diagnosis.toDTO() = DiagnosisDTO(
+    id = this.id ?: 0,
+    type = this.type ?: DiagnosisType.Simple,
+    title = this.title ?: "",
+    description = this.description ?: "",
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt,
+    questions = this.diagnosisQuestions.map { question ->
+        DiagnosisQuestionDTO(
+            seq = question.seq ?: 0,
+            text = question.text ?: "",
+            answers = question.diagnosisText.map { text ->
+                DiagnosisTextDTO(
+                    text = text.text ?: "",
+                    score = text.score,
+                )
+            }.sortedBy { it.score }
+        )
+    }.sortedBy { it.seq },
+    scale = this.diagnosisScale.map { scale ->
+        DiagnosisScaleDTO(
+            start = scale.start,
+            scaleName = scale.scaleName ?: "",
+            description = scale.description ?: "",
+        )
+    }.sortedBy { it.start },
+)
+fun Diagnosis.toDTOSelf() = DiagnosisDTO(
+    id = this.id ?: 0,
+    type = this.type ?: DiagnosisType.Simple,
+    title = this.title ?: "",
+    description = this.description ?: "",
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt,
+    questions = listOf(),
+    scale = this.diagnosisScale.map { scale ->
+        DiagnosisScaleDTO(
+            start = scale.start,
+            scaleName = scale.scaleName ?: "",
+            description = scale.description ?: "",
+        )
+    }.sortedBy { it.start },
+)
+
+data class DiagnosisResultSubmitRequest(
+    val id: Long,
+    val result: Int,
+    val scale: Int,
+)
+
+data class DiagnosisResultDTO(
+    val id: String,
+    val diagnosisId: Long,
+    val result: Int,
+    val scale: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+)
+fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
+    id = this.id ?: "",
+    diagnosisId = this.diagnosis?.id ?: 0,
+    result = this.result ?: 0,
+    scale = this.scale ?: 0,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt
+)
 
 @RestController
-@RequestMapping("/daignosis")
-@Tag(name = "Diagnosis API", description = "Endpoints for Diagnosis create and read data")
+@RequestMapping("/diagnosis")
+@Tag(name = "Diagnosis API", description = """
+    Endpoints for Diagnosis create and read data.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class DiagnosisController(
     @Autowired private val diagnosisService: DiagnosisService,
-    @Autowired private val jwtProvider: JwtProvider
-)
-{
-    @PostMapping("/create")
-    @Operation()
+    @Autowired private val jwtProvider: JwtProvider,
+    private val diagnosisRepository: DiagnosisRepository,
+    private val diagnosisResultsRepository: DiagnosisResultsRepository
+)  {
+    @GetMapping("/{id}")
+    @Operation(
+        summary = "Get diagnosis by ID",
+        description = """
+            Retrieve diagnosis details for the specified ID.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
+    )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully create diagnosis", useReturnTypeSchema = true),
-            ApiResponse(responseCode = "400", description = "Failed to create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))]),
-            ApiResponse(responseCode = "403", description = "Exception raised while create diagnosis", content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateDiagnosisResponse::class))])
-    ]
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Diagnosis not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
     )
-    fun createDiagnosis(
-        @RequestBody request: CreateDiagnosisRequest,
+    fun getDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
-    ): ResponseEntity<CreateDiagnosisResponse> {
+        @PathVariable id: Int,
+    ): ResponseEntity<ApiResponseDTO<DiagnosisDTO>> {
         // JWT 토큰 검증
         if (userDetails == null)
-            return ResponseEntity.badRequest().body(CreateDiagnosisResponse("Invalid JWT"))
+            throw UnauthorizedException()
 
-        // 검사 형식 검증
-        val isValidType = DiagnosisType.entries.any { it.name == request.type }
-        if (!isValidType) {
-            return ResponseEntity.badRequest().body(CreateDiagnosisResponse("Invalid diagnosis type"))
-        }
+        val diagnosis = diagnosisRepository.findDiagnosisById(id.toLong()).getOrNull()
 
-        // 날짜 파싱 (형식: yyyy-MM-dd HH:mm:ss)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val createdAt: LocalDateTime = try {
-            LocalDateTime.parse(request.createAt, formatter)
-        } catch (e: Exception) {
-            return ResponseEntity.badRequest().body(
-                CreateDiagnosisResponse("Invalid time format, valid time format is yyyy-MM-dd HH:mm:ss")
+        if (diagnosis == null) throw NotFoundException()
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosis.toDTO())
+        )
+    }
+
+    @GetMapping("/list")
+    @Operation(
+        summary = "Get all diagnosis list",
+        description = """
+            Retrieve a list of all available diagnoses.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis list",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
             )
-        }
+        ]
+    )
+    fun getDiagnosisList(
+        @AuthenticationPrincipal userDetails: User?,
+    ): ResponseEntity<ApiResponseDTO<List<DiagnosisDTO>>> {
+        if (userDetails == null) throw UnauthorizedException()
 
-        // 데이터 추가
-        diagnosisService.createDiagnosis(request.type, request.result, createdAt)
+        val diagnosisList = diagnosisRepository.findAll().map { it.toDTOSelf() }
 
-        // 결과 반환
-        return ResponseEntity.ok(CreateDiagnosisResponse("ok"))
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosisList)
+        )
+    }
+
+    @PutMapping("/submit")
+    @Operation(
+        summary = "Submit diagnosis result",
+        description = """
+            Submit a new diagnosis result for the authenticated user.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully submitted diagnosis result",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Diagnosis not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun putDiagnosis(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestBody request: DiagnosisResultSubmitRequest,
+    ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val diagnosis = diagnosisRepository.findDiagnosisById(request.id).getOrNull()
+        if (diagnosis == null) throw NotFoundException()
+
+        val diagnosisResult = DiagnosisResults(
+            user = userDetails,
+            diagnosis = diagnosis,
+            result = request.result,
+            scale = request.scale
+        )
+
+        diagnosisResultsRepository.save(diagnosisResult)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosisResult.toDTO())
+        )
+    }
+
+    @GetMapping("/results")
+    @Operation(
+        summary = "Get diagnosis results",
+        description = """
+            Retrieve diagnosis results for the authenticated user with optional date filtering.
+            AccessToken is required for this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis results",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getDiagnosisResults(
+        @AuthenticationPrincipal userDetails: User?,
+        @Schema(description = "Start date in format yyyy-MM-dd", example = "2000-01-01")
+        @RequestParam(required = false) start: String?,
+    ): ResponseEntity<ApiResponseDTO<List<DiagnosisResultDTO>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val diagnosis = start?.let {
+            val startDate = start.datetimeParser()
+            diagnosisResultsRepository.findByUserAndCreatedAtAfter(userDetails, startDate)
+        } ?: diagnosisResultsRepository.findByUser(userDetails)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosis.map { it.toDTO() }.sortedByDescending { it.createdAt } )
+        )
     }
 }

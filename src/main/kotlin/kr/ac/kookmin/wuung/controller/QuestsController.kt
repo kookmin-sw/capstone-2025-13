@@ -17,11 +17,13 @@ import kr.ac.kookmin.wuung.repository.UserRepository
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
+import kr.ac.kookmin.wuung.model.Quests
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -59,9 +61,31 @@ data class UpdateQuestRequest(
     val current: Int,
 )
 
+data class QuestsDTO(
+    val id: Long,
+    val type: QuestType,
+    val name: String,
+    val description: String,
+    val target: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+fun Quests.toDTO() = QuestsDTO(
+    id = this.id ?: 0,
+    type = this.type ?: QuestType.ACTIVITY,
+    name = this.name ?: "",
+    description = this.description ?: "",
+    target = this.target,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt
+)
+
 @RestController
 @RequestMapping("/quests")
-@Tag(name = "Quests API", description = "Endpoints for quests")
+@Tag(name = "Quests API", description = """
+    Endpoints for quests.
+    AccessToken is required for all of this part of endpoints on Authorization header.
+""")
 class QuestsController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
@@ -71,7 +95,12 @@ class QuestsController(
     @GetMapping("/me")
     @Operation(
         summary = "Get my quests",
-        description = "Get my quests"
+        description = """
+            Get my quests with optional filter by start date.
+            Start date is in format yyyy-MM-dd.
+            If start date is not provided, it will return all quests.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -102,7 +131,11 @@ class QuestsController(
     @PutMapping("")
     @Operation(
         summary = "Create a new quest",
-        description = "Creates a new quest instance for the authenticated user"
+        description = """
+            Creates a new quest instance for the authenticated user.
+            Required parameter is quest (unique) id.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -157,7 +190,11 @@ class QuestsController(
     @PostMapping("")
     @Operation(
         summary = "Update quest progress",
-        description = "Updates the progress of a quest for the authenticated user"
+        description = """
+            Updates the progress of a quest for the authenticated user.
+            Required parameter is quest (unique) id.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
     )
     @ApiResponses(
         value = [
@@ -201,6 +238,147 @@ class QuestsController(
 
         quest.progress = request.current
         userQuestsRepository.save(quest)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = quest.toDTO())
+        )
+    }
+
+    @GetMapping("/list")
+    @Operation(
+        summary = "List all quests",
+        description = """
+            Get a list of all available quests.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved quests list",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun listQuests(
+        @AuthenticationPrincipal userDetails: User?,
+    ): ResponseEntity<ApiResponseDTO<List<QuestsDTO>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val quests = questsRepository.findAll()
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = quests.map { it.toDTO() })
+        )
+    }
+
+    @GetMapping("/list/{type}")
+    @Operation(
+        summary = "List quests by type",
+        description = """
+           Get a list of quests filtered by type.
+           AccessToken is required for all of this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved filtered quests list",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun listQuestsWithTypes(
+        @AuthenticationPrincipal userDetails: User?,
+        @Schema(description = "Type of quest", example = "ACTIVITY")
+        @PathVariable type: QuestType,
+    ): ResponseEntity<ApiResponseDTO<List<QuestsDTO>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val quests = questsRepository.findAllByType(type)
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = quests.map { it.toDTO() })
+        )
+    }
+
+    @GetMapping("/list/{type}/{step}")
+    @Operation(
+        summary = "List quests by type and step",
+        description = """
+            Get a list of quests filtered by type and step number.
+            AccessToken is required for all of this part of endpoints on Authorization header.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved filtered quests list",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun listQuestsWithTypes(
+        @AuthenticationPrincipal userDetails: User?,
+        @Schema(description = "Type of quest", example = "ACTIVITY")
+        @PathVariable type: QuestType,
+        @Schema(description = "Step of quest type", example = "1")
+        @PathVariable step: Int,
+    ): ResponseEntity<ApiResponseDTO<QuestsDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val quest = questsRepository.findByTypeAndStep(type, step).getOrNull() ?: throw NotFoundException()
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = quest.toDTO())

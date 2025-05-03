@@ -15,15 +15,4 @@ class DiagnosisService(
         return diagnosisRepository.findByToken(token, type)
     }*/
 
-    @Transactional
-    fun createDiagnosis(type : String, result : Long, createdAt: LocalDateTime): Diagnosis {
-        val diagnosis = Diagnosis(
-            type = type,
-            result = result,
-            createdAt = createdAt,
-            updatedAt = createdAt
-        )
-
-        return diagnosisRepository.save(diagnosis)
-    }
 }
