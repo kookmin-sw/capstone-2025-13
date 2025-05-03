@@ -87,11 +87,14 @@ export default function Quest_meditation() {
       overflow: "hidden",
     },
     button: {
-      marginTop: width * 0.05,
       backgroundColor: "#6c63ff",
       paddingHorizontal: width * 0.15,
       paddingVertical: width * 0.04,
       borderRadius: 20,
+      alignSelf: "center",
+      position: "absolute",
+      bottom: width * 0.1,
+      zIndex: 1,
     },
     buttonText: {
       color: "#fff",
@@ -164,66 +167,69 @@ export default function Quest_meditation() {
   });
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { minHeight: height, padding: width * 0.1 },
-      ]}
-      bounces={false}
-      overScrollMode="never"
-    >
-      <Text style={dynamicStyles.missionTitle}>오늘의 미션 🔥</Text>
-      <Text style={dynamicStyles.mainText}>5분 간 명상하기</Text>
+    <View style={{ flex: 1, backgroundColor: "#0e0033" }}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { minHeight: height, padding: width * 0.1, paddingBottom: width * 0.25 },
+        ]}
+        bounces={false}
+        overScrollMode="never"
+      >
+        <Text style={dynamicStyles.missionTitle}>오늘의 미션 🔥</Text>
+        <Text style={dynamicStyles.mainText}>5분 간 명상하기</Text>
 
-      <Text style={dynamicStyles.timerText}>{formatTime(timeLeft)}</Text>
+        <Text style={dynamicStyles.timerText}>{formatTime(timeLeft)}</Text>
 
-      <Text style={dynamicStyles.warningTitle}>명상 타이머는 이렇게 작동해요 🧘🏻‍♀️</Text>
-      <Text style={dynamicStyles.description}>・ 시작 버튼을 누르면 타이머가 바로 시작돼요.</Text>
-      <Text style={dynamicStyles.description}>・ 앱을 강제로 종료하면 타이머가 초기화돼요.</Text>
-      <Text style={dynamicStyles.description}>・ 다른 화면으로 나가면 타이머가 멈춰요.</Text>
-      <Text style={dynamicStyles.description}>・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌</Text>
+        <Text style={dynamicStyles.warningTitle}>명상 타이머는 이렇게 작동해요 🧘🏻‍♀️</Text>
+        <Text style={dynamicStyles.description}>・ 시작 버튼을 누르면 타이머가 바로 시작돼요.</Text>
+        <Text style={dynamicStyles.description}>・ 앱을 강제로 종료하면 타이머가 초기화돼요.</Text>
+        <Text style={dynamicStyles.description}>・ 다른 화면으로 나가면 타이머가 멈춰요.</Text>
+        <Text style={dynamicStyles.description}>・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌</Text>
 
-      <Text style={dynamicStyles.sectionTitle}>오늘의 추천 플레이리스트 🎧</Text>
+        <Text style={dynamicStyles.sectionTitle}>오늘의 추천 플레이리스트 🎧</Text>
 
-      {/* 메인 유튜브 플레이어 */}
-      <View style={dynamicStyles.youtubeWrapper}>
-        <YoutubePlayer
-          height={dynamicStyles.youtubeWrapper.height}
-          width={dynamicStyles.youtubeWrapper.width}
-          videoId={mainVideo.id}
-          play={false}
-        />
-      </View>
+        <View style={dynamicStyles.youtubeWrapper}>
+          <YoutubePlayer
+            height={dynamicStyles.youtubeWrapper.height}
+            width={dynamicStyles.youtubeWrapper.width}
+            videoId={mainVideo.id}
+            play={false}
+          />
+        </View>
 
-      {/* 추천 영상 리스트 */}
-      {videoRecommendations.map((video) => (
-        <TouchableOpacity
-          key={video.id}
-          style={dynamicStyles.videoCard}
-          onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
-        >
-          <Image source={{ uri: video.thumbnail }} style={dynamicStyles.thumbnail} />
-          <View style={dynamicStyles.videoTextWrapper}>
-            <Text numberOfLines={2} style={dynamicStyles.videoTitle}>
-              {video.title}
-            </Text>
-            <Text style={dynamicStyles.videoMeta}>
-              {video.channel} · {video.duration}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+        {videoRecommendations.map((video) => (
+          <TouchableOpacity
+            key={video.id}
+            style={dynamicStyles.videoCard}
+            onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.id}`)}
+          >
+            <Image source={{ uri: video.thumbnail }} style={dynamicStyles.thumbnail} />
+            <View style={dynamicStyles.videoTextWrapper}>
+              <Text numberOfLines={2} style={dynamicStyles.videoTitle}>
+                {video.title}
+              </Text>
+              <Text style={dynamicStyles.videoMeta}>
+                {video.channel} · {video.duration}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
-      <TouchableOpacity style={dynamicStyles.button} onPress={startTimer} disabled={isRunning}>
+      <TouchableOpacity
+        style={dynamicStyles.button}
+        onPress={startTimer}
+        disabled={isRunning}
+      >
         <Text style={dynamicStyles.buttonText}>시 - 작 !</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    backgroundColor: "#0e0033",
   },
 });
