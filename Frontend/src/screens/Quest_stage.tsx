@@ -5,6 +5,7 @@ import Quest_circle from "../components/Darkgreen_circle";
 import questStyles from "../styles/questStyles";
 import questStageStyles from "../styles/questStageStyles";
 import Quest_title from "../components/Quest_title";
+import { useNavigation } from "@react-navigation/native"; 
 
 const { height, width } = Dimensions.get("window");
 
@@ -23,6 +24,7 @@ const lockPositions = [
 
 export default function Quest_stage() {
   const route = useRoute();
+  const navigation = useNavigation(); 
   const { title, subtitle } = route.params as {
     title: string;
     subtitle: string;
@@ -56,7 +58,15 @@ export default function Quest_stage() {
           style={questStageStyles.questTitle}
           onPress={() => {
             console.log("스테이지 터치됨!");
-            // 여기에 네비게이션이나 다른 동작 추가
+      
+            // 🔽 title에 따라 네비게이션 분기
+            if (title === "명상") {
+              navigation.navigate("Quest_meditation" as never);
+            } else if (title === "운동") {
+              navigation.navigate("Quest_exercise" as never);
+            } else {
+              console.warn("알 수 없는 title 값:", title);
+            }
           }}
         />
 
@@ -95,8 +105,16 @@ export default function Quest_stage() {
                 key={index}
                 style={imageStyle}
                 onPress={() => {
-                  console.log("현재 스테이지 터치됨!");
-                  // 여기에 네비게이션이나 다른 동작 추가
+                  console.log("스테이지 터치됨!");
+            
+                  // 🔽 title에 따라 네비게이션 분기
+                  if (title === "명상") {
+                    navigation.navigate("Quest_meditation" as never);
+                  } else if (title === "운동") {
+                    navigation.navigate("Quest_exercise" as never);
+                  } else {
+                    console.warn("알 수 없는 title 값:", title);
+                  }
                 }}
                 activeOpacity={0.8}
               >
