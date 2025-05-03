@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.model.Record
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -298,8 +297,12 @@ class RecordController(
     ): ResponseEntity<ApiResponseDTO<String>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        // 일단 피드백 받도록 표시는 해두는 코드만 추가해둠.
         val feedback = recordFeedbackRepository.findById(id).getOrNull() ?: throw NotFoundException()
+
+        // NullPointerException or IllegalArgumentException could trigger ServletException
+        if (id.isBlank() || request.data.isBlank()) {
+            throw IllegalArgumentException()
+        }
 
         when (feedback.status) {
             RecordFeedbackStatus.QUEUED -> Unit
@@ -308,17 +311,18 @@ class RecordController(
             RecordFeedbackStatus.COMPLETED -> throw AiFeedbackDuplicatedException()
         }
 
-
         feedback.status = RecordFeedbackStatus.PROCESSING
-        recordFeedbackRepository.save(feedback)
+        try {
+            recordFeedbackRepository.save(feedback)
+        } catch (e: Exception) {
+            // Database errors could trigger ServletException
+            throw ServerErrorException()
+        }
 
         // 레코드 테이블의 유져 id나 아니면 사용자 엑세스토큰 조회해서 차감하는 로직만들면 될 것 같고
 
         // request body에 피드백 원하는 내용 담을 수 있도록 만들어놨으니까 그거 이용해서 AI 피드백 받으면 될 듯?
 
-
-
-        // 차감을 요청만하는 거니까 따로 뭔가 밚환할 데이터 값은 없음.
         return ResponseEntity.ok(ApiResponseDTO())
     }
 
