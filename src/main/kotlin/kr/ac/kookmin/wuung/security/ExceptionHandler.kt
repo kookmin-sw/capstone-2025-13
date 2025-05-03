@@ -2,6 +2,7 @@ package kr.ac.kookmin.wuung.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kr.ac.kookmin.wuung.exceptions.CustomException
@@ -15,6 +16,12 @@ import java.io.IOException
 
 @Component
 class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRequestFilter() {
+
+    companion object {
+        private const val ERROR_WRITING_RESPONSE = "Error on Exception Handling!"
+        private const val JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON_VALUE
+    }
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -23,40 +30,45 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
         try {
             filterChain.doFilter(request, response)
         } catch (e: CustomException) {
-            handleCustomException(response, e)
-        } catch (e: org.springframework.security.access.AccessDeniedException) {
-            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
-        } catch (e: org.springframework.security.core.AuthenticationException) {
-            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
-        } catch(e: org.springframework.security.authentication.BadCredentialsException) {
-            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
-        } catch(e: org.springframework.security.authentication.DisabledException) {
-            handleCustomException(response, kr.ac.kookmin.wuung.exceptions.UnauthorizedException())
-        } catch(e: org.springframework.security.authentication.LockedException) {
-            handleCustomException(response, ServerErrorException())
-        } catch(e: HttpServerErrorException.InternalServerError) {
-            handleCustomException(response, ServerErrorException())
+            println("${e.message}, status: ${e.status}")
+            writeErrorResponse(response, e)
         } catch (e: RuntimeException) {
-            handleCustomException(response, ServerErrorException())
+            writeErrorResponse(response, ServerErrorException())
+        } catch(e: ServletException) {
+            val cause = e.cause
+            if (cause is CustomException) {
+                writeErrorResponse(response, cause)
+            } else {
+                writeErrorResponse(response, ServerErrorException())
+            }
+        } catch(e: Exception) {
+            println(e.javaClass.name)
+            println(e.stackTraceToString())
+            writeErrorResponse(response, ServerErrorException())
         }
     }
 
-    private fun handleCustomException(
+    private fun writeErrorResponse(
         response: HttpServletResponse,
         error: CustomException,
     ) {
         response.status = error.status
-        response.contentType = MediaType.APPLICATION_JSON_VALUE
-        val errorResponse = ApiResponseDTO<String>(
-            error = true,
-            message = error.message,
-            code = error.status
-        )
+        response.contentType = JSON_MEDIA_TYPE
+
+        val errorResponse = createErrorResponseDto(error)
 
         try {
             response.writer.write(objectMapper.writeValueAsString(errorResponse))
         } catch(e: IOException) {
-            logger.error("응답 작성 중 오류 발생", e)
+            logger.error(ERROR_WRITING_RESPONSE, e)
         }
+    }
+
+    private fun createErrorResponseDto(error: CustomException): ApiResponseDTO<String> {
+        return ApiResponseDTO(
+            error = true,
+            message = error.message,
+            code = error.status
+        )
     }
 }
