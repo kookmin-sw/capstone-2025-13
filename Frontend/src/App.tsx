@@ -20,13 +20,14 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import { refreshAccessToken } from "./API";
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title:string; subtitle?: string };
+    Quest_stage: { title: string; subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -59,12 +60,33 @@ export default function App() {
     useEffect(() => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem('accessToken');
-            if (token) {
-                setIsLoggedIn(true);
-                setLoading(false);
-            }
+            setIsLoggedIn(!!token);
+            setLoading(false);
         };
         checkToken();
+    }, []);
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const accessToken = await AsyncStorage.getItem("accessToken");
+            const tokenExpiry = await AsyncStorage.getItem("accessTokenExpiry");
+
+            if (accessToken && tokenExpiry) {
+                const expiryTime = new Date(tokenExpiry).getTime();
+                const currentTime = new Date().getTime();
+
+                // 5분 전까지 만료되면 갱신
+                if (expiryTime - currentTime <= 5 * 60 * 1000) {
+                    try {
+                        await refreshAccessToken(); // 토큰 갱신
+                    } catch (error) {
+                        console.error("Token refresh failed", error);
+                    }
+                }
+            }
+        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+
+        return () => clearInterval(interval); // cleanup
     }, []);
 
     const [fontsLoaded] = useFonts({
@@ -87,7 +109,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "HelpCall" : "HelpCall"}
+                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
             >
                 <Stack.Screen
                     name="Home"
