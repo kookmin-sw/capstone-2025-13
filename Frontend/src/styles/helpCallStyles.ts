@@ -1,5 +1,7 @@
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, Dimensions } from "react-native";
 import colors from "../constants/colors";
+
+const { height } = Dimensions.get("window"); // 화면 높이 가져오기
 
 const helpCallStyles = StyleSheet.create({
     container: {
@@ -17,10 +19,10 @@ const helpCallStyles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 10,
         width: "100%",
-        height: "20%",
+        height: height * 0.25, 
         justifyContent: "center",
         zIndex: 10,
-        paddingTop: 40,
+        paddingTop: height * 0.07, 
     },
     headerText: {
         fontWeight: "bold",
@@ -75,13 +77,12 @@ const helpCallStyles = StyleSheet.create({
         padding: 16,
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
     },
-    
     itemTitle: {
         fontSize: 16,
         fontWeight: "600",
     },
     itemPhone: {
-        color: colors.red
+        color: colors.red,
     },
     itemWebsite: {
         color: "blue",
