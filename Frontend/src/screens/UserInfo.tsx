@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Modal } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signOut, userInfoUpdate } from "../API";
-
+import { getUserInfo, signOut, userInfoUpdate } from "../API";
+import userInfoStyles from "../styles/userInfoStyles";
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
 type UserData = {
@@ -12,7 +12,7 @@ type UserData = {
   password: string;
   birthDate: string;
   gender: string;
-  secondPassword: string;
+  secondPassword: number; 
   profilePic: string | null;
 };
 
@@ -23,7 +23,7 @@ export default function UserInfo() {
     password: "password123",
     birthDate: "1990-01-01",
     gender: "남성",
-    secondPassword: "second123",
+    secondPassword: 1234,
     profilePic: null,
   });
 
@@ -32,17 +32,35 @@ export default function UserInfo() {
   const [hasChanges, setHasChanges] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const getGenderLabel = (gender: string | null | undefined): string => {
+    switch (gender) {
+      case "MALE":
+        return "남성";
+      case "FEMALE":
+        return "여성";
+      case "UNKNOWN":
+      default:
+        return "비밀";
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
+      const response = await getUserInfo();
+      console.log("User Info:", response);
+
+      const user = response.data;
+
       const initialData: UserData = {
-        nickname: "홍길동",
-        email: "hong@example.com",
-        password: "password123",
-        birthDate: "1990-01-01",
-        gender: "남성",
-        secondPassword: "second123",
-        profilePic: null,
+        nickname: user.username || "",
+        email: user.email || "",
+        password: user.password || "",
+        birthDate: user.birthDate || "",
+        gender: getGenderLabel(user.gender),
+        secondPassword: Number(await AsyncStorage.getItem("@secondPassword")) || 1111,
+        profilePic: user.profile || null,
       };
+
       setUserData(initialData);
       setOriginalData(initialData);
 
@@ -52,6 +70,20 @@ export default function UserInfo() {
 
     fetchData();
   }, []);
+
+
+  useEffect(() => {
+    const storeSecondPassword = async () => {
+      try {
+        await AsyncStorage.setItem("@secondPassword", userData.secondPassword.toString());
+      } catch (error) {
+        console.error("2차 비밀번호 저장 실패:", error);
+      }
+    };
+
+    storeSecondPassword();
+  }, [userData.secondPassword]);
+
 
   const handleLogout = async () => {
     try {
@@ -140,21 +172,21 @@ export default function UserInfo() {
 
   const renderProfilePic = () => {
     return userData.profilePic ? (
-      <Image source={{ uri: userData.profilePic }} style={styles.avatar} />
+      <Image source={{ uri: userData.profilePic }} style={userInfoStyles.avatar} />
     ) : (
-      <Image source={cloverProfile} style={styles.avatar} />
+      <Image source={cloverProfile} style={userInfoStyles.avatar} />
     );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>My Profile</Text>
-      <View style={styles.whiteBox}>
+    <View style={userInfoStyles.container}>
+      <Text style={userInfoStyles.header}>My Profile</Text>
+      <View style={userInfoStyles.whiteBox}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           {renderProfilePic()}
         </TouchableOpacity>
 
-        <Text style={styles.nickname}>{userData.nickname}</Text>
+        <Text style={userInfoStyles.nickname}>{userData.nickname}</Text>
 
         <InfoRow label="이메일" value={userData.email} editable={false} />
 
@@ -168,17 +200,17 @@ export default function UserInfo() {
 
         <InfoRow label="생년월일" value={userData.birthDate} editable={false} />
 
-        <View style={styles.row}>
-          <Text style={styles.label}>성별</Text>
+        <View style={userInfoStyles.row}>
+          <Text style={userInfoStyles.label}>성별</Text>
           {editMode ? (
-            <View style={styles.genderOptions}>
+            <View style={userInfoStyles.genderOptions}>
               {["여성", "남성", "비밀"].map((g) => (
                 <TouchableOpacity
                   key={g}
                   onPress={() => setUserData({ ...userData, gender: g })}
                   style={[
-                    styles.genderButton,
-                    userData.gender === g && styles.genderSelected,
+                    userInfoStyles.genderButton,
+                    userData.gender === g && userInfoStyles.genderSelected,
                   ]}
                 >
                   <Text>{g}</Text>
@@ -192,15 +224,21 @@ export default function UserInfo() {
 
         <InfoRow
           label="2차 비밀번호"
-          value={userData.secondPassword}
-          onChangeText={(text) => setUserData({ ...userData, secondPassword: text })}
+          value={userData.secondPassword.toString()}
+          onChangeText={(text) => {
+            const numericText = text.replace(/[^0-9]/g, '').slice(0, 4);
+            setUserData({ ...userData, secondPassword: Number(numericText) });
+          }}
           secureTextEntry={!editMode}
           editable={editMode}
+          keyboardType="number-pad"
+          maxLength={4}
         />
 
-        <View style={styles.buttonRow}>
+
+        <View style={userInfoStyles.buttonRow}>
           <TouchableOpacity
-            style={styles.cancelButton}
+            style={userInfoStyles.cancelButton}
             onPress={() => {
               setUserData(originalData as UserData);
               setEditMode(false);
@@ -210,7 +248,7 @@ export default function UserInfo() {
             <Text>취소</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.editButton}
+            style={userInfoStyles.editButton}
             onPress={() => {
               if (editMode) {
                 handleSave();
@@ -222,7 +260,7 @@ export default function UserInfo() {
             <Text>{editMode ? "저장" : "수정"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.logOutButton}
+            style={userInfoStyles.logOutButton}
             onPress={() => handleLogout()}
           >
             <Text>로그아웃</Text>
@@ -236,18 +274,18 @@ export default function UserInfo() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity onPress={handlePickImage} style={styles.button}>
+        <View style={userInfoStyles.modalContainer}>
+          <View style={userInfoStyles.modalContent}>
+            <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
               <Text>갤러리에서 선택</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleTakePhoto} style={styles.button}>
+            <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
               <Text>카메라로 찍기</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleResetProfilePic} style={styles.button}>
+            <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
               <Text>기본 이미지로 설정</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.button}>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
               <Text>닫기</Text>
             </TouchableOpacity>
           </View>
@@ -263,7 +301,10 @@ type InfoRowProps = {
   onChangeText?: (text: string) => void;
   editable?: boolean;
   secureTextEntry?: boolean;
+  keyboardType?: "default" | "number-pad" | "numeric" | "email-address" | "phone-pad";
+  maxLength?: number;
 };
+
 
 function InfoRow({
   label,
@@ -271,120 +312,27 @@ function InfoRow({
   onChangeText,
   editable = true,
   secureTextEntry = false,
+  keyboardType = "default",
+  maxLength = 20,
 }: InfoRowProps) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={userInfoStyles.row}>
+      <Text style={userInfoStyles.label}>{label}</Text>
       {editable ? (
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          style={styles.input}
+          style={userInfoStyles.input}
           secureTextEntry={secureTextEntry}
+          editable={editable}
+          keyboardType={keyboardType}
+          maxLength={maxLength}
         />
+
       ) : (
-        <Text>{secureTextEntry ? "●●●●●●" : value}</Text>
+        <Text>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#4CAF50", justifyContent: "center" },
-  header: {
-    fontSize: 28,
-    textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  whiteBox: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  nickname: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-    width: "100%",
-  },
-  label: { fontSize: 16, color: "#333" },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    width: 200,
-    padding: 5,
-    fontSize: 16,
-  },
-  genderOptions: { flexDirection: "row" },
-  genderButton: {
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-    backgroundColor: "#f0f0f0",
-  },
-  genderSelected: {
-    backgroundColor: "#4CAF50",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-    width: "100%",
-  },
-  cancelButton: {
-    backgroundColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    width: "30%",
-    alignItems: "center",
-  },
-  editButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-    width: "30%",
-    alignItems: "center",
-  },
-  logOutButton: {
-    backgroundColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    width: "30%",
-    alignItems: "center",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  button: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: "#4CAF50",
-    borderRadius: 5,
-    width: 200,
-    alignItems: "center",
-  },
-});
