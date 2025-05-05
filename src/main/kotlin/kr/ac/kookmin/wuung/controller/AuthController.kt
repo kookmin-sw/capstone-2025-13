@@ -35,6 +35,7 @@ import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
@@ -465,6 +466,49 @@ class AuthController(
 
         val user = userRepository.findById(userDetails.id!!).get()
         user.profile = file
+
+        val updatedUser = userRepository.save(user)
+
+        val userDTO = updatedUser.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO))
+    }
+
+    @DeleteMapping("/profile")
+    @Operation(
+        summary = "Delete user profile image",
+        description = """
+            Deletes the user's profile image from S3 storage(or compatible storage)
+            and removes the profile image reference.
+            The response will include the updated user's information with no profile image.
+            This endpoint is protected and requires a valid access token.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully deleted profile image",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing access token",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            )
+        ]
+    )
+    fun deleteProfile(
+        @AuthenticationPrincipal userDetails: User?,
+    ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
+        if (userDetails?.id == null) throw UnauthorizedException()
+
+        profileS3Service.removeProfile(userDetails)
+
+        val user = userRepository.findById(userDetails.id!!).get()
+        user.profile = null
 
         val updatedUser = userRepository.save(user)
 
