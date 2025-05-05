@@ -20,6 +20,9 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import Quest_meditation from "./screens/Quest_meditation";
+import Quest_exercise from "./screens/Quest_exercise";
+
 
 export type RootStackParamList = {
     Home: undefined;
@@ -45,6 +48,8 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
+    Quest_meditation: undefined;
+    Quest_exercise: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -87,7 +92,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "HelpCall" : "HelpCall"}
+                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
             >
                 <Stack.Screen
                     name="Home"
@@ -130,6 +135,16 @@ export default function App() {
                 <Stack.Screen
                     name="Quest_stage"
                     component={Quest_stage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_meditation"
+                    component={Quest_meditation}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_exercise" 
+                    component={Quest_exercise}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
