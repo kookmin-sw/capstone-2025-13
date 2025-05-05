@@ -64,4 +64,10 @@ class JwtAuthenticationFilter(
             bearerToken.substring(7)
         } else null
     }
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val excludePath = listOf("/auth/login", "/auth/register", "/auth/refresh")
+
+        return excludePath.any { request.requestURI.contains(it) }
+    }
 }
