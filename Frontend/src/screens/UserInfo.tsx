@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserInfo, signOut, userInfoUpdate } from "../API";
+import { getUserInfo, putProfileImg, signOut, userInfoUpdate } from "../API";
 import userInfoStyles from "../styles/userInfoStyles";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -110,6 +111,8 @@ export default function UserInfo() {
       Alert.alert("로그아웃 실패", "다시 시도해주세요.");
     }
   };
+
+
   const handleSave = async () => {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
@@ -120,22 +123,31 @@ export default function UserInfo() {
         gender: userData.gender === "남성" ? "MALE" : userData.gender === "여성" ? "FEMALE" : "UNKNOWN",
       };
 
-      // 프로필 이미지 처리
-      let profilePicBlob: Blob | null = null;
-      if (userData.profilePic) {
-        const fileInfo = await fetch(userData.profilePic);
-        profilePicBlob = await fileInfo.blob();
-      }
-
-      // 프로필 이미지와 다른 사용자 데이터를 함께 전달
+      // 기본 정보 업데이트
       const result = await userInfoUpdate(
         transformedUserData.password,
         transformedUserData.nickname,
         transformedUserData.birthDate,
         transformedUserData.gender,
-        // profilePicBlob // Blob 형식으로 변환된 프로필 이미지
       );
 
+      // 프로필 이미지가 있을 경우에만 전송
+      if (userData.profilePic) {
+        const fileUri = userData.profilePic;
+        const fileInfo = await FileSystem.getInfoAsync(fileUri);
+        if (fileInfo.exists) {
+          const profileImage = {
+            uri: fileInfo.uri,
+            name: "profile.jpg",
+            type: "image/jpeg",
+          };
+          await putProfileImg(profileImage);
+        } else {
+          throw new Error("파일을 찾을 수 없습니다");
+        }
+      }
+
+      // 저장 성공 후 처리
       Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
       setOriginalData(userData);
       setEditMode(false);
