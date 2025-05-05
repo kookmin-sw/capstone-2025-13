@@ -89,7 +89,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "HelpCall" : "HelpCall"}
+                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
             >
                 <Stack.Screen
                     name="Home"
