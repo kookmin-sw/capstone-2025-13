@@ -4,6 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserInfo, signOut, userInfoUpdate } from "../API";
 import userInfoStyles from "../styles/userInfoStyles";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
 type UserData = {
@@ -12,7 +15,7 @@ type UserData = {
   password: string;
   birthDate: string;
   gender: string;
-  secondPassword: number; 
+  secondPassword: number;
   profilePic: string | null;
 };
 
@@ -31,7 +34,8 @@ export default function UserInfo() {
   const [originalData, setOriginalData] = useState<UserData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getGenderLabel = (gender: string | null | undefined): string => {
     switch (gender) {
       case "MALE":
@@ -95,6 +99,12 @@ export default function UserInfo() {
       await AsyncStorage.removeItem("accessToken");
       await AsyncStorage.removeItem("refreshToken");
       Alert.alert("로그아웃 완료", "성공적으로 로그아웃되었습니다.");
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "SimpleDiagnosis" }],
+        })
+      )
     } catch (error) {
       console.error("Logout failed:", error);
       Alert.alert("로그아웃 실패", "다시 시도해주세요.");
@@ -103,21 +113,27 @@ export default function UserInfo() {
   const handleSave = async () => {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
-    const transformedUserData = {
-      ...userData,
-      gender:
-        userData.gender === "남성"
-          ? "MALE"
-          : userData.gender === "여성"
-            ? "FEMALE"
-            : "UNKNOWN",
-    };
+
     try {
-      await userInfoUpdate(
+      const transformedUserData = {
+        ...userData,
+        gender: userData.gender === "남성" ? "MALE" : userData.gender === "여성" ? "FEMALE" : "UNKNOWN",
+      };
+
+      // 프로필 이미지 처리
+      let profilePicBlob: Blob | null = null;
+      if (userData.profilePic) {
+        const fileInfo = await fetch(userData.profilePic);
+        profilePicBlob = await fileInfo.blob();
+      }
+
+      // 프로필 이미지와 다른 사용자 데이터를 함께 전달
+      const result = await userInfoUpdate(
         transformedUserData.password,
         transformedUserData.nickname,
         transformedUserData.birthDate,
-        transformedUserData.gender
+        transformedUserData.gender,
+        // profilePicBlob // Blob 형식으로 변환된 프로필 이미지
       );
 
       Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
@@ -131,9 +147,10 @@ export default function UserInfo() {
   };
 
 
+
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       quality: 1,
     });
