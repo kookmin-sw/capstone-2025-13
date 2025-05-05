@@ -105,7 +105,6 @@ export const refreshAccessToken = async () => {
 
 
 export const userInfoUpdate = async (password: string | null, nickname: string | null, birthDate: string | null, gender: string | null) => {
-    console.log("userInfoUpdate called with:", { password, nickname, birthDate, gender });
     try {
     const response = await fetch("https://wuung.mori.space/auth/update", {
       method: "POST",

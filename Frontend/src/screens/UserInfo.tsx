@@ -57,10 +57,10 @@ export default function UserInfo() {
       const user = response.data;
 
       const initialData: UserData = {
-        nickname: user.username || "",
-        email: user.email || "",
-        password: user.password || "",
-        birthDate: user.birthDate || "",
+        nickname: user.username || null,
+        email: user.email || null,
+        password: user.password || null,
+        birthDate: user.birthDate || null,
         gender: getGenderLabel(user.gender),
         secondPassword: Number(await AsyncStorage.getItem("@secondPassword")) || 1111,
         profilePic: user.profile || null,
@@ -94,6 +94,8 @@ export default function UserInfo() {
     try {
       const accessToken = await AsyncStorage.getItem("accessToken");
       const refreshToken = await AsyncStorage.getItem("refreshToken");
+      console.log("Access Token:", accessToken);
+      console.log("Refresh Token:", refreshToken);
       if (accessToken && refreshToken) {
         await signOut(accessToken, refreshToken);
       }
@@ -305,15 +307,21 @@ export default function UserInfo() {
       >
         <View style={userInfoStyles.modalContainer}>
           <View style={userInfoStyles.modalContent}>
-            <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
-              <Text>갤러리에서 선택</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
-              <Text>카메라로 찍기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
-              <Text>기본 이미지로 설정</Text>
-            </TouchableOpacity>
+            {editMode ? (
+              <>
+                <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
+                  <Text>갤러리에서 선택</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
+                  <Text>카메라로 찍기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
+                  <Text>기본 이미지로 설정</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <Text>수정 모드에서만 변경 가능합니다.</Text>
+            )}
             <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
               <Text>닫기</Text>
             </TouchableOpacity>
