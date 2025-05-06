@@ -124,6 +124,12 @@ const userInfoStyles = StyleSheet.create({
     fontSize: width * 0.035,         
     color: "black"               
   },
+  backButton: {
+    position: "absolute",
+    top: height * 0.06,   // 전체 높이의 5% 위치
+    left: width * 0.05,   // 전체 너비의 5% 위치
+    zIndex: 10,
+  },
 });
 
 export default userInfoStyles;

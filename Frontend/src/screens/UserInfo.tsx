@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal, Dimensions } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,6 +9,10 @@ import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 const cloverProfile = require("../assets/Images/cloverProfile.png");
+import { Ionicons } from "@expo/vector-icons";
+
+// 화면 너비와 높이 가져오기
+const { width, height } = Dimensions.get("window");
 
 type UserData = {
   nickname: string;
@@ -210,7 +214,15 @@ export default function UserInfo() {
   };
 
   return (
-    <View style={userInfoStyles.container}>
+
+    <View style={[userInfoStyles.container, { position: "relative" }]}>
+      <TouchableOpacity
+          onPress={() => navigation.navigate("Home")}
+          style={userInfoStyles.backButton}
+        >
+
+          <Ionicons name="arrow-back-circle" size={40} color="#fff" />
+        </TouchableOpacity>
       <Text style={userInfoStyles.header}>My Profile</Text>
       <View style={userInfoStyles.whiteBox}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
