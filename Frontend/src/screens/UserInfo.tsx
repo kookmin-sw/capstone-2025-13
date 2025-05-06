@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal, Dimensions } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,6 +10,10 @@ import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 const cloverProfile = require("../assets/Images/cloverProfile.png");
+import { Ionicons } from "@expo/vector-icons";
+
+// 화면 너비와 높이 가져오기
+const { width, height } = Dimensions.get("window");
 
 type UserData = {
   nickname: string;
@@ -211,7 +215,15 @@ export default function UserInfo() {
   };
 
   return (
-    <View style={userInfoStyles.container}>
+
+    <View style={[userInfoStyles.container, { position: "relative" }]}>
+      <TouchableOpacity
+          onPress={() => navigation.navigate("Home")}
+          style={userInfoStyles.backButton}
+        >
+
+          <Ionicons name="arrow-back-circle" size={40} color="#fff" />
+        </TouchableOpacity>
       <Text style={userInfoStyles.header}>My Profile</Text>
       <View style={userInfoStyles.whiteBox}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -245,12 +257,12 @@ export default function UserInfo() {
                     userData.gender === g && userInfoStyles.genderSelected,
                   ]}
                 >
-                  <Text>{g}</Text>
+                  <Text style={userInfoStyles.buttonText}>{g}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           ) : (
-            <Text>{userData.gender}</Text>
+            <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
           )}
         </View>
 
@@ -277,7 +289,7 @@ export default function UserInfo() {
               setHasChanges(false);
             }}
           >
-            <Text>취소</Text>
+            <Text style={userInfoStyles.buttonText}>취소</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={userInfoStyles.editButton}
@@ -289,13 +301,13 @@ export default function UserInfo() {
               }
             }}
           >
-            <Text>{editMode ? "저장" : "수정"}</Text>
+            <Text style={userInfoStyles.buttonText}>{editMode ? "저장" : "수정"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={userInfoStyles.logOutButton}
             onPress={() => handleLogout()}
           >
-            <Text>로그아웃</Text>
+            <Text style={userInfoStyles.buttonText}>로그아웃</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -311,20 +323,20 @@ export default function UserInfo() {
             {editMode ? (
               <>
                 <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
-                  <Text>갤러리에서 선택</Text>
+                  <Text style={userInfoStyles.buttonText}>갤러리에서 선택</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
-                  <Text>카메라로 찍기</Text>
+                  <Text style={userInfoStyles.buttonText}>카메라로 찍기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
-                  <Text>기본 이미지로 설정</Text>
+                  <Text style={userInfoStyles.buttonText}>기본 이미지로 설정</Text>
                 </TouchableOpacity>
               </>
             ) : (
-              <Text>수정 모드에서만 변경 가능합니다.</Text>
+              <Text style={userInfoStyles.buttonText}>수정 모드에서만 변경 가능합니다.</Text>
             )}
             <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
-              <Text>닫기</Text>
+              <Text style={userInfoStyles.buttonText}>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -368,7 +380,7 @@ function InfoRow({
         />
 
       ) : (
-        <Text>{secureTextEntry ? "●●●●" : value}</Text>
+        <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
   );
