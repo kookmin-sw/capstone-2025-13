@@ -36,9 +36,9 @@ export default function Quest() {
 
         <View style={questStyles.elementsOverlay}>
         {questData.map((quest, index) => {
-  const isLeft = index % 2 === 0;
-  const isFirst = index === 0;
-  const isLast = index === questData.length - 1;
+          const isLeft = index % 2 === 0;
+          const isFirst = index === 0;
+          const isLast = index === questData.length - 1;
 
   return (
     <React.Fragment key={index}>
