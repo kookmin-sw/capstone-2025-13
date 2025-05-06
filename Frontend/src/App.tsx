@@ -20,16 +20,16 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import Calendar from "./screens/Calendar";
 import Quest_meditation from "./screens/Quest_meditation";
 import Quest_exercise from "./screens/Quest_exercise";
-
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title:string; subtitle?: string };
+    Quest_stage: { title: string; subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -48,6 +48,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
+    Calendar: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
 };
@@ -182,6 +183,11 @@ export default function App() {
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Calendar"
+                    component={Calendar}
                     options={{ headerShown: false }}
                 />
 
