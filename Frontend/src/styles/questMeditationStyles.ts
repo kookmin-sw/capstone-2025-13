@@ -32,7 +32,7 @@ const questMeditationStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginBottom: 20,
+    marginBottom: width * 0.01,
   },
   button: {
     borderRadius: 20,
