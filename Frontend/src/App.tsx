@@ -53,7 +53,7 @@ export type RootStackParamList = {
     Calendar: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
-    SecondPassword: undefined;
+    SecondPassword: { nextScreen: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

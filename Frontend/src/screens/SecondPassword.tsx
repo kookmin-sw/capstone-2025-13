@@ -6,12 +6,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 
-export default function SecondPassword() {
+
+export default function SecondPassword({ route }: any) {
     const [password, setPassword] = useState('');
     const [storedPassword, setStoredPassword] = useState('');
+
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+    const { nextScreen } = route.params;
     useEffect(() => {
         const fetchPassword = async () => {
             try {
@@ -30,14 +32,26 @@ export default function SecondPassword() {
 
     useEffect(() => {
         if (password.length === 4) {
-            if (password === storedPassword) {
-                navigation.navigate("Home");
-            } else {
-                Alert.alert("비밀번호가 틀렸습니다.");
-                setPassword('');
-            }
+            const validatePassword = async () => {
+                if (password === storedPassword) {
+                    try {
+                        await AsyncStorage.setItem("secondPasswordPassed", "true");
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: nextScreen }],
+                        });
+                    } catch (error) {
+                        console.error("2차 비밀번호 통과 저장 실패:", error);
+                    }
+                } else {
+                    Alert.alert("비밀번호가 틀렸습니다.");
+                    setPassword('');
+                }
+            };
+            validatePassword();
         }
     }, [password]);
+
 
 
     const handlePress = (number: string) => {
