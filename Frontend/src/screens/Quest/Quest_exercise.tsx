@@ -97,14 +97,7 @@ export default function QuestExercise() {
         bounces={false}
         overScrollMode="never"
       >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          alignSelf: "flex-start",
-          marginTop: width * 0.05,
-        }}
-      >
+      <View style={styles.backButtonWrapper}>
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Quest_stage", {
@@ -115,7 +108,7 @@ export default function QuestExercise() {
         <Ionicons name="arrow-back-circle" size={40} color="#FF6188" />
       </TouchableOpacity>
 
-      <View style={{ marginLeft: 11 }}>
+      <View>
         <Text style={[dynamic.missionTitle, styles.title]}>
           오늘의 미션 🔥
         </Text>

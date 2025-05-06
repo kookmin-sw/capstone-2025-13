@@ -12,12 +12,20 @@ export const styles = StyleSheet.create({
     padding: width * 0.05,
     paddingBottom: width * 0.25,
     },
+    backButtonWrapper: {
+        flexDirection: "row",
+        alignItems: "center",
+        alignSelf: "flex-start",
+        marginTop: width * 0.05,
+     },
     title: {
+    marginLeft: width * 0.04,
     color: '#fff',
     marginTop: width * 0.03,
     fontFamily: fonts.laundryBold,
     },
     mission: {
+    marginLeft: width * 0.04,
     color: '#fff',
     fontWeight: 'bold',
     marginVertical: width * 0.02,
