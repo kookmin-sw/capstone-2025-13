@@ -10,7 +10,6 @@ import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
@@ -39,6 +38,8 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
             if (cause is CustomException) {
                 writeErrorResponse(response, cause)
             } else {
+                println(e.javaClass.name)
+                println(e.stackTraceToString())
                 writeErrorResponse(response, ServerErrorException())
             }
         } catch(e: Exception) {
