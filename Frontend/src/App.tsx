@@ -21,6 +21,7 @@ import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import { refreshAccessToken } from "./API";
+import Calendar from "./screens/Calendar";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -46,6 +47,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
+    Calendar: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -189,6 +191,11 @@ export default function App() {
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Calendar"
+                    component={Calendar}
                     options={{ headerShown: false }}
                 />
 
