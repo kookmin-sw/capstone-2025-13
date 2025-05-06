@@ -33,6 +33,7 @@ jwt:
   refresh-token-validity: 2592000
 etc:
   host: ${HOST_NAME}
+  record-prompt: ${RECORD_PROMPT}
 logging:
   level:
     root: INFO

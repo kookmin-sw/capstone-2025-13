@@ -1,7 +1,14 @@
 package kr.ac.kookmin.wuung.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kr.ac.kookmin.wuung.model.Record
 import kr.ac.kookmin.wuung.service.RecordService
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,15 +17,14 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.media.Content
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.repository.RecordRepository
+import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.launch.JobLauncher
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
@@ -26,16 +32,17 @@ import kr.ac.kookmin.wuung.lib.datetimeParser
 import java.time.LocalDate
 
 data class RecordDTO(
-    val id: Long,
+    val id: String,
     val rate: Int,
     val data: String,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+    val feedbacks: List<RecordFeedbackDTO> = emptyList(),
 )
 
 fun Record.toDTO() = RecordDTO(
-    this.id ?: 0,
-    this.rate ?: 0,
+    this.id ?: "",
+    this.rate,
     this.data ?: "",
     this.createdAt,
     this.updatedAt
@@ -71,8 +78,8 @@ class RecordController(
     ])
     fun getRecordByDate(
         @AuthenticationPrincipal userDetails: User?,
-        @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01")
-        @RequestParam date: String
+        @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01", type = "string")
+        @RequestParam date: String,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
@@ -93,7 +100,7 @@ class RecordController(
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 
-        return ResponseEntity.ok(ApiResponseDTO(data = record.toDTO()))
+        return ResponseEntity.ok(ApiResponseDTO(data = record.toFullDTO()))
     }
 
 
