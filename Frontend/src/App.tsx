@@ -9,8 +9,8 @@ import SignUpStep2 from "./screens/SignUp/SignUpStep2";
 import SimpleDiagnosis from "./screens/SimpleDiagnosis/SimpleDiagnosis";
 import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game/Game";
-import Quest from "./screens/Quest";
-import Quest_stage from "./screens/Quest_stage";
+import Quest from "./screens/Quest/Quest";
+import Quest_stage from "./screens/Quest/Quest_stage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -21,8 +21,8 @@ import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import Calendar from "./screens/Calendar";
-import Quest_meditation from "./screens/Quest_meditation";
-import Quest_exercise from "./screens/Quest_exercise";
+import Quest_meditation from "./screens/Quest/Quest_meditation";
+import Quest_exercise from "./screens/Quest/Quest_exercise";
 
 export type RootStackParamList = {
     Home: undefined;
