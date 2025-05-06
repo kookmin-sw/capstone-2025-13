@@ -58,7 +58,7 @@ export default function Quest() {
           questStyles.elementWrapper,
           {
             alignSelf: isLeft ? "flex-start" : "flex-end",
-            marginTop: isFirst ? height * 0.022 : height * 0.001,
+            marginTop: isFirst ? height * 0.025 : height * 0.01,
           },
         ]}
       >
