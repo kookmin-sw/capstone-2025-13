@@ -95,14 +95,14 @@ export default function Quest_meditation() {
         overScrollMode="never"
       >
       <View
-  style={{
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start", // ← 중요: 왼쪽 정렬
-    marginBottom: 20,
-  }}
->
-      {/* 뒤로 가기 버튼 */}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          alignSelf: "flex-start", // ← 중요: 왼쪽 정렬
+          marginBottom: 20,
+        }}
+      >
+        
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Quest_stage", {
