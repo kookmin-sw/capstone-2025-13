@@ -1,54 +1,68 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from '../constants/fonts';
 
 const { width, height } = Dimensions.get("window");
 
 const userInfoStyles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#4CAF50", justifyContent: "center" },
+  container: {
+    flex: 1,
+    padding: width * 0.05,
+    backgroundColor: "#4CAF50",
+    justifyContent: "center",
+  },
   header: {
-    fontSize: 28,
+    fontSize: width * 0.09,
     textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "bold",
+    marginBottom: height * 0.02,
+    fontFamily: fonts.extraBold,
     color: "#fff",
   },
   whiteBox: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: width * 0.05,
     borderRadius: 10,
     alignItems: "center",
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: (width * 0.25) / 2,
+    marginBottom: height * 0.01,
   },
   nickname: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: width * 0.05,
     textAlign: "center",
-    marginBottom: 10,
+    fontFamily: fonts.extraBold,
+    marginBottom: height * 0.01,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 10,
+    marginVertical: height * 0.015,
     width: "100%",
   },
-  label: { fontSize: 16, color: "#333" },
+  label: {
+    fontSize: width * 0.04,
+    fontFamily: fonts.semiBold,
+    color: "#333",
+  },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    width: 200,
+    width: width * 0.5,
     padding: 5,
-    fontSize: 16,
+    fontFamily: fonts.primary,
+    fontSize: width * 0.04,
   },
-  genderOptions: { flexDirection: "row" },
+  genderOptions: {
+    flexDirection: "row",
+  },
   genderButton: {
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 5,
-    marginHorizontal: 5,
+    marginHorizontal: width * 0.01,
     backgroundColor: "#f0f0f0",
+    fontFamily: fonts.semiBold,
   },
   genderSelected: {
     backgroundColor: "#4CAF50",
@@ -56,26 +70,26 @@ const userInfoStyles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: height * 0.03,
     width: "100%",
   },
   cancelButton: {
     backgroundColor: "#ccc",
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 5,
     width: "30%",
     alignItems: "center",
   },
   editButton: {
     backgroundColor: "#4CAF50",
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 5,
     width: "30%",
     alignItems: "center",
   },
   logOutButton: {
     backgroundColor: "#ccc",
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 5,
     width: "30%",
     alignItems: "center",
@@ -88,19 +102,34 @@ const userInfoStyles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: width * 0.05,
     borderRadius: 10,
     alignItems: "center",
   },
   button: {
-    marginVertical: 10,
-    padding: 10,
+    marginVertical: height * 0.015,
+    padding: width * 0.03,
     backgroundColor: "#4CAF50",
     borderRadius: 5,
-    width: 200,
+    width: width * 0.5,
     alignItems: "center",
   },
+  buttonText: {
+    fontFamily: fonts.semiBold,      
+    fontSize: width * 0.03,         
+    color: "black"               
+  },
+  Text: {
+    fontFamily: fonts.primary,      
+    fontSize: width * 0.035,         
+    color: "black"               
+  },
+  backButton: {
+    position: "absolute",
+    top: height * 0.06,   // 전체 높이의 5% 위치
+    left: width * 0.05,   // 전체 너비의 5% 위치
+    zIndex: 10,
+  },
 });
-
 
 export default userInfoStyles;

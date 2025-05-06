@@ -9,8 +9,8 @@ import SignUpStep2 from "./screens/SignUp/SignUpStep2";
 import SimpleDiagnosis from "./screens/SimpleDiagnosis/SimpleDiagnosis";
 import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game/Game";
-import Quest from "./screens/Quest";
-import Quest_stage from "./screens/Quest_stage";
+import Quest from "./screens/Quest/Quest";
+import Quest_stage from "./screens/Quest/Quest_stage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -20,11 +20,12 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
-import { refreshAccessToken } from "./API";
+import { refreshAccessToken } from "./API/signAPI";
 import Calendar from "./screens/Calendar";
 import Quest_meditation from "./screens/Quest_meditation";
 import Quest_exercise from "./screens/Quest_exercise";
 import SecondPassword from "./screens/SecondPassword";
+
 
 export type RootStackParamList = {
     Home: undefined;
@@ -117,7 +118,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
+                initialRouteName={isLoggedIn ? "Home" : "Quest"}
             >
                 <Stack.Screen
                     name="Home"

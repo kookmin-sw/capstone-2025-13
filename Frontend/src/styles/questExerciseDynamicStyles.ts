@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import fonts from '../constants/fonts';
 
 const { width } = Dimensions.get('window');
 
@@ -18,16 +19,18 @@ export const dynamic = StyleSheet.create({
         fontSize: width * 0.04,
     },
     stepCount: {
-        fontSize: width * 0.12,
+        fontFamily: fonts.laundryBold,
+        fontSize: width * 0.1,
         color: '#fff',
-        fontWeight: 'bold',
     },
     stepGoal: {
-        fontSize: width * 0.04,
+        fontFamily: fonts.laundryBold,
+        fontSize: width * 0.035,
         color: '#ccc',
     },
     buttonText: {
-        fontSize: 16,
+        fontFamily: fonts.laundryBold,
+        fontSize: width * 0.04,
         fontWeight: '600',
         color: '#fff',
     },

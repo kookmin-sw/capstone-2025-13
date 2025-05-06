@@ -1,8 +1,11 @@
 import React, { useState, useRef } from "react";
-import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
-import styles from "../styles/questMeditationStyles";
-import Youtube_playlist from "../components/Youtube_playlist";
-import { dynamic } from '../styles/questMeditaionDynamicStyles';
+import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions, Alert } from "react-native";
+import styles from "../../styles/questMeditationStyles";
+import Youtube_playlist from "../../components/Youtube_playlist";
+import { dynamic } from '../../styles/questMeditaionDynamicStyles';
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+
 
 export default function Quest_meditation() {
   const [timeLeft, setTimeLeft] = useState(30);
@@ -10,6 +13,7 @@ export default function Quest_meditation() {
   const [isMeditationDone, setIsMeditationDone] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { width, height } = useWindowDimensions();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -90,15 +94,64 @@ export default function Quest_meditation() {
         bounces={false}
         overScrollMode="never"
       >
-        <Text style={[styles.missionTitle, dynamic.missionTitle]}>오늘의 미션 🔥</Text>
-        <Text style={[styles.mainText, dynamic.mainText]}>5분 간 명상하기</Text>
-        <Text style={[styles.timerText, dynamic.timerText]}>{formatTime(timeLeft)}</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          alignSelf: "flex-start", // ← 중요: 왼쪽 정렬
+          marginBottom: 20,
+        }}
+      >
+        
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Quest_stage", {
+            title: "명상",
+          });
+        }}
+      >
+        <Ionicons name="arrow-back-circle" size={40} color="#6c63ff" />
+      </TouchableOpacity>
 
-        <Text style={[styles.warningTitle, dynamic.warningTitle]}>명상 타이머는 이렇게 작동해요 🧘🏻‍♀️</Text>
-        <Text style={[styles.description, dynamic.description]}>・ 시작 버튼을 누르면 타이머가 바로 시작돼요.</Text>
-        <Text style={[styles.description, dynamic.description]}>・ 앱을 강제로 종료하면 타이머가 초기화돼요.</Text>
-        <Text style={[styles.description, dynamic.description]}>・ 다른 화면으로 나가면 타이머가 멈춰요.</Text>
-        <Text style={[styles.description, dynamic.description]}>・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌</Text>
+      {/* 텍스트 묶음 */}
+      <View style={{ marginLeft: 12 }}>
+        <Text style={[styles.missionTitle, dynamic.missionTitle]}>
+          오늘의 미션 🔥
+        </Text>
+        <Text style={[styles.mainText, dynamic.mainText]}>
+          5분 간 명상하기
+        </Text>
+      </View>
+    </View>
+
+
+        {/* 타이머와 느낌표 아이콘을 같은 View 안에 배치 */}
+        <View style={{ flexDirection: "row", alignItems: "center", position: "relative" }}>
+          <Text style={[styles.timerText, dynamic.timerText]}>{formatTime(timeLeft)}</Text>
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                "명상 타이머 설명",
+                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌"
+              )
+            }
+            style={{
+              position: "absolute",
+              right: width * 0.001,  // 화면 너비에 비례
+              top: height * 0.01,  // 화면 높이에 비례
+            }}
+          >
+            <Ionicons name="information-circle-outline" size={22} color="red" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.warningTitle, dynamic.warningTitle]}>
+          오늘의 명상 가이드 🧘🏻‍♀️
+        </Text>
+
+        <Text style={[styles.description, dynamic.description]}>・ 자연스럽게 들이쉬고 내쉬는 호흡에 집중하세요. </Text>
+        <Text style={[styles.description, dynamic.description]}>・ 숨이 지나는 감각, 가슴이 움직이는 느낌에 주의해보세요.</Text>
+        <Text style={[styles.description, dynamic.description]}>・ 생각이 떠오르면 판단하지 말고 다시 호흡으로 돌아옵니다</Text>
 
         <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
 
