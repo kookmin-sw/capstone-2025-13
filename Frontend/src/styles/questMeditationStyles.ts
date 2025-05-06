@@ -11,7 +11,7 @@ const questMeditationStyles = StyleSheet.create({
   container: {
     alignItems: "center",
     paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.02,
+    paddingTop: height * 0.03,
   },
   timerText: {
     color: "#fff94f",
@@ -46,14 +46,13 @@ const questMeditationStyles = StyleSheet.create({
     color: "#fff",
     fontSize: width * 0.06,
     alignSelf: "flex-start", // 왼쪽 정렬
-    marginBottom: height * 0.01,
   },
   mainText: {
     fontFamily: fonts.laundryBold,
     color: "#fff",
     fontSize: width * 0.045,
     alignSelf: "flex-start", // 왼쪽 정렬
-    marginBottom: height * 0.015,
+    marginBottom: height * 0.005,
   },
   warningTitle: {
     color: "#fff",
@@ -64,8 +63,8 @@ const questMeditationStyles = StyleSheet.create({
     color: "#ccc",
     fontFamily: fonts.laundry,
     textAlign: "center",
-    fontSize: width * 0.04,
-    marginVertical: height * 0.01,
+    fontSize: width * 0.03,
+    marginVertical: height * 0.005,
   },
   sectionTitle: {
     fontFamily: fonts.laundryBold,
