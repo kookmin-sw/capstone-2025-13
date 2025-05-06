@@ -1,11 +1,11 @@
 import React from "react";
 import { View, ScrollView, Dimensions } from "react-native";
-import Header_sky from "../components/Header_sky";
-import Quest_circle from "../components/Darkgreen_circle";
-import Street from "../components/Street";
-import Street_basic from "../components/Street_basic";
-import questStyles from "../styles/questStyles";
-import Tree from "../components/Tree";
+import Header_sky from "../../components/Header_sky";
+import Quest_circle from "../../components/Darkgreen_circle";
+import Street from "../../components/Street";
+import Street_basic from "../../components/Street_basic";
+import questStyles from "../../styles/questStyles";
+import Tree from "../../components/Tree";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, Dimensions, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ProgressChart } from 'react-native-chart-kit';
-import Youtube_playlist from "../components/Youtube_playlist";
+import Youtube_playlist from "../../components/Youtube_playlist";
 import { Pedometer } from 'expo-sensors';
-import { dynamic } from '../styles/questExerciseDynamicStyles';
-import { styles } from '../styles/questExerciseStyles';
+import { dynamic } from '../../styles/questExerciseDynamicStyles';
+import { styles } from '../../styles/questExerciseStyles';
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const mainVideo = {
   id: "5qap5aO4i9A",
@@ -41,6 +43,7 @@ const exerciseVideos = [
 export default function QuestExercise() {
   const [steps, setSteps] = useState(0);
   const [image, setImage] = useState<string | null>(null);
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -89,9 +92,38 @@ export default function QuestExercise() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={[styles.title, dynamic.missionTitle]}>오늘의 미션 🔥</Text>
-        <Text style={[styles.mission, dynamic.mainText]}>10000걸음 걷기</Text>
+       <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        bounces={false}
+        overScrollMode="never"
+      >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          alignSelf: "flex-start",
+          marginTop: width * 0.05,
+        }}
+      >
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Quest_stage", {
+            title: "운동",
+          });
+        }}
+      >
+        <Ionicons name="arrow-back-circle" size={40} color="#FF6188" />
+      </TouchableOpacity>
+
+      <View style={{ marginLeft: 11 }}>
+        <Text style={[dynamic.missionTitle, styles.title]}>
+          오늘의 미션 🔥
+        </Text>
+        <Text style={[dynamic.mainText, styles.mission]}>
+          10000걸음 걷기
+        </Text>
+      </View>
+    </View>
 
         <View style={styles.chartContainer}>
           <ProgressChart

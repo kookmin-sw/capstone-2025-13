@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
-import { signUp } from "../../API";
+import { signUp } from "../../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;

@@ -13,7 +13,7 @@ import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { Image } from "react-native";
 import helpCallStyles from "../../styles/helpCallStyles";
-import { getCenters } from "../../API";
+import { getCenters } from "../../API/helpcallAPI";
 import Spinner from "../Spinner";
 import MarkerDetailCard from "../../components/MarkerDetailCard";
 import { useNavigation } from "@react-navigation/native";
