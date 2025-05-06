@@ -11,9 +11,10 @@ const userInfoStyles = StyleSheet.create({
     justifyContent: "center",
   },
   header: {
-    fontSize: width * 0.07,
+    fontSize: width * 0.09,
     textAlign: "center",
     marginBottom: height * 0.02,
+    fontFamily: fonts.extraBold,
     color: "#fff",
   },
   whiteBox: {
@@ -31,6 +32,7 @@ const userInfoStyles = StyleSheet.create({
   nickname: {
     fontSize: width * 0.05,
     textAlign: "center",
+    fontFamily: fonts.extraBold,
     marginBottom: height * 0.01,
   },
   row: {
@@ -41,6 +43,7 @@ const userInfoStyles = StyleSheet.create({
   },
   label: {
     fontSize: width * 0.04,
+    fontFamily: fonts.semiBold,
     color: "#333",
   },
   input: {
@@ -48,6 +51,7 @@ const userInfoStyles = StyleSheet.create({
     borderBottomColor: "#ccc",
     width: width * 0.5,
     padding: 5,
+    fontFamily: fonts.primary,
     fontSize: width * 0.04,
   },
   genderOptions: {
@@ -58,6 +62,7 @@ const userInfoStyles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: width * 0.01,
     backgroundColor: "#f0f0f0",
+    fontFamily: fonts.semiBold,
   },
   genderSelected: {
     backgroundColor: "#4CAF50",
@@ -108,6 +113,11 @@ const userInfoStyles = StyleSheet.create({
     borderRadius: 5,
     width: width * 0.5,
     alignItems: "center",
+  },
+  buttonText: {
+    fontFamily: fonts.semiBold,      
+    fontSize: width * 0.04,         
+    color: "#fff"               
   },
 });
 
