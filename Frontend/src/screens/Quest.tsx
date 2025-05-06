@@ -30,7 +30,7 @@ export default function Quest() {
       >
         
         <View style={questStyles.headerWrapper}>
-          <Header_sky title= "퀘스트" subtitle="미션을 완료해보세요!" />
+          <Header_sky title= "퀘스트" subtitle="미션을 완료해보세요!"  screenName="Quest" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
