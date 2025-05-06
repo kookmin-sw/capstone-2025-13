@@ -116,8 +116,13 @@ const userInfoStyles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: fonts.semiBold,      
-    fontSize: width * 0.04,         
-    color: "#fff"               
+    fontSize: width * 0.03,         
+    color: "black"               
+  },
+  Text: {
+    fontFamily: fonts.primary,      
+    fontSize: width * 0.035,         
+    color: "black"               
   },
 });
 

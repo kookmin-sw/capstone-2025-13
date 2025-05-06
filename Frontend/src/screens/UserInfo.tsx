@@ -244,12 +244,12 @@ export default function UserInfo() {
                     userData.gender === g && userInfoStyles.genderSelected,
                   ]}
                 >
-                  <Text>{g}</Text>
+                  <Text style={userInfoStyles.buttonText}>{g}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           ) : (
-            <Text>{userData.gender}</Text>
+            <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
           )}
         </View>
 
@@ -276,7 +276,7 @@ export default function UserInfo() {
               setHasChanges(false);
             }}
           >
-            <Text>취소</Text>
+            <Text style={userInfoStyles.buttonText}>취소</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={userInfoStyles.editButton}
@@ -288,13 +288,13 @@ export default function UserInfo() {
               }
             }}
           >
-            <Text>{editMode ? "저장" : "수정"}</Text>
+            <Text style={userInfoStyles.buttonText}>{editMode ? "저장" : "수정"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={userInfoStyles.logOutButton}
             onPress={() => handleLogout()}
           >
-            <Text>로그아웃</Text>
+            <Text style={userInfoStyles.buttonText}>로그아웃</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -310,20 +310,20 @@ export default function UserInfo() {
             {editMode ? (
               <>
                 <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
-                  <Text>갤러리에서 선택</Text>
+                  <Text style={userInfoStyles.buttonText}>갤러리에서 선택</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
-                  <Text>카메라로 찍기</Text>
+                  <Text style={userInfoStyles.buttonText}>카메라로 찍기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
-                  <Text>기본 이미지로 설정</Text>
+                  <Text style={userInfoStyles.buttonText}>기본 이미지로 설정</Text>
                 </TouchableOpacity>
               </>
             ) : (
-              <Text>수정 모드에서만 변경 가능합니다.</Text>
+              <Text style={userInfoStyles.buttonText}>수정 모드에서만 변경 가능합니다.</Text>
             )}
             <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
-              <Text>닫기</Text>
+              <Text style={userInfoStyles.buttonText}>닫기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -367,7 +367,7 @@ function InfoRow({
         />
 
       ) : (
-        <Text>{secureTextEntry ? "●●●●" : value}</Text>
+        <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
   );
