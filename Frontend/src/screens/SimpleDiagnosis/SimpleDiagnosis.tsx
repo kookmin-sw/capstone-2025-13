@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
-import { signIn } from "../../API";
+import { signIn } from "../../API/signAPI";
 
 type SimpleDiagnosisRouteProp = RouteProp<
     RootStackParamList,

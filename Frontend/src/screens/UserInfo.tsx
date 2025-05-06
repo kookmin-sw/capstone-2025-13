@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Modal } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signOut, userInfoUpdate } from "../API";
+import { signOut } from "../API/signAPI";
+import { userInfoUpdate } from "../API/userInfoAPI";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 

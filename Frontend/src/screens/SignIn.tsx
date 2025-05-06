@@ -15,7 +15,7 @@ import signInStyles from "../styles/signInStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
-import { signIn } from "../API";
+import { signIn } from "../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
