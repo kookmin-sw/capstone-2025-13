@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, Dimensions, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ProgressChart } from 'react-native-chart-kit';
-import Youtube_playlist from "../components/Youtube_playlist";
+import Youtube_playlist from "../../components/Youtube_playlist";
 import { Pedometer } from 'expo-sensors';
-import { dynamic } from '../styles/questExerciseDynamicStyles';
-import { styles } from '../styles/questExerciseStyles';
+import { dynamic } from '../../styles/questExerciseDynamicStyles';
+import { styles } from '../../styles/questExerciseStyles';
 
 const { width } = Dimensions.get('window');
 

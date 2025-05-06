@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions, Alert } from "react-native";
-import styles from "../styles/questMeditationStyles";
-import Youtube_playlist from "../components/Youtube_playlist";
-import { dynamic } from '../styles/questMeditaionDynamicStyles';
+import styles from "../../styles/questMeditationStyles";
+import Youtube_playlist from "../../components/Youtube_playlist";
+import { dynamic } from '../../styles/questMeditaionDynamicStyles';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 

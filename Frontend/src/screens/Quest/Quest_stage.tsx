@@ -1,11 +1,11 @@
 import React from "react";
 import { View, ScrollView, Image, Dimensions, Text, TouchableOpacity } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import Header_sky from "../components/Header_sky"; // Header_sky import
-import Quest_circle from "../components/Darkgreen_circle";
-import questStyles from "../styles/questStyles";
-import questStageStyles from "../styles/questStageStyles";
-import Quest_title from "../components/Quest_title";
+import Header_sky from "../../components/Header_sky"; // Header_sky import
+import Quest_circle from "../../components/Darkgreen_circle";
+import questStyles from "../../styles/questStyles";
+import questStageStyles from "../../styles/questStageStyles";
+import Quest_title from "../../components/Quest_title";
 import { useNavigation } from "@react-navigation/native";
 
 const { height, width } = Dimensions.get("window");
@@ -30,14 +30,14 @@ export default function Quest_stage() {
   return (
     <View style={questStageStyles.container}>
       <ScrollView contentContainerStyle={[questStyles.scrollContainer]} bounces={false} overScrollMode="never">
-        <Image source={require("../assets/Images/stage_street.png")} style={[questStageStyles.street]} resizeMode="contain" />
+        <Image source={require("../../assets/Images/stage_street.png")} style={[questStageStyles.street]} resizeMode="contain" />
         
         <View style={questStyles.headerWrapper}>
           <Header_sky title="" subtitle="" screenName="Quest_stage" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
-        <Image source={require("../assets/Images/goal.png")} style={questStageStyles.goalImage} />
+        <Image source={require("../../assets/Images/goal.png")} style={questStageStyles.goalImage} />
 
         <Quest_title
           text="조용한 마음을 가져봐요."
@@ -70,11 +70,11 @@ export default function Quest_stage() {
           let imageSource;
 
           if (index === currentStageIndex) {
-            imageSource = require("../assets/Images/stage_current.png"); // 🔸 현재 스테이지 이미지
+            imageSource = require("../../assets/Images/stage_current.png"); // 🔸 현재 스테이지 이미지
           } else if (index < currentStageIndex) {
-            imageSource = require("../assets/Images/stage_lock.png");
+            imageSource = require("../../assets/Images/stage_lock.png");
           } else {
-            imageSource = require("../assets/Images/stage_unlock.png");
+            imageSource = require("../../assets/Images/stage_unlock.png");
           }
 
           const imageStyle = [questStageStyles.stage, { top: pos.top, left: pos.left }];
