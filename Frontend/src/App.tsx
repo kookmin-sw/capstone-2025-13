@@ -20,7 +20,7 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
-import { refreshAccessToken } from "./API";
+import { refreshAccessToken } from "./API/signAPI";
 import Calendar from "./screens/Calendar";
 import Quest_meditation from "./screens/Quest/Quest_meditation";
 import Quest_exercise from "./screens/Quest/Quest_exercise";
