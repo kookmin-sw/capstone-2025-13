@@ -22,6 +22,8 @@ import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import { refreshAccessToken } from "./API";
 import Calendar from "./screens/Calendar";
+import Quest_meditation from "./screens/Quest_meditation";
+import Quest_exercise from "./screens/Quest_exercise";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -48,6 +50,8 @@ export type RootStackParamList = {
     HelpCall2: undefined;
     UserInfo: undefined;
     Calendar: undefined;
+    Quest_meditation: undefined;
+    Quest_exercise: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -154,6 +158,16 @@ export default function App() {
                 <Stack.Screen
                     name="Quest_stage"
                     component={Quest_stage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_meditation"
+                    component={Quest_meditation}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_exercise" 
+                    component={Quest_exercise}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

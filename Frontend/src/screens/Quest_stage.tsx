@@ -1,15 +1,16 @@
+import React from "react";
 import { View, ScrollView, Image, Dimensions, Text, TouchableOpacity } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import Header_sky from "../components/Header_sky";
+import Header_sky from "../components/Header_sky"; // Header_sky import
 import Quest_circle from "../components/Darkgreen_circle";
 import questStyles from "../styles/questStyles";
 import questStageStyles from "../styles/questStageStyles";
 import Quest_title from "../components/Quest_title";
+import { useNavigation } from "@react-navigation/native";
 
 const { height, width } = Dimensions.get("window");
 
 const currentStageIndex = 2; // 예: 0부터 시작해서 2까지는 unlock
-
 
 const lockPositions = [
   { top: height * 0.3, left: width * 0.24 },
@@ -23,40 +24,33 @@ const lockPositions = [
 
 export default function Quest_stage() {
   const route = useRoute();
-  const { title, subtitle } = route.params as {
-    title: string;
-    subtitle: string;
-  };
+  const navigation = useNavigation();
+  const { title, subtitle } = route.params as { title: string; subtitle: string };
 
   return (
     <View style={questStageStyles.container}>
-      <ScrollView
-        contentContainerStyle={[questStyles.scrollContainer]}
-        bounces={false}
-        overScrollMode="never"
-      >
-
-        <Image
-          source={require("../assets/Images/stage_street.png")}
-          style={[questStageStyles.street]}
-          resizeMode="contain"
-        />
+      <ScrollView contentContainerStyle={[questStyles.scrollContainer]} bounces={false} overScrollMode="never">
+        <Image source={require("../assets/Images/stage_street.png")} style={[questStageStyles.street]} resizeMode="contain" />
+        
         <View style={questStyles.headerWrapper}>
-          <Header_sky title="" subtitle="" />
+          <Header_sky title="" subtitle="" screenName="Quest_stage" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
-        <Image
-          source={require("../assets/Images/goal.png")}
-          style={questStageStyles.goalImage}
-        />
+        <Image source={require("../assets/Images/goal.png")} style={questStageStyles.goalImage} />
 
         <Quest_title
           text="조용한 마음을 가져봐요."
           style={questStageStyles.questTitle}
           onPress={() => {
             console.log("스테이지 터치됨!");
-            // 여기에 네비게이션이나 다른 동작 추가
+            if (title === "명상") {
+              navigation.navigate("Quest_meditation" as never);
+            } else if (title === "운동") {
+              navigation.navigate("Quest_exercise" as never);
+            } else {
+              console.warn("알 수 없는 title 값:", title);
+            }
           }}
         />
 
@@ -72,7 +66,6 @@ export default function Quest_stage() {
           </View>
         </View>
 
-
         {lockPositions.map((pos, index) => {
           let imageSource;
 
@@ -84,10 +77,7 @@ export default function Quest_stage() {
             imageSource = require("../assets/Images/stage_unlock.png");
           }
 
-          const imageStyle = [
-            questStageStyles.stage,
-            { top: pos.top, left: pos.left},
-          ];
+          const imageStyle = [questStageStyles.stage, { top: pos.top, left: pos.left }];
 
           if (index === currentStageIndex) {
             return (
@@ -95,8 +85,14 @@ export default function Quest_stage() {
                 key={index}
                 style={imageStyle}
                 onPress={() => {
-                  console.log("현재 스테이지 터치됨!");
-                  // 여기에 네비게이션이나 다른 동작 추가
+                  console.log("스테이지 터치됨!");
+                  if (title === "명상") {
+                    navigation.navigate("Quest_meditation" as never);
+                  } else if (title === "운동") {
+                    navigation.navigate("Quest_exercise" as never);
+                  } else {
+                    console.warn("알 수 없는 title 값:", title);
+                  }
                 }}
                 activeOpacity={0.8}
               >
@@ -104,7 +100,7 @@ export default function Quest_stage() {
               </TouchableOpacity>
             );
           }
-        
+
           return (
             <Image
               key={index}
@@ -115,9 +111,7 @@ export default function Quest_stage() {
           );
         })}
 
-      
-      <View style={questStageStyles.scrollBottomSpacer} />
-
+        <View style={questStageStyles.scrollBottomSpacer} />
       </ScrollView>
     </View>
   );
