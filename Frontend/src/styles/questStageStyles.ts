@@ -18,7 +18,7 @@ const questStageStyles = StyleSheet.create({
     zIndex: 3,
   },
   questTitle: {
-    width: width*0.8,
+    width: width*0.7,
     position: "absolute",
     alignSelf: "center",
     zIndex: 3 
