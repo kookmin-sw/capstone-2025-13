@@ -87,22 +87,11 @@ export default function Quest_meditation() {
   return (
     <View style={styles.page}>
       <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { minHeight: height, padding: width * 0.1, paddingBottom: width * 0.25 },
-        ]}
+        contentContainerStyle={[styles.container]}
         bounces={false}
         overScrollMode="never"
       >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          alignSelf: "flex-start", // ← 중요: 왼쪽 정렬
-          marginBottom: 20,
-        }}
-      >
-        
+      <View style={styles.backButtonWrapper}>      
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Quest_stage", {
@@ -113,8 +102,7 @@ export default function Quest_meditation() {
         <Ionicons name="arrow-back-circle" size={40} color="#6c63ff" />
       </TouchableOpacity>
 
-      {/* 텍스트 묶음 */}
-      <View style={{ marginLeft: 12 }}>
+      <View>
         <Text style={[styles.missionTitle, dynamic.missionTitle]}>
           오늘의 미션 🔥
         </Text>
@@ -124,9 +112,7 @@ export default function Quest_meditation() {
       </View>
     </View>
 
-
-        {/* 타이머와 느낌표 아이콘을 같은 View 안에 배치 */}
-        <View style={{ flexDirection: "row", alignItems: "center", position: "relative" }}>
+        <View style={styles.timerWrapper}>
           <Text style={[styles.timerText, dynamic.timerText]}>{formatTime(timeLeft)}</Text>
           <TouchableOpacity
             onPress={() =>
@@ -135,11 +121,7 @@ export default function Quest_meditation() {
                 "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌"
               )
             }
-            style={{
-              position: "absolute",
-              right: width * 0.001,  // 화면 너비에 비례
-              top: height * 0.01,  // 화면 높이에 비례
-            }}
+            style={styles.timerDescription}
           >
             <Ionicons name="information-circle-outline" size={22} color="red" />
           </TouchableOpacity>

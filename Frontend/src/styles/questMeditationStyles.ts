@@ -28,6 +28,12 @@ const questMeditationStyles = StyleSheet.create({
     overflow: "hidden",
     marginVertical: height * 0.02,
   },
+  backButtonWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    marginBottom: 20,
+  },
   button: {
     borderRadius: 20,
     alignSelf: "center",
@@ -42,17 +48,29 @@ const questMeditationStyles = StyleSheet.create({
     fontSize: width * 0.04,
   },
   missionTitle: {
+    marginLeft: width * 0.04,
     fontFamily: fonts.laundryBold,
     color: "#fff",
     fontSize: width * 0.06,
     alignSelf: "flex-start", // 왼쪽 정렬
   },
   mainText: {
+    marginLeft: width * 0.04,
     fontFamily: fonts.laundryBold,
     color: "#fff",
     fontSize: width * 0.045,
     alignSelf: "flex-start", // 왼쪽 정렬
     marginBottom: height * 0.005,
+  },
+  timerWrapper:{
+    flexDirection: "row",
+    alignItems: "center",
+    position: "relative" 
+  },
+  timerDescription: {
+    position: "absolute",
+    right: width * 0.001,
+    top: height * 0.01, 
   },
   warningTitle: {
     color: "#fff",
