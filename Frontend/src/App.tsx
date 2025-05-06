@@ -24,6 +24,7 @@ import { refreshAccessToken } from "./API";
 import Calendar from "./screens/Calendar";
 import Quest_meditation from "./screens/Quest_meditation";
 import Quest_exercise from "./screens/Quest_exercise";
+import SecondPassword from "./screens/SecondPassword";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -52,6 +53,7 @@ export type RootStackParamList = {
     Calendar: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
+    SecondPassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -166,7 +168,7 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                    name="Quest_exercise" 
+                    name="Quest_exercise"
                     component={Quest_exercise}
                     options={{ headerShown: false }}
                 />
@@ -210,6 +212,11 @@ export default function App() {
                 <Stack.Screen
                     name="Calendar"
                     component={Calendar}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="SecondPassword"
+                    component={SecondPassword}
                     options={{ headerShown: false }}
                 />
 

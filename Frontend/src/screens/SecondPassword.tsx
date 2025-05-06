@@ -1,9 +1,44 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import fonts from '../constants/fonts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../App';
 
 export default function SecondPassword() {
     const [password, setPassword] = useState('');
+    const [storedPassword, setStoredPassword] = useState('');
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+    useEffect(() => {
+        const fetchPassword = async () => {
+            try {
+                const saved = await AsyncStorage.getItem("@secondPassword");
+                if (saved) {
+                    setStoredPassword(saved);
+                }
+            } catch (error) {
+                console.error("비밀번호 불러오기 실패:", error);
+            }
+        };
+
+        fetchPassword();
+    }, []);
+
+
+    useEffect(() => {
+        if (password.length === 4) {
+            if (password === storedPassword) {
+                navigation.navigate("Home");
+            } else {
+                Alert.alert("비밀번호가 틀렸습니다.");
+                setPassword('');
+            }
+        }
+    }, [password]);
+
 
     const handlePress = (number: string) => {
         if (password.length < 4) {
