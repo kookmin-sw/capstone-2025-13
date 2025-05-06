@@ -104,13 +104,6 @@ class RecordController(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
                 )]
-            ),
-            ApiResponse(
-                responseCode = "404", description = "Record not found",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
             )
         ]
     )
@@ -118,7 +111,7 @@ class RecordController(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01")
         @RequestParam date: String
-    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+    ): ResponseEntity<ApiResponseDTO<RecordDTO?>> {
         if (userDetails == null) throw UnauthorizedException()
 
         // 요청된 날짜의 시작·끝 시각 계산
@@ -132,15 +125,11 @@ class RecordController(
             startOfDay,
             endOfDay
         )
-
-        if (records.isEmpty()) {
-            throw NotFoundException()
-        }
-
+    
         // 가장 최신 생성 레코드 선택
-        val record = records.maxByOrNull { it.createdAt } ?: throw NotFoundException()
-
-        return ResponseEntity.ok(ApiResponseDTO(data = record.toDTO()))
+        val record = records.maxByOrNull { it.createdAt }?.toDTO()
+    
+        return ResponseEntity.ok(ApiResponseDTO(data = record))
     }
 
     @PutMapping("/create")
