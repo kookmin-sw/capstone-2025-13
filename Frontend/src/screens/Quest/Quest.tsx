@@ -1,15 +1,17 @@
 import React from "react";
-import { View, ScrollView, Dimensions } from "react-native";
+import { View, ScrollView, Dimensions,  Image} from "react-native";
 import Header_sky from "../../components/Header_sky";
 import Quest_circle from "../../components/Darkgreen_circle";
 import Street from "../../components/Street";
 import Street_basic from "../../components/Street_basic";
 import questStyles from "../../styles/questStyles";
 import Tree from "../../components/Tree";
+import styles from "../../styles/homeStyles";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
+
 
 const questData = [
   { title: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
@@ -70,17 +72,23 @@ export default function Quest() {
       </View>
 
       {isLast && (
-        <Street_basic
-          style={[
-            questStyles.street,
-            {
-              top:
-                  height * 0.2 * questData.length -
-                  height * 0.1,
-            },
-          ]}
-        />
+        <>
+          <Street_basic
+            style={[
+              questStyles.street,
+              {
+                top: height * 0.2 * questData.length - height * 0.1,
+              },
+            ]}
+          />
+          <Image
+            source={require("../../assets/Images/clover_good.png")}
+            style={questStyles.clover}
+            resizeMode="contain"
+          />
+        </>
       )}
+
     </React.Fragment>
   );
 })}
