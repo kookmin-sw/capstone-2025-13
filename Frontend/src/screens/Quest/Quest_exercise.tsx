@@ -9,36 +9,37 @@ import { styles } from '../../styles/questExerciseStyles';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const mainVideo = {
-  id: "5qap5aO4i9A",
+  id: "58uXqbAfAVg",  
   title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
 };
 
 const exerciseVideos = [
   {
-    id: "bZkNtE6F3yQ",
+    id: "ohsMB2Whyf4",
     title: "운동 전 듣기 좋은 신나는 음악",
     channel: "Fit Beats",
     duration: "35:12",
-    thumbnail: "https://img.youtube.com/vi/bZkNtE6F3yQ/0.jpg",
+    thumbnail: "https://img.youtube.com/vi/ohsMB2Whyf4/0.jpg",
   },
   {
-    id: "6zD3acN2RfY",
+    id: "fj8ReY0HxWc",
     title: "마음이 차분해지는 피아노 선율 모음",
     channel: "Healing Piano",
     duration: "52:10",
-    thumbnail: "https://img.youtube.com/vi/6zD3acN2RfY/0.jpg",
+    thumbnail: "https://img.youtube.com/vi/fj8ReY0HxWc/0.jpg",
   },
   {
-    id: "hHW1oY26kxQ",
+    id: "X5v7q7p5t1k",
     title: "편안한 재즈로 명상 타임 즐기기",
     channel: "Jazz Relax",
     duration: "45:00",
-    thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/0.jpg",
+    thumbnail: "https://img.youtube.com/vi/X5v7q7p5t1k/0.jpg",
   },
 ];
+
 
 export default function QuestExercise() {
   const [steps, setSteps] = useState(0);
@@ -157,7 +158,7 @@ export default function QuestExercise() {
         </TouchableOpacity>
 
         <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>
-          오늘의 추천 플레이리스트 🎧
+          '우웅'의 추천 플레이리스트 🎧
         </Text>
 
         <Youtube_playlist 

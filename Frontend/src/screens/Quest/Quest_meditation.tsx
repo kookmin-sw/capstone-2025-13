@@ -44,33 +44,34 @@ export default function Quest_meditation() {
   };
 
   const mainVideo = {
-    id: "5qap5aO4i9A",
-    title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
+    id: "FjHGZj2IjBk",
+    title: "하루의 피로를 풀어주는 힐링 음악 모음 | Relaxing Music for a Calm Evening",
   };
+  
 
-  const meditationVideos= [
+  const meditationVideos = [
     {
-      id: "DWcJFNfaw9c",
-      title: "명상과 함께하는 자연 속 음악",
-      channel: "Calm Sound",
-      duration: "1:03:22",
-      thumbnail: "https://img.youtube.com/vi/DWcJFNfaw9c/0.jpg",
+      id: "Yuw8TnTei58",
+      title: "잔잔한 자연의 소리와 함께하는 명상",
+      channel: "Calm Nature",
+      duration: "1:00:00",
+      thumbnail: "https://img.youtube.com/vi/Yuw8TnTei58/0.jpg",
     },
     {
-      id: "6zD3acN2RfY",
-      title: "마음이 차분해지는 피아노 선율 모음",
+      id: "_LVeoEEYN9c",
+      title: "마음을 다스리는 깊은 명상 음악",
+      channel: "Mindful Music",
+      duration: "58:32",
+      thumbnail: "https://img.youtube.com/vi/_LVeoEEYN9c/0.jpg",
+    },
+    {
+      id: "JYPIDIQSvb8",
+      title: "편안한 피아노 선율로 힐링하기",
       channel: "Healing Piano",
-      duration: "52:10",
-      thumbnail: "https://img.youtube.com/vi/6zD3acN2RfY/0.jpg",
+      duration: "47:15",
+      thumbnail: "https://img.youtube.com/vi/JYPIDIQSvb8/0.jpg",
     },
-    {
-      id: "hHW1oY26kxQ",
-      title: "편안한 재즈로 명상 타임 즐기기",
-      channel: "Jazz Relax",
-      duration: "45:00",
-      thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/0.jpg",
-    },
-  ];
+  ];  
 
   const buttonText = isMeditationDone
     ? "완 료 !"
@@ -135,7 +136,7 @@ export default function Quest_meditation() {
         <Text style={[styles.description, dynamic.description]}>・ 숨이 지나는 감각, 가슴이 움직이는 느낌에 주의해보세요.</Text>
         <Text style={[styles.description, dynamic.description]}>・ 생각이 떠오르면 판단하지 말고 다시 호흡으로 돌아옵니다</Text>
 
-        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
+        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>'우웅'의 추천 플레이리스트 🎧</Text>
 
         <Youtube_playlist 
           title="추천 플레이리스트" 
