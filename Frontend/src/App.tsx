@@ -28,6 +28,7 @@ import Calendar from "./screens/Calendar";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
+import Calendar from "./screens/Calendar"
 import Record from "./screens/Record";
 import * as Integrity from "expo-app-integrity"
 import {Alert, Platform} from "react-native";
@@ -63,6 +64,7 @@ export type RootStackParamList = {
     Record: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
+    Calendar: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -218,86 +220,82 @@ function AppInner() {
                         {() => <SignUpStep3 />}
                     </Stack.Screen>
                     <Stack.Screen
-                        name="SimpleDiagnosis"
-                        options={{ headerShown: false }}
-                        component={SimpleDiagnosis}
-                    />
-                    <Stack.Screen name="Game" options={{ headerShown: false }}>
-                        {() => <Game />}
-                    </Stack.Screen>
-                    <Stack.Screen
-                        name="Quest"
-                        component={Quest}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Quest_stage"
-                        component={Quest_stage}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Quest_meditation"
-                        component={Quest_meditation}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Quest_exercise"
-                        component={Quest_exercise}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="FormalDiagnosis" // FormalDiagnosis 화면 추가
-                        component={FormalDiagnosis}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
-                        component={FormalDiagnosisSurvey}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="GameScreen" // GameScreen 화면 추가
-                        component={GameScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="DailyTopic" // DailyTopic 화면 추가
-                        component={DailyTopic}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Spinner" // Spinner 화면 추가
-                        component={Spinner}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="UserInfo"
-                        component={UserInfo}
-                        options={{ headerShown: false }}
-                    />
-
-                    <Stack.Screen
-                        name="Calendar"
-                        component={Calendar}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="Record"
-                        component={Record}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="HelpCall"
-                        component={HelpCall}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="HelpCall2"
-                        component={HelpCall2}
-                        options={{ headerShown: false }}
-                    />
-                </Stack.Navigator>
-            )}
+                    name="SimpleDiagnosis"
+                    options={{ headerShown: false }}
+                    component={SimpleDiagnosis}
+                />
+                <Stack.Screen name="Game" options={{ headerShown: false }}>
+                    {() => <Game />}
+                </Stack.Screen>
+                <Stack.Screen
+                    name="Quest"
+                    component={Quest}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_stage"
+                    component={Quest_stage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_meditation"
+                    component={Quest_meditation}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_exercise"
+                    component={Quest_exercise}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="FormalDiagnosis" // FormalDiagnosis 화면 추가
+                    component={FormalDiagnosis}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
+                    component={FormalDiagnosisSurvey}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="GameScreen" // GameScreen 화면 추가
+                    component={GameScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="DailyTopic" // DailyTopic 화면 추가
+                    component={DailyTopic}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Spinner" // Spinner 화면 추가
+                    component={Spinner}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="UserInfo"
+                    component={UserInfo}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Record"
+                    component={Record}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HelpCall"
+                    component={HelpCall}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
+                    name="HelpCall2" 
+                    component={HelpCall2}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
+                    name="Calendar" 
+                    component={Calendar}
+                    options={{ headerShown: false }} />
+                </Stack.Screen>
+              </Stack.Navigator>
         </NavigationContainer>
     );
 }
