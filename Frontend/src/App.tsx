@@ -12,6 +12,7 @@ import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game/Game";
 import Quest from "./screens/Quest";
 import Quest_stage from "./screens/Quest_stage";
+import Quest_emotion from "./screens/Quest_emotion";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -27,6 +28,7 @@ export type RootStackParamList = {
     SignUpStep1: undefined;
     Quest: undefined;
     Quest_stage: { title:string; subtitle?: string };
+    Quest_emotion: undefined;
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -85,7 +87,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
+                initialRouteName={"Quest_emotion"}
             >
                 <Stack.Screen
                     name="Home"
@@ -128,6 +130,11 @@ export default function App() {
                 <Stack.Screen
                     name="Quest_stage"
                     component={Quest_stage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_emotion"
+                    component={Quest_emotion}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
