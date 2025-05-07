@@ -22,7 +22,7 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/signAPI";
+import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 
 export type RootStackParamList = {
