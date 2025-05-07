@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kr.ac.kookmin.wuung.exceptions.CustomException
 import kr.ac.kookmin.wuung.exceptions.JwtExpiredException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
@@ -45,6 +46,8 @@ class JwtAuthenticationFilter(
                     }
                 SecurityContextHolder.getContext().authentication = authentication
             }
+        } catch (e: CustomException) {
+            throw e
         } catch (e: UsernameNotFoundException) {
             logger.error("User not found: ${e.message}")
             throw UnauthorizedException()

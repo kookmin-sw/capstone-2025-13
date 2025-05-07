@@ -32,8 +32,8 @@ fun main(args: Array<String>) {
 		"GPT_API_KEY" to dotenv["GPT_API_KEY"],
 		"GPT_BASE_URL" to (dotenv["GPT_BASE_URL"]?.let {
 			if (!it.startsWith("http://") && !it.startsWith("https://")) "https://$it" else it
-		} ?: "https://api.openai.com")
-
+		} ?: "https://api.openai.com"),
+		"JWT_ISSUER" to (dotenv["JWT_ISSUER"] ?: "localhost"),
 	)
 
 	runApplication<WuungApplication>(*args) {
