@@ -4,8 +4,8 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "user_records")
-data class Record(
+@Table(name = "topics")
+data class Topic(
     @Id
     @GeneratedValue(strategy =  GenerationType.UUID)
     var id : String? = null,
@@ -23,7 +23,7 @@ data class Record(
     val user: User? = null,
 
     @OneToMany
-    val recordFeedback: MutableList<RecordFeedback> = mutableListOf(),
+    val topicFeedback: MutableList<TopicFeedback> = mutableListOf(),
 
     @Column(nullable = false)
     val createdAt : LocalDateTime = LocalDateTime.now(),

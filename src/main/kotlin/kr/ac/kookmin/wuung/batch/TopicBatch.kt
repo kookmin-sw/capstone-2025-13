@@ -1,12 +1,10 @@
 package kr.ac.kookmin.wuung.batch
 
 import groovy.util.logging.Slf4j
-import kr.ac.kookmin.wuung.config.ChatClientConfig
-import kr.ac.kookmin.wuung.model.RecordFeedback
+import kr.ac.kookmin.wuung.model.TopicFeedback
 import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
-import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
+import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.ai.chat.client.ChatClient
-import org.springframework.ai.chat.prompt.Prompt
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.job.builder.JobBuilder
@@ -24,8 +22,8 @@ import org.springframework.transaction.PlatformTransactionManager
 
 @Slf4j
 @Configuration
-class RecordBatch(
-    @Autowired private val recordFeedbackRepository: RecordFeedbackRepository,
+class TopicBatch(
+    @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
     @Autowired private val chatClient: ChatClient,
     @Autowired private val recordPrompt: String
 ) {
@@ -34,31 +32,31 @@ class RecordBatch(
     }
 
     @Bean
-    fun recordJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
-        return JobBuilder("recordJob", jobRepository)
-            .start(processRecordsStep(
+    fun topicJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
+        return JobBuilder("topicJob", jobRepository)
+            .start(processTopicStep(
                 jobRepository, transactionManager
             ))
             .build()
     }
 
     @Bean
-    fun processRecordsStep(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Step {
-        return StepBuilder("processRecordStep", jobRepository)
-            .chunk<RecordFeedback, RecordFeedback>(CHUNK_SIZE, transactionManager)
-            .reader(recordFeedbackReader())
-            .processor(recordFeedbackProcessor())
-            .writer(recordFeedbackWriter())
+    fun processTopicStep(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Step {
+        return StepBuilder("processTopicStep", jobRepository)
+            .chunk<TopicFeedback, TopicFeedback>(CHUNK_SIZE, transactionManager)
+            .reader(topicFeedbackReader())
+            .processor(topicFeedbackProcessor())
+            .writer(topicFeedbackWriter())
             .build()
     }
 
     @Bean
-    fun recordFeedbackReader(): RepositoryItemReader<RecordFeedback> {
+    fun topicFeedbackReader(): RepositoryItemReader<TopicFeedback> {
         val sortKeys = hashMapOf("createdAt" to Sort.Direction.ASC)
 
-        return RepositoryItemReaderBuilder<RecordFeedback>()
+        return RepositoryItemReaderBuilder<TopicFeedback>()
             .name("recordFeedbackReader")
-            .repository(recordFeedbackRepository)
+            .repository(topicFeedbackRepository)
             .methodName("findRecordFeedbacksByStatus")
             .arguments(listOf(RecordFeedbackStatus.QUEUED))
             .sorts(sortKeys)
@@ -67,7 +65,7 @@ class RecordBatch(
     }
 
     @Bean
-    fun recordFeedbackProcessor(): ItemProcessor<RecordFeedback, RecordFeedback> {
+    fun topicFeedbackProcessor(): ItemProcessor<TopicFeedback, TopicFeedback> {
         return ItemProcessor { record ->
             val prompt = recordPrompt.trimIndent()
 
@@ -80,14 +78,14 @@ class RecordBatch(
                 return@ItemProcessor record
             }
 
-            val previousData = record.record?.recordFeedback?.filter {
+            val previousData = record.topic?.topicFeedback?.filter {
                 it.status == RecordFeedbackStatus.COMPLETED
             }?.map {
                 Pair(it.data ?: "", it.aiFeedback ?: "")
             }
 
             val data = """
-                주제: ${record.record?.data ?: ""}
+                주제: ${record.topic?.data ?: ""}
                 이전 대화 기록:
                 ${previousData?.joinToString("\n") {
                     "유저: ${it.first}\n" +
@@ -112,7 +110,7 @@ class RecordBatch(
     }
 
     @Bean
-    fun recordFeedbackWriter(): ItemWriter<RecordFeedback> {
+    fun topicFeedbackWriter(): ItemWriter<TopicFeedback> {
         return ItemWriter { items ->
             // 처리 완료 후 DB 업데이트, 로그 기록 등 필요한 로직 구현
             // 예시로 단순 로그 출력
