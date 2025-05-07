@@ -19,7 +19,7 @@ import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import UserInfo from "./screens/UserInfo";
-
+import Record from "./screens/Record";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -43,6 +43,7 @@ export type RootStackParamList = {
     DailyTopic: undefined;
     Spinner: undefined;
     UserInfo: undefined;
+    Record: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,10 +54,9 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [loading, setLoading] = useState(true);
 
-
     useEffect(() => {
         const checkToken = async () => {
-            const token = await AsyncStorage.getItem('accessToken');
+            const token = await AsyncStorage.getItem("accessToken");
             if (token) {
                 setIsLoggedIn(true);
                 setLoading(false);
@@ -153,14 +153,18 @@ export default function App() {
                 <Stack.Screen
                     name="Spinner" // Spinner 화면 추가
                     component={Spinner}
-                    options={{ headerShown: false }} />
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
                     options={{ headerShown: false }}
                 />
-
-
+                <Stack.Screen
+                    name="Record"
+                    component={Record}
+                    options={{ headerShown: false }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
