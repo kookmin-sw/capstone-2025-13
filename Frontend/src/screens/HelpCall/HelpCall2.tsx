@@ -100,7 +100,7 @@ export default function HelpCall2() {
                     onPress={() => {
                     navigation.navigate("HelpCall")}}
                 >
-                <Ionicons name="arrow-back-circle" size={40} color="green" />
+                <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
                 </TouchableOpacity>
                 <Text style={helpCallStyles.headerText}>전화번호</Text>
                 <ScrollView

@@ -143,7 +143,7 @@ export default function HelpCall() {
                             onPress={() => {
                             navigation.navigate("Home")}}
                         >
-                            <Ionicons name="arrow-back-circle" size={40} color="green" />
+                            <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
                         </TouchableOpacity>
 
 
