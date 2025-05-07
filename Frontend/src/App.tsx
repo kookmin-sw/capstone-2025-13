@@ -22,8 +22,8 @@ import UserInfo from "./screens/UserInfo";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import { refreshAccessToken } from "./API/signAPI";
 import Calendar from "./screens/Calendar";
-import Quest_meditation from "./screens/Quest_meditation";
-import Quest_exercise from "./screens/Quest_exercise";
+import Quest_meditation from "./screens/Quest/Quest_meditation";
+import Quest_exercise from "./screens/Quest/Quest_exercise";
 import SecondPassword from "./screens/SecondPassword";
 
 
