@@ -18,8 +18,8 @@ enum class RecordFeedbackStatus(val value: Short) {
 }
 
 @Entity
-@Table(name = "user_record_feedback")
-data class RecordFeedback(
+@Table(name = "topic_feedback")
+data class TopicFeedback(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: String? = null,
@@ -37,7 +37,7 @@ data class RecordFeedback(
     var comment : String? = null,
 
     @ManyToOne
-    val record: Record? = null,
+    val topic: Topic? = null,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kr.ac.kookmin.wuung.model.Record
+import kr.ac.kookmin.wuung.model.Topic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,7 +20,7 @@ import kr.ac.kookmin.wuung.exceptions.*
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
-import kr.ac.kookmin.wuung.repository.RecordRepository
+import kr.ac.kookmin.wuung.repository.TopicRepository
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import kr.ac.kookmin.wuung.model.User
@@ -28,10 +28,10 @@ import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.ConfigurationKey
-import kr.ac.kookmin.wuung.model.RecordFeedback
 import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
+import kr.ac.kookmin.wuung.model.TopicFeedback
 import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
-import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
+import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
 import org.springframework.web.bind.annotation.PathVariable
@@ -57,7 +57,7 @@ data class RecordDTO(
     val feedbacks: List<RecordFeedbackDTO> = emptyList(),
 )
 
-fun Record.toDTO() = RecordDTO(
+fun Topic.toDTO() = RecordDTO(
     this.id ?: "",
     this.rate,
     this.data ?: "",
@@ -65,13 +65,13 @@ fun Record.toDTO() = RecordDTO(
     this.updatedAt
 )
 
-fun Record.toFullDTO() = RecordDTO(
+fun Topic.toFullDTO() = RecordDTO(
     this.id ?: "",
     this.rate,
     this.data ?: "",
     this.createdAt,
     this.updatedAt,
-    this.recordFeedback.map { it.toDTO() }
+    this.topicFeedback.map { it.toDTO() }
 )
 
 data class RecordFeedbackRequest(
@@ -98,7 +98,7 @@ data class RecordFeedbackDTO(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
-fun RecordFeedback.toDTO() = RecordFeedbackDTO(
+fun TopicFeedback.toDTO() = RecordFeedbackDTO(
     this.id,
     this.aiFeedback,
     this.comment,
@@ -122,31 +122,31 @@ data class UpdateFeedbackRequest(
 )
 
 @RestController
-@RequestMapping("/record")
+@RequestMapping("/topic")
 @Tag(
     name = "Record API", description = """
-    [en] API endpoints for managing daily records and their AI-generated feedback
-    [ko] 일일 기록 및 AI 생성 피드백을 관리하기 위한 API 엔드포인트
+    [en] API endpoints for managing daily topics and their AI-generated feedback
+    [ko] 1일 1주제 기록 및 AI 생성 피드백을 관리하기 위한 API 엔드포인트
 """
 )
-class RecordController(
-    @Autowired private val recordRepository: RecordRepository,
-    @Autowired private val recordFeedbackRepository: RecordFeedbackRepository,
+class TopicController(
+    @Autowired private val topicRepository: TopicRepository,
+    @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
     @Autowired private val jobLauncher: JobLauncher,
-    @Autowired private val recordJob: Job,
+    @Autowired private val topicJob: Job,
     private val configurationsRepository: ConfigurationsRepository,
 ) {
     @GetMapping("/me")
     @Operation(
-        summary = "Get record information for a specific date", description = """
-        [en] Retrieves the most recent record for a specific date, including record ID, emotional rate, and content data. Defaults to the current date if no date is specified.
+        summary = "Get topic information for a specific date", description = """
+        [en] Retrieves the most recent topic for a specific date, including topic ID, emotional rate, and content data. Defaults to the current date if no date is specified.
         [ko] 특정 날짜의 가장 최근 기록을 조회합니다. 기록 ID, 감정 수치, 내용 데이터를 포함합니다. 기본 값은 오늘 입니다.
     """
     )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get record successfully",
+                responseCode = "200", description = "Get topic successfully",
                 useReturnTypeSchema = true
             ),
             ApiResponse(
@@ -171,28 +171,28 @@ class RecordController(
         val endOfDay: LocalDateTime = targetDate.atTime(23, 59, 59)
 
         // JPA 메서드로 날짜 범위 내 레코드 조회
-        val records: List<Record> = recordRepository.findByUserAndCreatedAtBetween(
+        val topics: List<Topic> = topicRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startOfDay,
             endOfDay
         )
     
         // 가장 최신 생성 레코드 선택
-        val record = records.maxByOrNull { it.createdAt } ?: throw NotFoundException()
+        val topic = topics.maxByOrNull { it.createdAt } ?: throw NotFoundException()
 
-        return ResponseEntity.ok(ApiResponseDTO(data = record.toFullDTO()))
+        return ResponseEntity.ok(ApiResponseDTO(data = topic.toFullDTO()))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     @PutMapping("/create")
-    @Operation(summary = "Create new record", description = """
-        [en] Creates a new daily record with emotional rate and content. Only one record per day is allowed. Requires valid access token in Authorization header
+    @Operation(summary = "Create new topic", description = """
+        [en] Creates a new daily topic with emotional rate and content. Only one topic per day is allowed. Requires valid access token in Authorization header
         [ko] 감정 수치와 내용이 포함된 새로운 일일 기록을 생성합니다. 하루에 한 개의 기록만 허용됩니다. Authorization 헤더에 유효한 접근 토큰이 필요합니다
     """)
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Create record successfully",
+                responseCode = "200", description = "Create topic successfully",
                 useReturnTypeSchema = true,
             ),
             ApiResponse(
@@ -221,14 +221,14 @@ class RecordController(
         val endOfDay = today.atTime(23, 59, 59)
 
         // 레코드 하루에 한 개 이상 생성하는 거 방지하려고 추가
-        val existingRecords = recordRepository.findByUserAndCreatedAtBetween(
+        val existingRecords = topicRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startOfDay,
             endOfDay
         )
         if (existingRecords.isNotEmpty()) throw RecordAlreadyCreatedException()
 
-        val weekRecords = recordRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+        val weekRecords = topicRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
             userDetails,
             today.minusDays(7).atStartOfDay(),
             endOfDay,
@@ -237,19 +237,19 @@ class RecordController(
         if(dailyQuestions.isEmpty()) throw NotFoundException()
 
         val dailyQuestionWithoutDuplication = dailyQuestions
-            .filter { !weekRecords.map { record -> record.innerSeq }.contains(it.innerSeq) }
+            .filter { !weekRecords.map { topic -> topic.innerSeq }.contains(it.innerSeq) }
 
         if (dailyQuestionWithoutDuplication.isEmpty()) throw NotFoundException()
 
         val selectedQuestion = dailyQuestionWithoutDuplication.random()
 
 
-        val record = Record(
+        val topic = Topic(
             data = selectedQuestion.value,
             innerSeq = selectedQuestion.innerSeq,
             user = userDetails
         )
-        val saved = recordRepository.save(record)
+        val saved = topicRepository.save(topic)
 
         GlobalScope.launch {
             runJob()
@@ -258,18 +258,18 @@ class RecordController(
         return ResponseEntity.ok(ApiResponseDTO(data = saved.toDTO()))
     }
 
-    @PostMapping("/modify/{recordId}")
+    @PostMapping("/modify/{topicId}")
     @Operation(
-        summary = "Modify existing record information",
+        summary = "Modify existing topic information",
         description = """
-            [en] Updates the emotional rate and content data of an existing record. Only the record owner can modify their records
+            [en] Updates the emotional rate and content data of an existing topic. Only the topic owner can modify their topics
             [ko] 기존 기록의 감정 수치와 내용을 수정합니다. 기록 소유자만 수정할 수 있습니다
         """
     )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Update record successfully",
+                responseCode = "200", description = "Update topic successfully",
                 useReturnTypeSchema = true
             ),
             ApiResponse(
@@ -291,28 +291,71 @@ class RecordController(
     fun modifyRecord(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: RecordUpdateRequest,
-        @PathVariable recordId: String,
+        @PathVariable topicId: String,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
-        if (record.user?.id != userDetails.id) throw UnauthorizedException()
+        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
+        if (topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val latestFeedback = record.recordFeedback.maxByOrNull { it.createdAt }
+        val latestFeedback = topic.topicFeedback.maxByOrNull { it.createdAt }
         if(latestFeedback == null) throw NotFoundException()
 
-        record.rate = request.rate
+        topic.rate = request.rate
         latestFeedback.comment = request.data
         // updatedAt은 @PreUpdate로 자동 갱신
 
-        return ResponseEntity.ok(ApiResponseDTO(data = record.toFullDTO()))
+        return ResponseEntity.ok(ApiResponseDTO(data = topic.toFullDTO()))
+    }
+
+    @PutMapping("/feedback")
+    @Operation(
+        summary = "Create new feedback topic", description = """
+        [en] Initializes a new empty feedback topic associated with an existing daily topic. This is the first step in the AI feedback process
+        [ko] 기존 일일 기록에 연결된 새로운 빈 피드백 기록을 초기화합니다. AI 피드백 프로세스의 첫 단계입니다
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Create feedback topic successfully",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "401", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404", description = "Record not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun createFeedback(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestParam topicId: String
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
+        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
+        val feedback = TopicFeedback(topic = topic)
+        val saved = topicFeedbackRepository.save(feedback)
+        return ResponseEntity.ok(ApiResponseDTO(data = saved.id))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    @PutMapping("/feedback/{recordId}")
+    @PutMapping("/feedback/{topicId}")
     @Operation(
         summary = "Request AI feedback", description = """
-        [en] Initiates an AI feedback request for a specific record. The feedback process runs asynchronously and updates the feedback status accordingly
+        [en] Initiates an AI feedback request for a specific topic. The feedback process runs asynchronously and updates the feedback status accordingly
         [ko] 특정 기록에 대한 AI 피드백 요청을 시작합니다. 피드백 프로세스는 비동기적으로 실행되며 피드백 상태가 그에 따라 업데이트됩니다
     """
     )
@@ -330,7 +373,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Feedback record not found",
+                responseCode = "404", description = "Feedback topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -361,25 +404,25 @@ class RecordController(
     )
     fun updateFeedbackStatus(
         @AuthenticationPrincipal userDetails: User?,
-        @PathVariable recordId: String,
+        @PathVariable topicId: String,
         @RequestBody request: RecordFeedbackRequest,
     ): ResponseEntity<ApiResponseDTO<String>> {
         if (userDetails == null) throw UnauthorizedException()
 
         // NullPointerException or IllegalArgumentException could trigger ServletException
-        if (recordId.isBlank() || request.data.isBlank()) {
+        if (topicId.isBlank() || request.data.isBlank()) {
             throw IllegalArgumentException()
         }
 
-        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
 
-        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+        if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val feedbackNum = record.recordFeedback.size
+        val feedbackNum = topic.topicFeedback.size
 
         if(feedbackNum >= 5) throw LimitReachedException()
 
-        val lastFeedback = record.recordFeedback.lastOrNull()
+        val lastFeedback = topic.topicFeedback.lastOrNull()
 
         if (lastFeedback != null) when (lastFeedback.status) {
             RecordFeedbackStatus.QUEUED -> AiFeedbackNotCompleteException()
@@ -388,13 +431,13 @@ class RecordController(
             RecordFeedbackStatus.COMPLETED -> Unit
         }
 
-        val feedback = RecordFeedback(
-            record = record,
+        val feedback = TopicFeedback(
+            topic = topic,
             data = request.data,
             status = RecordFeedbackStatus.QUEUED,
         )
-        record.recordFeedback.add(feedback)
-        recordFeedbackRepository.save(feedback)
+        topic.topicFeedback.add(feedback)
+        topicFeedbackRepository.save(feedback)
 
         GlobalScope.launch {
             runJob()
@@ -407,17 +450,17 @@ class RecordController(
         )
     }
 
-    @GetMapping("/{recordId}")
+    @GetMapping("/{topicId}")
     @Operation(
-        summary = "Get all feedback record", description = """
-        [en] Retrieves all completed AI feedback records associated with a specific record. Only shows feedback with COMPLETED status
+        summary = "Get all feedback topic", description = """
+        [en] Retrieves all completed AI feedback topics associated with a specific topic. Only shows feedback with COMPLETED status
         [ko] 특정 기록과 관련된 모든 완료된 AI 피드백 기록을 조회합니다. COMPLETED 상태의 피드백만 표시됩니다
     """
     )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get feedback records successfully",
+                responseCode = "200", description = "Get feedback topics successfully",
                 useReturnTypeSchema = true
             ),
             ApiResponse(
@@ -438,15 +481,15 @@ class RecordController(
     )
     fun getFeedbacks(
         @AuthenticationPrincipal userDetails: User?,
-        @PathVariable recordId: String,
+        @PathVariable topicId: String,
     ): ResponseEntity<ApiResponseDTO<List<RecordFeedbackDTO>>> {
 
         if (userDetails == null) throw UnauthorizedException()
-        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
 
-        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+        if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val feedbacks = record.recordFeedback.filter { it.status == RecordFeedbackStatus.COMPLETED }
+        val feedbacks = topic.topicFeedback.filter { it.status == RecordFeedbackStatus.COMPLETED }
 
         if (feedbacks.isEmpty()) throw NotFoundException()
 
@@ -455,17 +498,17 @@ class RecordController(
         }))
     }
 
-    @GetMapping("/feedback/{recordFeedbackId}")
+    @GetMapping("/feedback/{topicFeedbackId}")
     @Operation(
-        summary = "Get feedback record", description = """
-        [en] Retrieves detailed information about a specific feedback record, including AI feedback content and user comments
+        summary = "Get feedback topic", description = """
+        [en] Retrieves detailed information about a specific feedback topic, including AI feedback content and user comments
         [ko] 특정 피드백 기록의 상세 정보를 조회합니다. AI 피드백 내용과 사용자 댓글을 포함합니다
     """
     )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get feedback record successfully",
+                responseCode = "200", description = "Get feedback topic successfully",
                 useReturnTypeSchema = true
             ),
             ApiResponse(
@@ -476,7 +519,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Feedback record not found",
+                responseCode = "404", description = "Feedback topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -500,12 +543,12 @@ class RecordController(
     )
     fun getFeedback(
         @AuthenticationPrincipal userDetails: User?,
-        @PathVariable recordFeedbackId: String,
+        @PathVariable topicFeedbackId: String,
     ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
         if (userDetails == null) throw UnauthorizedException()
-        val feedback = recordFeedbackRepository.findById(recordFeedbackId).getOrNull() ?: throw NotFoundException()
+        val feedback = topicFeedbackRepository.findById(topicFeedbackId).getOrNull() ?: throw NotFoundException()
 
-        if(feedback.record?.user?.id != userDetails.id) throw UnauthorizedException()
+        if(feedback.topic?.user?.id != userDetails.id) throw UnauthorizedException()
 
         when (feedback.status) {
             RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
@@ -522,10 +565,10 @@ class RecordController(
     }
 
 
-    @PostMapping("/feedback/{recordId}")
+    @PostMapping("/feedback/{topicId}")
     @Operation(
-        summary = "Update feedback record", description = """
-        [en] Updates the data and user comments of a completed feedback record. Only the record owner can update their records feedbacks. Only applies to COMPLETED feedback records.
+        summary = "Update feedback topic", description = """
+        [en] Updates the data and user comments of a completed feedback topic. Only the topic owner can update their topics feedbacks. Only applies to COMPLETED feedback topics.
         [ko] 완료된 피드백 기록의 데이터와 사용자 댓글을 업데이트합니다. 레코드의 주인만 레코드의 피드백을 수정할 수 있습니다. 마지막 요청이 COMPLETED 상태인 피드백에만 적용 가능합니다.
     """
     )
@@ -543,7 +586,7 @@ class RecordController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Feedback record not found",
+                responseCode = "404", description = "Feedback topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -567,16 +610,16 @@ class RecordController(
     )
     fun updateFeedback(
         @AuthenticationPrincipal userDetails: User?,
-        @PathVariable recordId: String,
+        @PathVariable topicId: String,
         @RequestBody request: UpdateFeedbackRequest,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
+        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
 
-        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+        if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val feedback = record.recordFeedback.lastOrNull() ?: throw NotFoundException()
+        val feedback = topic.topicFeedback.lastOrNull() ?: throw NotFoundException()
 
         when (feedback.status) {
             RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
@@ -587,12 +630,12 @@ class RecordController(
 
         // 데이터 업데이트
         feedback.comment = request.comment
-        record.rate = request.rate
+        topic.rate = request.rate
 
-        recordFeedbackRepository.save(feedback)
+        topicFeedbackRepository.save(feedback)
 
         return ResponseEntity.ok(ApiResponseDTO(
-            data = record.toFullDTO()
+            data = topic.toFullDTO()
         ))
     }
 
@@ -602,11 +645,11 @@ class RecordController(
             .toJobParameters()
 
         try {
-            jobLauncher.run(recordJob, jobParameters)
+            jobLauncher.run(topicJob, jobParameters)
         } catch (e: JobInstanceAlreadyCompleteException) {
             // Job already running, wait and retry
             Thread.sleep(1000L)
-            jobLauncher.run(recordJob, jobParameters)
+            jobLauncher.run(topicJob, jobParameters)
         }
     }
 }
