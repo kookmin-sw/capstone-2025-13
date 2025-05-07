@@ -22,6 +22,7 @@ java {
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/milestone") }
+	google()
 }
 
 extra["springAiVersion"] = "1.0.0-M4"
@@ -66,6 +67,12 @@ dependencies {
 	implementation("org.springframework.ai:spring-ai-core:${property("springAiVersion")}")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
+	// Google Play Integrity API 클라이언트 라이브러리
+	implementation("com.google.android.play:integrity:1.4.0")
+
+	// HTTP 클라이언트
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

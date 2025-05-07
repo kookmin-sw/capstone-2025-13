@@ -25,6 +25,11 @@ import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
 
+import * as Integrity from "expo-app-integrity"
+import {Alert, Platform} from "react-native";
+import {verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
+
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
@@ -58,6 +63,37 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
     // 하드코딩된 로그인 상태
+
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState(false);
+
+    useEffect(() => {
+        const checkIntegrity = async () => {
+            try {
+                if (__DEV__) {
+                    console.log('Development build - skipping integrity check');
+                    setIsIntegrityVerified(true);
+                    return;
+                }
+
+                const result = await verifyDeviceIntegrity();
+
+                if(result.isValid) {
+                    console.log('Device integrity verified');
+                    setIsIntegrityVerified(true);
+                } else {
+                    console.error('Integrity verification failed: ', result.message)
+                }
+            } catch (error: any) {
+                console.error('Integrity check error:', error);
+            }
+        };
+
+        checkIntegrity();
+    }, []);
+
+    if(!isIntegrityVerified) {
+        return <RestrictedAccessScreen />;
+    }
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [loading, setLoading] = useState(true);

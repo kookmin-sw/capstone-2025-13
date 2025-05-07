@@ -17,8 +17,4 @@ class AiFeedbackErrorException : CustomException("AI Feedback error raised", 500
 class RecordAlreadyCreatedException : CustomException("Record already created", 409)
 
 class LimitReachedException : CustomException("Limit reached", 403)
-
-// 혹시 몰라서 남겨둠, 필요없으면 삭제
-class BadRequestException : CustomException("Bad Request", 400)
-class AlreadyExistException : CustomException("Already Exist", 409)
-
+class InvalidIssuerException : CustomException("Invalid Issuer", 403)

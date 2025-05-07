@@ -9,4 +9,5 @@ import java.time.LocalDateTime
 interface DiagnosisResultsRepository : JpaRepository<DiagnosisResults, String> {
     fun findByUser(user: User): List<DiagnosisResults>
     fun findByUserAndCreatedAtAfter(user: User, createdAt: LocalDateTime): List<DiagnosisResults>
+    fun findByUserAndCreatedAtBetween(user: User, startTime: LocalDateTime, endTime:LocalDateTime): List<DiagnosisResults>
 }

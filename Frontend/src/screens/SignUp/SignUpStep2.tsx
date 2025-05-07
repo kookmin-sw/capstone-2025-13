@@ -11,7 +11,7 @@ import {
     ImageBackground,
     ScrollView
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker from "react-native-date-picker";
 import signUpStyles from "../../styles/signUpStyles";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -91,10 +91,10 @@ const SignUpStep2 = () => {
 
                                 {isDatePickerVisible && (
                                     <DateTimePicker
-                                        value={date ?? new Date()}
+                                        date={date ?? new Date()}
                                         mode="date"
-                                        onChange={handleDateChange}
-                                        display="spinner"
+                                        onDateChange={handleDateChange}
+                                        locale="ko-KR"
                                     />
                                 )}
                             </View>

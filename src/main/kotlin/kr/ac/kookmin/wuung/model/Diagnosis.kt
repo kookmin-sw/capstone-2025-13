@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 // 약식 검사와 정식 검사 종류를 표현한 클래스
 enum class DiagnosisType(val value : String) {
     Simple("Simple"),
-    `PHQ-9`("PHQ-9"),
-    `GAD-7`("GAD-7"),
+    PHQ_9("PHQ_9"),
+    GAD_7("GAD_7"),
     BDI("BDI")
 }
 
