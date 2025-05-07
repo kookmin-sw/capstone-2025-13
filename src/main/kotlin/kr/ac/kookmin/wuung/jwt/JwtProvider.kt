@@ -82,9 +82,9 @@ class JwtProvider(
             .parseClaimsJws(token)
             .body
 
-        if(!jwt.expiration.before(Date.from(Instant.now())))
+        if (jwt.expiration.before(Date.from(Instant.now())))
             throw JwtExpiredException()
-        if(jwt?.issuer != issuer) throw InvalidIssuerException()
+        if (jwt?.issuer != issuer) throw InvalidIssuerException()
 
         return jwt
     }
