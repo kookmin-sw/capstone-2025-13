@@ -21,6 +21,7 @@ import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import Calendar from "./screens/Calendar";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
@@ -50,6 +51,8 @@ export type RootStackParamList = {
     HelpCall2: undefined;
     UserInfo: undefined;
     Record: undefined;
+    Quest_meditation: undefined;
+    Quest_exercise: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -210,6 +213,16 @@ export default function App() {
                 <Stack.Screen
                     name="Record"
                     component={Record}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HelpCall"
+                    component={HelpCall}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HelpCall2"
+                    component={HelpCall2}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

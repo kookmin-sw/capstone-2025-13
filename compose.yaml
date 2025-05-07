@@ -17,5 +17,17 @@ services:
     image: 'redis:latest'
     ports:
       - '6379'
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
 volumes:
   postgresql:
+  minio-data:
