@@ -9,6 +9,9 @@ const questStageStyles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#17B96D",
   },
+  scrollContainer: {
+    width: "100%",
+  },
   street: {
     position: "absolute",
     right: width / 16,
@@ -16,6 +19,11 @@ const questStageStyles = StyleSheet.create({
     height: height,
     top: height * 0.25,
     zIndex: 3,
+  },
+  elementWrapper: {
+    width: width * 0.23,
+    marginVertical: height * 0.005,
+    zIndex: 4,
   },
   questTitle: {
     width: width*0.7,
@@ -95,9 +103,6 @@ const questStageStyles = StyleSheet.create({
   fullSizeImage: {
     width: "100%",
     height: "100%",
-  },
-  scrollBottomSpacer: {
-    height: height * 1,
   },
 });
 
