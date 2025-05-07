@@ -33,7 +33,6 @@ jwt:
   refresh-token-validity: 2592000
 etc:
   host: ${HOST_NAME}
-  record-prompt: ${RECORD_PROMPT}
 logging:
   level:
     root: INFO
@@ -44,3 +43,9 @@ s3:
   secret-key: ${S3_SECRET_KEY}
   profile-bucket: ${S3_PROFILE_BUCKET}
   public-endpoint: ${S3_PUBLIC_ENDPOINT}
+app:
+  package-name: ${PACKAGE_NAME}
+  google-cloud-project-number: ${GOOGLE_CLOUD_PROJECT_NUMBER}
+  google-cloud-api-key: ${GOOGLE_CLOUD_API_KEY}
+  apple-team-id: ${APPLE_TEAM_ID}
+  apple-key-id: ${APPLE_KEY_ID}

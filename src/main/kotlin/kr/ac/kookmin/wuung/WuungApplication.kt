@@ -34,6 +34,11 @@ fun main(args: Array<String>) {
 			if (!it.startsWith("http://") && !it.startsWith("https://")) "https://$it" else it
 		} ?: "https://api.openai.com"),
 		"JWT_ISSUER" to (dotenv["JWT_ISSUER"] ?: "localhost"),
+		"PACKAGE_NAME" to dotenv["PACKAGE_NAME"],
+		"GOOGLE_CLOUD_PROJECT_NUMBER" to dotenv["GOOGLE_CLOUD_PROJECT_NUMBER"],
+		"GOOGLE_CLOUD_API_KEY" to dotenv["GOOGLE_CLOUD_API_KEY"],
+		"APPLE_TEAM_ID" to dotenv["APPLE_TEAM_ID"],
+		"APPLE_KEY_ID" to dotenv["APPLE_KEY_ID"],
 	)
 
 	runApplication<WuungApplication>(*args) {

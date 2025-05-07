@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$USER_HOME$/Downloads/configurations.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_diagnosis_questions.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_diagnosis_scale.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_questions.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_questions_diagnosis_text.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_scales.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_text.sql" dialect="PostgreSQL" />
-    <file url="file://$USER_HOME$/Downloads/quests.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>
