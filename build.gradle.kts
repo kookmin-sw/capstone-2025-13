@@ -5,7 +5,7 @@ plugins {
 	kotlin("jvm") version "2.1.10"
 	kotlin("plugin.spring") version "2.1.10"
 	id("org.hibernate.orm") version "6.5.2.Final"
-	id("org.springframework.boot") version "3.4.3"
+	id("org.springframework.boot") version "3.4.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
 }
@@ -25,6 +25,7 @@ repositories {
 }
 
 extra["springAiVersion"] = "1.0.0-M4"
+extra["springCloudVersion"] = "2023.0.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -35,6 +36,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
+
+	implementation("io.swagger.core.v3:swagger-core:2.2.30")
+	implementation("io.swagger.core.v3:swagger-annotations:2.2.30")
 
 	// https://mvnrepository.com/artifact/jakarta.websocket/jakarta.websocket-api
 	implementation("jakarta.websocket:jakarta.websocket-api:2.2.0")
@@ -54,6 +58,14 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
 	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+
+	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+	implementation("javax.xml.bind:jaxb-api:2.3.1")
+
+	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:${property("springAiVersion")}")
+	implementation("org.springframework.ai:spring-ai-core:${property("springAiVersion")}")
+
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

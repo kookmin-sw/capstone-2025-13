@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 @Table(name = "user_records")
 data class Record(
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    var id : Long? = null,
+    @GeneratedValue(strategy =  GenerationType.UUID)
+    var id : String? = null,
 
     @Column(nullable = false)
     var rate : Int = 0,
@@ -20,7 +20,7 @@ data class Record(
     val user: User? = null,
 
     @OneToMany
-    val recordFeedback: List<RecordFeedback> = listOf(),
+    val recordFeedback: MutableList<RecordFeedback> = mutableListOf(),
 
     @Column(nullable = false)
     val createdAt : LocalDateTime = LocalDateTime.now(),
