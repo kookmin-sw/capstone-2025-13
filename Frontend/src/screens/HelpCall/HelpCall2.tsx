@@ -2,6 +2,10 @@
 import { ScrollView, Text, TouchableOpacity, View, Linking } from "react-native";
 import helpCallStyles from "../../styles/helpCallStyles";
 import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../App";
 
 const phoneData = [
     {
@@ -65,6 +69,7 @@ const phoneData = [
 ];
 
 export default function HelpCall2() {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [selected, setSelected] = useState("all");
 
     const buttons = [
@@ -90,6 +95,13 @@ export default function HelpCall2() {
     return (
         <View style={helpCallStyles.container}>
             <View style={helpCallStyles.headerBox}>
+                <TouchableOpacity
+                    style={helpCallStyles.backButtonWrapper}
+                    onPress={() => {
+                    navigation.navigate("HelpCall")}}
+                >
+                <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
+                </TouchableOpacity>
                 <Text style={helpCallStyles.headerText}>전화번호</Text>
                 <ScrollView
                     horizontal
