@@ -1,15 +1,17 @@
 import React from "react";
-import { View, ScrollView, Dimensions } from "react-native";
-import Header_sky from "../components/Header_sky";
-import Quest_circle from "../components/Darkgreen_circle";
-import Street from "../components/Street";
-import Street_basic from "../components/Street_basic";
-import questStyles from "../styles/questStyles";
-import Tree from "../components/Tree";
+import { View, ScrollView, Dimensions,  Image} from "react-native";
+import Header_sky from "../../components/Header_sky";
+import Quest_circle from "../../components/Darkgreen_circle";
+import Street from "../../components/Street";
+import Street_basic from "../../components/Street_basic";
+import questStyles from "../../styles/questStyles";
+import Tree from "../../components/Tree";
+import styles from "../../styles/homeStyles";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
+
 
 const questData = [
   { title: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
@@ -30,15 +32,15 @@ export default function Quest() {
       >
         
         <View style={questStyles.headerWrapper}>
-          <Header_sky title= "퀘스트" subtitle="미션을 완료해보세요!" />
+          <Header_sky title= "퀘스트" subtitle="미션을 완료해보세요!"  screenName="Quest" />
           <Quest_circle style={questStyles.circle} />
         </View>
 
         <View style={questStyles.elementsOverlay}>
         {questData.map((quest, index) => {
-  const isLeft = index % 2 === 0;
-  const isFirst = index === 0;
-  const isLast = index === questData.length - 1;
+          const isLeft = index % 2 === 0;
+          const isFirst = index === 0;
+          const isLast = index === questData.length - 1;
 
   return (
     <React.Fragment key={index}>
@@ -58,7 +60,7 @@ export default function Quest() {
           questStyles.elementWrapper,
           {
             alignSelf: isLeft ? "flex-start" : "flex-end",
-            marginTop: isFirst ? height * 0.022 : height * 0.001,
+            marginTop: isFirst ? height * 0.025 : height * 0.01,
           },
         ]}
       >
@@ -70,17 +72,23 @@ export default function Quest() {
       </View>
 
       {isLast && (
-        <Street_basic
-          style={[
-            questStyles.street,
-            {
-              top:
-                  height * 0.2 * questData.length -
-                  height * 0.1,
-            },
-          ]}
-        />
+        <>
+          <Street_basic
+            style={[
+              questStyles.street,
+              {
+                top: height * 0.2 * questData.length - height * 0.1,
+              },
+            ]}
+          />
+          <Image
+            source={require("../../assets/Images/clover_good.png")}
+            style={questStyles.clover}
+            resizeMode="contain"
+          />
+        </>
       )}
+
     </React.Fragment>
   );
 })}

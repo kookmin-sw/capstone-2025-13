@@ -373,7 +373,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
       index: 45,
       type:"navigate",
-      navigateTo: "Home",
+      navigateTo: "SignIn",
     }
   ];
   

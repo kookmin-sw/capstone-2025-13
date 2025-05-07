@@ -9,8 +9,10 @@ import SignUpStep2 from "./screens/SignUp/SignUpStep2";
 import SimpleDiagnosis from "./screens/SimpleDiagnosis/SimpleDiagnosis";
 import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game/Game";
-import Quest from "./screens/Quest";
-import Quest_stage from "./screens/Quest_stage";
+import Quest from "./screens/Quest/Quest";
+import Quest_stage from "./screens/Quest/Quest_stage";
+import Quest_meditation from "./screens/Quest/Quest_meditation";
+import Quest_exercise from "./screens/Quest/Quest_exercise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -19,14 +21,15 @@ import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
-import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import { refreshAccessToken } from "./API/signAPI";
+import Record from "./screens/Record";
 
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title:string; subtitle?: string };
+    Quest_stage: { title: string; subtitle?: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -45,6 +48,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
+    Record: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,16 +59,38 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [loading, setLoading] = useState(true);
 
-
     useEffect(() => {
         const checkToken = async () => {
-            const token = await AsyncStorage.getItem('accessToken');
+            const token = await AsyncStorage.getItem("accessToken");
             if (token) {
                 setIsLoggedIn(true);
                 setLoading(false);
             }
         };
         checkToken();
+    }, []);
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const accessToken = await AsyncStorage.getItem("accessToken");
+            const tokenExpiry = await AsyncStorage.getItem("accessTokenExpiry");
+
+            if (accessToken && tokenExpiry) {
+                const expiryTime = new Date(tokenExpiry).getTime();
+                const currentTime = new Date().getTime();
+
+                // 5분 전까지 만료되면 갱신
+                if (expiryTime - currentTime <= 5 * 60 * 1000) {
+                    try {
+                        await refreshAccessToken(); // 토큰 갱신
+                    } catch (error) {
+                        console.error("Token refresh failed", error);
+                    }
+                }
+            }
+        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+
+        return () => clearInterval(interval); // cleanup
     }, []);
 
     const [fontsLoaded] = useFonts({
@@ -86,9 +112,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator
-                initialRouteName={isLoggedIn ? "HelpCall" : "HelpCall"}
-            >
+            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Quest"}>
                 <Stack.Screen
                     name="Home"
                     component={Home}
@@ -133,6 +157,16 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="Quest_meditation"
+                    component={Quest_meditation}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_exercise"
+                    component={Quest_exercise}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="FormalDiagnosis" // FormalDiagnosis 화면 추가
                     component={FormalDiagnosis}
                     options={{ headerShown: false }}
@@ -155,21 +189,18 @@ export default function App() {
                 <Stack.Screen
                     name="Spinner" // Spinner 화면 추가
                     component={Spinner}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="HelpCall" // HelpCall 화면 추가
-                    component={HelpCall}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="HelpCall2" // HelpCall 화면 추가
-                    component={HelpCall2}
-                    options={{ headerShown: false }} />
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
                     options={{ headerShown: false }}
                 />
-
+                <Stack.Screen
+                    name="Record"
+                    component={Record}
+                    options={{ headerShown: false }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

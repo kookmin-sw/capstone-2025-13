@@ -1,5 +1,7 @@
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, Dimensions } from "react-native";
 import colors from "../constants/colors";
+
+const { width, height } = Dimensions.get("window");
 
 const helpCallStyles = StyleSheet.create({
     container: {
@@ -10,33 +12,40 @@ const helpCallStyles = StyleSheet.create({
     },
     headerBox: {
         backgroundColor: "white",
-        paddingHorizontal: 10,
+        paddingHorizontal: width * 0.015,
         elevation: Platform.OS === "android" ? 10 : 5,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 5 },
+        shadowOffset: { width: 0, height: height * 0.006 },
         shadowOpacity: 0.5,
-        shadowRadius: 10,
+        shadowRadius: width * 0.03,
         width: "100%",
-        height: "20%",
+        height: height * 0.2,
         justifyContent: "center",
         zIndex: 10,
-        paddingTop: 40,
+        paddingTop: height * 0.07,
+    },
+    backButtonWrapper: {
+        position: 'absolute',
+        left: width * 0.02,
+        top: width * 0.115,
+        padding: width * 0.02,
+        zIndex: 11,
     },
     headerText: {
         fontWeight: "bold",
-        fontSize: 22,
+        fontSize: width * 0.055,
         textAlign: "center",
     },
     scrollContainer: {
         flexDirection: "row",
         alignItems: "center",
-        paddingVertical: 10,
+        paddingVertical: height * 0.015,
     },
     button: {
-        paddingVertical: 12,
-        paddingHorizontal: 18,
-        borderRadius: 40,
-        marginHorizontal: 5,
+        paddingVertical: height * 0.015,
+        paddingHorizontal: width * 0.045,
+        borderRadius: width * 0.1,
+        marginHorizontal: width * 0.015,
         borderWidth: 1,
     },
     selectedButton: {
@@ -49,6 +58,7 @@ const helpCallStyles = StyleSheet.create({
     },
     buttonText: {
         fontWeight: "bold",
+        fontSize: width * 0.03,
         textAlign: "center",
     },
     selectedText: {
@@ -59,10 +69,10 @@ const helpCallStyles = StyleSheet.create({
     },
     callButton: {
         position: "absolute",
-        bottom: 20,
-        right: 20,
-        width: 60,
-        height: 60,
+        bottom: height * 0.025,
+        right: width * 0.05,
+        width: width * 0.15,
+        height: width * 0.15,
         justifyContent: "center",
         alignItems: "center",
         zIndex: 999,
@@ -72,18 +82,18 @@ const helpCallStyles = StyleSheet.create({
         backgroundColor: "white",
     },
     itemContainer: {
-        padding: 16,
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        padding: width * 0.04,
     },
-    
     itemTitle: {
-        fontSize: 16,
+        fontSize: width * 0.04,
         fontWeight: "600",
     },
     itemPhone: {
-        color: colors.red
+        fontSize: width * 0.038,
+        color: colors.red,
     },
     itemWebsite: {
+        fontSize: width * 0.038,
         color: "blue",
         textDecorationLine: "underline",
     },
