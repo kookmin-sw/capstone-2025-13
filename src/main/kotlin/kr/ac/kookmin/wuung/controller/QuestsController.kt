@@ -83,8 +83,11 @@ fun Quests.toDTO() = QuestsDTO(
 @RestController
 @RequestMapping("/quests")
 @Tag(name = "Quests API", description = """
-    Endpoints for quests.
+    [en] Endpoints for quests.
     AccessToken is required for all of this part of endpoints on Authorization header.
+    
+    [ko] 퀘스트 관련 엔드포인트입니다.
+    모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
 """)
 class QuestsController(
     @Autowired private val authenticationManager: AuthenticationManager,
@@ -96,10 +99,15 @@ class QuestsController(
     @Operation(
         summary = "Get my quests",
         description = """
-            Get my quests with optional filter by start date.
+            [en] Get my quests with optional filter by start date.
             Start date is in format yyyy-MM-dd.
             If start date is not provided, it will return all quests.
             AccessToken is required for all of this part of endpoints on Authorization header.
+            
+            [ko] 시작 날짜로 필터링 할 수 있는 내 퀘스트 목록을 가져옵니다.
+            시작 날짜는 yyyy-MM-dd 형식입니다.
+            시작 날짜가 제공되지 않으면 모든 퀘스트를 반환합니다.
+            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(
@@ -132,9 +140,13 @@ class QuestsController(
     @Operation(
         summary = "Create a new quest",
         description = """
-            Creates a new quest instance for the authenticated user.
+            [en] Creates a new quest instance for the authenticated user.
             Required parameter is quest (unique) id.
             AccessToken is required for all of this part of endpoints on Authorization header.
+            
+            [ko] 인증된 사용자를 위한 새로운 퀘스트 요소를 생성합니다.
+            필수 파라미터는 퀘스트 (고유) ID입니다.
+            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(
@@ -191,9 +203,13 @@ class QuestsController(
     @Operation(
         summary = "Update quest progress",
         description = """
-            Updates the progress of a quest for the authenticated user.
+            [en] Updates the progress of a quest for the authenticated user.
             Required parameter is quest (unique) id.
             AccessToken is required for all of this part of endpoints on Authorization header.
+            
+            [ko] 인증된 사용자의 퀘스트 진행 상황을 업데이트합니다.
+            필수 파라미터는 퀘스트 (고유) ID입니다.
+            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(
@@ -248,8 +264,11 @@ class QuestsController(
     @Operation(
         summary = "List all quests",
         description = """
-            Get a list of all available quests.
+            [en] Get a list of all available quests.
             AccessToken is required for all of this part of endpoints on Authorization header.
+            
+            [ko] 사용 가능한 모든 퀘스트 목록을 가져옵니다.
+            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(
@@ -293,8 +312,11 @@ class QuestsController(
     @Operation(
         summary = "List quests by type",
         description = """
-           Get a list of quests filtered by type.
+           [en] Get a list of quests filtered by type.
            AccessToken is required for all of this part of endpoints on Authorization header.
+           
+           [ko] 유형별로 필터링된 퀘스트 목록을 가져옵니다.
+           모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(
@@ -340,8 +362,11 @@ class QuestsController(
     @Operation(
         summary = "List quests by type and step",
         description = """
-            Get a list of quests filtered by type and step number.
+            [en] Get a list of quests filtered by type and step number.
             AccessToken is required for all of this part of endpoints on Authorization header.
+            
+            [ko] 유형과 단계 번호로 필터링된 퀘스트 목록을 가져옵니다.
+            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
     @ApiResponses(

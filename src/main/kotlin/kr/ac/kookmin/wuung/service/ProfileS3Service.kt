@@ -34,4 +34,9 @@ class ProfileS3Service(
             throw ServerErrorException()
         }
     }
+
+    fun removeProfile(user: User) {
+        val s3Path = user.profile ?: return
+        profileS3Client.deleteObject(bucketName, s3Path)
+    }
 }
