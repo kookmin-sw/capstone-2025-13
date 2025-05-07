@@ -85,7 +85,10 @@ export default function UserInfo() {
   useEffect(() => {
     const storeSecondPassword = async () => {
       try {
-        await AsyncStorage.setItem("@secondPassword", userData.secondPassword.toString());
+        if (originalData?.secondPassword !== userData.secondPassword) {
+          await AsyncStorage.setItem("@secondPassword", userData.secondPassword.toString());
+          console.log("2차 비밀번호가 변경되었습니다.");
+        }
       } catch (error) {
         console.error("2차 비밀번호 저장 실패:", error);
       }
