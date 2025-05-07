@@ -314,7 +314,7 @@ class RecordController(
     )
     fun createFeedback(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestParam recordId: Long
+        @RequestParam recordId: String
     ): ResponseEntity<ApiResponseDTO<String>> {
         if (userDetails == null) throw UnauthorizedException()
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
@@ -323,7 +323,8 @@ class RecordController(
         return ResponseEntity.ok(ApiResponseDTO(data = saved.id))
     }
 
-    @PutMapping("/feedback/{id}")
+    @OptIn(DelicateCoroutinesApi::class)
+    @PutMapping("/feedback/{recordId}")
     @Operation(
         summary = "Request AI feedback", description = """
         [en] Initiates an AI feedback request for a specific record. The feedback process runs asynchronously and updates the feedback status accordingly
@@ -419,7 +420,7 @@ class RecordController(
         )
     }
 
-    @GetMapping("/feedback")
+    @GetMapping("/feedback/{recordId}")
     @Operation(
         summary = "Get all feedback record", description = """
         [en] Retrieves all completed AI feedback records associated with a specific record. Only shows feedback with COMPLETED status
@@ -465,7 +466,7 @@ class RecordController(
         }))
     }
 
-    @GetMapping("/feedback/{id}")
+    @GetMapping("/feedback/{recordFeedbackId}")
     @Operation(
         summary = "Get feedback record", description = """
         [en] Retrieves detailed information about a specific feedback record, including AI feedback content and user comments
@@ -531,7 +532,7 @@ class RecordController(
     }
 
 
-    @PostMapping("/feedback/{id}")
+    @PostMapping("/feedback/{recordId}")
     @Operation(
         summary = "Update feedback record", description = """
         [en] Updates the data and user comments of a completed feedback record. Only applicable to feedback with COMPLETED status
