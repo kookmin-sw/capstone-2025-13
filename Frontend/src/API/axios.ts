@@ -1,11 +1,19 @@
 import axios from 'axios';
 
 const createdAxios = axios.create({
-    baseURL: process.env.API_URL,
+    baseURL: process.env.EXPO_PUBLIC_API_URL,
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-    }
+    },
+    withCredentials: true
 });
+
+export interface ApiResponseDTO<T> {
+    error: boolean;
+    message: string;
+    code: number;
+    data: T;
+}
 
 export default createdAxios;

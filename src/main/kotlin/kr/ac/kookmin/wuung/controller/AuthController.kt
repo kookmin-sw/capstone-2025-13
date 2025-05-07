@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import kr.ac.kookmin.wuung.exceptions.AlreadyExistException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
@@ -187,7 +188,7 @@ class AuthController(
    )
    fun authenticateUser(
        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email and password for authentication") 
-       @RequestBody loginRequest: LoginRequest
+       @Valid @RequestBody loginRequest: LoginRequest
    ): ResponseEntity<ApiResponseDTO<LoginResponse>> {
        val authentication = authenticationManager.authenticate(
            UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)

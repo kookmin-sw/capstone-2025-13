@@ -1,28 +1,54 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, {ApiResponseDTO} from "./axios";
+import {AxiosResponse} from "axios";
+
+export enum GenderEnum {
+    MALE = "MALE",
+    FEMALE = "FEMALE",
+    THIRD_GENDER = "THIRD_GENDER",
+    UNKNOWN = "UNKNOWN",
+}
+
+export interface UserInfoResponse {
+    id: number;
+    email: string;
+    username: string;
+    birthDate: string;
+    gender: GenderEnum;
+    profile: string;
+    createdAt: string;
+    updatedAt: string;
+    roles: string[];
+}
+
+export interface UpdateUserResponse {
+    email: string;
+    userName: string;
+    gender: GenderEnum;
+    birthDate: string;
+}
 
 export const userInfoUpdate = async (password: string | null, nickname: string | null, birthDate: string | null, gender: string | null) => {
     console.log("userInfoUpdate called with:", { password, nickname, birthDate, gender });
     try {
-        const response = await fetch("https://wuung.mori.space/auth/update", {
-            method: "POST",
+        const response = await axios.post("/auth/update",
+        {
+            password,
+            gender: gender?.toUpperCase() || null,
+            user_name: nickname,
+            birth_date: birthDate
+        },
+        {
             headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json",
                 "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
-            },
-            body: JSON.stringify({  
-                password,
-                gender: gender?.toUpperCase() || null, 
-                user_name: nickname,
-                birth_date: birthDate, }),
-        });
+            }
+        }) as AxiosResponse<ApiResponseDTO<UpdateUserResponse>>
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
+        if (response.data.error) {
+            throw new Error("Network response was not ok: " + response.data.message);
         }
 
-        const data = await response.json();
-        return data;
+        return response.data.data
     } catch (error) {
         console.error("Error during user info update:", error);
         throw error;
@@ -32,21 +58,17 @@ export const userInfoUpdate = async (password: string | null, nickname: string |
 
 export const getUserInfo = async () => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/me", {
-            method: "GET",
+        const response = await axios.get("/auth/me", {
             headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json",
                 "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
             },
-        });
+        }) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
+        if (response.data.error) {
+            throw new Error("Network response was not ok: " + response.data.message);
         }
 
-        const data = await response.json();
-        return data;
+        return response.data.data
     } catch (error) {
         console.error("Error during user info update:", error);
         throw error;
@@ -64,21 +86,18 @@ export const putProfileImg = async (profileImage: { uri: string; name: string; t
       } as any);
   
     try {
-      const response = await fetch("https://wuung.mori.space/auth/profile", {
-        method: "PUT",
+      const response = await axios.put("/auth/profile", formData, {
         headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
-        },
-        body: formData,
-      });
+            "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
+            "Content-Type": "multipart/form-data"
+        }
+      }) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>
   
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      if (response.data.error) {
+        throw new Error("Network response was not ok: " + response.data.message);
       }
   
-      const data = await response.json();
-      return data;
+      return response.data.data;
     } catch (error) {
       console.error("Error during profile image update:", error);
       throw error;

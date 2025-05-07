@@ -1,28 +1,28 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, {ApiResponseDTO} from "./axios";
+import {AxiosResponse} from "axios";
 
-export const refreshAccessToken = async () => {
+interface SignInResponse {
+    accessToken: string;
+    refreshToken: string;
+}
+
+export const refreshAccessToken = async (): Promise<string> => {
     try {
         const refreshToken = await AsyncStorage.getItem("refreshToken");
 
-        const response = await fetch("https://wuung.mori.space/auth/refresh", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                accept: "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-        });
+        const response = await axios.post("/auth/refresh", { refreshToken }, {}) as AxiosResponse<ApiResponseDTO<SignInResponse>>
 
-        if (!response.ok) {
-            throw new Error("Failed to refresh tokens");
+        if (response.data.error) {
+            throw new Error("Failed to refresh tokens: " + response.data.message);
         }
 
-        const data = await response.json();
+        const data = response.data.data;
 
         await AsyncStorage.setItem("accessToken", data.accessToken);
         await AsyncStorage.setItem("refreshToken", data.refreshToken);
 
-        return data;
+        return data.accessToken;
     } catch (error) {
         console.error("Error refreshing tokens:", error);
         throw error;
@@ -31,20 +31,22 @@ export const refreshAccessToken = async () => {
 
 export const signIn = async (email: string, password: string) => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                accept: "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-        });
+        const response = await axios.post("/auth/login", {
+            email,
+            password
+        }) as AxiosResponse<ApiResponseDTO<SignInResponse>>
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
+        console.log(response.data)
+
+        if (response.data.error) {
+            throw new Error("Failed to login: " + response.data.message);
         }
 
-        const data = await response.json();
+        const data = response.data.data;
+
+        await AsyncStorage.setItem("accessToken", data.accessToken);
+        await AsyncStorage.setItem("refreshToken", data.refreshToken);
+
         return data;
     } catch (error) {
         console.error("Error during sign-in:", error);
@@ -52,27 +54,19 @@ export const signIn = async (email: string, password: string) => {
     }
 };
 
-export const signOut = async (accessToken: string, refreshToken: string) => {
+export const signOut = async (accessToken: string, refreshToken: string): Promise<boolean> => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ accessToken, refreshToken }),
-        });
+        const response = await axios.post("/auth/logout", { accessToken, refreshToken }, {}) as AxiosResponse<ApiResponseDTO<string>>
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
+        if (response.data.error) {
+            throw new Error("Failed to refresh tokens: " + response.data.message);
         }
-
-        const data = await response.json();
 
         // Clear tokens from AsyncStorage
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
 
-        return data;
+        return true;
     } catch (error) {
         console.error("Error during sign-out:", error);
         throw error;
@@ -87,26 +81,25 @@ export const signUp = async (
     gender: string
 ) => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                accept: "application/json",
-            },
-            body: JSON.stringify({
+        const response = await axios.post("/auth/signup",
+            {
                 email,
                 password,
                 gender: gender.toUpperCase(),
                 user_name: nickname,
                 birth_date: birthDate,
-            }),
-        });
+            }, {}
+        ) as AxiosResponse<ApiResponseDTO<SignInResponse>>
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
+        if (response.data.error) {
+            throw new Error("Network response was not ok: " + response.data.message);
         }
 
-        const data = await response.json();
+        const data = response.data.data;
+
+        await AsyncStorage.setItem("accessToken", data.accessToken);
+        await AsyncStorage.setItem("refreshToken", data.refreshToken);
+
         return data;
     } catch (error) {
         console.error("Error during sign-up:", error);

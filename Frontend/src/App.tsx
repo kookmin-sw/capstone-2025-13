@@ -24,14 +24,11 @@ import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
-import Calendar from "./screens/Calendar";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Calendar from "./screens/Calendar"
 import Record from "./screens/Record";
-import * as Integrity from "expo-app-integrity"
-import {Alert, Platform} from "react-native";
 import {verifyDeviceIntegrity} from "./API/IntegrityAPI";
 import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
 
@@ -72,7 +69,13 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function AppInner() {
     // 하드코딩된 로그인 상태
 
-    const [isIntegrityVerified, setIsIntegrityVerified] = useState(false);
+    const { isLoading, setLoading } = useLoading();
+
+    // @ts-ignore
+    const routeNameRef = useRef();
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
 
     useEffect(() => {
         const checkIntegrity = async () => {
@@ -96,19 +99,6 @@ function AppInner() {
             }
         };
 
-        checkIntegrity();
-    }, []);
-
-    if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen />;
-    }
-    const { isLoading, setLoading } = useLoading();
-
-    const routeNameRef = useRef();
-
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-
-    useEffect(() => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem("accessToken");
             console.log("🔍 accessToken:", token);
@@ -121,7 +111,7 @@ function AppInner() {
                 setLoading(false);
             }
         };
-        checkToken();
+        checkIntegrity().then(() => checkToken());
     }, []);
 
     useEffect(() => {
@@ -166,10 +156,15 @@ function AppInner() {
 
     if (!fontsLoaded) return <Spinner />;
 
+    if(!isIntegrityVerified) {
+        return <RestrictedAccessScreen />;
+    }
+
     return (
         <NavigationContainer
             ref={navigationRef}
             onReady={() => {
+                // @ts-ignore
                 routeNameRef.current = navigationRef.getCurrentRoute().name;
             }}
             onStateChange={() => {
@@ -294,8 +289,7 @@ function AppInner() {
                     name="Calendar" 
                     component={Calendar}
                     options={{ headerShown: false }} />
-                </Stack.Screen>
-              </Stack.Navigator>
+              </Stack.Navigator>)}
         </NavigationContainer>
     );
 }
