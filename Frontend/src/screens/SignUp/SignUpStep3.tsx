@@ -4,7 +4,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
-import { signUp } from "../../API";
+import { signUp } from "../../API/signAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;
 type SignUpStep3RouteProp = RouteProp<RootStackParamList, "SignUpStep3">;
@@ -14,12 +15,13 @@ const SignUpStep3 = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [secondPassword, setSecondPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const route = useRoute<SignUpStep3RouteProp>();
 
     const { nickname, gender, birthDate } = route.params;
-   
+
     const handleSignUp = async () => {
         if (!email.trim()) {
             setErrorMessage("이메일을 입력하세요.");
@@ -41,12 +43,18 @@ const SignUpStep3 = () => {
             setErrorMessage("비밀번호가 일치하지 않습니다.");
             return;
         }
+        if (!/^\d{4}$/.test(secondPassword)) {
+            setErrorMessage("2차 비밀번호는 4자리 숫자여야 합니다.");
+            return;
+        }
 
-        // 모든 유효성 검사 통과 시
         try {
-            console.log(email, nickname, password, birthDate, gender)
+            // 2차 비밀번호는 로컬에 저장
+            await AsyncStorage.setItem("@secondPassword", secondPassword);
+
             await signUp(email, password, nickname, birthDate, gender);
-            navigation.navigate('SimpleDiagnosis', { initialIndex: 13 });
+
+            navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
         } catch (error) {
             console.error("회원가입 실패:", error);
             if ((error as any).response && (error as any).response.status === 400) {
@@ -56,6 +64,7 @@ const SignUpStep3 = () => {
             }
         }
     };
+
 
     return (
         <ImageBackground
@@ -97,7 +106,18 @@ const SignUpStep3 = () => {
                             onChangeText={setConfirmPassword}
                         />
                     </View>
-
+                    <View style={signUpStyles.inputContainer}>
+                        <Text style={signUpStyles.inputTitle}>2차 비밀번호</Text>
+                        <TextInput
+                            placeholder="2차 비밀번호"
+                            secureTextEntry
+                            keyboardType="numeric"
+                            maxLength={4}
+                            style={signUpStyles.input}
+                            value={secondPassword}
+                            onChangeText={setSecondPassword}
+                        />
+                    </View>
 
                     {errorMessage !== "" && (
                         <Text style={signUpStyles.errorText}>{errorMessage}</Text>

@@ -1,3 +1,34 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const refreshAccessToken = async () => {
+    try {
+        const refreshToken = await AsyncStorage.getItem("refreshToken");
+
+        const response = await fetch("https://wuung.mori.space/auth/refresh", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json",
+            },
+            body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to refresh tokens");
+        }
+
+        const data = await response.json();
+
+        await AsyncStorage.setItem("accessToken", data.accessToken);
+        await AsyncStorage.setItem("refreshToken", data.refreshToken);
+
+        return data;
+    } catch (error) {
+        console.error("Error refreshing tokens:", error);
+        throw error;
+    }
+};
+
 export const signIn = async (email: string, password: string) => {
     try {
         const response = await fetch("https://wuung.mori.space/auth/login", {
