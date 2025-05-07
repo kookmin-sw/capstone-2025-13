@@ -29,8 +29,8 @@ jwt:
   signing-key: ${JWT_SIGNING_KEY}
   validate-key: ${JWT_VALIDATE_KEY}
   issuer: ${JWT_ISSUER}
-  access-token-validity: 900
-  refresh-token-validity: 604800
+  access-token-validity: 10800 # 원래 900초
+  refresh-token-validity: 2592000
 etc:
   host: ${HOST_NAME}
 logging:
