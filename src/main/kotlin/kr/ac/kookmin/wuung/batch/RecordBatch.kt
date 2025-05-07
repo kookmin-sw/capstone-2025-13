@@ -87,6 +87,7 @@ class RecordBatch(
             }
 
             val data = """
+                주제: ${record.record?.data ?: ""}
                 이전 대화 기록:
                 ${previousData?.joinToString("\n") {
                     "유저: ${it.first}\n" +

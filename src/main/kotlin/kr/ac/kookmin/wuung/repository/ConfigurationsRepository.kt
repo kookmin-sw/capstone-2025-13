@@ -7,4 +7,5 @@ import java.util.Optional
 
 interface ConfigurationsRepository: JpaRepository<Configurations, Long> {
     fun findByKey(key: ConfigurationKey): Optional<Configurations>
+    fun findAllByKey(key: ConfigurationKey): List<Configurations>
 }
