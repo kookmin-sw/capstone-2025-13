@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width } = Dimensions.get("window");
 
@@ -24,9 +25,12 @@ export default StyleSheet.create({
         paddingTop: 12, // ✅ 텍스트 위치를 조금 아래로 내림
     },
     title: {
-        fontSize: 32,
+        fontSize: 40,
         fontWeight: "bold",
         color: "#fff",
+        fontFamily: fonts.laundry,
+        marginLeft: 18,
+        marginTop: 10,
     },
     dateBox: {
         backgroundColor: "#fff",

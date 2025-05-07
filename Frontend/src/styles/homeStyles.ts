@@ -4,14 +4,16 @@ import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
+const wp = (percentage: number) => (width * percentage) / 100;
+const hp = (percentage: number) => (height * percentage) / 100;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0A814C",
     },
     scroll: {
-        paddingTop: height * 0.08,
-        paddingBottom: 100,
+        paddingTop: hp(6),
     },
     headerWrapper: {
         position: "relative",
@@ -20,26 +22,26 @@ const styles = StyleSheet.create({
     },
     circle: {
         position: "absolute",
-        top: height * 0.2,
+        top: hp(20),
         alignSelf: "center",
         zIndex: 0,
     },
     buttonGroup: {
-        marginTop: 28,
-        paddingHorizontal: 20,
-        gap: 20,
+        marginTop: hp(3.5),
+        paddingHorizontal: wp(5),
+        gap: hp(2),
     },
     calendarBadgeWrapper: {
         position: "absolute",
-        top: 100,
-        right: 20,
+        top: hp(12),
+        right: wp(5),
         zIndex: 3,
     },
     dateBox: {
         backgroundColor: "#F6914D",
-        width: 56,
-        height: 80,
-        borderRadius: 12,
+        width: wp(15),
+        height: hp(10),
+        borderRadius: wp(3),
         alignItems: "center",
         justifyContent: "center",
         borderColor: "#fff",
@@ -51,14 +53,20 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     day: {
-        fontSize: 14,
+        fontSize: wp(3.7),
         color: "#fff",
         fontWeight: "bold",
     },
     date: {
-        fontSize: 22,
+        fontSize: wp(5.8),
         color: "#fff",
         fontWeight: "bold",
+    },
+    floatingButtonWrapper: {
+        marginTop: hp(15),
+        marginBottom: hp(5),
+        alignItems: "flex-end",
+        paddingRight: wp(6),
     },
 });
 
