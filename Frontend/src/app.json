@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.wooong",
       "config": {
-        "googleMapsApiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
+        "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
       }
     },
     "android": {
@@ -27,7 +27,7 @@
       "package": "com.anonymous.wooong",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
+          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
       }
     },
