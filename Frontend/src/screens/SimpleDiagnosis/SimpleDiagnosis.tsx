@@ -1,4 +1,4 @@
-import { ImageBackground, View } from "react-native";
+import { Alert, ImageBackground, View } from "react-native";
 import DialogueBox from "../../components/DialogueBox";
 import DialogueChoice from "../../components/DialogueChoice";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
+import { signIn } from "../../API/signAPI";
 
 type SimpleDiagnosisRouteProp = RouteProp<
     RootStackParamList,
@@ -167,7 +168,7 @@ const SimpleDiagnosis = () => {
                                 ) {
                                     navigation.navigate(
                                         option.navigateTo.screen ||
-                                            option.navigateTo,
+                                        option.navigateTo,
                                         buildParams(
                                             option.navigateTo.params || {}
                                         )

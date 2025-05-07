@@ -1,4 +1,3 @@
-// components/Tree.tsx
 import React from "react";
 import { Image, View, Text, TouchableOpacity } from "react-native";
 import treeElementStyles, { baseWidth } from "../styles/treeElementStyles";
@@ -11,54 +10,55 @@ type TreeType = "apple" | "peach" | "forest";
 
 interface TreeProps {
   type: TreeType;
-  name: string;
-  subtitle?: string;
+  title: string;
+  subtitle: string;
 }
 
-export default function Tree({ type, name, subtitle }: TreeProps) {
+export default function Tree({ type, title, subtitle }: TreeProps) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // 이미지와 스타일 동적 선택
   const treeImages = {
     apple: require("../assets/Images/apple_tree.png"),
     peach: require("../assets/Images/peach_tree.png"),
     forest: require("../assets/Images/forest.png"),
   };
 
-  // 타입별 width, height 설정
   const sizeStyles = {
-    apple: { width: 0.3, height: 0.33,},
-    peach: { width: 0.37, height: 0.38 },
-    forest: { width: 0.38, height: 0.35 },
+    apple: { width: 0.3, height: 0.33 },
+    peach: { width: 0.37, height: 0.31 },
+    forest: { width: 0.38, height: 0.32 },
+  };
+
+  const handlePress = () => {
+    navigation.navigate("Quest_stage", { title, subtitle });
   };
 
   return (
     <View style={treeElementStyles.container}>
       <TouchableOpacity
-        onPress={() => {
-          if (subtitle) {
-            navigation.navigate("Quest_stage", { subtitle });
-          } else {
-            console.warn("subtitle이 없습니다!");
-          }
-        }}
+        activeOpacity={1}
+        onPress={handlePress}
+        style={{ alignItems: 'center'}}
       >
         <Image
           source={treeImages[type]}
           style={[
             treeElementStyles.icon,
-            { width: sizeStyles[type].width * baseWidth, height: sizeStyles[type].height * baseWidth },
+            {
+              width: sizeStyles[type].width * baseWidth,
+              height: sizeStyles[type].height * baseWidth,
+            },
           ]}
         />
-      </TouchableOpacity>
 
-      <View style={treeElementStyles.nameContainer}>
-        <Image
-          source={require("../assets/Images/title.png")}
-          style={treeElementStyles.name}
-        />
-        <Text style={treeElementStyles.nameText}>{name}</Text>
-      </View>
+        <View style={treeElementStyles.nameContainer}>
+          <Image
+            source={require("../assets/Images/title.png")}
+            style={treeElementStyles.name}
+          />
+          <Text style={treeElementStyles.nameText}>{title}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }

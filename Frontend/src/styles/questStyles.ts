@@ -13,17 +13,19 @@ const questStyles = StyleSheet.create({
     paddingBottom: height * 0.2,
   },
   headerWrapper: {
-    height: height * 0.2,
     position: "relative",
+    width: "100%",
+    height: height * 0.2,
+    zIndex: 1,
   },
   circle: {
     position: "absolute",
-    top: height * 0.20,
+    width: width,
+    top: height * 0.195,
     alignSelf: "center",
     zIndex: 2,
   },
   elementsOverlay: {
-    position: "relative",
     width: "100%",
   },
   elementWrapper: {
@@ -38,13 +40,14 @@ const questStyles = StyleSheet.create({
     alignSelf: "center",
     zIndex: 3,
   },
-  street_basic: {
+  clover: {
     position: "absolute",
-    width: width * 0.75,
-    height: width * 0.5,
-    alignSelf: "center",
-    zIndex: 3,
-  },
+    top: height * 0.5,
+    right: width * 0.05,
+    width: width * 0.3,
+    height: width * 0.3,
+    zIndex: 10,
+  }
 });
 
 export default questStyles;
