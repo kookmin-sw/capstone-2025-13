@@ -16,6 +16,9 @@ data class Record(
     @Column(nullable = false, columnDefinition = "TEXT")
     var data : String? = null,
 
+    @Column(nullable = false)
+    var innerSeq : Int = 0,
+
     @ManyToOne
     val user: User? = null,
 

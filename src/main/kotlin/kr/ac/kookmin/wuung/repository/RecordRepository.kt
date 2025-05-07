@@ -14,4 +14,9 @@ interface RecordRepository : JpaRepository<Record, String>{
         start: LocalDateTime,
         end: LocalDateTime
     ): List<Record>
+    fun findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+        user: User,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<Record>
 }

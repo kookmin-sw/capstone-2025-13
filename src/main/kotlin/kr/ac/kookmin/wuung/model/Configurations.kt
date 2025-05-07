@@ -20,10 +20,14 @@ class Configurations(
     val key: ConfigurationKey? = null,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    val value: String? = null
+    val value: String? = null,
+
+    @Column(nullable = false)
+    val innerSeq: Int = 0
 )
 
 enum class ConfigurationKey(val value: String) {
     RECORD_PROMPT("RECORD_PROMPT"),
-    LUCKY_VICKY("LUCKY_VICKY")
+    LUCKY_VICKY("LUCKY_VICKY"),
+    DAILY_QUESTION("DAILY_QUESTION")
 }

@@ -27,8 +27,10 @@ import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
+import kr.ac.kookmin.wuung.model.ConfigurationKey
 import kr.ac.kookmin.wuung.model.RecordFeedback
 import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
+import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
 import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
@@ -42,6 +44,12 @@ import kotlin.jvm.optionals.getOrNull
 
 data class RecordDTO(
     val id: String,
+    @Schema(
+        description = """
+        [en] Rating score (1-5 stars), default value is 0 (unrated)
+        [ko] 별점 점수 (1-5점), 기본값은 0이다. (평가하지 않음)
+    """, minimum = "1", maximum = "5"
+    )
     val rate: Int,
     val data: String,
     val createdAt: LocalDateTime,
@@ -66,18 +74,19 @@ fun Record.toFullDTO() = RecordDTO(
     this.recordFeedback.map { it.toDTO() }
 )
 
-data class CreateRecordRequest(
-    val rate: Int,
-    val data: String,
-)
-
 data class RecordFeedbackRequest(
     val data: String,
 )
 
 data class RecordUpdateRequest(
-    val id: String,
+    @Schema(
+        description = """
+        [en] Rating score (1-5 stars)
+        [ko] 별점 점수 (1-5점)
+    """, minimum = "1", maximum = "5"
+    )
     val rate: Int,
+    val data: String,
 )
 
 data class RecordFeedbackDTO(
@@ -100,21 +109,40 @@ fun RecordFeedback.toDTO() = RecordFeedbackDTO(
 )
 
 data class UpdateFeedbackRequest(
+    @Schema(description = "User comment for the feedback")
     val comment: String,
-    val rate: Int = 1
+
+    @Schema(
+        description = """
+        [en] Rating score (1-5 stars)
+        [ko] 별점 점수 (1-5점)
+    """, minimum = "1", maximum = "5"
+    )
+    val rate: Int = 1,
 )
 
 @RestController
 @RequestMapping("/record")
-@Tag(name = "Record API", description = "Endpoints for record, feedback record")
+@Tag(
+    name = "Record API", description = """
+    [en] API endpoints for managing daily records and their AI-generated feedback
+    [ko] 일일 기록 및 AI 생성 피드백을 관리하기 위한 API 엔드포인트
+"""
+)
 class RecordController(
     @Autowired private val recordRepository: RecordRepository,
     @Autowired private val recordFeedbackRepository: RecordFeedbackRepository,
     @Autowired private val jobLauncher: JobLauncher,
     @Autowired private val recordJob: Job,
+    private val configurationsRepository: ConfigurationsRepository,
 ) {
     @GetMapping("/me")
-    @Operation(summary = "Get record information for a specific date", description = "Get record id, data, rate, ...")
+    @Operation(
+        summary = "Get record information for a specific date", description = """
+        [en] Retrieves the most recent record for a specific date, including record ID, emotional rate, and content data. Defaults to the current date if no date is specified.
+        [ko] 특정 날짜의 가장 최근 기록을 조회합니다. 기록 ID, 감정 수치, 내용 데이터를 포함합니다. 기본 값은 오늘 입니다.
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
@@ -127,25 +155,18 @@ class RecordController(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
                 )]
-            ),
-            ApiResponse(
-                responseCode = "404", description = "Record not found",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
             )
         ]
     )
     fun getRecordByDate(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01", type = "string")
-        @RequestParam date: String,
+        @RequestParam date: String?,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         // 요청된 날짜의 시작·끝 시각 계산
-        val targetDate: LocalDate = date.datetimeParser().toLocalDate()
+        val targetDate: LocalDate = date?.datetimeParser()?.toLocalDate() ?: LocalDate.now()
         val startOfDay: LocalDateTime = targetDate.atStartOfDay()
         val endOfDay: LocalDateTime = targetDate.atTime(23, 59, 59)
 
@@ -155,11 +176,7 @@ class RecordController(
             startOfDay,
             endOfDay
         )
-
-        if (records.isEmpty()) {
-            throw NotFoundException()
-        }
-
+    
         // 가장 최신 생성 레코드 선택
         val record = records.maxByOrNull { it.createdAt } ?: throw NotFoundException()
 
@@ -168,12 +185,10 @@ class RecordController(
 
     @OptIn(DelicateCoroutinesApi::class)
     @PutMapping("/create")
-    @Operation(
-        summary = "Create new record", description = """
-        Create a new record with rate and data.
-        AccessToken is required for all of this part of endpoints on Authorization header.
-    """
-    )
+    @Operation(summary = "Create new record", description = """
+        [en] Creates a new daily record with emotional rate and content. Only one record per day is allowed. Requires valid access token in Authorization header
+        [ko] 감정 수치와 내용이 포함된 새로운 일일 기록을 생성합니다. 하루에 한 개의 기록만 허용됩니다. Authorization 헤더에 유효한 접근 토큰이 필요합니다
+    """)
     @ApiResponses(
         value = [
             ApiResponse(
@@ -198,7 +213,6 @@ class RecordController(
     )
     fun createRecord(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestBody request: CreateRecordRequest,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
@@ -214,21 +228,28 @@ class RecordController(
         )
         if (existingRecords.isNotEmpty()) throw RecordAlreadyCreatedException()
 
+        val weekRecords = recordRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+            userDetails,
+            today.minusDays(7).atStartOfDay(),
+            endOfDay,
+        )
+        val dailyQuestions = configurationsRepository.findAllByKey(ConfigurationKey.DAILY_QUESTION)
+        if(dailyQuestions.isEmpty()) throw NotFoundException()
+
+        val dailyQuestionWithoutDuplication = dailyQuestions
+            .filter { !weekRecords.map { record -> record.innerSeq }.contains(it.innerSeq) }
+
+        if (dailyQuestionWithoutDuplication.isEmpty()) throw NotFoundException()
+
+        val selectedQuestion = dailyQuestionWithoutDuplication.random()
+
+
         val record = Record(
-            rate = request.rate,
-            data = request.data,
+            data = selectedQuestion.value,
+            innerSeq = selectedQuestion.innerSeq,
             user = userDetails
         )
         val saved = recordRepository.save(record)
-
-        val recordFeedback = RecordFeedback(
-            record = record,
-            data = request.data,
-            status = RecordFeedbackStatus.QUEUED,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
-        )
-        recordFeedbackRepository.save(recordFeedback)
 
         GlobalScope.launch {
             runJob()
@@ -237,10 +258,13 @@ class RecordController(
         return ResponseEntity.ok(ApiResponseDTO(data = saved.toDTO()))
     }
 
-    @PostMapping("/modify")
+    @PostMapping("/modify/{recordId}")
     @Operation(
         summary = "Modify existing record information",
-        description = "Update rate and data of an existing record"
+        description = """
+            [en] Updates the emotional rate and content data of an existing record. Only the record owner can modify their records
+            [ko] 기존 기록의 감정 수치와 내용을 수정합니다. 기록 소유자만 수정할 수 있습니다
+        """
     )
     @ApiResponses(
         value = [
@@ -267,22 +291,31 @@ class RecordController(
     fun modifyRecord(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: RecordUpdateRequest,
+        @PathVariable recordId: String,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val record = recordRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
+        val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
         if (record.user?.id != userDetails.id) throw UnauthorizedException()
 
+        val latestFeedback = record.recordFeedback.maxByOrNull { it.createdAt }
+        if(latestFeedback == null) throw NotFoundException()
+
         record.rate = request.rate
+        latestFeedback.comment = request.data
         // updatedAt은 @PreUpdate로 자동 갱신
 
-        val updated = recordRepository.save(record)
-        return ResponseEntity.ok(ApiResponseDTO(data = updated.toDTO()))
+        return ResponseEntity.ok(ApiResponseDTO(data = record.toFullDTO()))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     @PutMapping("/feedback/{recordId}")
-    @Operation(summary = "Request AI feedback", description = "Request AI feedback for a specific record ID with next conversation data.")
+    @Operation(
+        summary = "Request AI feedback", description = """
+        [en] Initiates an AI feedback request for a specific record. The feedback process runs asynchronously and updates the feedback status accordingly
+        [ko] 특정 기록에 대한 AI 피드백 요청을 시작합니다. 피드백 프로세스는 비동기적으로 실행되며 피드백 상태가 그에 따라 업데이트됩니다
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
@@ -340,13 +373,15 @@ class RecordController(
 
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
 
+        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+
         val feedbackNum = record.recordFeedback.size
 
         if(feedbackNum >= 5) throw LimitReachedException()
 
-        val lastFeedback = record.recordFeedback.lastOrNull() ?: throw NotFoundException()
+        val lastFeedback = record.recordFeedback.lastOrNull()
 
-        when (lastFeedback.status) {
+        if (lastFeedback != null) when (lastFeedback.status) {
             RecordFeedbackStatus.QUEUED -> AiFeedbackNotCompleteException()
             RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
             RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
@@ -373,7 +408,12 @@ class RecordController(
     }
 
     @GetMapping("/{recordId}")
-    @Operation(summary = "Get all feedback record", description = "Get all feedback that ai feedback completed")
+    @Operation(
+        summary = "Get all feedback record", description = """
+        [en] Retrieves all completed AI feedback records associated with a specific record. Only shows feedback with COMPLETED status
+        [ko] 특정 기록과 관련된 모든 완료된 AI 피드백 기록을 조회합니다. COMPLETED 상태의 피드백만 표시됩니다
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
@@ -404,6 +444,8 @@ class RecordController(
         if (userDetails == null) throw UnauthorizedException()
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
 
+        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+
         val feedbacks = record.recordFeedback.filter { it.status == RecordFeedbackStatus.COMPLETED }
 
         if (feedbacks.isEmpty()) throw NotFoundException()
@@ -414,7 +456,12 @@ class RecordController(
     }
 
     @GetMapping("/feedback/{recordFeedbackId}")
-    @Operation(summary = "Get feedback record", description = "Get feedback details by feedback record ID")
+    @Operation(
+        summary = "Get feedback record", description = """
+        [en] Retrieves detailed information about a specific feedback record, including AI feedback content and user comments
+        [ko] 특정 피드백 기록의 상세 정보를 조회합니다. AI 피드백 내용과 사용자 댓글을 포함합니다
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
@@ -455,9 +502,10 @@ class RecordController(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable recordFeedbackId: String,
     ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
-
         if (userDetails == null) throw UnauthorizedException()
         val feedback = recordFeedbackRepository.findById(recordFeedbackId).getOrNull() ?: throw NotFoundException()
+
+        if(feedback.record?.user?.id != userDetails.id) throw UnauthorizedException()
 
         when (feedback.status) {
             RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
@@ -475,7 +523,12 @@ class RecordController(
 
 
     @PostMapping("/feedback/{recordId}")
-    @Operation(summary = "Update feedback record", description = "Update feedback ")
+    @Operation(
+        summary = "Update feedback record", description = """
+        [en] Updates the data and user comments of a completed feedback record. Only the record owner can update their records feedbacks. Only applies to COMPLETED feedback records.
+        [ko] 완료된 피드백 기록의 데이터와 사용자 댓글을 업데이트합니다. 레코드의 주인만 레코드의 피드백을 수정할 수 있습니다. 마지막 요청이 COMPLETED 상태인 피드백에만 적용 가능합니다.
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
@@ -521,6 +574,8 @@ class RecordController(
 
         val record = recordRepository.findById(recordId).getOrNull() ?: throw NotFoundException()
 
+        if(record.user?.id != userDetails.id) throw UnauthorizedException()
+
         val feedback = record.recordFeedback.lastOrNull() ?: throw NotFoundException()
 
         when (feedback.status) {
@@ -533,6 +588,8 @@ class RecordController(
         // 데이터 업데이트
         feedback.comment = request.comment
         record.rate = request.rate
+
+        recordFeedbackRepository.save(feedback)
 
         return ResponseEntity.ok(ApiResponseDTO(
             data = record.toFullDTO()
