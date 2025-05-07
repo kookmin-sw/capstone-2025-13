@@ -78,8 +78,8 @@ class EtcController(
 
         var behaviors: List<Pair<String, String>> = diagnosis.mapNotNull { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.GAD_7 -> "GAD-7" to "불안 검사 시행"
-                DiagnosisType.PHQ_9 -> "PHQ-9" to "우울 검사 시행"
+                DiagnosisType.`GAD-7` -> "GAD-7" to "불안 검사 시행"
+                DiagnosisType.`PHQ-9` -> "PHQ-9" to "우울 검사 시행"
                 DiagnosisType.Simple -> "SIMPLE" to "간단 검사 시행"
                 DiagnosisType.BDI -> "BDI" to "우울 검사 시행"
                 else -> null
