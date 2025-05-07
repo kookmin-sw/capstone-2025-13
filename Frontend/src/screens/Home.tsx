@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
-import { View, TouchableOpacity } from "react-native";
+import { View, ScrollView } from "react-native";
 import HomeCircle from "../components/Home_circle";
 import HeaderForest from "../components/Header_forest";
 import StatusBox from "../components/StatusBox";
@@ -39,31 +39,36 @@ export default function Home() {
                 <HomeCircle style={styles.circle} />
             </View>
 
-            <View style={styles.scroll}>
+            <ScrollView
+                contentContainerStyle={styles.scroll}
+                showsVerticalScrollIndicator={false}
+            >
                 <StatusBox />
 
                 <View style={styles.buttonGroup}>
                     <HomeButton
                         icon="heart-pulse"
                         title="마음 건강 진단"
-                        subtitle="PHQ-9 기반 설문 자가 진단하기"
+                        subtitle="지금, 내 마음 상태 알아보기"
                         onPress={() => navigation.navigate("FormalDiagnosis")}
                     />
                     <HomeButton
-                        icon="book-heart"
+                        icon="book-open-variant"
                         title="일기"
-                        subtitle="오늘 하루 나의 마음 기록하기"
-                        onPress={() => console.log("일기")}
+                        subtitle="오늘 하루, 나의 마음 기록하기"
+                        onPress={() => navigation.navigate("Record")}
                     />
                     <HomeButton
                         icon="target"
                         title="퀘스트"
+                        subtitle="작은 실천 모아 나의 마음 건강 지키기"
                         onPress={() => navigation.navigate("Quest")}
                     />
                 </View>
-            </View>
-
-            <FloatingButton />
+                <View style={styles.floatingButtonWrapper}>
+                    <FloatingButton />
+                </View>
+            </ScrollView>
         </View>
     );
 }

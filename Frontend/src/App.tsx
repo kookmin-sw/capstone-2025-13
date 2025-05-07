@@ -11,6 +11,8 @@ import SignUpStep3 from "./screens/SignUp/SignUpStep3";
 import Game from "./screens/Game/Game";
 import Quest from "./screens/Quest/Quest";
 import Quest_stage from "./screens/Quest/Quest_stage";
+import Quest_meditation from "./screens/Quest/Quest_meditation";
+import Quest_exercise from "./screens/Quest/Quest_exercise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -19,13 +21,8 @@ import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
-import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import { refreshAccessToken } from "./API/signAPI";
-import Calendar from "./screens/Calendar";
-import Quest_meditation from "./screens/Quest/Quest_meditation";
-import Quest_exercise from "./screens/Quest/Quest_exercise";
-import SecondPassword from "./screens/SecondPassword";
-
+import Record from "./screens/Record";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -51,10 +48,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
-    Calendar: undefined;
-    Quest_meditation: undefined;
-    Quest_exercise: undefined;
-    SecondPassword: { nextScreen: string };
+    Record: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -65,12 +59,13 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [loading, setLoading] = useState(true);
 
-
     useEffect(() => {
         const checkToken = async () => {
-            const token = await AsyncStorage.getItem('accessToken');
-            setIsLoggedIn(!!token);
-            setLoading(false);
+            const token = await AsyncStorage.getItem("accessToken");
+            if (token) {
+                setIsLoggedIn(true);
+                setLoading(false);
+            }
         };
         checkToken();
     }, []);
@@ -117,9 +112,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator
-                initialRouteName={isLoggedIn ? "Home" : "Quest"}
-            >
+            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Quest"}>
                 <Stack.Screen
                     name="Home"
                     component={Home}
@@ -196,31 +189,18 @@ export default function App() {
                 <Stack.Screen
                     name="Spinner" // Spinner 화면 추가
                     component={Spinner}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="HelpCall" // HelpCall 화면 추가
-                    component={HelpCall}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="HelpCall2" // HelpCall 화면 추가
-                    component={HelpCall2}
-                    options={{ headerShown: false }} />
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                    name="Calendar"
-                    component={Calendar}
+                    name="Record"
+                    component={Record}
                     options={{ headerShown: false }}
                 />
-                <Stack.Screen
-                    name="SecondPassword"
-                    component={SecondPassword}
-                    options={{ headerShown: false }}
-                />
-
             </Stack.Navigator>
         </NavigationContainer>
     );
