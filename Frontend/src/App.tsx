@@ -20,6 +20,7 @@ import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
@@ -49,6 +50,8 @@ export type RootStackParamList = {
     HelpCall2: undefined;
     UserInfo: undefined;
     Record: undefined;
+    Quest_meditation: undefined;
+    Quest_exercise: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -201,6 +204,14 @@ export default function App() {
                     component={Record}
                     options={{ headerShown: false }}
                 />
+                 <Stack.Screen
+                    name="HelpCall" // HelpCall 화면 추가
+                    component={HelpCall}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
+                    name="HelpCall2" // HelpCall 화면 추가
+                    component={HelpCall2}
+                    options={{ headerShown: false }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
