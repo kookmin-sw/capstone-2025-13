@@ -40,6 +40,14 @@ const questStyles = StyleSheet.create({
     alignSelf: "center",
     zIndex: 3,
   },
+  clover: {
+    position: "absolute",
+    top: height * 0.5,
+    right: width * 0.05,
+    width: width * 0.3,
+    height: width * 0.3,
+    zIndex: 10,
+  }
 });
 
 export default questStyles;

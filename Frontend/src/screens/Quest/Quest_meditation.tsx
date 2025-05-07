@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions, Alert } from "react-native";
 import styles from "../../styles/questMeditationStyles";
 import Youtube_playlist from "../../components/Youtube_playlist";
 import { dynamic } from '../../styles/questMeditaionDynamicStyles';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Quest_meditation() {
@@ -12,7 +13,7 @@ export default function Quest_meditation() {
   const [isRunning, setIsRunning] = useState(false);
   const [isMeditationDone, setIsMeditationDone] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const navigation = useNavigation<NavigationProp<any>>();
 
   const formatTime = (seconds: number) => {
@@ -44,33 +45,34 @@ export default function Quest_meditation() {
   };
 
   const mainVideo = {
-    id: "5qap5aO4i9A",
-    title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
+    id: "FjHGZj2IjBk",
+    title: "하루의 피로를 풀어주는 힐링 음악 모음 | Relaxing Music for a Calm Evening",
   };
+  
 
-  const meditationVideos= [
+  const meditationVideos = [
     {
-      id: "DWcJFNfaw9c",
-      title: "명상과 함께하는 자연 속 음악",
-      channel: "Calm Sound",
-      duration: "1:03:22",
-      thumbnail: "https://img.youtube.com/vi/DWcJFNfaw9c/0.jpg",
+      id: "Yuw8TnTei58",
+      title: "잔잔한 자연의 소리와 함께하는 명상",
+      channel: "Calm Nature",
+      duration: "1:00:00",
+      thumbnail: "https://img.youtube.com/vi/Yuw8TnTei58/0.jpg",
     },
     {
-      id: "6zD3acN2RfY",
-      title: "마음이 차분해지는 피아노 선율 모음",
+      id: "_LVeoEEYN9c",
+      title: "마음을 다스리는 깊은 명상 음악",
+      channel: "Mindful Music",
+      duration: "58:32",
+      thumbnail: "https://img.youtube.com/vi/_LVeoEEYN9c/0.jpg",
+    },
+    {
+      id: "JYPIDIQSvb8",
+      title: "편안한 피아노 선율로 힐링하기",
       channel: "Healing Piano",
-      duration: "52:10",
-      thumbnail: "https://img.youtube.com/vi/6zD3acN2RfY/0.jpg",
+      duration: "47:15",
+      thumbnail: "https://img.youtube.com/vi/JYPIDIQSvb8/0.jpg",
     },
-    {
-      id: "hHW1oY26kxQ",
-      title: "편안한 재즈로 명상 타임 즐기기",
-      channel: "Jazz Relax",
-      duration: "45:00",
-      thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/0.jpg",
-    },
-  ];
+  ];  
 
   const buttonText = isMeditationDone
     ? "완 료 !"
@@ -83,26 +85,34 @@ export default function Quest_meditation() {
     : isRunning
       ? "#aaa"
       : "#6c63ff";
-
+      useEffect(() => {
+        const checkFirstVisit = async () => {
+          try {
+            const hasVisited = await AsyncStorage.getItem('hasVisitedMeditation');
+            if (!hasVisited) {
+              // 최초 실행 시 알림창 띄우기
+              Alert.alert(
+                 "명상 타이머 설명",
+                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌",
+                [{ text: '확인' }]
+              );
+              await AsyncStorage.setItem('hasVisitedMeditation', 'true');
+            }
+          } catch (error) {
+            console.log('Error checking first visit:', error);
+          }
+        };
+    
+        checkFirstVisit();
+      }, []);
   return (
     <View style={styles.page}>
       <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { minHeight: height, padding: width * 0.1, paddingBottom: width * 0.25 },
-        ]}
+        contentContainerStyle={[styles.container]}
         bounces={false}
         overScrollMode="never"
       >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          alignSelf: "flex-start", // ← 중요: 왼쪽 정렬
-          marginBottom: 20,
-        }}
-      >
-        
+      <View style={styles.backButtonWrapper}>      
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Quest_stage", {
@@ -113,8 +123,7 @@ export default function Quest_meditation() {
         <Ionicons name="arrow-back-circle" size={40} color="#6c63ff" />
       </TouchableOpacity>
 
-      {/* 텍스트 묶음 */}
-      <View style={{ marginLeft: 12 }}>
+      <View>
         <Text style={[styles.missionTitle, dynamic.missionTitle]}>
           오늘의 미션 🔥
         </Text>
@@ -124,22 +133,16 @@ export default function Quest_meditation() {
       </View>
     </View>
 
-
-        {/* 타이머와 느낌표 아이콘을 같은 View 안에 배치 */}
-        <View style={{ flexDirection: "row", alignItems: "center", position: "relative" }}>
+        <View style={styles.timerWrapper}>
           <Text style={[styles.timerText, dynamic.timerText]}>{formatTime(timeLeft)}</Text>
           <TouchableOpacity
             onPress={() =>
               Alert.alert(
                 "명상 타이머 설명",
-                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌"
+                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌", [{ text: '확인' }]
               )
             }
-            style={{
-              position: "absolute",
-              right: width * 0.001,  // 화면 너비에 비례
-              top: height * 0.01,  // 화면 높이에 비례
-            }}
+            style={styles.timerDescription}
           >
             <Ionicons name="information-circle-outline" size={22} color="red" />
           </TouchableOpacity>
@@ -153,7 +156,7 @@ export default function Quest_meditation() {
         <Text style={[styles.description, dynamic.description]}>・ 숨이 지나는 감각, 가슴이 움직이는 느낌에 주의해보세요.</Text>
         <Text style={[styles.description, dynamic.description]}>・ 생각이 떠오르면 판단하지 말고 다시 호흡으로 돌아옵니다</Text>
 
-        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>오늘의 추천 플레이리스트 🎧</Text>
+        <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>'우웅'의 추천 플레이리스트 🎧</Text>
 
         <Youtube_playlist 
           title="추천 플레이리스트" 

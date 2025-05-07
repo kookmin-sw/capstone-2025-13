@@ -9,6 +9,9 @@ const questStageStyles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#17B96D",
   },
+  scrollContainer: {
+    width: "100%",
+  },
   street: {
     position: "absolute",
     right: width / 16,
@@ -17,8 +20,13 @@ const questStageStyles = StyleSheet.create({
     top: height * 0.25,
     zIndex: 3,
   },
+  elementWrapper: {
+    width: width * 0.23,
+    marginVertical: height * 0.005,
+    zIndex: 4,
+  },
   questTitle: {
-    width: width*0.8,
+    width: width*0.7,
     position: "absolute",
     alignSelf: "center",
     zIndex: 3 
@@ -49,6 +57,20 @@ const questStageStyles = StyleSheet.create({
     width: width * 0.14,
     height: width * 0.14,
     zIndex: 4,
+  },
+  iconWrapper:{
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center' 
+  },
+  cloverIcon:{
+    position: 'absolute',
+    top: -height * 0.04,
+    width: width * 0.2,  
+    height: width * 0.18, 
+    marginRight: width * 0.00001, 
+    zIndex: 2,
+
   },
   textWrapper: {
     position: "absolute",
@@ -95,9 +117,6 @@ const questStageStyles = StyleSheet.create({
   fullSizeImage: {
     width: "100%",
     height: "100%",
-  },
-  scrollBottomSpacer: {
-    height: height * 1,
   },
 });
 

@@ -25,8 +25,8 @@ export default function Tree({ type, title, subtitle }: TreeProps) {
 
   const sizeStyles = {
     apple: { width: 0.3, height: 0.33 },
-    peach: { width: 0.37, height: 0.38 },
-    forest: { width: 0.38, height: 0.35 },
+    peach: { width: 0.37, height: 0.31 },
+    forest: { width: 0.38, height: 0.32 },
   };
 
   const handlePress = () => {
@@ -38,7 +38,7 @@ export default function Tree({ type, title, subtitle }: TreeProps) {
       <TouchableOpacity
         activeOpacity={1}
         onPress={handlePress}
-        style={{ alignItems: 'center' }}
+        style={{ alignItems: 'center'}}
       >
         <Image
           source={treeImages[type]}
