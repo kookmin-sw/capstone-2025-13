@@ -63,23 +63,29 @@ class EtcController(
         if (userDetails == null) throw UnauthorizedException()
 
         val startDate = date.datetimeParser()
-        val diagnosis = diagnosisResultsRepository.findByUserAndCreatedAt(userDetails, startDate)
-            ?: diagnosisResultsRepository.findByUser(userDetails)
+        val endDate = startDate.plusDays(1)
 
-        val behaviors: List<String> = diagnosis.map { result ->
+        val diagnosis = diagnosisResultsRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        var behaviors: List<String> = diagnosis.map { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.BDI -> "BDI 검사 시행"
                 DiagnosisType.PHQ_9 -> "PHQ-9 검사 시행"
+                DiagnosisType.BDI -> "BDI 검사 시행"
                 DiagnosisType.Simple -> "약식 검사 시행"
-                null -> ""
+                else -> ""
             }
         }.filter { it.isNotEmpty() }
 
+        behaviors = behaviors + ""
+        
         return ResponseEntity.ok(
             ApiResponseDTO(
                 data = behaviors
             )
         )
-
     }
 }
