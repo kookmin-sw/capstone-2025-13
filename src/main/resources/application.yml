@@ -28,6 +28,7 @@ springdoc:
 jwt:
   signing-key: ${JWT_SIGNING_KEY}
   validate-key: ${JWT_VALIDATE_KEY}
+  issuer: ${JWT_ISSUER}
   access-token-validity: 900
   refresh-token-validity: 604800
 etc:
