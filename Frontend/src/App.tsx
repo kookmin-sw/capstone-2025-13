@@ -20,6 +20,7 @@ import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
+import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
@@ -194,6 +195,16 @@ export default function App() {
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="HelpCall"
+                    component={HelpCall}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Calendar"
+                    component={Calendar}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
