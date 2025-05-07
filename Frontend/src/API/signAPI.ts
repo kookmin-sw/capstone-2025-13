@@ -8,7 +8,7 @@ export const refreshAccessToken = async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "accept": "application/json",
+                accept: "application/json",
             },
             body: JSON.stringify({ refreshToken }),
         });
@@ -35,7 +35,7 @@ export const signIn = async (email: string, password: string) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "accept": "application/json",
+                accept: "application/json",
             },
             body: JSON.stringify({ email, password }),
         });
@@ -50,7 +50,7 @@ export const signIn = async (email: string, password: string) => {
         console.error("Error during sign-in:", error);
         throw error;
     }
-}
+};
 
 export const signOut = async (accessToken: string, refreshToken: string) => {
     try {
@@ -67,27 +67,39 @@ export const signOut = async (accessToken: string, refreshToken: string) => {
         }
 
         const data = await response.json();
+
+        // Clear tokens from AsyncStorage
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
+
         return data;
     } catch (error) {
         console.error("Error during sign-out:", error);
         throw error;
     }
-}
+};
 
-export const signUp = async (email: string, password: string, nickname: string, birthDate:string, gender: string) => {
+export const signUp = async (
+    email: string,
+    password: string,
+    nickname: string,
+    birthDate: string,
+    gender: string
+) => {
     try {
         const response = await fetch("https://wuung.mori.space/auth/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "accept": "application/json",
+                accept: "application/json",
             },
-            body: JSON.stringify({  
+            body: JSON.stringify({
                 email,
                 password,
-                gender: gender.toUpperCase(), 
+                gender: gender.toUpperCase(),
                 user_name: nickname,
-                birth_date: birthDate, }),
+                birth_date: birthDate,
+            }),
         });
 
         if (!response.ok) {
@@ -100,4 +112,4 @@ export const signUp = async (email: string, password: string, nickname: string, 
         console.error("Error during sign-up:", error);
         throw error;
     }
-}   
+};
