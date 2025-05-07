@@ -1,7 +1,7 @@
 import { Platform, StyleSheet, Dimensions } from "react-native";
 import colors from "../constants/colors";
 
-const { height } = Dimensions.get("window"); // 화면 높이 가져오기
+const { width, height } = Dimensions.get("window"); // 화면 높이 가져오기
 
 const helpCallStyles = StyleSheet.create({
     container: {
@@ -24,6 +24,13 @@ const helpCallStyles = StyleSheet.create({
         zIndex: 10,
         paddingTop: height * 0.07, 
     },
+    backButtonWrapper: {
+        position: 'absolute',
+        left: width* 0.01,
+        top: width* 0.115,
+        padding: 8,
+        zIndex: 10,
+      },
     headerText: {
         fontWeight: "bold",
         fontSize: 22,
