@@ -22,6 +22,7 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
+import Record from "./screens/Record";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -47,6 +48,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
+    Record: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -192,6 +194,11 @@ export default function App() {
                 <Stack.Screen
                     name="UserInfo"
                     component={UserInfo}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Record"
+                    component={Record}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
