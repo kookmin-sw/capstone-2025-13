@@ -9,6 +9,7 @@
     <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_questions_diagnosis_text.sql" dialect="PostgreSQL" />
     <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_scales.sql" dialect="PostgreSQL" />
     <file url="file://$USER_HOME$/Downloads/diagnosis/diagnosis_text.sql" dialect="PostgreSQL" />
+    <file url="file://$USER_HOME$/Downloads/quests.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

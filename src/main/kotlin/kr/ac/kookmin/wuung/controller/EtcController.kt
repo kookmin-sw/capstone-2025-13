@@ -6,20 +6,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.media.Schema
-import kr.ac.kookmin.wuung.exceptions.JwtExpiredException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.QuestType
-import kr.ac.kookmin.wuung.model.Quests
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
-import kr.ac.kookmin.wuung.repository.QuestsRepository
-import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
 import kr.ac.kookmin.wuung.repository.RecordRepository
 import kr.ac.kookmin.wuung.repository.UserQuestsRepository
-import kr.ac.kookmin.wuung.service.DiagnosisService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
@@ -83,9 +78,10 @@ class EtcController(
 
         var behaviors: List<Pair<String, String>> = diagnosis.mapNotNull { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.PHQ_9 -> "마음 검사" to "PHQ-9 검사 시행"
-                DiagnosisType.BDI -> "마음 검사" to "BDI 검사 시행"
-                DiagnosisType.Simple -> "마음 검사" to "약식 검사 시행"
+                DiagnosisType.GAD_7 -> "GAD-7" to "불안 검사 시행"
+                DiagnosisType.PHQ_9 -> "PHQ-9" to "우울 검사 시행"
+                DiagnosisType.Simple -> "SIMPLE" to "간단 검사 시행"
+                DiagnosisType.BDI -> "BDI" to "우울 검사 시행"
                 else -> null
             }
         }
