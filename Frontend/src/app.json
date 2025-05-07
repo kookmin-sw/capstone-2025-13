@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
-      "expo-secure-store", [
-        "expo-build-properties", {
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
           "ios": {
             "deploymentTarget": "15.1"
           },
           "android": {
-            "minSdkVersion": 23
+            "minSdkVersion": 24
           }
         }
       ]
@@ -45,6 +47,12 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9be9ecfd-1267-47dd-9930-304a748660b1"
+      }
+    },
+    "owner": "wooong"
   }
 }

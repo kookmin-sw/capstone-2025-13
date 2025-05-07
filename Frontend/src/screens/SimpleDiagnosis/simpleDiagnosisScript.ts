@@ -130,21 +130,21 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
       index: 13,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "아하 그렇구나!\n여기 물!",
     },
     {
       index: 14,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "근데 여기는 어쩌다가 오게 되었어?",
     },
     {
       index: 15,
       type: "options",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       options: [
         { text: "나를 찾으러 왔어 ",nextType: "story", score: 0, nextIndex: 16 },
         { text: "사랑 찾아 왔어 💕",nextType: "story", score: 0, nextIndex: 16 },
@@ -154,21 +154,21 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
       index: 16,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "혼자 여행 다니는 거 정말 멋있다!\n낭만있구 대단해",
     },
     {
       index: 17,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "여행 말고 요즘 관심있는 거 있어?",
     },
     {
       index: 18,
       type: "options",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       options: [
         { text: "응!", nextType: "story",score: 0, nextIndex: 19 },
         { text: "아니, 그치만 새 관심사를 요즘 찾아가는 중이야", nextType: "story",score: 0, nextIndex: 21 },
@@ -183,28 +183,28 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
       index: 20,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "우와! 멋지다!\n나도 그거 좋아해!",
     },
     {
       index: 21,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "좋다!\n지금 이 여행이 도움 됐으면 좋겠어!",
     },
     {
       index: 22,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-4.png"),
       name: "세잎이",
       text: "그래, 그럴 때가 있지~",
     },
     {
         index: 23,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-4.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-4.png"),
         name: "세잎이",
         text: "(꼬르륵..)\n나 지금 밥 먹으려고 했는데\n너도 먹고 갈래?",
       },
@@ -228,21 +228,21 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
     index: 26,
     type: "story",
-    backgroundImage: require("../../assets/Images/simple-6.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-6.png"),
     name: "나",
     text: "(끼이익..)",
     },
     {
     index: 27,
     type: "story",
-    backgroundImage: require("../../assets/Images/simple-6.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-6.png"),
     name: "세잎이",
     text: "(우르르 쾅쾅!!!!)\n비가 너무 많이 오는데 갈 수 있겟어?\n괜찮으면 오늘 하루 여기서 지내도 돼",
     },
     {
     index: 28,
     type: "options",
-    backgroundImage: require("../../assets/Images/simple-6.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-6.png"),
     options: [
         { text: "웅, 알겠어. 고마워", nextType: "story",score: 0, nextIndex: 29 },
         { text: "헐.. 감동이야 😭", nextType: "story",score: 0, nextIndex: 29 },
@@ -251,14 +251,14 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
     index: 29,
     type: "story",
-    backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-7.png"),
     name: "세잎이",
     text: "비오니까\n괜히 좀 가라앉는 기분이네,,",
     },
     {
     index: 30,
     type: "options",
-    backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-7.png"),
     options: [
         { text: "나도 비오면 좀 센치해져", nextType: "story",score: 0, nextIndex: 31 },
         { text: "나는 비 오는 날 좋아!", nextType: "story",score: 0, nextIndex: 31 },
@@ -268,7 +268,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index: 31,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-7.png"),
         name: "세잎이",
         text: "분위기 띄울 겸\n같이 게임 한 판 할래??",
     },
@@ -280,21 +280,21 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index: 33,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-7.png"),
         name: "세잎이",
         text: "오 잘하는데?",
     },
     {
         index: 34,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-7.png"),
         name: "세잎이",
         text: "(하암~)\n게임했더니 피곤하다!\n이만 자러 가자!",
     },
     {
         index: 35,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-8.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-8.png"),
         options: [
             { text: "아무생각이 없다", nextType: "story",score: 0, nextIndex: 36 },
             { text: "아니, 나 오늘 정말 알찬 하루였어! 재밌다,,", nextType: "story",score: 0, nextIndex: 36 },
@@ -311,21 +311,21 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index:37,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         name: " ",
         text: "(아침이 밝았다)",
     },
     {
       index:38,
       type: "story",
-      backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+      backgroundImage: require("../../assets/Images/simple-10.png"),
       name: "세잎이",
       text: "잘잤어?",
   },
     {
         index: 39,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
             { text: "완전 푹 잤어!",nextType: "story", score: 0, nextIndex: 40 },
             { text: "아니, 요즘 잠을 잘 못 자",nextType: "story", score: 1, nextIndex: 40 },
@@ -335,14 +335,14 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index:40,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "세잎이",
         text: "그렇구나!\n나는 오늘 하루 너무 기대 돼\n너는 어때?",
     },
     {
         index: 41,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
             { text: "나도 완전 기대돼 ~", nextType: "story",score: 0, nextIndex: 42 },
             { text: "그게 그거지 뭐...", nextType: "story",score: 1, nextIndex: 42 },
@@ -352,14 +352,14 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index:42,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "세잎이",
         text: "그렇구나!\n그럼 이제 다시 여행 떠나는 거야?",
     },
     {
         index: 43,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         name: "나",
         text: "엉\n재워줘서 고마워 안녕!\n또 보자!",
     },

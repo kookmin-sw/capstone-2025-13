@@ -69,6 +69,12 @@ export default function App() {
     useEffect(() => {
         const checkIntegrity = async () => {
             try {
+                if (__DEV__) {
+                    console.log('Development build - skipping integrity check');
+                    setIsIntegrityVerified(true);
+                    return;
+                }
+
                 const result = await verifyDeviceIntegrity();
 
                 if(result.isValid) {
