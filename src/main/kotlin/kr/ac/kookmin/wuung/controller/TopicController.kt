@@ -124,7 +124,7 @@ data class UpdateFeedbackRequest(
 @RestController
 @RequestMapping("/topic")
 @Tag(
-    name = "Record API", description = """
+    name = "Topic API", description = """
     [en] API endpoints for managing daily topics and their AI-generated feedback
     [ko] 1일 1주제 기록 및 AI 생성 피드백을 관리하기 위한 API 엔드포인트
 """
