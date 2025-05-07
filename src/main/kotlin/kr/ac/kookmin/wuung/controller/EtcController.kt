@@ -11,8 +11,14 @@ import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.DiagnosisType
+import kr.ac.kookmin.wuung.model.QuestType
+import kr.ac.kookmin.wuung.model.Quests
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
+import kr.ac.kookmin.wuung.repository.QuestsRepository
+import kr.ac.kookmin.wuung.repository.RecordFeedbackRepository
+import kr.ac.kookmin.wuung.repository.RecordRepository
+import kr.ac.kookmin.wuung.repository.UserQuestsRepository
 import kr.ac.kookmin.wuung.service.DiagnosisService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
@@ -26,14 +32,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 
 @RestController
 @RequestMapping("/etc")
-@Tag(name = "etc API", description = """
+@Tag(
+    name = "etc API", description = """
     [En] Support convenience for Front End Side
     AccessToken is required for all of this part of endpoints on Authorization header.
     [Kr] 프론트 엔드를 위한 편의성 지원용 API
     해당 API를 사용하기 위해서는 Authorization 헤더에 AccessToken을 명시해야합니다.
-""")
+"""
+)
 class EtcController(
-    @Autowired private val diagnosisResultsRepository: DiagnosisResultsRepository
+    @Autowired private val diagnosisResultsRepository: DiagnosisResultsRepository,
+    @Autowired private val recordRepository: RecordRepository,
+    @Autowired private val userQuestRepository: UserQuestsRepository
 ) {
     @GetMapping("/behavior")
     @Operation(summary = "Get behavior information successfully")
@@ -58,7 +68,7 @@ class EtcController(
     fun getBehaviorByDate(
         @AuthenticationPrincipal userDetails: User?,
         @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") date: String
-    ): ResponseEntity<ApiResponseDTO<List<String>>> {
+    ): ResponseEntity<ApiResponseDTO<List<Pair<String, String>>>> {
 
         if (userDetails == null) throw UnauthorizedException()
 
@@ -71,17 +81,45 @@ class EtcController(
             endDate
         )
 
-        var behaviors: List<String> = diagnosis.map { result ->
+        var behaviors: List<Pair<String, String>> = diagnosis.mapNotNull { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.PHQ_9 -> "PHQ-9 검사 시행"
-                DiagnosisType.BDI -> "BDI 검사 시행"
-                DiagnosisType.Simple -> "약식 검사 시행"
-                else -> ""
+                DiagnosisType.PHQ_9 -> "마음 검사" to "PHQ-9 검사 시행"
+                DiagnosisType.BDI -> "마음 검사" to "BDI 검사 시행"
+                DiagnosisType.Simple -> "마음 검사" to "약식 검사 시행"
+                else -> null
             }
-        }.filter { it.isNotEmpty() }
+        }
 
-        behaviors = behaviors + ""
-        
+        val records = recordRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        if (records.isNotEmpty()) {
+            val recordBehavior = "기록" to "${startDate.monthValue}월 ${startDate.dayOfMonth}일 기록 작성"
+            behaviors = behaviors + recordBehavior
+        }
+
+        val userQuests = userQuestRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val userQuestBehaviors = userQuests.map { userQuest ->
+            val status = if (userQuest.target == userQuest.progress) "완료" else "수행 중"
+            val behaviorDesc = "${userQuest.id}-${userQuest.step} $status"
+            val questType = when (userQuest.quest.type) {
+                QuestType.MEDITATE -> "명상하기"
+                QuestType.ACTIVITY -> "운동하기"
+                QuestType.EMOTION -> "감정 표현하기"
+            }
+            questType to behaviorDesc
+        }
+
+        behaviors = behaviors + userQuestBehaviors
+
         return ResponseEntity.ok(
             ApiResponseDTO(
                 data = behaviors

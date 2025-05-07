@@ -2,8 +2,10 @@ package kr.ac.kookmin.wuung.repository
 
 import kr.ac.kookmin.wuung.model.QuestType
 import kr.ac.kookmin.wuung.model.Quests
+import kr.ac.kookmin.wuung.model.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 import java.util.Optional
 
 @Repository
