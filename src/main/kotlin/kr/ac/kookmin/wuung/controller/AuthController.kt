@@ -35,6 +35,7 @@ import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
@@ -133,11 +134,19 @@ data class UpdateUserResponse(
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Auth API", description = """
+    [en]
     Endpoints for authentication and token management.
     Tokens are valid for 15 minutes.
     Refreshed tokens will be invalidated for the previous token.
     The refresh token can be used to obtain new access tokens until they expire.
     AccessToken is required for protected endpoints on Authorization header.
+    
+    [ko]
+    인증 및 토큰 관리를 위한 엔드포인트입니다.
+    토큰은 15분간 유효합니다.
+    새로고침된 토큰은 이전 토큰을 무효화합니다.
+    리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
+    보호된 엔드포인트에는 Authorization 헤더에 AccessToken이 필요합니다.
 """)
 class AuthController(
     @Autowired private val authenticationManager: AuthenticationManager,
@@ -151,13 +160,22 @@ class AuthController(
     @Value("\${s3.profile-bucket}") private val s3BucketName: String,
 ) {
    @PostMapping("/login")
-   @Operation(summary = "Authenticate user and generate JWT tokens", description =
-    """
+   @Operation(
+       summary = "Authenticate user and generate JWT tokens / 사용자 인증 및 JWT 토큰 생성", description =
+           """
+        [en]
         Validates user credentials and provides access and refresh tokens.
         Tokens are valid for 15 minutes.
         Refreshed tokens will be invalidated for the previous token.
         The refresh token can be used to obtain new access tokens until they expire.
         This endpoint is not protected and can be used by unauthenticated clients.
+   
+        [ko]
+        사용자 자격 증명을 검증하고 액세스 및 리프레시 토큰을 제공합니다.
+        토큰은 15분간 유효합니다.
+        새로고침된 토큰은 이전 토큰을 무효화합니다.
+        리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
+        이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.
     """
    )
    @ApiResponses(
@@ -190,12 +208,20 @@ class AuthController(
    }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh JWT tokens", description =
-    """
+    @Operation(
+        summary = "Refresh JWT tokens / JWT 토큰 새로고침", description =
+            """
+        [en]
         Generates new access and refresh tokens from a valid refresh token.
         Tokens are valid for 15 minutes.
         The refresh token can be used to obtain new access tokens until they expire.
         This endpoint is not protected and can be used by unauthenticated clients.
+    
+        [ko]
+        유효한 리프레시 토큰으로 새로운 액세스 및 리프레시 토큰을 생성합니다.
+        토큰은 15분간 유효합니다.
+        리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
+        이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.
     """
     )
     @ApiResponses(
@@ -242,9 +268,15 @@ class AuthController(
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Logout user", description = """
+    @Operation(
+        summary = "Logout user / 사용자 로그아웃", description = """
+        [en]
         Invalidates refresh tokens for the user. The user will need to authenticate again to obtain new tokens.
         This endpoint is protected and requires a valid access token.
+    
+        [ko]
+        사용자의 리프레시 토큰을 무효화합니다. 사용자는 새로운 토큰을 얻기 위해 다시 인증해야 합니다.
+        이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
     """)
     @ApiResponses(
         value = [
@@ -267,12 +299,19 @@ class AuthController(
 
     @PostMapping("/signup")
     @Operation(
-        summary = "Sign up new user and generate new tokens",
+        summary = "Sign up new user and generate new tokens / 새 사용자 가입 및 토큰 생성",
         description = """
+            [en]
             Create new user provided credentials with additional fields and generate tokens for access.
             Tokens are valid for 15 minutes.
             The refresh token can be used to obtain new access tokens until they expire.
             This endpoint is not protected and can be used by unauthenticated clients.
+    
+            [ko]
+            추가 필드와 함께 제공된 자격 증명으로 새 사용자를 생성하고 액세스용 토큰을 생성합니다.
+            토큰은 15분간 유효합니다.
+            리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
+            이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.
         """
     )
     @ApiResponses(
@@ -329,12 +368,19 @@ class AuthController(
 
     @GetMapping("/me")
     @Operation(
-        summary = "Get current user's information",
+        summary = "Get current user's information / 현재 사용자 정보 조회",
         description = """
+            [en]
             Retrieves the logged-in user's information using a valid access token.
             The user's information will be returned in the response body.
             The response will include the user's email, roles, and username, as well as their gender and birth date.
             This endpoint is protected and requires a valid access token.
+    
+            [ko]
+            유효한 액세스 토큰을 사용하여 로그인한 사용자의 정보를 검색합니다.
+            사용자 정보는 응답 본문에 반환됩니다.
+            응답에는 사용자의 이메일, 역할, 사용자 이름과 함께 성별과 생년월일이 포함됩니다.
+            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
         """
     )
     @ApiResponses(
@@ -367,12 +413,19 @@ class AuthController(
 
     @PostMapping("/update")
     @Operation(
-        summary = "Update user information",
+        summary = "Update user information / 사용자 정보 업데이트",
         description = """
+            [en]
             Updates user information. Null fields will be ignored.
             The response will include the updated user's email, username, gender, and birth date.
             The user's information will be updated in the database.
             This endpoint is protected and requires a valid access token.
+    
+            [ko]
+            사용자 정보를 업데이트합니다. Null 필드는 무시됩니다.
+            응답에는 업데이트된 사용자의 이메일, 사용자 이름, 성별 및 생년월일이 포함됩니다.
+            사용자 정보가 데이터베이스에서 업데이트됩니다.
+            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
         """
     )
     @ApiResponses(
@@ -421,12 +474,19 @@ class AuthController(
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     @Operation(
-        summary = "Update user profile image",
+        summary = "Update user profile image / 사용자 프로필 이미지 업데이트",
         description = """
+            [en]
             Updates the user's profile image. The image will be uploaded to S3 storage.
             The response will include the updated user's information including the new profile image URL.
             Maximum file size is 5MB and only image files (jpg, jpeg, png) are allowed.
             This endpoint is protected and requires a valid access token.
+    
+            [ko]
+            사용자의 프로필 이미지를 업데이트합니다. 이미지는 S3 저장소에 업로드됩니다.
+            응답에는 새 프로필 이미지 URL을 포함한 업데이트된 사용자 정보가 포함됩니다.
+            최대 파일 크기는 5MB이며 이미지 파일(jpg, jpeg, png)만 허용됩니다.
+            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
         """
     )
     @ApiResponses(
@@ -465,6 +525,56 @@ class AuthController(
 
         val user = userRepository.findById(userDetails.id!!).get()
         user.profile = file
+
+        val updatedUser = userRepository.save(user)
+
+        val userDTO = updatedUser.toDTO()
+        userDTO.profileEndpoint = s3PublicEndpoint
+        userDTO.profileBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO))
+    }
+
+    @DeleteMapping("/profile")
+    @Operation(
+        summary = "Delete user profile image / 사용자 프로필 이미지 삭제",
+        description = """
+            [en]
+            Deletes the user's profile image from S3 storage(or compatible storage)
+            and removes the profile image reference.
+            The response will include the updated user's information with no profile image.
+            This endpoint is protected and requires a valid access token.
+    
+            [ko]
+            S3 저장소(또는 호환 가능한 저장소)에서 사용자의 프로필 이미지를 삭제하고
+            프로필 이미지 참조를 제거합니다.
+            응답에는 프로필 이미지가 없는 업데이트된 사용자 정보가 포함됩니다.
+            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully deleted profile image",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing access token",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            )
+        ]
+    )
+    fun deleteProfile(
+        @AuthenticationPrincipal userDetails: User?,
+    ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
+        if (userDetails?.id == null) throw UnauthorizedException()
+
+        profileS3Service.removeProfile(userDetails)
+
+        val user = userRepository.findById(userDetails.id!!).get()
+        user.profile = null
 
         val updatedUser = userRepository.save(user)
 
