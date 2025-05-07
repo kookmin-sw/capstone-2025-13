@@ -107,16 +107,21 @@ class EtcController(
             endDate
         )
 
-        val userQuestBehaviors = userQuests.map { userQuest ->
+        val userQuestBehaviors = userQuests.mapNotNull { userQuest ->
             val status = if (userQuest.target == userQuest.progress) "완료" else "수행 중"
-            val behaviorDesc = "${userQuest.id}-${userQuest.step} $status"
-            val questType = when (userQuest.quest.type) {
+            val quest = userQuest.quest ?: return@mapNotNull null
+
+            val questType = when (quest.type) {
                 QuestType.MEDITATE -> "명상하기"
                 QuestType.ACTIVITY -> "운동하기"
                 QuestType.EMOTION -> "감정 표현하기"
+                null -> return@mapNotNull null
             }
+
+            val behaviorDesc = "${userQuest.id}-${quest.step} $status"
             questType to behaviorDesc
         }
+
 
         behaviors = behaviors + userQuestBehaviors
 
