@@ -116,20 +116,14 @@ export default function Quest_stage() {
                 }}
                 activeOpacity={0.8}
               >
-                <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={questStageStyles.iconWrapper}>
                 <Image
                   source={
                     title === "명상"
                       ? require("../../assets/Images/clover_meditation.png")
                       : require("../../assets/Images/clover_exercise.png")
                   }
-                  style={{
-                    position: 'absolute',
-                    top: -height * 0.04, // 화면 높이의 5%만큼 위로 이동
-                    width: width * 0.18,  // 화면 너비의 18%
-                    height: width * 0.18, // 정사각형 유지
-                    zIndex: 2,
-                  }}
+                  style={questStageStyles.cloverIcon}
                   resizeMode="contain"
                 />
               </View>
