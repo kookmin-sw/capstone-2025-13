@@ -204,12 +204,12 @@ export default function App() {
                     component={Record}
                     options={{ headerShown: false }}
                 />
-                 <Stack.Screen
-                    name="HelpCall" // HelpCall 화면 추가
+                <Stack.Screen
+                    name="HelpCall"
                     component={HelpCall}
                     options={{ headerShown: false }} />
                 <Stack.Screen
-                    name="HelpCall2" // HelpCall 화면 추가
+                    name="HelpCall2" 
                     component={HelpCall2}
                     options={{ headerShown: false }} />
             </Stack.Navigator>
