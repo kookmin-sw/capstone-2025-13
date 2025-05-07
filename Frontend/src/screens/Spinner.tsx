@@ -83,7 +83,6 @@ const Spinner = () => {
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <View style={styles.cloverContainer}>
-                    {/* 🍀 Single leaf preview (Top-left only) */}
                     <Animated.Image
                         source={require("../assets/Images/leaf.png")}
                         style={leafStyle(
@@ -120,24 +119,6 @@ const Spinner = () => {
                             colorInterpolations[3]
                         )} // Bottom-left
                     />
-                    {/*
-                    <Animated.Image
-                        source={require("../assets/Images/leaf.png")}
-                        style={leafStyle("45deg", leafSpacingX, -leafSpacingY)} // Top-right
-                    />
-                    <Animated.Image
-                        source={require("../assets/Images/leaf.png")}
-                        style={leafStyle("135deg", leafSpacingX, leafSpacingY)} // Bottom-right
-                    />
-                    <Animated.Image
-                        source={require("../assets/Images/leaf.png")}
-                        style={leafStyle(
-                            "-135deg",
-                            -leafSpacingX,
-                            leafSpacingY
-                        )} // Bottom-left
-                    />
-                    */}
                 </View>
                 <View style={{ flexDirection: "row", marginTop: 20 }}>
                     {loadingText.split("").map((char, i) => (

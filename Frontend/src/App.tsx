@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useLoading, LoadingProvider } from "./hooks/LoadingContext";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+    NavigationContainer,
+    createNavigationContainerRef,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
 import SignIn from "./screens/SignIn";
@@ -25,6 +29,8 @@ import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
+
+const navigationRef = createNavigationContainerRef();
 
 export type RootStackParamList = {
     Home: undefined;
@@ -57,17 +63,25 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function AppInner() {
     // 하드코딩된 로그인 상태
 
+    const { isLoading, setLoading } = useLoading();
+
+    const routeNameRef = useRef();
+
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem("accessToken");
+            console.log("🔍 accessToken:", token);
             if (token) {
                 setIsLoggedIn(true);
+                console.log("✅ Token exists. setLoading(false) 호출됨");
+                setLoading(false);
+            } else {
+                console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
                 setLoading(false);
             }
         };
@@ -112,120 +126,152 @@ export default function App() {
         "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
     });
 
-    if (!fontsLoaded) return null;
+    console.log("📦 fontsLoaded:", fontsLoaded, "| isLoading:", isLoading);
+
+    if (!fontsLoaded) return <Spinner />;
 
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Quest"}>
-                <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen name="SignIn" options={{ headerShown: false }}>
-                    {() => <SignIn />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="SignUpStep1"
-                    options={{ headerShown: false }}
-                    component={SignUpStep1}
-                />
-                <Stack.Screen
-                    name="SignUpStep2"
-                    options={{ headerShown: false }}
+        <NavigationContainer
+            ref={navigationRef}
+            onReady={() => {
+                routeNameRef.current = navigationRef.getCurrentRoute().name;
+            }}
+            onStateChange={() => {
+                const previous = routeNameRef.current;
+                const current = navigationRef.getCurrentRoute()?.name;
+
+                if (!previous || previous === current) return;
+
+                console.log("🌀 Navigation changed:", previous, "→", current);
+                setLoading(true);
+                setTimeout(() => setLoading(false), 500);
+
+                routeNameRef.current = current;
+            }}
+        >
+            {isLoading ? (
+                <Spinner />
+            ) : (
+                <Stack.Navigator
+                    initialRouteName={isLoggedIn ? "Home" : "Quest"}
                 >
-                    {() => <SignUpStep2 />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="SignUpStep3"
-                    options={{ headerShown: false }}
-                >
-                    {() => <SignUpStep3 />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="SimpleDiagnosis"
-                    options={{ headerShown: false }}
-                    component={SimpleDiagnosis}
-                />
-                <Stack.Screen name="Game" options={{ headerShown: false }}>
-                    {() => <Game />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="Quest"
-                    component={Quest}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_stage"
-                    component={Quest_stage}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_meditation"
-                    component={Quest_meditation}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_exercise"
-                    component={Quest_exercise}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="FormalDiagnosis" // FormalDiagnosis 화면 추가
-                    component={FormalDiagnosis}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
-                    component={FormalDiagnosisSurvey}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="GameScreen" // GameScreen 화면 추가
-                    component={GameScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="DailyTopic" // DailyTopic 화면 추가
-                    component={DailyTopic}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Spinner" // Spinner 화면 추가
-                    component={Spinner}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="UserInfo"
-                    component={UserInfo}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="HelpCall"
-                    component={HelpCall}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Calendar"
-                    component={Calendar}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Record"
-                    component={Record}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="HelpCall"
-                    component={HelpCall}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="HelpCall2"
-                    component={HelpCall2}
-                    options={{ headerShown: false }}
-                />
-            </Stack.Navigator>
+                    <Stack.Screen
+                        name="Home"
+                        component={Home}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="SignIn"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignIn />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="SignUpStep1"
+                        options={{ headerShown: false }}
+                        component={SignUpStep1}
+                    />
+                    <Stack.Screen
+                        name="SignUpStep2"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignUpStep2 />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="SignUpStep3"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignUpStep3 />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="SimpleDiagnosis"
+                        options={{ headerShown: false }}
+                        component={SimpleDiagnosis}
+                    />
+                    <Stack.Screen name="Game" options={{ headerShown: false }}>
+                        {() => <Game />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="Quest"
+                        component={Quest}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_stage"
+                        component={Quest_stage}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_meditation"
+                        component={Quest_meditation}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_exercise"
+                        component={Quest_exercise}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormalDiagnosis" // FormalDiagnosis 화면 추가
+                        component={FormalDiagnosis}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
+                        component={FormalDiagnosisSurvey}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="GameScreen" // GameScreen 화면 추가
+                        component={GameScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="DailyTopic" // DailyTopic 화면 추가
+                        component={DailyTopic}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Spinner" // Spinner 화면 추가
+                        component={Spinner}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="UserInfo"
+                        component={UserInfo}
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="Calendar"
+                        component={Calendar}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Record"
+                        component={Record}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="HelpCall"
+                        component={HelpCall}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="HelpCall2"
+                        component={HelpCall2}
+                        options={{ headerShown: false }}
+                    />
+                </Stack.Navigator>
+            )}
         </NavigationContainer>
+    );
+}
+
+export default function App() {
+    return (
+        <LoadingProvider>
+            <AppInner />
+        </LoadingProvider>
     );
 }
