@@ -71,13 +71,13 @@ class IntegrityService(
     }
 
     fun verifyAndroidIntegrity(
-        attestationJwt: String
+        challenge: String
     ): IntegrityVerificationResponse {
         try {
             val decodedToken = webClient.post()
                 .uri(decodeIntegrityTokenUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(mapOf("integrity_token" to attestationJwt)))
+                .body(BodyInserters.fromValue(mapOf("integrity_token" to challenge)))
                 .header("Authorization", "Bearer $apiKey")
                 .retrieve()
                 .bodyToMono(ByteArray::class.java)

@@ -82,7 +82,7 @@ class IntegrityController(
 
         try {
             val result = when (request.platform.lowercase()) {
-                "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
+                "android" -> integrityService.verifyAndroidIntegrity(request.challenge)
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
                     request.bundleId ?: "",
