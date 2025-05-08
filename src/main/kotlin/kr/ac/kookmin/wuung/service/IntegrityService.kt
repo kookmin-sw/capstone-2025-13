@@ -17,6 +17,10 @@ import java.security.PublicKey
 import java.util.Base64
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.auth.oauth2.AccessToken
+import org.springframework.scheduling.annotation.Scheduled
+import java.io.ByteArrayInputStream
 
 @Service
 class IntegrityService(
@@ -35,16 +39,21 @@ class IntegrityService(
 
     @Value("\${app.apple-key-id}")
     private val keyId: String,
+
+    @Value("\${app.google-account-json}")
+    private val googleAccountJwt: String,
 ) {
     companion object {
         var applePublicKey: PublicKey? = null
         var appleParser: JwtParser? = null
+        private var googleAccessToken: AccessToken? = null
     }
 
     private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
     private val objectMapper = ObjectMapper()
-    
+
     init {
+        refreshGoogleAccessToken()
         val appleResponse = webClient.get()
             .uri("https://www.apple.com/certificateauthority/Apple_App_Attestation_Root_CA.pem")
             .accept(MediaType.APPLICATION_OCTET_STREAM)
@@ -67,6 +76,21 @@ class IntegrityService(
             }
         } else {
             throw RuntimeException("Failed to fetch Apple public key")
+        }
+
+
+    }
+
+    @Scheduled(fixedRate = 3300000) // Refresh every 55 minutes
+    private fun refreshGoogleAccessToken() {
+        try {
+            val credentials = GoogleCredentials
+                .fromStream(ByteArrayInputStream(Base64.getDecoder().decode(googleAccountJwt)))
+                .createScoped("https://www.googleapis.com/auth/playintegrity")
+            credentials.refresh()
+            googleAccessToken = credentials.accessToken
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to refresh Google access token: ${e.message}")
         }
     }
 

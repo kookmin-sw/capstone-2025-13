@@ -68,6 +68,8 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
+	implementation("com.google.auth:google-auth-library-oauth2-http:1.34.0")
+
 	// Google Play Integrity API 클라이언트 라이브러리
 	implementation("com.google.android.play:integrity:1.4.0")
 

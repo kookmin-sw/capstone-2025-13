@@ -47,5 +47,6 @@ app:
   package-name: ${PACKAGE_NAME}
   google-cloud-project-number: ${GOOGLE_CLOUD_PROJECT_NUMBER}
   google-cloud-api-key: ${GOOGLE_CLOUD_API_KEY}
+  google-account-json: ${GOOGLE_ACCOUNT_JSON}
   apple-team-id: ${APPLE_TEAM_ID}
   apple-key-id: ${APPLE_KEY_ID}
