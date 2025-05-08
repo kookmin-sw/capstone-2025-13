@@ -4,7 +4,7 @@ import * as Integrity from '@dalbodeule/expo-app-integrity';
 import {Platform} from "react-native";
 
 const EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT = process.env.EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT;
-const apiUrl =  "http://jioo0224-macbook.local:8080"; //process.env.EXPO_PUBLIC_API_URL;
+const apiUrl =  process.env.EXPO_PUBLIC_API_URL;
 
 export interface RequestChallengeResponse {
     challenge: string;
