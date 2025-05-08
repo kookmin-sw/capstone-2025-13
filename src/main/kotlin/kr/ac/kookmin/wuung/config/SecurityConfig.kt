@@ -58,7 +58,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests {
                 it.requestMatchers("/auth/**").permitAll()
-                it.requestMatchers("/api/integrity").permitAll()
+                it.requestMatchers("/api/integrity/**").permitAll()
                 it.requestMatchers("/").permitAll()
                 it.requestMatchers(
                     "/swagger-ui.html",

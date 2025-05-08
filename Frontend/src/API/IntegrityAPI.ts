@@ -33,7 +33,7 @@ export const requestChallenge = async() => {
 
         return response.data.challenge;
     } catch(error: any) {
-        console.error('Failed to get challenge:', error);
+        console.error('Failed to get challenge: ' + error.message);
         throw error;
     }
 }
@@ -64,7 +64,7 @@ export const verifyDeviceIntegrity = async()=> {
 
         return verificationResponse.data;
     } catch(error: any) {
-        console.error('Failed to verify integrity:', error);
+        console.error('Failed to verify integrity:' + error.message);
         throw error;
     }
 }
