@@ -4,7 +4,7 @@ import * as Integrity from '@dalbodeule/expo-app-integrity';
 import {Platform} from "react-native";
 
 const EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT = process.env.EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT;
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const apiUrl =  "http://jioo0224-macbook.local:8080"; //process.env.EXPO_PUBLIC_API_URL;
 
 export interface RequestChallengeResponse {
     challenge: string;
@@ -12,7 +12,7 @@ export interface RequestChallengeResponse {
 }
 
 export interface VerifyDeviceIntegrityResponse {
-    isValid: boolean;
+    valid: boolean;
     message: string;
     details: Map<string, any> | undefined
 }
@@ -98,8 +98,9 @@ export const verifyDeviceIntegrity = async () => {
             throw new Error(`HTTP error! status: ${response.status} / ${data.message} / ${data.details ? JSON.stringify(data.details) : ''}`);
         }
 
-        if (data.isValid) {
+        if (data.valid) {
             await AsyncStorage.removeItem('integrityChallenge');
+            await AsyncStorage.removeItem('integrityChallengeExp');
         }
 
         return data;

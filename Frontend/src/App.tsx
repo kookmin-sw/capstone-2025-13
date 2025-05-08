@@ -82,7 +82,7 @@ function AppInner() {
     useEffect(() => {
         const checkIntegrity = async () => {
             try {
-                if (__DEV__ && false) {
+                if (__DEV__) {
                     console.log('Development build - skipping integrity check');
                     setIsIntegrityVerified(true);
                     return;
@@ -91,7 +91,7 @@ function AppInner() {
                 await requestChallenge();
                 const result = await verifyDeviceIntegrity();
 
-                if(result.isValid) {
+                if(result.valid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {

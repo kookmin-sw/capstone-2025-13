@@ -81,7 +81,7 @@ class IntegrityController(
 
         try {
             val result = when (request.platform.lowercase()) {
-                "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
+                "android" -> integrityService.verifyAndroidIntegrity(request.attestation, request.challenge)
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
                     request.bundleId ?: "",
@@ -95,7 +95,6 @@ class IntegrityController(
             }
 
             integrityChallengeService.completeChallenge(request.challenge)
-
             return ResponseEntity.ok(result)
         } catch(e: Exception) {
             logger.error("Error on verifying integrity: ${e.message}")

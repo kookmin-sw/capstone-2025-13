@@ -55,7 +55,6 @@ class IntegrityService(
     }
 
     private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
-    private val objectMapper = ObjectMapper()
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     init {
@@ -96,15 +95,13 @@ class IntegrityService(
                     .createScoped("https://www.googleapis.com/auth/playintegrity")
                 credentials.refresh()
                 googleAccessToken = credentials.accessToken
-
-                logger.debug(credentials.accessToken.tokenValue)
             } catch (e: Exception) {
                 throw RuntimeException("Failed to refresh Google access token: ${e.message}")
             }
         }
     }
 
-    fun verifyAndroidIntegrity(challenge: String): IntegrityVerificationResponse {
+    fun verifyAndroidIntegrity(challenge: String, nonce: String): IntegrityVerificationResponse {
         return try {
             val decodedTokenBytes = webClient.post()
                 .uri(decodeIntegrityTokenUrl)
@@ -123,17 +120,31 @@ class IntegrityService(
             }
 
             val decodedTokenJson = String(decodedTokenBytes)
+
             val decodeResponse: DecodeIntegrityTokenResponse = gson.fromJson(decodedTokenJson, DecodeIntegrityTokenResponse::class.java)
-            val tokenPayload = decodeGoogleToken(decodeResponse.tokenPayload)
+            val tokenPayload = decodeResponse.tokenPayloadExternal
 
             // Package Name Verification
-            if (tokenPayload.requestDetails.requestPackageName != packageName) {
+            if (tokenPayload.appIntegrity.packageName != packageName) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Package name mismatch",
                     details = mapOf(
                         "expected" to packageName,
                         "actual" to tokenPayload.requestDetails.requestPackageName
+                    )
+                )
+            }
+
+            if (tokenPayload.requestDetails.nonce.replace("=", "").trim() !=
+                nonce.replace("=", "").trim()
+            ) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Challenge mismatch",
+                    details = mapOf(
+                        "expected" to nonce,
+                        "actual" to tokenPayload.requestDetails.nonce
                     )
                 )
             }
@@ -157,7 +168,7 @@ class IntegrityService(
             }
 
             // Device Integrity Verification
-            if (tokenPayload.deviceIntegrity.deviceRecognitionVerdict != "MEETS_BASIC_INTEGRITY") {
+            if (!tokenPayload.deviceIntegrity.deviceRecognitionVerdict.contains("MEETS_DEVICE_INTEGRITY")) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Device integrity check failed",
@@ -182,12 +193,6 @@ class IntegrityService(
     private fun isTokenExpired(timestampMillis: Long): Boolean {
         val currentTime = System.currentTimeMillis()
         return currentTime - timestampMillis > TimeUnit.MINUTES.toMillis(5)
-    }
-
-    fun decodeGoogleToken(payload: String): TokenPayload {
-        val decodedBytes = Base64.getUrlDecoder().decode(payload)
-        val decodedJson = String(decodedBytes)
-        return gson.fromJson(decodedJson, TokenPayload::class.java)
     }
 
     fun verifyIosAppAttest(
@@ -292,40 +297,38 @@ class IntegrityService(
 }
 
 data class DecodeIntegrityTokenResponse(
-    val tokenPayload: String
+    val tokenPayloadExternal: TokenPayload
 )
 
 data class TokenPayload(
     val appIntegrity: AppIntegrity,
     val deviceIntegrity: DeviceIntegrity,
     val requestDetails: RequestDetails,
-    val accountDetails: AccountDetails?
+    val accountDetails: AccountDetails?,
+    val testingDetails: TestingDetails?
 )
 
 data class AppIntegrity(
     val appRecognitionVerdict: String,
-    val apkPackageName: String,
-    val apkCertificateDigestSha256: List<String>
+    val packageName: String,
+    val certificateSha256Digest: List<String>,
+    val versionCode: String,
 )
 
 data class DeviceIntegrity(
-    val deviceRecognitionVerdict: String,
-    val deviceProperties: DeviceProperties
-)
-
-data class DeviceProperties(
-    val deviceModel: String,
-    val deviceBrand: String,
-    val osVersion: String
+    val deviceRecognitionVerdict: List<String>
 )
 
 data class RequestDetails(
     val requestPackageName: String,
-    val requestNonce: String,
+    val nonce: String,
     val timestampMillis: Long
 )
 
 data class AccountDetails(
-    val accountType: String,
-    val accountEmail: String
+    val appLicensingVerdict: String,
+)
+
+data class TestingDetails(
+    val isTestingResponse: Boolean,
 )
