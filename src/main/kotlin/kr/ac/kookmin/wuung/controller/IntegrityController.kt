@@ -17,7 +17,8 @@ data class ChallengeRequest(
 
 data class ChallengeResponse(
     val challenge: String,
-    val expiresInMinutes: Long
+    val expiresInMinutes: Long,
+    val message: String,
 )
 
 data class IntegrityVerificationRequest(
@@ -52,7 +53,8 @@ class IntegrityController(
             return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = challenge.first ?: "",
-                    expiresInMinutes = challenge.second
+                    expiresInMinutes = challenge.second,
+                    message = ""
                 )
             )
         } catch(e: Exception) {
@@ -61,7 +63,8 @@ class IntegrityController(
             return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = "",
-                    expiresInMinutes = 0
+                    expiresInMinutes = 0,
+                    message = "An error occurred while generating challenge. Please try again later."
                 )
             )
         }
@@ -71,14 +74,8 @@ class IntegrityController(
     fun verifyIntegrity(
         @RequestBody request: IntegrityVerificationRequest
     ): ResponseEntity<IntegrityVerificationResponse> {
-        if (!challengeService.verifyChallenge(request.challenge, request.deviceId)) {
-            return ResponseEntity.ok(
-                IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Challenge가 유효하지 않거나 만료되었습니다. 새로운 Challenge를 요청해주세요."
-                )
-            )
-        }
+        val challengeErrors = challengeService.verifyChallenge(request.challenge, request.deviceId)
+        if(challengeErrors != null) return ResponseEntity.ok(challengeErrors)
 
         try {
             val result = when (request.platform.lowercase()) {
