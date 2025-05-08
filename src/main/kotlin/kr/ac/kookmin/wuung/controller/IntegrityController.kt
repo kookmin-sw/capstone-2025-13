@@ -58,7 +58,7 @@ class IntegrityController(
         } catch(e: Exception) {
             logger.error("Error on getting challenge: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(200).body(
+            return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = "",
                     expiresInMinutes = 0
@@ -101,7 +101,7 @@ class IntegrityController(
         } catch(e: Exception) {
             logger.error("Error on verifying integrity: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(200).body(
+            return ResponseEntity.ok(
                 IntegrityVerificationResponse(
                     isValid = false,
                     message = "An error occurred while verifying integrity. Please try again later."

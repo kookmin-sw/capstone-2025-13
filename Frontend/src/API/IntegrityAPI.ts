@@ -2,7 +2,7 @@ import DeviceInfo from 'react-native-device-info'
 import axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AxiosResponse} from "axios";
-import * as Integrity from 'expo-app-integrity';
+import * as Integrity from '@dalbodeule/expo-app-integrity';
 import {Platform} from "react-native";
 
 // @ts-ignore
@@ -31,8 +31,11 @@ export const requestChallenge = async() => {
             deviceId
         }) as AxiosResponse<RequestChallengeResponse>
 
+        const expDate = new Date()
+        expDate.setMinutes(expDate.getMinutes() + response.data.expiresInMinutes)
+
         await AsyncStorage.setItem('integrityChallenge', response.data.challenge);
-        await AsyncStorage.setItem('integrityDeviceId', deviceId);
+        await AsyncStorage.setItem('integrityChallengeExp', expDate.toISOString())
 
         return response.data.challenge;
     } catch(error: any) {
@@ -43,17 +46,26 @@ export const requestChallenge = async() => {
 
 export const verifyDeviceIntegrity = async()=> {
     let challenge = await AsyncStorage.getItem('integrityChallenge');
-    const deviceId = getDeviceId()
+    const expDate = await AsyncStorage.getItem('integrityChallengeExp');
+    const deviceId = await getDeviceId()
 
-    if(!challenge) {
+    if(!challenge || (expDate && new Date(expDate).getTime() < Date.now())) {
         challenge = await requestChallenge();
     }
 
     try {
         const googleCloudProject: number = parseInt(EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT);
-        const attestation = JSON.stringify(await Integrity.attestKey(challenge, googleCloudProject));
+        const attestation = await Integrity.attestKey(challenge, googleCloudProject);
 
-        const verificationResponse = await axios.post('/api/integrity/verify', {
+        console.log({
+            platform: Platform.OS,
+            attestation,
+            bundleId: DeviceInfo.getBundleId(),
+            challenge,
+            deviceId
+        })
+
+        const response = await axios.post('/api/integrity/verify', {
             platform: Platform.OS,
             attestation,
             bundleId: DeviceInfo.getBundleId(),
@@ -61,11 +73,11 @@ export const verifyDeviceIntegrity = async()=> {
             deviceId
         }) as AxiosResponse<VerifyDeviceIntegrityResponse>
 
-        if(verificationResponse.data.isValid) {
+        if(response.data.isValid) {
             await AsyncStorage.removeItem('integrityChallenge');
         }
 
-        return verificationResponse.data;
+        return response.data;
     } catch(error: any) {
         console.error('Failed to verify integrity:' + error.message);
         throw error;

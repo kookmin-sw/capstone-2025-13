@@ -93,9 +93,11 @@ function AppInner() {
                     setIsIntegrityVerified(true);
                 } else {
                     console.error('Integrity verification failed: ', result.message)
+                    setIsIntegrityVerified(false)
                 }
             } catch (error: any) {
                 console.error('Integrity check error:', error);
+                setIsIntegrityVerified(false)
             }
         };
 
