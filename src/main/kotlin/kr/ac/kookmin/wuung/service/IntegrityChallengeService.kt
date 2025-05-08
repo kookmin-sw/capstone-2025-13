@@ -58,18 +58,19 @@ class IntegrityChallengeService(
     fun verifyChallenge(challenge: String, deviceId: String): Boolean {
         val challengeOpt = challengeRepository.findByChallenge(challenge).getOrNull()
 
-        if(challengeOpt == null) {
+        if (challengeOpt == null) {
             logger.info("Challenge not found for device: $deviceId")
             return false
         }
 
-        if(challengeOpt.deviceId != deviceId) {
+        if (challengeOpt.deviceId != deviceId) {
             logger.info("Device ID mismatch for challenge: $challenge, expected: $deviceId, actual: ${challengeOpt.deviceId}")
             return false
         }
 
+        val currentTime = LocalDateTime.now()
         challengeOpt.expiresAt?.let {
-            if(it.isBefore(LocalDateTime.now())) {
+            if (it.isBefore(currentTime)) {
                 challengeOpt.status = IntegrityChallengeStatus.EXPIRED
                 challengeRepository.save(challengeOpt)
                 logger.info("Challenge expired: $challenge")

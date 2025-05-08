@@ -71,11 +71,11 @@ class IntegrityController(
     fun verifyIntegrity(
         @RequestBody request: IntegrityVerificationRequest
     ): ResponseEntity<IntegrityVerificationResponse> {
-        if(!challengeService.verifyChallenge(request.challenge, request.deviceId)) {
+        if (!challengeService.verifyChallenge(request.challenge, request.deviceId)) {
             return ResponseEntity.ok(
                 IntegrityVerificationResponse(
                     isValid = false,
-                    message = "Invalid or expired challenge. Please request a new challenge and try again."
+                    message = "Challenge가 유효하지 않거나 만료되었습니다. 새로운 Challenge를 요청해주세요."
                 )
             )
         }
