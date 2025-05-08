@@ -1,0 +1,2291 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Wuung API Server",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    },
+    {
+      "url": "https://wuung.mori.space"
+    },
+    {
+      "url": "https://wuung-frontend.mori.space"
+    }
+  ],
+  "security": [
+    {
+      "api token": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Diagnosis API",
+      "description": "\n    [EN] Endpoints for Diagnosis create and read data.\n    AccessToken is required for all of this part of endpoints on Authorization header.\n    \n    [KR] 진단 생성 및 읽기를 위한 엔드포인트입니다.\n    모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n"
+    },
+    {
+      "name": "Quests API",
+      "description": "\n    [en] Endpoints for quests.\n    AccessToken is required for all of this part of endpoints on Authorization header.\n    \n    [ko] 퀘스트 관련 엔드포인트입니다.\n    모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n"
+    },
+    {
+      "name": "Record API",
+      "description": "\n    [en] API endpoints for managing daily records and their AI-generated feedback\n    [ko] 일일 기록 및 AI 생성 피드백을 관리하기 위한 API 엔드포인트\n"
+    },
+    {
+      "name": "Auth API",
+      "description": "\n    [en]\n    Endpoints for authentication and token management.\n    Tokens are valid for 15 minutes.\n    Refreshed tokens will be invalidated for the previous token.\n    The refresh token can be used to obtain new access tokens until they expire.\n    AccessToken is required for protected endpoints on Authorization header.\n    \n    [ko]\n    인증 및 토큰 관리를 위한 엔드포인트입니다.\n    토큰은 15분간 유효합니다.\n    새로고침된 토큰은 이전 토큰을 무효화합니다.\n    리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.\n    보호된 엔드포인트에는 Authorization 헤더에 AccessToken이 필요합니다.\n"
+    }
+  ],
+  "paths": {
+    "/record/feedback": {
+      "put": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Create new feedback record",
+        "description": "\n        [en] Initializes a new empty feedback record associated with an existing daily record. This is the first step in the AI feedback process\n        [ko] 기존 일일 기록에 연결된 새로운 빈 피드백 기록을 초기화합니다. AI 피드백 프로세스의 첫 단계입니다\n    ",
+        "operationId": "createFeedback",
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Create feedback record successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/record/feedback/{recordId}": {
+      "get": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Get all feedback record",
+        "description": "\n        [en] Retrieves all completed AI feedback records associated with a specific record. Only shows feedback with COMPLETED status\n        [ko] 특정 기록과 관련된 모든 완료된 AI 피드백 기록을 조회합니다. COMPLETED 상태의 피드백만 표시됩니다\n    ",
+        "operationId": "getFeedbacks",
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get feedback records successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListRecordFeedbackDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Request AI feedback",
+        "description": "\n        [en] Initiates an AI feedback request for a specific record. The feedback process runs asynchronously and updates the feedback status accordingly\n        [ko] 특정 기록에 대한 AI 피드백 요청을 시작합니다. 피드백 프로세스는 비동기적으로 실행되며 피드백 상태가 그에 따라 업데이트됩니다\n    ",
+        "operationId": "updateFeedbackStatus",
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordFeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback request successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOString"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feedback record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "AI feedback is still processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "AI feedback already completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "AI feedback processing error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Update feedback record",
+        "description": "\n        [en] Updates the data and user comments of a completed feedback record. Only applicable to feedback with COMPLETED status\n        [ko] 완료된 피드백 기록의 데이터와 사용자 댓글을 업데이트합니다. COMPLETED 상태의 피드백에만 적용 가능합니다\n    ",
+        "operationId": "updateFeedback",
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update feedback successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTORecordDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feedback record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "AI feedback is still processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "AI feedback processing error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/record/create": {
+      "put": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Create new record",
+        "description": "\n        [en] Creates a new daily record with emotional rate and content. Only one record per day is allowed. Requires valid access token in Authorization header\n        [ko] 감정 수치와 내용이 포함된 새로운 일일 기록을 생성합니다. 하루에 한 개의 기록만 허용됩니다. Authorization 헤더에 유효한 접근 토큰이 필요합니다\n    ",
+        "operationId": "createRecord",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Create record successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTORecordDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Record already created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests": {
+      "put": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Create a new quest",
+        "description": "\n            [en] Creates a new quest instance for the authenticated user.\n            Required parameter is quest (unique) id.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n            \n            [ko] 인증된 사용자를 위한 새로운 퀘스트 요소를 생성합니다.\n            필수 파라미터는 퀘스트 (고유) ID입니다.\n            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "createQuests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created quest",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quest not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Update quest progress",
+        "description": "\n            [en] Updates the progress of a quest for the authenticated user.\n            Required parameter is quest (unique) id.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n            \n            [ko] 인증된 사용자의 퀘스트 진행 상황을 업데이트합니다.\n            필수 파라미터는 퀘스트 (고유) ID입니다.\n            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "updateQuests",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated quest",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quest not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnosis/submit": {
+      "put": {
+        "tags": [
+          "Diagnosis API"
+        ],
+        "summary": "Submit diagnosis result / 진단 결과 제출",
+        "description": "\n            [EN] Submit a new diagnosis result for the authenticated user.\n            AccessToken is required for this part of endpoints on Authorization header.\n            \n            [KR] 인증된 사용자의 새로운 진단 결과를 제출합니다.\n            이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "putDiagnosis",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiagnosisResultSubmitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully submitted diagnosis result",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTODiagnosisResultDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Diagnosis not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/profile": {
+      "put": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Update user profile image / 사용자 프로필 이미지 업데이트",
+        "description": "\n            [en]\n            Updates the user's profile image. The image will be uploaded to S3 storage.\n            The response will include the updated user's information including the new profile image URL.\n            Maximum file size is 5MB and only image files (jpg, jpeg, png) are allowed.\n            This endpoint is protected and requires a valid access token.\n    \n            [ko]\n            사용자의 프로필 이미지를 업데이트합니다. 이미지는 S3 저장소에 업로드됩니다.\n            응답에는 새 프로필 이미지 URL을 포함한 업데이트된 사용자 정보가 포함됩니다.\n            최대 파일 크기는 5MB이며 이미지 파일(jpg, jpeg, png)만 허용됩니다.\n            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.\n        ",
+        "operationId": "updateProfile",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "multipartFile": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Profile image file to be uploaded"
+                  }
+                },
+                "required": [
+                  "multipartFile"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated profile image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserInfoDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file format or size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Delete user profile image / 사용자 프로필 이미지 삭제",
+        "description": "\n            [en]\n            Deletes the user's profile image from S3 storage(or compatible storage)\n            and removes the profile image reference.\n            The response will include the updated user's information with no profile image.\n            This endpoint is protected and requires a valid access token.\n    \n            [ko]\n            S3 저장소(또는 호환 가능한 저장소)에서 사용자의 프로필 이미지를 삭제하고\n            프로필 이미지 참조를 제거합니다.\n            응답에는 프로필 이미지가 없는 업데이트된 사용자 정보가 포함됩니다.\n            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.\n        ",
+        "operationId": "deleteProfile",
+        "responses": {
+          "200": {
+            "description": "Successfully deleted profile image",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserInfoDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing access token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/record/modify": {
+      "post": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Modify existing record information",
+        "description": "\n            [en] Updates the emotional rate and content data of an existing record. Only the record owner can modify their records\n            [ko] 기존 기록의 감정 수치와 내용을 수정합니다. 기록 소유자만 수정할 수 있습니다\n        ",
+        "operationId": "modifyRecord",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update record successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTORecordDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/update": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Update user information / 사용자 정보 업데이트",
+        "description": "\n            [en]\n            Updates user information. Null fields will be ignored.\n            The response will include the updated user's email, username, gender, and birth date.\n            The user's information will be updated in the database.\n            This endpoint is protected and requires a valid access token.\n    \n            [ko]\n            사용자 정보를 업데이트합니다. Null 필드는 무시됩니다.\n            응답에는 업데이트된 사용자의 이메일, 사용자 이름, 성별 및 생년월일이 포함됩니다.\n            사용자 정보가 데이터베이스에서 업데이트됩니다.\n            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.\n        ",
+        "operationId": "updateUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated user information",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUpdateUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing access token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Sign up new user and generate new tokens / 새 사용자 가입 및 토큰 생성",
+        "description": "\n            [en]\n            Create new user provided credentials with additional fields and generate tokens for access.\n            Tokens are valid for 15 minutes.\n            The refresh token can be used to obtain new access tokens until they expire.\n            This endpoint is not protected and can be used by unauthenticated clients.\n    \n            [ko]\n            추가 필드와 함께 제공된 자격 증명으로 새 사용자를 생성하고 액세스용 토큰을 생성합니다.\n            토큰은 15분간 유효합니다.\n            리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.\n            이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.\n        ",
+        "operationId": "signUpUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "sign up user",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOSignUpResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "sign up failed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Refresh JWT tokens / JWT 토큰 새로고침",
+        "description": "\n        [en]\n        Generates new access and refresh tokens from a valid refresh token.\n        Tokens are valid for 15 minutes.\n        The refresh token can be used to obtain new access tokens until they expire.\n        This endpoint is not protected and can be used by unauthenticated clients.\n    \n        [ko]\n        유효한 리프레시 토큰으로 새로운 액세스 및 리프레시 토큰을 생성합니다.\n        토큰은 15분간 유효합니다.\n        리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.\n        이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.\n    ",
+        "operationId": "refreshToken",
+        "requestBody": {
+          "description": "Refresh token to generate new tokens",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully refreshed tokens",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOTokenRefreshResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Logout user / 사용자 로그아웃",
+        "description": "\n        [en]\n        Invalidates refresh tokens for the user. The user will need to authenticate again to obtain new tokens.\n        This endpoint is protected and requires a valid access token.\n    \n        [ko]\n        사용자의 리프레시 토큰을 무효화합니다. 사용자는 새로운 토큰을 얻기 위해 다시 인증해야 합니다.\n        이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.\n    ",
+        "operationId": "logoutUser",
+        "requestBody": {
+          "description": "Refresh token to invalidate",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOString"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid refresh token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Authenticate user and generate JWT tokens / 사용자 인증 및 JWT 토큰 생성",
+        "description": "\n        [en]\n        Validates user credentials and provides access and refresh tokens.\n        Tokens are valid for 15 minutes.\n        Refreshed tokens will be invalidated for the previous token.\n        The refresh token can be used to obtain new access tokens until they expire.\n        This endpoint is not protected and can be used by unauthenticated clients.\n   \n        [ko]\n        사용자 자격 증명을 검증하고 액세스 및 리프레시 토큰을 제공합니다.\n        토큰은 15분간 유효합니다.\n        새로고침된 토큰은 이전 토큰을 무효화합니다.\n        리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.\n        이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.\n    ",
+        "operationId": "authenticateUser",
+        "requestBody": {
+          "description": "Email and password for authentication",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully authenticated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOLoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/record/me": {
+      "get": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Get record information for a specific date",
+        "description": "\n        [en] Retrieves the most recent record for a specific date, including record ID, emotional rate, and content data\n        [ko] 특정 날짜의 가장 최근 기록을 조회합니다. 기록 ID, 감정 수치, 내용 데이터를 포함합니다\n    ",
+        "operationId": "getRecordByDate",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Date in format yyyy-MM-dd",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Date in format yyyy-MM-dd",
+              "example": "2025-05-01"
+            },
+            "example": "2025-05-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get record successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTORecordDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/record/feedback/{recordFeedbackId}": {
+      "get": {
+        "tags": [
+          "Record API"
+        ],
+        "summary": "Get feedback record",
+        "description": "\n        [en] Retrieves detailed information about a specific feedback record, including AI feedback content and user comments\n        [ko] 특정 피드백 기록의 상세 정보를 조회합니다. AI 피드백 내용과 사용자 댓글을 포함합니다\n    ",
+        "operationId": "getFeedback",
+        "parameters": [
+          {
+            "name": "recordFeedbackId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get feedback record successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTORecordFeedbackDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feedback record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "AI feedback is still processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "AI feedback processing error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/me": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "Get my quests",
+        "description": "\n            [en] Get my quests with optional filter by start date.\n            Start date is in format yyyy-MM-dd.\n            If start date is not provided, it will return all quests.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n            \n            [ko] 시작 날짜로 필터링 할 수 있는 내 퀘스트 목록을 가져옵니다.\n            시작 날짜는 yyyy-MM-dd 형식입니다.\n            시작 날짜가 제공되지 않으면 모든 퀘스트를 반환합니다.\n            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "getQuests",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date in format yyyy-MM-dd",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Start date in format yyyy-MM-dd",
+              "example": "2000-01-01"
+            },
+            "example": "2000-01-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved quests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListUserQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/list": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List all quests",
+        "description": "\n            [en] Get a list of all available quests.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n            \n            [ko] 사용 가능한 모든 퀘스트 목록을 가져옵니다.\n            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "listQuests",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/list/{type}": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List quests by type",
+        "description": "\n           [en] Get a list of quests filtered by type.\n           AccessToken is required for all of this part of endpoints on Authorization header.\n           \n           [ko] 유형별로 필터링된 퀘스트 목록을 가져옵니다.\n           모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "listQuestsWithTypes",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Type of quest",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Type of quest",
+              "enum": [
+                "MEDITATE",
+                "ACTIVITY",
+                "EMOTION"
+              ],
+              "example": "ACTIVITY"
+            },
+            "example": "ACTIVITY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filtered quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quests/list/{type}/{step}": {
+      "get": {
+        "tags": [
+          "Quests API"
+        ],
+        "summary": "List quests by type and step",
+        "description": "\n            [en] Get a list of quests filtered by type and step number.\n            AccessToken is required for all of this part of endpoints on Authorization header.\n            \n            [ko] 유형과 단계 번호로 필터링된 퀘스트 목록을 가져옵니다.\n            모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "listQuestsWithTypes_1",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Type of quest",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Type of quest",
+              "enum": [
+                "MEDITATE",
+                "ACTIVITY",
+                "EMOTION"
+              ],
+              "example": "ACTIVITY"
+            },
+            "example": "ACTIVITY"
+          },
+          {
+            "name": "step",
+            "in": "path",
+            "description": "Step of quest type",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Step of quest type",
+              "example": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filtered quests list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOQuestsDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnosis/{id}": {
+      "get": {
+        "tags": [
+          "Diagnosis API"
+        ],
+        "summary": "Get diagnosis by ID / ID로 진단 조회",
+        "description": "\n            [EN] Retrieve diagnosis details for the specified ID.\n            AccessToken is required for this part of endpoints on Authorization header.\n            \n            [KR] 지정된 ID의 진단 상세 정보를 조회합니다.\n            이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "getDiagnosis",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved diagnosis",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTODiagnosisDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Diagnosis not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnosis/results": {
+      "get": {
+        "tags": [
+          "Diagnosis API"
+        ],
+        "summary": "Get diagnosis results / 진단 결과 조회",
+        "description": "\n            [EN] Retrieve diagnosis results for the authenticated user with optional date filtering.\n            AccessToken is required for this part of endpoints on Authorization header.\n            \n            [KR] 인증된 사용자의 진단 결과를 조회합니다. 선택적으로 날짜 필터링이 가능합니다.\n            이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "getDiagnosisResults",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date in format yyyy-MM-dd",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Start date in format yyyy-MM-dd",
+              "example": "2000-01-01"
+            },
+            "example": "2000-01-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved diagnosis results",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListDiagnosisResultDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnosis/list": {
+      "get": {
+        "tags": [
+          "Diagnosis API"
+        ],
+        "summary": "Get all diagnosis list / 전체 진단 목록 조회",
+        "description": "\n            [EN] Retrieve a list of all available diagnoses.\n            AccessToken is required for this part of endpoints on Authorization header.\n            \n            [KR] 사용 가능한 모든 진단 목록을 조회합니다.\n            이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.\n        ",
+        "operationId": "getDiagnosisList",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved diagnosis list",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOListDiagnosisDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "Auth API"
+        ],
+        "summary": "Get current user's information / 현재 사용자 정보 조회",
+        "description": "\n            [en]\n            Retrieves the logged-in user's information using a valid access token.\n            The user's information will be returned in the response body.\n            The response will include the user's email, roles, and username, as well as their gender and birth date.\n            This endpoint is protected and requires a valid access token.\n    \n            [ko]\n            유효한 액세스 토큰을 사용하여 로그인한 사용자의 정보를 검색합니다.\n            사용자 정보는 응답 본문에 반환됩니다.\n            응답에는 사용자의 이메일, 역할, 사용자 이름과 함께 성별과 생년월일이 포함됩니다.\n            이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.\n        ",
+        "operationId": "getUserInfo",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user information",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDTOUserInfoDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing access token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponseDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+
+          }
+        }
+      },
+      "RecordFeedbackRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOString": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateRecordRequest": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTORecordDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RecordDTO"
+          }
+        }
+      },
+      "RecordDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "feedbacks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecordFeedbackDTO"
+            }
+          }
+        }
+      },
+      "RecordFeedbackDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "aiFeedback": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "COMPLETED",
+              "PROCESSING_ERROR"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateQuestRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseDTOUserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserQuestsDTO"
+          }
+        }
+      },
+      "UserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MEDITATE",
+              "ACTIVITY",
+              "EMOTION"
+            ]
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "target": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DiagnosisResultSubmitRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "result": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseDTODiagnosisResultDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DiagnosisResultDTO"
+          }
+        }
+      },
+      "DiagnosisResultDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "diagnosisId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "result": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseDTOUserInfoDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserInfoDTO"
+          }
+        }
+      },
+      "UserInfoDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "username": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profile": {
+            "type": "string"
+          }
+        }
+      },
+      "RecordUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateFeedbackRequest": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateQuestRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "description": "Birth date in format yyyy-MM-dd",
+            "example": "2000-01-01"
+          }
+        }
+      },
+      "ApiResponseDTOUpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UpdateUserResponse"
+          }
+        }
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SignUpRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "THIRD_GENDER",
+              "UNKNOWN"
+            ]
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string",
+            "description": "Birth date in format yyyy-MM-dd",
+            "example": "2000-01-01"
+          }
+        }
+      },
+      "ApiResponseDTOSignUpResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SignUpResponse"
+          }
+        }
+      },
+      "SignUpResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOTokenRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TokenRefreshResponse"
+          }
+        }
+      },
+      "TokenRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOLoginResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginResponse"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDTOListRecordFeedbackDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecordFeedbackDTO"
+            }
+          }
+        }
+      },
+      "ApiResponseDTORecordFeedbackDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RecordFeedbackDTO"
+          }
+        }
+      },
+      "ApiResponseDTOListUserQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserQuestsDTO"
+            }
+          }
+        }
+      },
+      "ApiResponseDTOListQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestsDTO"
+            }
+          }
+        }
+      },
+      "QuestsDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MEDITATE",
+              "ACTIVITY",
+              "EMOTION"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "target": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseDTOQuestsDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/QuestsDTO"
+          }
+        }
+      },
+      "ApiResponseDTODiagnosisDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DiagnosisDTO"
+          }
+        }
+      },
+      "DiagnosisDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Simple",
+              "PHQ_9",
+              "BDI"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosisQuestionDTO"
+            }
+          },
+          "scale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosisScaleDTO"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DiagnosisQuestionDTO": {
+        "type": "object",
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosisTextDTO"
+            }
+          }
+        }
+      },
+      "DiagnosisScaleDTO": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scaleName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "DiagnosisTextDTO": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseDTOListDiagnosisResultDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosisResultDTO"
+            }
+          }
+        }
+      },
+      "ApiResponseDTOListDiagnosisDTO": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosisDTO"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api token": {
+        "type": "http",
+        "name": "api token",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -12,12 +12,18 @@ import Answer from "../components/Answer";
 import dailyTopicstyles from "../styles/dailyTopicStyles";
 import { Text } from "react-native";
 import { useState, useRef, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../App";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function DailyTopic() {
     const [answer, setAnswer] = useState<string>("");
     const [chatHistory, setChatHistory] = useState<{ type: "question" | "answer"; text: string }[]>([]); 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);  
     const scrollRef = useRef<ScrollView>(null);
+    const navigation =
+            useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const questionList = [
         "질문 1", "질문 2", "질문 3", "질문 4", "질문 5"
@@ -92,7 +98,17 @@ export default function DailyTopic() {
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             keyboardVerticalOffset={80}
         >
-            <View style={[dailyTopicstyles.container, { flex: 1 }]}>
+                <View style={[dailyTopicstyles.container, { flex: 1 }]}>
+                <TouchableOpacity
+                    style={dailyTopicstyles.backButtonWrapper}
+                    onPress={() => {
+                    navigation.navigate("Home")}}
+                >
+                    <Ionicons name="arrow-back-circle" size={40} color="#349C64" />
+                </TouchableOpacity>
+
+
+                <Text style={dailyTopicstyles.headerText}>매일 1주제</Text>
                 <ScrollView
                     contentContainerStyle={dailyTopicstyles.scrollContainer}
                     ref={scrollRef}
@@ -101,6 +117,7 @@ export default function DailyTopic() {
                     {/* 채팅 기록 렌더링 */}
                     {renderChat()}
                 </ScrollView>
+                </View>
                 <View style={dailyTopicstyles.inputContainer}>
                     <TextInput
                         placeholder="메세지를 입력하세요."
@@ -112,7 +129,6 @@ export default function DailyTopic() {
                         <Text style={dailyTopicstyles.sendButtonText}>전송</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
         </KeyboardAvoidingView>
     );
 }

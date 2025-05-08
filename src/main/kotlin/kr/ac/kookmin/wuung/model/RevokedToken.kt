@@ -10,9 +10,9 @@ data class RevokedToken(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 2048)
     val token: String? = null,
 
     @Column(name = "revoked_at", nullable = false)
-    val revokedAt: LocalDateTime = LocalDateTime.now()
+    val revokedAt: LocalDateTime = LocalDateTime.now(),
 )

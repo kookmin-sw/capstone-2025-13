@@ -12,6 +12,7 @@ export default function Quest_meditation() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [isRunning, setIsRunning] = useState(false);
   const [isMeditationDone, setIsMeditationDone] = useState(false);
+  // @ts-ignore
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { width } = useWindowDimensions();
   const navigation = useNavigation<NavigationProp<any>>();

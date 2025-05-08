@@ -1,13 +1,21 @@
-import axios from 'axios';
+import axios from "axios";
+// @ts-ignore
+import { EXPO_PUBLIC_API_URL } from "@env";
 
-const apiUrl = process.env.API_URL;
-
-const customAxios = axios.create({
-    baseURL: apiUrl,
+const createdAxios = axios.create({
+    baseURL: EXPO_PUBLIC_API_URL,
     headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-    }
+        Accept: "application/json",
+        "Content-Type": "application/json",
+    },
+    withCredentials: true,
 });
 
-export default customAxios;
+export interface ApiResponseDTO<T> {
+    error: boolean;
+    message: string;
+    code: number;
+    data: T;
+}
+
+export default createdAxios;

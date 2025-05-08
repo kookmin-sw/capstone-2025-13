@@ -40,21 +40,19 @@ const SignIn = () => {
         setError(null);
 
         try {
-
             console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
             console.log("로그인 성공:", response.accessToken);
-            console.log("🔐 저장된 accessToken:", response.accessToken);
-            console.log("🔐 저장된 refreshToken:", response.refreshToken);
-            await AsyncStorage.setItem('accessToken', response.accessToken);
-            await AsyncStorage.setItem('refreshToken', response.refreshToken);
-            navigation.navigate('Home')
+            await AsyncStorage.setItem("accessToken", response.accessToken);
+            await AsyncStorage.setItem("refreshToken", response.refreshToken);
+            navigation.navigate("Home");
         } catch (error) {
             console.error("로그인 실패:", error);
-            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+            setError(
+                "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."
+            );
         }
     };
-
 
     return (
         <KeyboardAvoidingView

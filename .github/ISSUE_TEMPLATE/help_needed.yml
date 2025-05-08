@@ -1,0 +1,80 @@
+name: 도움 요청 (Help Needed)
+description: 구현 중 문제를 겪고 있다면 여기에 질문을 남겨주세요.
+title: "[HELP] "
+labels: [help wanted]
+assignees: []
+
+body:
+  - type: textarea
+    id: help-question
+    attributes:
+      label: ❓ 무엇을 도와드릴까요? (What do you need help with?)
+      description: 겪고 있는 문제나 궁금한 점을 구체적으로 작성해주세요.
+      placeholder: 예) useEffect 안에서 상태가 업데이트되지 않아요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: relevant-code
+    attributes:
+      label: 💻 관련 코드 (Relevant code)
+      description: 문제와 관련된 코드가 있다면 여기에 작성해주세요.
+      placeholder: 예) React Native, Spring Boot, Python 코드 등
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 예시 코드 참고
+
+        #### React Native (TypeScript)
+        ```tsx
+        import { useState } from 'react';
+
+        export default function App() {
+          const [count, setCount] = useState(0);
+
+          return (
+            <Button onPress={() => setCount(count + 1)} title={`Count: ${count}`} />
+          );
+        }
+        ```
+
+        #### Spring Boot (Kotlin)
+        ```kotlin
+        @RestController
+        @RequestMapping("/api")
+        class HelloController {
+            @GetMapping("/hello")
+            fun sayHello(): String = "Hello, World!"
+        }
+        ```
+
+        #### Python (Keras/OpenCV)
+        ```python
+        from keras.models import load_model
+        import cv2
+
+        model = load_model('model.h5')
+        img = cv2.imread('sample.png')
+        # 전처리 후 예측
+        ```
+
+  - type: textarea
+    id: tried-methods
+    attributes:
+      label: 🧪 시도해본 방법 (What have you tried?)
+      description: 해결을 위해 시도해본 방법이 있다면 작성해주세요.
+      placeholder: 예) 상태 초기화를 해보거나 useEffect의 의존성 배열을 수정해보았습니다.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 💬 추가 내용 (Additional context)
+      description: 상황을 이해하는 데 도움이 될 수 있는 정보를 자유롭게 작성해주세요.
+      placeholder: 예) 에러 로그, API 호출 시 응답 등
+    validations:
+      required: false
