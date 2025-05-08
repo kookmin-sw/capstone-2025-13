@@ -24,10 +24,10 @@ data class IntegrityChallenge(
     val id: String? = null,
 
     @Column(nullable = false)
-    val challenge: String,
+    val challenge: String? = null,
 
     @Column(nullable = false)
-    val deviceId: String,
+    val deviceId: String? = null,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -36,11 +36,12 @@ data class IntegrityChallenge(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(nullable = false)
-    val expiresAt: LocalDateTime,
+    val expiresAt: LocalDateTime? = null,
 
     @Enumerated
     var status: IntegrityChallengeStatus = IntegrityChallengeStatus.PENDING
 ) {
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

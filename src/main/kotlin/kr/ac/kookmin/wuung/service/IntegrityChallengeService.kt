@@ -21,7 +21,7 @@ class IntegrityChallengeService(
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val secureRandom = SecureRandom()
 
-    fun generateChallenge(deviceId: String): Pair<String, Long> {
+    fun generateChallenge(deviceId: String): Pair<String?, Long> {
        val pendingChallenges = challengeRepository.findByDeviceIdAndStatus(
            deviceId,
            IntegrityChallengeStatus.PENDING
@@ -30,7 +30,7 @@ class IntegrityChallengeService(
         if(pendingChallenges.isNotEmpty()) {
             val latestChallenge = pendingChallenges.maxByOrNull { it.createdAt }
 
-            if (latestChallenge != null && latestChallenge.expiresAt.isAfter(LocalDateTime.now())) {
+            if (latestChallenge != null && latestChallenge.expiresAt?.isAfter(LocalDateTime.now()) == true) {
                 logger.info("Challenge already exists for device: $deviceId")
                 return Pair(latestChallenge.challenge, ChronoUnit.MINUTES.between(LocalDateTime.now(), latestChallenge.expiresAt))
             }
@@ -68,12 +68,14 @@ class IntegrityChallengeService(
             return false
         }
 
-        if(challengeOpt.expiresAt.isBefore(LocalDateTime.now())) {
-            challengeOpt.status = IntegrityChallengeStatus.EXPIRED
-            challengeRepository.save(challengeOpt)
-            logger.info("Challenge expired: $challenge")
-            return false
-        }
+        challengeOpt.expiresAt?.let {
+            if(it.isBefore(LocalDateTime.now())) {
+                challengeOpt.status = IntegrityChallengeStatus.EXPIRED
+                challengeRepository.save(challengeOpt)
+                logger.info("Challenge expired: $challenge")
+                return false
+            }
+        } ?: return false
 
         if (challengeOpt.status != IntegrityChallengeStatus.PENDING) {
             logger.info("Challenge already used or expired: $challenge")

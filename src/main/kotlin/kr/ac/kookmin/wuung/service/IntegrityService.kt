@@ -3,14 +3,15 @@ package kr.ac.kookmin.wuung.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtParser
-import io.jsonwebtoken.JwtParserBuilder
 import io.jsonwebtoken.Jwts
 import kr.ac.kookmin.wuung.controller.IntegrityVerificationResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.util.Base64
@@ -37,27 +38,28 @@ class IntegrityService(
 ) {
     companion object {
         var applePublicKey: PublicKey? = null
-        var parser: JwtParser? = null
+        var appleParser: JwtParser? = null
     }
 
+    private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
     private val objectMapper = ObjectMapper()
-
+    
     init {
-        val response = webClient.get()
+        val appleResponse = webClient.get()
             .uri("https://www.apple.com/certificateauthority/Apple_App_Attestation_Root_CA.pem")
             .accept(MediaType.APPLICATION_OCTET_STREAM)
             .retrieve()
             .bodyToMono(ByteArray::class.java)
             .block()
 
-        if (response != null) {
+        if (appleResponse != null) {
             try {
                 val keyFactory = KeyFactory.getInstance("RSA")
                 val certFactory = java.security.cert.CertificateFactory.getInstance("X.509")
-                val certificate = certFactory.generateCertificate(response.inputStream())
+                val certificate = certFactory.generateCertificate(appleResponse.inputStream())
                 applePublicKey = certificate.publicKey
 
-                parser = Jwts.parser()
+                appleParser = Jwts.parser()
                     .setSigningKey(applePublicKey)
                     .build()
             } catch (e: Exception) {
@@ -72,78 +74,67 @@ class IntegrityService(
         attestationJwt: String
     ): IntegrityVerificationResponse {
         try {
-            // JWT 파싱
-            val parts = attestationJwt.split(".")
-            if (parts.size != 3) {
+            val decodedToken = webClient.post()
+                .uri(decodeIntegrityTokenUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(mapOf("integrity_token" to attestationJwt)))
+                .header("Authorization", "Bearer $apiKey")
+                .retrieve()
+                .bodyToMono(ByteArray::class.java)
+                .block()
+
+            if (decodedToken == null) {
                 return IntegrityVerificationResponse(
                     isValid = false,
-                    message = "Invalid JWT format"
+                    message = "Decoded token is null"
                 )
             }
 
-            // 페이로드 디코딩
-            val payload = String(Base64.getUrlDecoder().decode(parts[1]))
-            val jsonPayload = objectMapper.readValue(payload, Map::class.java) as Map<String, Any>
+            val decodedTokenString = String(decodedToken)
+            val decodedTokenMap = objectMapper.readValue(decodedTokenString, Map::class.java) as Map<String, Any>
 
-            // 토큰 페이로드 검사
-            val tokenPayload = jsonPayload["tokenPayload"] as? Map<String, Any> ?: return IntegrityVerificationResponse(
-                isValid = false,
-                message = "Invalid token payload"
-            )
-
-            // 앱 무결성 검증
-            val appIntegrity = tokenPayload["appIntegrity"] as? Map<String, Any>
-            val appRecognitionVerdict = appIntegrity?.get("appRecognitionVerdict") as? String
-
-            if (appRecognitionVerdict != "PLAY_RECOGNIZED") {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "App not recognized by Google Play",
-                    details = mapOf("verdict" to (appRecognitionVerdict ?: "UNKNOWN"))
-                )
-            }
-
-            // 디바이스 무결성 검증
-            val deviceIntegrity = tokenPayload["deviceIntegrity"] as? Map<String, Any>
-            @Suppress("UNCHECKED_CAST")
-            val deviceRecognitionVerdict = deviceIntegrity?.get("deviceRecognitionVerdict") as? List<String>
-
-            if (deviceRecognitionVerdict == null || !deviceRecognitionVerdict.contains("MEETS_BASIC_INTEGRITY")) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Device does not meet basic integrity requirements",
-                    details = mapOf("verdicts" to (deviceRecognitionVerdict ?: emptyList<String>()))
-                )
-            }
-
-            // 패키지 이름 확인
-            val requestDetails = tokenPayload["requestDetails"] as? Map<String, Any>
-            val requestPackageName = requestDetails?.get("requestPackageName") as? String
-
-            if (requestPackageName != packageName) {
+            val tokenPackageName = (decodedTokenMap["packageName"] as? String)
+            if (tokenPackageName != packageName) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Package name mismatch",
                     details = mapOf(
                         "expected" to packageName,
-                        "actual" to (requestPackageName ?: "null")
+                        "actual" to (tokenPackageName ?: "null")
                     )
                 )
             }
 
-            // 타임스탬프 검증
-            val timestampMillis = requestDetails?.get("timestampMillis") as? Long ?: 0
-            val currentTimeMillis = System.currentTimeMillis()
+            val requestDetails = decodedTokenMap["requestDetails"] as? Map<String, Any>
+            val timestampMillis = requestDetails?.get("timestampMillis") as? Long
+            if (timestampMillis != null) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - timestampMillis > TimeUnit.MINUTES.toMillis(5)) {
+                    return IntegrityVerificationResponse(
+                        isValid = false,
+                        message = "Token has expired",
+                        details = mapOf("timestamp" to timestampMillis)
+                    )
+                }
+            }
 
-            // 5분 이상 지난 토큰 거부
-            if (currentTimeMillis - timestampMillis > TimeUnit.MINUTES.toMillis(5)) {
+            val appIntegrity = decodedTokenMap["appIntegrity"] as? Map<String, Any>
+            val appRecognitionVerdict = appIntegrity?.get("appRecognitionVerdict") as? String
+            if (appRecognitionVerdict != "PLAY_RECOGNIZED") {
                 return IntegrityVerificationResponse(
                     isValid = false,
-                    message = "Token has expired",
-                    details = mapOf(
-                        "tokenTime" to timestampMillis,
-                        "currentTime" to currentTimeMillis
-                    )
+                    message = "App not recognized by Google Play",
+                    details = mapOf("verdict" to (appRecognitionVerdict ?: "null"))
+                )
+            }
+
+            val deviceIntegrity = decodedTokenMap["deviceIntegrity"] as? Map<String, Any>
+            val deviceRecognitionVerdict = deviceIntegrity?.get("deviceRecognitionVerdict") as? List<String>
+            if (deviceRecognitionVerdict?.contains("MEETS_DEVICE_INTEGRITY") != true) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Device integrity check failed",
+                    details = mapOf("verdicts" to (deviceRecognitionVerdict ?: "null"))
                 )
             }
 
@@ -177,7 +168,7 @@ class IntegrityService(
             // JWT 클레임 검증
             val claims: Claims
             try {
-                claims = parser?.let {
+                claims = appleParser?.let {
                     it.parseClaimsJws(attestation)?.body ?: throw RuntimeException("Invalid JWT format")
                 } ?: throw RuntimeException("JWT parser not initialized")
             } catch (e: Exception) {
