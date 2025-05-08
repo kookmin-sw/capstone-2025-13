@@ -69,7 +69,7 @@ class IntegrityController(
 
     @PostMapping("/verify")
     fun verifyIntegrity(
-        @Valid @RequestBody request: IntegrityVerificationRequest
+        @RequestBody request: IntegrityVerificationRequest
     ): ResponseEntity<IntegrityVerificationResponse> {
         if(!challengeService.verifyChallenge(request.challenge, request.deviceId)) {
             return ResponseEntity.ok(
@@ -82,7 +82,7 @@ class IntegrityController(
 
         try {
             val result = when (request.platform.lowercase()) {
-                "android" -> integrityService.verifyAndroidIntegrity(request.challenge)
+                "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
                     request.bundleId ?: "",

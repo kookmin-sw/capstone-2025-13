@@ -51,7 +51,7 @@ export const verifyDeviceIntegrity = async()=> {
 
     try {
         const googleCloudProject: number = parseInt(EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT);
-        const attestation = await Integrity.attestKey(challenge, googleCloudProject);
+        const attestation = JSON.stringify(await Integrity.attestKey(challenge, googleCloudProject));
 
         const verificationResponse = await axios.post('/api/integrity/verify', {
             platform: Platform.OS,
