@@ -24,14 +24,17 @@
             "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-video"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.wooong",
       "config": {
         "googleMapsApiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
-      }
+      },
+      "buildNumber": "65"
     },
     "android": {
       "adaptiveIcon": {
@@ -43,7 +46,12 @@
         "googleMaps": {
           "apiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
         }
-      }
+      },
+      "versionCode": 65,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

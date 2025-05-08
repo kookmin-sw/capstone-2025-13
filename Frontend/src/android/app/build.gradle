@@ -92,7 +92,7 @@ android {
         applicationId 'com.anonymous.wooong'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode = (VERSION_CODE ?: "1").toInteger()
+        versionCode 65
         versionName = VERSION_NAME
     }
     signingConfigs {
@@ -104,9 +104,9 @@ android {
         }
         release {
             storeFile = file('wooong.release.jks')
-            storePassword = KEYSTORE_PASSWORD
-            keyAlias = 'woonog-deploy'
-            keyPassword = KEYSTORE_PASSWORD
+            storePassword = MYKEY_KEYSTORE_PASSWORD
+            keyAlias = 'wooong-deploy'
+            keyPassword = MYKEY_KEYSTORE_PASSWORD
         }
     }
     buildTypes {

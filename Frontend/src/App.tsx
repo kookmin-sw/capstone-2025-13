@@ -26,10 +26,12 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/signAPI";
+import { refreshAccessToken } from "./API/common";
 import Calendar from "./screens/Calendar"
 import Record from "./screens/Record";
-import {verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import customAxios from './API/axios';
+
+import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
 import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
 
 const navigationRef = createNavigationContainerRef();
@@ -86,6 +88,7 @@ function AppInner() {
                     return;
                 }
 
+                await requestChallenge();
                 const result = await verifyDeviceIntegrity();
 
                 if(result.isValid) {
@@ -110,6 +113,7 @@ function AppInner() {
                 setLoading(false);
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
+                setIsLoggedIn(false);
                 setLoading(false);
             }
         };
@@ -134,7 +138,7 @@ function AppInner() {
                     }
                 }
             }
-        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+        }, 4 * 60 * 1000);
 
         return () => clearInterval(interval); // cleanup
     }, []);

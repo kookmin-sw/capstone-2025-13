@@ -7,6 +7,7 @@ import SurveyHeader from "../../components/SurveyHeader";
 import SurveyQuestion from "../../components/SurveyQuestion";
 import ConfirmButton from "../../components/ConfirmButton";
 import styles from "../../styles/formalSurveyStyles";
+import {DiagnosisQuestion} from "../../API/diagnosisAPI";
 
 // 🔄 토큰 재발급 함수
 const refreshAccessToken = async () => {
@@ -28,7 +29,7 @@ export default function FormalDiagnosisSurvey() {
     const route = useRoute();
     const { diagnosisId } = route.params as { diagnosisId: string };
 
-    const [questions, setQuestions] = useState<any[]>([]);
+    const [questions, setQuestions] = useState<DiagnosisQuestion[]>([]);
 
     useEffect(() => {
         const fetchDiagnosis = async () => {

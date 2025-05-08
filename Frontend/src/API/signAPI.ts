@@ -1,78 +1,47 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios, {ApiResponseDTO} from "./axios";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from "axios";
+import ApiResponseDTO, { RefreshAccessTokenResponse } from "./common";
+import axios from "./axios";
 
-interface SignInResponse {
-    accessToken: string;
-    refreshToken: string;
-}
+export type SignOutResponse = string;
 
-export const refreshAccessToken = async (): Promise<string> => {
-    try {
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
-
-        const response = await axios.post("/auth/refresh", { refreshToken }, {}) as AxiosResponse<ApiResponseDTO<SignInResponse>>
-
-        if (response.data.error) {
-            throw new Error("Failed to refresh tokens: " + response.data.message);
-        }
-
-        const data = response.data.data;
-
-        await AsyncStorage.setItem("accessToken", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
-
-        return data.accessToken;
-    } catch (error) {
-        console.error("Error refreshing tokens:", error);
-        throw error;
-    }
-};
-
+// 로그인
 export const signIn = async (email: string, password: string) => {
     try {
         const response = await axios.post("/auth/login", {
             email,
             password
-        }) as AxiosResponse<ApiResponseDTO<SignInResponse>>
+        }) as AxiosResponse<ApiResponseDTO<RefreshAccessTokenResponse>>;
 
-        console.log(response.data)
-
-        if (response.data.error) {
-            throw new Error("Failed to login: " + response.data.message);
-        }
-
-        const data = response.data.data;
-
-        await AsyncStorage.setItem("accessToken", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
-
-        return data;
+        return response.data.data;
     } catch (error) {
         console.error("Error during sign-in:", error);
         throw error;
     }
 };
 
-export const signOut = async (accessToken: string, refreshToken: string): Promise<boolean> => {
+// 로그아웃
+export const signOut = async (accessToken: string, refreshToken: string) => {
     try {
-        const response = await axios.post("/auth/logout", { accessToken, refreshToken }, {}) as AxiosResponse<ApiResponseDTO<string>>
+        const response = await axios.post("/auth/logout", {
+            accessToken,
+            refreshToken
+        }) as AxiosResponse<ApiResponseDTO<SignOutResponse>>;
 
-        if (response.data.error) {
-            throw new Error("Failed to refresh tokens: " + response.data.message);
-        }
+        const data = response.data.data;
 
         // Clear tokens from AsyncStorage
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
 
-        return true;
+        return data;
     } catch (error) {
         console.error("Error during sign-out:", error);
         throw error;
     }
 };
 
+// 회원가입
 export const signUp = async (
     email: string,
     password: string,
@@ -81,26 +50,17 @@ export const signUp = async (
     gender: string
 ) => {
     try {
-        const response = await axios.post("/auth/signup",
-            {
-                email,
-                password,
-                gender: gender.toUpperCase(),
-                user_name: nickname,
-                birth_date: birthDate,
-            }, {}
-        ) as AxiosResponse<ApiResponseDTO<SignInResponse>>
+        const upperGender = gender.toUpperCase();
 
-        if (response.data.error) {
-            throw new Error("Network response was not ok: " + response.data.message);
-        }
+        const response = await axios.post("/auth/signup", {
+            email,
+            password,
+            gender: upperGender,
+            user_name: nickname,
+            birth_date: birthDate,
+        }) as AxiosResponse<ApiResponseDTO<RefreshAccessTokenResponse>>;
 
-        const data = response.data.data;
-
-        await AsyncStorage.setItem("accessToken", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
-
-        return data;
+        return response.data.data;
     } catch (error) {
         console.error("Error during sign-up:", error);
         throw error;
