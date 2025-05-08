@@ -1,8 +1,8 @@
 package kr.ac.kookmin.wuung.controller
 
-import io.swagger.v3.oas.annotations.Hidden
 import kr.ac.kookmin.wuung.service.IntegrityChallengeService
 import kr.ac.kookmin.wuung.service.IntegrityService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,22 +34,34 @@ data class IntegrityVerificationResponse(
 )
 
 @RestController("/api/integrity")
-@Hidden
 class IntegrityController(
     @Autowired private val integrityService: IntegrityService,
     @Autowired private val challengeService: IntegrityChallengeService
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @PostMapping("/challenge")
     fun getChallenge(
         @Valid @RequestBody request: ChallengeRequest
     ): ResponseEntity<ChallengeResponse> {
+        try {
         val challenge = challengeService.generateChallenge(request.deviceId)
-        return ResponseEntity.ok(
-            ChallengeResponse(
-                challenge = challenge.first,
-                expiresInMinutes = challenge.second
+            return ResponseEntity.ok(
+                ChallengeResponse(
+                    challenge = challenge.first,
+                    expiresInMinutes = challenge.second
+                )
             )
-        )
+        } catch(e: Exception) {
+            logger.error("Error on getting challenge: ${e.message}")
+            logger.debug(e.stackTraceToString())
+            return ResponseEntity.status(500).body(
+                ChallengeResponse(
+                    challenge = "",
+                    expiresInMinutes = 0
+                )
+            )
+        }
     }
 
     @PostMapping("/verify")
@@ -65,16 +77,31 @@ class IntegrityController(
             )
         }
 
-        val result = when (request.platform.lowercase()) {
-            "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
-            "ios" -> integrityService.verifyIosAppAttest(
-                request.attestation,
-                request.bundleId ?: "",
-                request.challenge ?: ""
-            )
-            else -> IntegrityVerificationResponse(isValid = false, message = "Unsupported platform: ${request.platform}")
-        }
+        try {
+            val result = when (request.platform.lowercase()) {
+                "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
+                "ios" -> integrityService.verifyIosAppAttest(
+                    request.attestation,
+                    request.bundleId ?: "",
+                    request.challenge ?: ""
+                )
 
-        return ResponseEntity.ok(result)
+                else -> IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Unsupported platform: ${request.platform}"
+                )
+            }
+
+            return ResponseEntity.ok(result)
+        } catch(e: Exception) {
+            logger.error("Error on verifying integrity: ${e.message}")
+            logger.debug(e.stackTraceToString())
+            return ResponseEntity.status(500).body(
+                IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "An error occurred while verifying integrity. Please try again later."
+                )
+            )
+        }
     }
 }
