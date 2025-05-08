@@ -50,6 +50,10 @@ export type RootStackParamList = {
     HelpCall2: undefined;
     UserInfo: undefined;
     Record: undefined;
+    Quest_meditation: undefined;
+    Quest_exercise: undefined;
+    Calendar: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
