@@ -1,6 +1,7 @@
 ![](./Images/main.png)
 
 # 📝 프로젝트 소개
+
 ## 여러분은 지금 행복하신가요?
 
 ### “내가 우울한 건지, 그냥 힘든 건지”
@@ -25,7 +26,6 @@
 **2\. 낮은 지속 사용 유도력** – 관심을 유지할 장치 부족<br>
 **3\. 과도한 유료화·광고** – 진입 장벽 상승<br>
 **4\. 커뮤니티 부작용** – 부정적 경험의 확산<br>
-
 
 ## 🌱 브랜드 아이덴티티
 
@@ -52,7 +52,6 @@
     </td>
   </tr>
 </table>
-
 
   <h2>👨‍👩‍👧‍👦 팀 해피니스 소개</h2>
     <table>
@@ -102,24 +101,20 @@
       </tr>
     </table>
 
-
 ## ⚙️ 사용법
 
 앱은 현재 \[TestFlight / APK 링크\]를 통해 설치할 수 있습니다.
-
-
 
 ## 🎬 시연 영상
 
 [![시연 영상](https://img.youtube.com/vi/jIa5xfGGVd0/0.jpg)](https://www.youtube.com/watch?v=jIa5xfGGVd0)
 
-
 ## 🖼 기능소개
 
 <p align="center">
-  <img src="./images/simple.png" alt="simple" width="30%" />
-  <img src="./images/signup.png" alt="signup" width="30%" />
-  <img src="./images/login.png" alt="login" width="30%" />
+  <img src="./Images/simple.png" alt="simple" width="30%" />
+  <img src="./Images/signup.png" alt="signup" width="30%" />
+  <img src="./Images/login.png" alt="login" width="30%" />
 </p>
 
 <p align="center">
@@ -127,9 +122,9 @@
 <em>#마음여행시작 #스토리기반 #심리케어첫단계 #게임 #재미 #약식검사 #로그인 #회원가입</em>
 </p>
 <p align="center">
-  <img src="./images/loading.png" alt="loading" width="30%" />
-  <img src="./images/home.png" alt="home" width="30%" />
-  <img src="./images/userinfo.png" alt="userinfo" width="30%" />
+  <img src="./Images/loading.png" alt="loading" width="30%" />
+  <img src="./Images/home.png" alt="home" width="30%" />
+  <img src="./Images/userinfo.png" alt="userinfo" width="30%" />
 </p>
 
 <p align="center">
@@ -138,8 +133,8 @@
 </p>
 
 <p align="center">
-  <img src="./images/calendar.png" alt="calendar" width="45%" />
-  <img src="./images/helpcall.png" alt="helpcall" width="45%" />
+  <img src="./Images/calendar.png" alt="calendar" width="45%" />
+  <img src="./Images/helpcall.png" alt="helpcall" width="45%" />
 </p>
 
 <p align="center">
@@ -148,9 +143,9 @@
 </p>
 
 <p align="center">
-  <img src="./images/secondpw.png" alt="secondpw" width="30%" />
-  <img src="./images/diag.png" alt="diag" width="30%" />
-  <img src="./images/diag2.png" alt="diag2" width="30%" />
+  <img src="./Images/secondpw.png" alt="secondpw" width="30%" />
+  <img src="./Images/diag.png" alt="diag" width="30%" />
+  <img src="./Images/diag2.png" alt="diag2" width="30%" />
 </p>
 
 <p align="center">
@@ -159,8 +154,8 @@
 </p>
 
 <p align="center">
-  <img src="./images/daily.png" alt="daily" width="45%" />
-  <img src="./images/diary.png" alt="diary" width="45%" />
+  <img src="./Images/daily.png" alt="daily" width="45%" />
+  <img src="./Images/diary.png" alt="diary" width="45%" />
 </p>
 
 <p align="center">
@@ -169,9 +164,9 @@
 </p>
 
 <p align="center">
-  <img src="./images/quest.png" alt="quest" width="30%" />
-  <img src="./images/quest2.png" alt="quest2" width="30%" />
-  <img src="./images/quest3.png" alt="quest3" width="30%" />
+  <img src="./Images/quest.png" alt="quest" width="30%" />
+  <img src="./Images/quest2.png" alt="quest2" width="30%" />
+  <img src="./Images/quest3.png" alt="quest3" width="30%" />
 </p>
 
 <p align="center">
@@ -180,15 +175,13 @@
 </p>
 
 <p align="center">
-  <img src="./images/face.png" alt="face" width="40%" />
+  <img src="./Images/face.png" alt="face" width="40%" />
 </p>
 
 <p align="center">
 📸 카메라 속 나의 표정, 내가 몰랐던 감정을 알려줘요.   <br>
 <em>#감정인식 #나돌아보기 #표정분석 #얼굴감지 #셀카</em>
 </p>
-
-
 
 ## 🛠 기술 스택
 
@@ -208,8 +201,6 @@
 
 ![](https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white) ![](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white) ![](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
 
-
-
 ## 🖥 개발 환경
 
 - **OS**: Windows 11 / macOS Sequoia 15.2
@@ -223,23 +214,19 @@
 - **데이터베이스**: MySQL (RDS)
 - **API 통신**: RESTful API (Axios 기반)
 
-
-
 ## 시스템 구조도
 
-![서비스 구조](./images/system.png)
+![서비스 구조](./Images/system.png)
 
 ## 표정분석 플로우
 
-![서비스 구조](./images/aiflow.png)
-
-
+![서비스 구조](./Images/aiflow.png)
 
 ## 🤝 협업 방식
 
 > 독립적 개발 + 전체 구조의 일관성 유지 = **효율적 협업 달성!**
 
-![깃플로우](./images/cowork.png)
+![깃플로우](./Images/cowork.png)
 
 - **브랜치 전략**
 
