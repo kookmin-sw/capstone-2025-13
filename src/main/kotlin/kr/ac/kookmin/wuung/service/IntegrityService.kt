@@ -41,7 +41,7 @@ class IntegrityService(
     private val keyId: String,
 
     @Value("\${app.google-account-json}")
-    private val googleAccountJwt: String,
+    private val googleAccountJson: String,
 ) {
     companion object {
         var applePublicKey: PublicKey? = null
@@ -84,8 +84,7 @@ class IntegrityService(
     @Scheduled(fixedRate = 3300000) // Refresh every 55 minutes
     private fun refreshGoogleAccessToken() {
         try {
-            val credentials = GoogleCredentials
-                .fromStream(ByteArrayInputStream(Base64.getDecoder().decode(googleAccountJwt)))
+            val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(googleAccountJson.toByteArray()))
                 .createScoped("https://www.googleapis.com/auth/playintegrity")
             credentials.refresh()
             googleAccessToken = credentials.accessToken
@@ -102,7 +101,7 @@ class IntegrityService(
                 .uri(decodeIntegrityTokenUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(mapOf("integrity_token" to challenge)))
-                .header("Authorization", "Bearer $apiKey")
+                .header("Authorization", "Bearer ${googleAccessToken?.tokenValue}")
                 .retrieve()
                 .bodyToMono(ByteArray::class.java)
                 .block()
