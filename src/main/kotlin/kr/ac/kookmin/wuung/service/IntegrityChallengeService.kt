@@ -38,7 +38,7 @@ class IntegrityChallengeService(
             }
         }
 
-        val bytes = ByteArray(64)
+        val bytes = ByteArray(16)
         secureRandom.nextBytes(bytes)
 
         val challenge = Base64.getUrlEncoder()
