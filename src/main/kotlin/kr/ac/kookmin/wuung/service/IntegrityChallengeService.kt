@@ -80,12 +80,11 @@ class IntegrityChallengeService(
             }
         }
 
-        if (challengeOpt.status != IntegrityChallengeStatus.PENDING) {
-            logger.info("Challenge already used or expired: $challenge")
-            return IntegrityVerificationResponse(false, "Challenge already used or expired")
+        return when (challengeOpt.status) {
+            IntegrityChallengeStatus.COMPLETED -> IntegrityVerificationResponse(false, "Challenge already used")
+            IntegrityChallengeStatus.EXPIRED -> IntegrityVerificationResponse(false, "Challenge expired")
+            else -> null
         }
-
-        return null
     }
 
     fun completeChallenge(challenge: String): Boolean {

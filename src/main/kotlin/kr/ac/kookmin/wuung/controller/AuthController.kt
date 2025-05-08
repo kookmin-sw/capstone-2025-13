@@ -36,6 +36,7 @@ import kr.ac.kookmin.wuung.service.TokenService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -298,6 +299,7 @@ class AuthController(
         return ResponseEntity.ok(ApiResponseDTO(data = "Success"))
     }
 
+    @Transactional(timeout = 5)
     @PostMapping("/signup")
     @Operation(
         summary = "Sign up new user and generate new tokens / 새 사용자 가입 및 토큰 생성",
@@ -323,7 +325,7 @@ class AuthController(
                 useReturnTypeSchema = true,
             ),
             ApiResponse(
-                responseCode = "400",
+                responseCode = "409",
                 description = "sign up failed",
                 content = [Content(schema = Schema(implementation = java.lang.Exception::class))]
             )
