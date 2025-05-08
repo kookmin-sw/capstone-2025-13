@@ -3,6 +3,8 @@ package kr.ac.kookmin.wuung.model
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
@@ -18,6 +20,7 @@ enum class IntegrityChallengeStatus(val value: Int) {
 @Table(name = "integrity_challenges")
 data class IntegrityChallenge(
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
 
     @Column(nullable = false)

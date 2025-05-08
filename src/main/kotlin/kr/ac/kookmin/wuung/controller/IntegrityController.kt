@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
@@ -33,7 +34,8 @@ data class IntegrityVerificationResponse(
     val details: Map<String, Any>? = null
 )
 
-@RestController("/api/integrity")
+@RestController
+@RequestMapping("/api/integrity")
 class IntegrityController(
     @Autowired private val integrityService: IntegrityService,
     @Autowired private val challengeService: IntegrityChallengeService
@@ -55,7 +57,7 @@ class IntegrityController(
         } catch(e: Exception) {
             logger.error("Error on getting challenge: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(500).body(
+            return ResponseEntity.status(200).body(
                 ChallengeResponse(
                     challenge = "",
                     expiresInMinutes = 0
@@ -83,7 +85,7 @@ class IntegrityController(
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
                     request.bundleId ?: "",
-                    request.challenge ?: ""
+                    request.challenge
                 )
 
                 else -> IntegrityVerificationResponse(
@@ -96,7 +98,7 @@ class IntegrityController(
         } catch(e: Exception) {
             logger.error("Error on verifying integrity: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(500).body(
+            return ResponseEntity.status(200).body(
                 IntegrityVerificationResponse(
                     isValid = false,
                     message = "An error occurred while verifying integrity. Please try again later."
