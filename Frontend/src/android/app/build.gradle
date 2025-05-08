@@ -92,7 +92,7 @@ android {
         applicationId 'com.anonymous.wooong'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 66
+        versionCode 67
         versionName = VERSION_NAME
     }
     signingConfigs {

@@ -82,7 +82,7 @@ function AppInner() {
     useEffect(() => {
         const checkIntegrity = async () => {
             try {
-                if (__DEV__) {
+                if (__DEV__ && false) {
                     console.log('Development build - skipping integrity check');
                     setIsIntegrityVerified(true);
                     return;
@@ -95,7 +95,7 @@ function AppInner() {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
-                    console.error('Integrity verification failed: ', result.message)
+                    console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
                     setIsIntegrityVerified(false)
                 }
             } catch (error: any) {

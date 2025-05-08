@@ -124,6 +124,8 @@ class IntegrityService(
             val decodedTokenString = String(decodedToken)
             val decodedTokenMap = objectMapper.readValue(decodedTokenString, Map::class.java) as Map<String, Any>
 
+            decodedTokenMap.forEach(::println)
+
             val tokenPackageName = (decodedTokenMap["packageName"] as? String)
             if (tokenPackageName != packageName) {
                 return IntegrityVerificationResponse(
