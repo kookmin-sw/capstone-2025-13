@@ -11,14 +11,15 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 import java.security.KeyFactory
 import java.security.PublicKey
-import java.util.Base64
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.AccessToken
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import java.io.ByteArrayInputStream
@@ -83,17 +84,20 @@ class IntegrityService(
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Scheduled(fixedRate = 3300000) // Refresh every 55 minutes
     private fun refreshGoogleAccessToken() {
-        try {
-            val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(googleAccountJson.toByteArray()))
-                .createScoped("https://www.googleapis.com/auth/playintegrity")
-            credentials.refresh()
-            googleAccessToken = credentials.accessToken
+        GlobalScope.launch {
+            try {
+                val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(googleAccountJson.toByteArray()))
+                    .createScoped("https://www.googleapis.com/auth/playintegrity")
+                credentials.refresh()
+                googleAccessToken = credentials.accessToken
 
-            logger.debug(credentials.accessToken.tokenValue)
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to refresh Google access token: ${e.message}")
+                logger.debug(credentials.accessToken.tokenValue)
+            } catch (e: Exception) {
+                throw RuntimeException("Failed to refresh Google access token: ${e.message}")
+            }
         }
     }
 
