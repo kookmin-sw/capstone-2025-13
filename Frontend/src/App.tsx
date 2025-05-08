@@ -24,6 +24,7 @@ import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
+import customAxios from './API/axios';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -70,11 +71,15 @@ export default function App() {
             if (token) {
                 setIsLoggedIn(true);
                 setLoading(false);
+            } else {
+                setIsLoggedIn(false);
+                setLoading(false);
             }
         };
         checkToken();
     }, []);
 
+    // App 로딩 중에 폰트 로딩 및 토큰 체크
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");
@@ -93,7 +98,7 @@ export default function App() {
                     }
                 }
             }
-        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+        }, 4 * 60 * 1000);
 
         return () => clearInterval(interval); // cleanup
     }, []);
