@@ -110,7 +110,7 @@ class IntegrityService(
                 .uri(decodeIntegrityTokenUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mapOf("integrity_token" to challenge))
-                .header("Authorization", "Bearer $googleAccessToken")
+                .header("Authorization", "Bearer ${googleAccessToken?.tokenValue}")
                 .retrieve()
                 .bodyToMono(ByteArray::class.java)
                 .block()
@@ -169,6 +169,7 @@ class IntegrityService(
                 isValid = true,
                 message = "Android app integrity verification successful"
             )
+
         } catch (e: Exception) {
             IntegrityVerificationResponse(
                 isValid = false,
