@@ -38,7 +38,8 @@ data class IntegrityVerificationResponse(
 @RequestMapping("/api/integrity")
 class IntegrityController(
     @Autowired private val integrityService: IntegrityService,
-    @Autowired private val challengeService: IntegrityChallengeService
+    @Autowired private val challengeService: IntegrityChallengeService,
+    private val integrityChallengeService: IntegrityChallengeService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -93,6 +94,8 @@ class IntegrityController(
                     message = "Unsupported platform: ${request.platform}"
                 )
             }
+
+            integrityChallengeService.completeChallenge(request.challenge)
 
             return ResponseEntity.ok(result)
         } catch(e: Exception) {

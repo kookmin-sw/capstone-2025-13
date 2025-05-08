@@ -5,6 +5,9 @@ import {AxiosResponse} from "axios";
 import * as Integrity from 'expo-app-integrity';
 import {Platform} from "react-native";
 
+// @ts-ignore
+import { EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT } from '@env';
+
 export interface RequestChallengeResponse {
     challenge: string;
     expiresInMinutes: number;
@@ -47,7 +50,7 @@ export const verifyDeviceIntegrity = async()=> {
     }
 
     try {
-        const googleCloudProject: number = parseInt(process.env.GOOGLE_CLOUD_PROJECT);
+        const googleCloudProject: number = parseInt(EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT);
         const attestation = await Integrity.attestKey(challenge, googleCloudProject);
 
         const verificationResponse = await axios.post('/api/integrity/verify', {
