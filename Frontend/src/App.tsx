@@ -26,13 +26,9 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/signAPI";
-import Calendar from "./screens/Calendar"
+import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
-import {verifyDeviceIntegrity} from "./API/IntegrityAPI";
-import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
-
-const navigationRef = createNavigationContainerRef();
+import customAxios from './API/axios';
 
 export type RootStackParamList = {
     Home: undefined;
@@ -62,6 +58,7 @@ export type RootStackParamList = {
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Calendar: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -109,11 +106,15 @@ function AppInner() {
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
                 setLoading(false);
+            } else {
+                setIsLoggedIn(false);
+                setLoading(false);
             }
         };
         checkIntegrity().then(() => checkToken());
     }, []);
 
+    // App 로딩 중에 폰트 로딩 및 토큰 체크
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");
@@ -132,7 +133,7 @@ function AppInner() {
                     }
                 }
             }
-        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+        }, 4 * 60 * 1000);
 
         return () => clearInterval(interval); // cleanup
     }, []);

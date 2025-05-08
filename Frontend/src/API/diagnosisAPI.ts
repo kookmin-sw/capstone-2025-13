@@ -1,124 +1,83 @@
-import axios, {ApiResponseDTO} from "./axios";
+import axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {refreshAccessToken} from "./signAPI";
-import { AxiosResponse } from "axios";
+import ApiResponseDTO, { refreshAccessToken } from "./common";
 
-export enum DiagnosisEnum {
-    SIMPLE = 'SIMPLE',
-    'PHQ-9' = 'PHQ-9',
-    'GAD-7' = 'GAD-7',
-    BDI = 'BDI'
+export enum DiagnosisTypeEnum {
+  "Simple" = "Simple",
+  "PHQ-9" = "PHQ-9",
+  "GAD-7" = "GAD-7",
+  "BDI" = "BDI"
 }
 
-export interface Diagnosis {
-    id: number;
-    type: DiagnosisEnum;
-    title: string;
-    description: string;
-    questions: DiagnosisQuestions[],
-    scale: DiagnosisScales[],
-    createdAt: string;
-    updatedAt: string;
+export interface DiagnosisList {
+  id: number;
+  type: DiagnosisTypeEnum;
+  title: string;
+  description: string;
+  questions: DiagnosisQuestion[];
+  scale: DiagnosisScale[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface DiagnosisQuestions {
-    seq: number;
-    text: string;
-    answers: DiagnosisAnswers[]
+export interface DiagnosisQuestion {
+  seq: number;
+  text: string;
+  answers: DiagnosisAnswers[];
 }
 
 export interface DiagnosisAnswers {
-    text: string;
-    score: number;
+  text: string;
+  score: number;
 }
 
-export interface DiagnosisScales {
-    start: number;
-    scaleName: string;
-    description: string;
+export interface DiagnosisScale {
+  start: number;
+  scaleName: string;
+  description: string;
 }
 
-export const fetchDiagnosisList = async () => {
-    let token = await AsyncStorage.getItem("accessToken");
-
-    if (!token) {
-        console.log("❌ 로그인되지 않았습니다.");
-        return null;
-    }
-
-    try {
-        const response = await axios.get(
-            "/diagnosis/list", {
-                headers: {
-                    "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
-                }
-            }
-        ) as AxiosResponse<ApiResponseDTO<Diagnosis[]>>;
-        return response.data?.data || [];
-    } catch (error: any) {
-        if (error.response?.status === 401) {
-            console.log("🔄 토큰 만료됨, 재발급 시도");
-            token = await refreshAccessToken();
-            if (token) {
-                const retryResponse = await axios.get(
-                    "/diagnosis/list", {
-                        headers: {
-                            "Authorization": `Bearer ${await AsyncStorage.getItem("accessToken")}`,
-                        }
-                    }
-                ) as AxiosResponse<ApiResponseDTO<Diagnosis[]>>;
-            } else {
-                console.error("❌ 토큰 재발급 실패로 요청 중단");
-                return null;
-            }
-        } else {
-            console.error("❌ axios 요청 실패:", error);
-            return null;
-        }
-    }
+const getAuthHeaders = async () => {
+  const token = await AsyncStorage.getItem("accessToken");
+  if (!token) throw new Error("❌ 로그인되지 않았습니다.");
+  return { Authorization: `Bearer ${token}` };
 };
 
-export const fetchDiagnosisDetail = async (id: number) => {
-    let token = await AsyncStorage.getItem("accessToken");
-
-    if (!token) {
-        console.log("❌ 로그인되지 않았습니다.");
-        return null;
-    }
-
-    try {
-        const response = await axios.get(`/diagnosis/${id}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        ) as AxiosResponse<ApiResponseDTO<Diagnosis>>;
-        return response.data?.data || null;
-    } catch (error: any) {
-        if (error.response?.status === 401) {
-            console.log("🔄 토큰 만료됨, 재발급 시도");
-            token = await refreshAccessToken();
-            if (token) {
-                try {
-                    const retryResponse = await axios.get(`/diagnosis/${id}`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    ) as AxiosResponse<ApiResponseDTO<Diagnosis>>;
-                } catch (retryError: any) {
-                    console.error("❌ 재시도 실패:", retryError);
-                    return null;
-                }
-            } else {
-                console.error("❌ 토큰 재발급 실패로 요청 중단");
-                return null;
-            }
-        } else {
-            console.error("❌ 요청 실패:", error);
-            return null;
+const handleAuthRequest = async <T>(requestFn: () => Promise<T>): Promise<T | null> => {
+  try {
+    return await requestFn();
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      console.log("🔄 토큰 만료됨, 재발급 시도");
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        try {
+          return await requestFn();
+        } catch (retryError) {
+          console.error("❌ 재시도 실패:", retryError);
         }
+      } else {
+        console.error("❌ 토큰 재발급 실패로 요청 중단");
+      }
+    } else {
+      console.error("❌ 요청 실패:", error);
     }
+    return null;
+  }
+};
+
+export const fetchDiagnosisList = async (): Promise<DiagnosisList[] | null> => {
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisList[]>>("/diagnosis/list", { headers });
+    return data.data;
+  });
+};
+
+export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | null> => {
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisList>>(`/diagnosis/${id}`, { headers });
+    return data.data;
+  });
 };
