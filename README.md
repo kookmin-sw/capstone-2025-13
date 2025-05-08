@@ -1,7 +1,6 @@
 ![](./Images/main.png)
 
 # 📝 프로젝트 소개
-
 ## 여러분은 지금 행복하신가요?
 
 ### “내가 우울한 건지, 그냥 힘든 건지”
@@ -22,52 +21,98 @@
 
 **저희는 다양한 정신건강 앱을 직접 사용해보고 다음과 같은 공통 문제를 발견했습니다:**
 
-- **1\. 진단·치료 기능의 단절** – 흐름이 끊기고, 별도 앱을 요구
-- **2\. 낮은 지속 사용 유도력** – 관심을 유지할 장치 부족
-- **3\. 과도한 유료화·광고** – 진입 장벽 상승
-- **4\. 커뮤니티 부작용** – 부정적 경험의 확산
+**1\. 진단·치료 기능의 단절** – 흐름이 끊기고, 별도 앱을 요구 <br>
+**2\. 낮은 지속 사용 유도력** – 관심을 유지할 장치 부족<br>
+**3\. 과도한 유료화·광고** – 진입 장벽 상승<br>
+**4\. 커뮤니티 부작용** – 부정적 경험의 확산<br>
 
----
 
 ## 🌱 브랜드 아이덴티티
 
-![우웅 로고](./Images/wooong.jpeg)
+<table>
+  <tr>
+    <td align="center">
+      <img src="./Images/wooong.jpeg" alt="우웅 로고" width="200"/><br/>
+      <b>앱 이름</b><br/>
+      ‘우웅~’이라는 인터넷 밈에서 착안하여,<br/>
+      무겁지 않고 <b>가볍고 따뜻한 느낌</b>으로 다가갑니다.
+    </td>
+    <td align="center">
+      <img src="./Images/clover.png" alt="세잎이와 네잎이" width="200"/><br/>
+      <b>마스코트</b><br/>
+      세잎이와 네잎이라는 클로버 캐릭터.<br/>
+      사용자에게 <b>소소한 위로와 행운</b>을 전해주는 존재입니다.
+    </td>
+    <td align="center">
+      <img src="./Images/colorchart.png" alt="컬러 팔레트" width="200"/><br/>
+      <b>메인 컬러</b><br/>
+      초록색 – 심리적 안정과 편안함을 상징.<br/>
+      보조색 – 갈색, 포인트 색 – 주황색으로<br/>
+      따뜻한 활기를 더했습니다.
+    </td>
+  </tr>
+</table>
 
-**앱 이름**  
-‘우웅~’이라는 인터넷 밈에서 착안하여, 무겁지 않고 **가볍고 따뜻한 느낌**으로 다가갑니다.
 
-![세잎이와 네잎이](./Images/clover.png)
+  <h2>👨‍👩‍👧‍👦 팀 해피니스 소개</h2>
+    <table>
+      <tr>
+        <td>
+          <img src="https://avatars.githubusercontent.com/cherror" width="100">
+          <br>
+          <strong>한초희</strong><br>
+          PM&Frontend<br>
+          <a href="https://github.com/cherror">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/Kim-JiYun" width="100">
+          <br>
+          <strong>김지윤</strong><br>
+          Frontend<br>
+          <a href="https://github.com/Kim-JiYun">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/janeny117" width="100">
+          <br>
+          <strong>김재인</strong><br>
+          Frontend<br>
+          <a href="https://github.com/janeny117">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/20203153" width="100">
+        <br>
+          <strong>최진우</strong><br>
+          Backend<br>
+          <a href="https://github.com/20203153">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/toad-memntomori" width="100">
+          <br>
+          <strong>이충호</strong><br>
+          Backend<br>
+          <a href="https://github.com/toad-memntomori">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/suyeone" width="100">
+<br>
+          <strong>이수연</strong><br>
+          AI<br>
+          <a href="https://github.com/suyeone">GitHub</a>
+        </td>
+      </tr>
+    </table>
 
-**마스코트**  
-세잎이와 네잎이라는 클로버 캐릭터. 사용자에게 **소소한 위로와 행운**을 전해주는 존재입니다.
-
-![컬러 팔레트](./Images/colorchart.png)
-
-**메인 컬러**  
-초록색 – 심리적 안정과 편안함을 상징.  
-보조색 – 갈색, 포인트 색 – 주황색으로 따뜻한 활기를 더했습니다.
-
----
-
-## 👨‍👩‍👧‍👦 팀 해피니스 소개
-
-|                                                                                                                            |                                                                                                                             |                                                                                                                             |                                                                                                                          |                                                                                                                                        |                                                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| ![](https://avatars.githubusercontent.com/cherror) <br>**한초희** <br>PM&Frontend <br>[GitHub](https://github.com/cherror) | ![](https://avatars.githubusercontent.com/Kim-JiYun) <br>**김지윤** <br>Frontend <br>[GitHub](https://github.com/Kim-JiYun) | ![](https://avatars.githubusercontent.com/janeny117) <br>**김재인** <br>Frontend <br>[GitHub](https://github.com/janeny117) | ![](https://avatars.githubusercontent.com/20203153) <br>**최진우** <br>Backend <br>[GitHub](https://github.com/20203153) | ![](https://avatars.githubusercontent.com/toad-memntomori) <br>**이충호** <br>Backend <br>[GitHub](https://github.com/toad-memntomori) | ![](https://avatars.githubusercontent.com/suyeone) <br>**이수연** <br>AI <br>[GitHub](https://github.com/suyeone) |
-
----
 
 ## ⚙️ 사용법
 
 앱은 현재 \[TestFlight / APK 링크\]를 통해 설치할 수 있습니다.
 
----
+
 
 ## 🎬 시연 영상
 
 [![시연 영상](https://img.youtube.com/vi/jIa5xfGGVd0/0.jpg)](https://www.youtube.com/watch?v=jIa5xfGGVd0)
 
----
 
 ## 🖼 기능소개
 
@@ -144,7 +189,6 @@
 </p>
 
 
----
 
 ## 🛠 기술 스택
 
@@ -164,7 +208,7 @@
 
 ![](https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white) ![](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white) ![](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
 
----
+
 
 ## 🖥 개발 환경
 
@@ -179,7 +223,7 @@
 - **데이터베이스**: MySQL (RDS)
 - **API 통신**: RESTful API (Axios 기반)
 
----
+
 
 ## 시스템 구조도
 
@@ -189,7 +233,7 @@
 
 ![서비스 구조](./images/aiflow.png)
 
----
+
 
 ## 🤝 협업 방식
 
