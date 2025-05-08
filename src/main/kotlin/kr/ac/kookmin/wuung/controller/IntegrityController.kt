@@ -51,7 +51,7 @@ class IntegrityController(
         val challenge = challengeService.generateChallenge(request.deviceId)
             return ResponseEntity.ok(
                 ChallengeResponse(
-                    challenge = challenge.first,
+                    challenge = challenge.first ?: "",
                     expiresInMinutes = challenge.second
                 )
             )
