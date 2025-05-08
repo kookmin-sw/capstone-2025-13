@@ -19,6 +19,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.AccessToken
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import java.io.ByteArrayInputStream
 
@@ -51,6 +52,7 @@ class IntegrityService(
 
     private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
     private val objectMapper = ObjectMapper()
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     init {
         refreshGoogleAccessToken()
@@ -88,6 +90,8 @@ class IntegrityService(
                 .createScoped("https://www.googleapis.com/auth/playintegrity")
             credentials.refresh()
             googleAccessToken = credentials.accessToken
+
+            logger.debug(credentials.accessToken.tokenValue)
         } catch (e: Exception) {
             throw RuntimeException("Failed to refresh Google access token: ${e.message}")
         }
