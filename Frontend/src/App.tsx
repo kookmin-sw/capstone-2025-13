@@ -83,7 +83,7 @@ export default function App() {
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");
-            const tokenExpiry = await AsyncStorage.getItem("accessTokenExpiry");
+            const tokenExpiry = 15 * 60 * 1000; // 15분 (900000ms) 후 만료된다고 가정
 
             if (accessToken && tokenExpiry) {
                 const expiryTime = new Date(tokenExpiry).getTime();
@@ -91,17 +91,24 @@ export default function App() {
 
                 // 5분 전까지 만료되면 갱신
                 if (expiryTime - currentTime <= 5 * 60 * 1000) {
+                    console.log("토큰 갱신 시도 중...");
                     try {
                         await refreshAccessToken(); // 토큰 갱신
+                        console.log("토큰 갱신 성공");
                     } catch (error) {
-                        console.error("Token refresh failed", error);
+                        console.error("토큰 갱신 실패:", error);
                     }
+                } else {
+                    console.log("토큰 유효함, 갱신 불필요");
                 }
+            } else {
+                console.log("토큰 없음, 갱신 불필요");
             }
-        }, 4 * 60 * 1000);
+        }, 4 * 60 * 1000); // 4분마다 실행
 
         return () => clearInterval(interval); // cleanup
     }, []);
+
 
     const [fontsLoaded] = useFonts({
         "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),
@@ -122,7 +129,7 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Quest"}>
+            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}>
                 <Stack.Screen
                     name="Home"
                     component={Home}
