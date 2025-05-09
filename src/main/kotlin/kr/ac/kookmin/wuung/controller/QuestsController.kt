@@ -676,18 +676,17 @@ class QuestsController(
     )
     fun getCurrentQuests(
         @AuthenticationPrincipal userDetails: User?
-    ): ResponseEntity<ApiResponseDTO<List<UserQuestsDTO>>> {
+    ): ResponseEntity<ApiResponseDTO<List<Int>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val questsByType = userQuestsRepository.findByUser(userDetails)
+        val questSteps = userQuestsRepository.findByUser(userDetails)
             .filter { it.status == UserQuestStatus.PROCESSING }
             .groupBy { it.quest?.type }
             .mapValues { (_, quests) -> quests.maxByOrNull { it.createdAt } }
-            .mapNotNull { it.value }
+            .mapNotNull { it.value?.quest?.step }
 
-        return ResponseEntity.ok(ApiResponseDTO(data = questsByType.map { it.toDTO() }))
+        return ResponseEntity.ok(ApiResponseDTO(data = questSteps))
     }
-
     @GetMapping("/last/{type}")
     @Operation(
         summary = "Get current quest by type",
@@ -735,7 +734,7 @@ class QuestsController(
     fun getCurrentQuestByType(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable type: QuestType
-    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
+    ): ResponseEntity<ApiResponseDTO<Int>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findByUser(userDetails)
@@ -743,7 +742,7 @@ class QuestsController(
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 
-        return ResponseEntity.ok(ApiResponseDTO(data = quest.toDTO()))
+        return ResponseEntity.ok(ApiResponseDTO(data = quest.quest?.step))
     }
 
 }
