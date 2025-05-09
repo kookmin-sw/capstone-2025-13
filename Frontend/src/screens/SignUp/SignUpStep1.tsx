@@ -24,13 +24,14 @@ const SignUpStep1 = () => {
     const [showError, setShowError] = useState(false);
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ImageBackground
-                    source={require("../../assets/Images/simple-3.png")}
-                    style={{ flex: 1 }}
-                    resizeMode="cover"
-                >
+
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ImageBackground
+                source={require("../../assets/Images/simple-3.png")}
+                style={{ flex: 1 }}
+                resizeMode="cover"
+            >
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                     <ScrollView contentContainerStyle={signUpStyles.overlay}>
                         <View style={signUpStyles.container}>
                             <Text style={signUpStyles.title}>회원가입</Text>
@@ -71,9 +72,10 @@ const SignUpStep1 = () => {
                             </View>
                         </View>
                     </ScrollView>
-                </ImageBackground>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                </KeyboardAvoidingView >
+            </ImageBackground>
+        </TouchableWithoutFeedback>
+
     );
 };
 
