@@ -28,7 +28,7 @@ import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.ConfigurationKey
-import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
+import kr.ac.kookmin.wuung.model.TopicFeedbackStatus
 import kr.ac.kookmin.wuung.model.TopicFeedback
 import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
 import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
@@ -42,7 +42,7 @@ import java.time.LocalDate
 import kotlin.collections.map
 import kotlin.jvm.optionals.getOrNull
 
-data class RecordDTO(
+data class TopicDTO(
     val id: String,
     @Schema(
         description = """
@@ -54,10 +54,10 @@ data class RecordDTO(
     val data: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    val feedbacks: List<RecordFeedbackDTO> = emptyList(),
+    val feedbacks: List<TopicFeedbackDTO> = emptyList(),
 )
 
-fun Topic.toDTO() = RecordDTO(
+fun Topic.toDTO() = TopicDTO(
     this.id ?: "",
     this.rate,
     this.data ?: "",
@@ -65,7 +65,7 @@ fun Topic.toDTO() = RecordDTO(
     this.updatedAt
 )
 
-fun Topic.toFullDTO() = RecordDTO(
+fun Topic.toFullDTO() = TopicDTO(
     this.id ?: "",
     this.rate,
     this.data ?: "",
@@ -74,11 +74,11 @@ fun Topic.toFullDTO() = RecordDTO(
     this.topicFeedback.map { it.toDTO() }
 )
 
-data class RecordFeedbackRequest(
+data class TopicFeedbackRequest(
     val data: String,
 )
 
-data class RecordUpdateRequest(
+data class TopicUpdateRequest(
     @Schema(
         description = """
         [en] Rating score (1-5 stars)
@@ -89,16 +89,16 @@ data class RecordUpdateRequest(
     val data: String,
 )
 
-data class RecordFeedbackDTO(
+data class TopicFeedbackDTO(
     val id: String?,
     val aiFeedback: String?,
     val comment: String?,
     val data: String?,
-    val status: RecordFeedbackStatus,
+    val status: TopicFeedbackStatus,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
-fun TopicFeedback.toDTO() = RecordFeedbackDTO(
+fun TopicFeedback.toDTO() = TopicFeedbackDTO(
     this.id,
     this.aiFeedback,
     this.comment,
@@ -158,11 +158,11 @@ class TopicController(
             )
         ]
     )
-    fun getRecordByDate(
+    fun getTopicByDate(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Date in format yyyy-MM-dd", example = "2025-05-01", type = "string")
         @RequestParam date: String?,
-    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+    ): ResponseEntity<ApiResponseDTO<TopicDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         // 요청된 날짜의 시작·끝 시각 계산
@@ -203,7 +203,7 @@ class TopicController(
                 )]
             ),
             ApiResponse(
-                responseCode = "409", description = "Record already created",
+                responseCode = "409", description = "Topic already created",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -211,9 +211,9 @@ class TopicController(
             )
         ]
     )
-    fun createRecord(
+    fun createTopic(
         @AuthenticationPrincipal userDetails: User?,
-    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+    ): ResponseEntity<ApiResponseDTO<TopicDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val today = LocalDate.now()
@@ -221,14 +221,14 @@ class TopicController(
         val endOfDay = today.atTime(23, 59, 59)
 
         // 레코드 하루에 한 개 이상 생성하는 거 방지하려고 추가
-        val existingRecords = topicRepository.findByUserAndCreatedAtBetween(
+        val existingTopics = topicRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startOfDay,
             endOfDay
         )
-        if (existingRecords.isNotEmpty()) throw RecordAlreadyCreatedException()
+        if (existingTopics.isNotEmpty()) throw AlreadyExistException()
 
-        val weekRecords = topicRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
+        val weekTopics = topicRepository.findByUserAndCreatedAtBetweenOrderByCreatedAtDesc(
             userDetails,
             today.minusDays(7).atStartOfDay(),
             endOfDay,
@@ -237,7 +237,7 @@ class TopicController(
         if(dailyQuestions.isEmpty()) throw NotFoundException()
 
         val dailyQuestionWithoutDuplication = dailyQuestions
-            .filter { !weekRecords.map { topic -> topic.innerSeq }.contains(it.innerSeq) }
+            .filter { !weekTopics.map { topic -> topic.innerSeq }.contains(it.innerSeq) }
 
         if (dailyQuestionWithoutDuplication.isEmpty()) throw NotFoundException()
 
@@ -280,7 +280,7 @@ class TopicController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Record not found",
+                responseCode = "404", description = "Topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -288,11 +288,11 @@ class TopicController(
             )
         ]
     )
-    fun modifyRecord(
+    fun modifyTopic(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestBody request: RecordUpdateRequest,
+        @RequestBody request: TopicUpdateRequest,
         @PathVariable topicId: String,
-    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+    ): ResponseEntity<ApiResponseDTO<TopicDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
@@ -332,7 +332,7 @@ class TopicController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Record not found",
+                responseCode = "404", description = "Topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -405,7 +405,7 @@ class TopicController(
     fun updateFeedbackStatus(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable topicId: String,
-        @RequestBody request: RecordFeedbackRequest,
+        @RequestBody request: TopicFeedbackRequest,
     ): ResponseEntity<ApiResponseDTO<String>> {
         if (userDetails == null) throw UnauthorizedException()
 
@@ -425,16 +425,16 @@ class TopicController(
         val lastFeedback = topic.topicFeedback.lastOrNull()
 
         if (lastFeedback != null) when (lastFeedback.status) {
-            RecordFeedbackStatus.QUEUED -> AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
-            RecordFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.QUEUED -> AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
+            TopicFeedbackStatus.COMPLETED -> Unit
         }
 
         val feedback = TopicFeedback(
             topic = topic,
             data = request.data,
-            status = RecordFeedbackStatus.QUEUED,
+            status = TopicFeedbackStatus.QUEUED,
         )
         topic.topicFeedback.add(feedback)
         topicFeedbackRepository.save(feedback)
@@ -471,7 +471,7 @@ class TopicController(
                 )]
             ),
             ApiResponse(
-                responseCode = "404", description = "Record not found",
+                responseCode = "404", description = "Topic not found",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -482,14 +482,14 @@ class TopicController(
     fun getFeedbacks(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable topicId: String,
-    ): ResponseEntity<ApiResponseDTO<List<RecordFeedbackDTO>>> {
+    ): ResponseEntity<ApiResponseDTO<List<TopicFeedbackDTO>>> {
 
         if (userDetails == null) throw UnauthorizedException()
         val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
 
         if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val feedbacks = topic.topicFeedback.filter { it.status == RecordFeedbackStatus.COMPLETED }
+        val feedbacks = topic.topicFeedback.filter { it.status == TopicFeedbackStatus.COMPLETED }
 
         if (feedbacks.isEmpty()) throw NotFoundException()
 
@@ -544,17 +544,17 @@ class TopicController(
     fun getFeedback(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable topicFeedbackId: String,
-    ): ResponseEntity<ApiResponseDTO<RecordFeedbackDTO>> {
+    ): ResponseEntity<ApiResponseDTO<TopicFeedbackDTO>> {
         if (userDetails == null) throw UnauthorizedException()
         val feedback = topicFeedbackRepository.findById(topicFeedbackId).getOrNull() ?: throw NotFoundException()
 
         if(feedback.topic?.user?.id != userDetails.id) throw UnauthorizedException()
 
         when (feedback.status) {
-            RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
-            RecordFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
+            TopicFeedbackStatus.COMPLETED -> Unit
         }
 
         return ResponseEntity.ok(
@@ -612,7 +612,7 @@ class TopicController(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable topicId: String,
         @RequestBody request: UpdateFeedbackRequest,
-    ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
+    ): ResponseEntity<ApiResponseDTO<TopicDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
@@ -622,10 +622,10 @@ class TopicController(
         val feedback = topic.topicFeedback.lastOrNull() ?: throw NotFoundException()
 
         when (feedback.status) {
-            RecordFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
-            RecordFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
-            RecordFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
+            TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
+            TopicFeedbackStatus.COMPLETED -> Unit
         }
 
         // 데이터 업데이트
