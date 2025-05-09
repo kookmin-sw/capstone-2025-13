@@ -408,3 +408,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/reactnative,node,gradle,windows,macos,linux
 
 credentials.json
+*.aab
+*.ipa

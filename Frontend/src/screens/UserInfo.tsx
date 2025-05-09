@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal, Dimensions } from "react-native";
+import React, {useEffect, useState} from "react";
+import {Alert, Dimensions, Image, Modal, Text, TextInput, TouchableOpacity, View} from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
-import { getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
+import {GenderEnum, getUserInfo, putProfileImg, userInfoUpdate} from "../API/userInfoAPI";
 import userInfoStyles from "../styles/userInfoStyles";
-import { CommonActions, useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../App";
+import {CommonActions, useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../App";
+import {Ionicons} from "@expo/vector-icons";
+
 const cloverProfile = require("../assets/Images/cloverProfile.png");
-import { Ionicons } from "@expo/vector-icons";
 
 // 화면 너비와 높이 가져오기
 const { width, height } = Dimensions.get("window");
@@ -18,7 +19,7 @@ const { width, height } = Dimensions.get("window");
 type UserData = {
   nickname: string;
   email: string;
-  password: string;
+  password: string | null;
   birthDate: string;
   gender: string;
   secondPassword: number;
@@ -42,15 +43,21 @@ export default function UserInfo() {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const getGenderLabel = (gender: string | null | undefined): string => {
+  const getGenderLabel = (gender: GenderEnum | string | null | undefined): string => {
     switch (gender) {
+      case GenderEnum.MALE:
       case "MALE":
+      case GenderEnum.MALE:
         return "남성";
+      case GenderEnum.FEMALE:
       case "FEMALE":
+      case GenderEnum.FEMALE:
         return "여성";
-      case "UNKNOWN":
+      case "THIRD_GENDER":
+      case GenderEnum.THIRD_GENDER:
+        return "제 3의 성"
       default:
-        return "비밀";
+        return "밝히지 않음"
     }
   };
 
@@ -59,16 +66,16 @@ export default function UserInfo() {
       const response = await getUserInfo();
       console.log("User Info:", response);
 
-      const user = response.data;
+      const user = response;
 
       const initialData: UserData = {
-        nickname: user.username || null,
-        email: user.email || null,
-        password: user.password || null,
-        birthDate: user.birthDate || null,
+        nickname: user.username,
+        email: user.email,
+        password: "",
+        birthDate: user.birthDate,
         gender: getGenderLabel(user.gender),
         secondPassword: Number(await AsyncStorage.getItem("@secondPassword")) || 1111,
-        profilePic: user.profile || null,
+        profilePic: user.profile ?? null,
       };
 
       setUserData(initialData);
@@ -127,10 +134,24 @@ export default function UserInfo() {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
 
+    let gender: GenderEnum = GenderEnum.UNKNOWN
+
+    switch(userData.gender) {
+      case GenderEnum.MALE:
+        gender = GenderEnum.MALE;
+        break;
+      case GenderEnum.FEMALE:
+        gender = GenderEnum.FEMALE;
+        break;
+      case GenderEnum.THIRD_GENDER:
+        gender = GenderEnum.THIRD_GENDER;
+        break;
+    }
+
     try {
       const transformedUserData = {
         ...userData,
-        gender: userData.gender === "남성" ? "MALE" : userData.gender === "여성" ? "FEMALE" : "UNKNOWN",
+        gender
       };
 
       // 기본 정보 업데이트
@@ -239,7 +260,7 @@ export default function UserInfo() {
 
         <InfoRow
           label="비밀번호"
-          value={userData.password}
+          value={userData.password ?? ""}
           onChangeText={(text) => setUserData({ ...userData, password: text })}
           secureTextEntry={!editMode}
           editable={editMode}

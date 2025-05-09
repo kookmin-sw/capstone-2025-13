@@ -6,3 +6,6 @@ springdoc:
 spring:
   jpa:
     show-sql: true
+logging:
+  level:
+    root: INFO
