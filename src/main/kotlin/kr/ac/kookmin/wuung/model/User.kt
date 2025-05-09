@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.model
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
@@ -46,8 +48,8 @@ data class User(
     @Column(nullable = true, length = 512)
     var profile: String? = null,
 
-    @OneToMany(mappedBy = "user")
-    var questStages: List<UserQuestStage> = listOf(),
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var questStages: MutableList<UserQuestStages> = mutableListOf(),
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -78,6 +80,21 @@ data class User(
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
     }
+
+    @PrePersist
+    private fun onCreate() {
+        QuestType.entries.forEach { questType ->
+            val questStage = UserQuestStages(
+                user = this,
+                stage = 1,
+                type = questType,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+            questStages.add(questStage)
+        }
+    }
+
 }
 
 enum class GenderEnum(val value: String) {

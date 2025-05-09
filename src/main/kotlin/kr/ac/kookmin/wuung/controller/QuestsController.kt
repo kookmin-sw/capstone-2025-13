@@ -18,6 +18,9 @@ import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.model.Quests
+import kr.ac.kookmin.wuung.model.UserQuestStages
+import kr.ac.kookmin.wuung.model.UserQuestStatus
+import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -40,6 +43,7 @@ data class UserQuestsDTO(
     val type: QuestType,
     val progress: Int,
     val target: Int,
+    val status: UserQuestStatus,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
@@ -50,6 +54,7 @@ fun UserQuests.toDTO() = UserQuestsDTO(
     this.quest?.type ?: QuestType.ACTIVITY,
     this.progress,
     this.target,
+    this.status,
     this.createdAt,
     this.updatedAt
 )
@@ -59,6 +64,7 @@ data class CreateQuestRequest(
 data class UpdateQuestRequest(
     val id: String,
     val current: Int,
+    val status: UserQuestStatus
 )
 
 data class QuestsDTO(
@@ -93,7 +99,8 @@ class QuestsController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
     @Autowired private val questsRepository: QuestsRepository,
-    @Autowired private val userQuestsRepository: UserQuestsRepository
+    @Autowired private val userQuestsRepository: UserQuestsRepository,
+    @Autowired private val userQuestStageRepository : UserQuestStageRepository
 ) {
     @GetMapping("/me")
     @Operation(
@@ -253,7 +260,10 @@ class QuestsController(
         }
 
         quest.progress = request.current
+        quest.status = request.status
         userQuestsRepository.save(quest)
+
+
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = quest.toDTO())
@@ -409,4 +419,314 @@ class QuestsController(
             ApiResponseDTO(data = quest.toDTO())
         )
     }
+
+
+    @PostMapping("/stage")
+    @Operation(
+        summary = "Increment all quests circular",
+        description = """
+        [en] Increment all quest circular by 1 for the authenticated user.
+        AccessToken is required on Authorization header.
+        
+        [ko] 인증된 사용자의 모든 퀘스트 서큘러값을 1씩 증가시킵니다.
+        Authorization 헤더에 AccessToken이 필요합니다.
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "update quest circular successfully",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class))]),
+            ApiResponse(responseCode = "500",
+                description = "Internal server error",
+                content = [Content(mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class))]),
+        ]
+    )
+    fun incrementAllStages(
+        @AuthenticationPrincipal userDetails: User?
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        // user 찾아서
+        val stages = userQuestStageRepository.findByUser(userDetails)
+
+        // 서큘러 값 업데이트
+        stages.forEach { stage ->
+            stage.stage += 1
+            userQuestStageRepository.save(stage)
+        }
+
+        // 그냥 성공했다고 전달만 하면 됨.
+        return ResponseEntity.ok(ApiResponseDTO())
+    }
+
+    @PostMapping("/stage/{type}")
+    @Operation(
+        summary = "Increment quest circular specific type by 1",
+        description = """
+        [en] Increment quest circular count by 1 for specific type.
+        AccessToken is required on Authorization header.
+        
+        [ko] 특정 타입의 퀘스트 서큘러 값을 1 증가시킵니다.
+        Authorization 헤더에 AccessToken이 필요합니다.
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "update quest circular successfully",
+                useReturnTypeSchema = true),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class))]),
+            ApiResponse(
+                responseCode = "404",
+                description = "Stage not found",
+                content = [Content(mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class))]),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class))]),
+        ]
+    )
+    fun incrementStageByType(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable type: QuestType
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        // 스테이지 값 찾고
+        val stage = userQuestStageRepository.findByUserAndType(userDetails, type)
+            ?: throw NotFoundException()
+
+        // 업데이트 및 저장
+        stage.stage += 1
+        userQuestStageRepository.save(stage)
+
+        // 반환
+        return ResponseEntity.ok(ApiResponseDTO())
+    }
+
+    @GetMapping("/stage")
+    @Operation(
+        summary = "Get quest stages",
+        description = """
+            [en] Get all quest stages for the authenticated user.
+            AccessToken is required on Authorization header.
+
+            [ko] 인증된 사용자의 모든 퀘스트 스테이지를 가져옵니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved quest stages",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getQuestStages(
+        @AuthenticationPrincipal userDetails: User?
+    ): ResponseEntity<ApiResponseDTO<List<UserQuestStages>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val stages = userQuestStageRepository.findByUser(userDetails)
+        return ResponseEntity.ok(ApiResponseDTO(data = stages))
+    }
+
+    @GetMapping("/stage/{type}")
+    @Operation(
+        summary = "Get quest stage by type",
+        description = """
+            [en] Get quest stage for specific type.
+            AccessToken is required on Authorization header.
+            
+            [ko] 특정 타입의 퀘스트 스테이지를 가져옵니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved quest stage",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Quest stage not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getQuestStageByType(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable type: QuestType
+    ): ResponseEntity<ApiResponseDTO<Int>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val stage = userQuestStageRepository.findByUserAndType(userDetails, type)
+            ?.stage
+
+        return ResponseEntity.ok(ApiResponseDTO(data = stage))
+    }
+
+    // 부 스테이지 관련 API
+    @GetMapping("/last")
+    @Operation(
+        summary = "Get current quests",
+        description = """
+            [en] Get all current quests in progress.
+            AccessToken is required on Authorization header.
+            
+            [ko] 현재 진행 중인 모든 퀘스트를 가져옵니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved current quests",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getCurrentQuests(
+        @AuthenticationPrincipal userDetails: User?
+    ): ResponseEntity<ApiResponseDTO<List<UserQuestsDTO>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val questsByType = userQuestsRepository.findByUser(userDetails)
+            .filter { it.status == UserQuestStatus.PROCESSING }
+            .groupBy { it.quest?.type }
+            .mapValues { (_, quests) -> quests.maxByOrNull { it.createdAt } }
+            .mapNotNull { it.value }
+
+        return ResponseEntity.ok(ApiResponseDTO(data = questsByType.map { it.toDTO() }))
+    }
+
+    @GetMapping("/last/{type}")
+    @Operation(
+        summary = "Get current quest by type",
+        description = """
+            [en] Get current quest in progress for specific type.
+            AccessToken is required on Authorization header.
+            
+            [ko] 특정 타입의 현재 진행 중인 퀘스트를 가져옵니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved current quest",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "No current quest found for given type",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getCurrentQuestByType(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable type: QuestType
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val quest = userQuestsRepository.findByUser(userDetails)
+            .filter { it.quest?.type == type && it.status == UserQuestStatus.PROCESSING }
+            .maxByOrNull { it.createdAt }
+            ?: throw NotFoundException()
+
+        return ResponseEntity.ok(ApiResponseDTO(data = quest.toDTO()))
+    }
+
 }
