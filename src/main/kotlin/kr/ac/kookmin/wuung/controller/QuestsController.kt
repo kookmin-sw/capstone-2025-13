@@ -86,6 +86,23 @@ fun Quests.toDTO() = QuestsDTO(
     updatedAt = this.updatedAt
 )
 
+data class UserQuestStagesDTO(
+    val id: Long,
+    val type: QuestType,
+    val stage: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+
+fun UserQuestStages.toDTO() = UserQuestStagesDTO(
+    id = this.id ?: 0,
+    type = this.type ?: QuestType.ACTIVITY,
+    stage = this.stage,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt
+)
+
+
 @RestController
 @RequestMapping("/quests")
 @Tag(name = "Quests API", description = """
@@ -557,10 +574,10 @@ class QuestsController(
     )
     fun getQuestStages(
         @AuthenticationPrincipal userDetails: User?
-    ): ResponseEntity<ApiResponseDTO<List<UserQuestStages>>> {
+    ): ResponseEntity<ApiResponseDTO<List<UserQuestStagesDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val stages = userQuestStageRepository.findByUser(userDetails)
+        val stages = userQuestStageRepository.findByUser(userDetails).map { it.toDTO() }
         return ResponseEntity.ok(ApiResponseDTO(data = stages))
     }
 
