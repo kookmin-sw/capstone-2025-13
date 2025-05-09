@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
@@ -40,10 +41,13 @@ data class User(
     var gender: GenderEnum? = null,
 
     @Column(nullable = false)
-    var birthDate : LocalDateTime? = null,
+    var birthDate: LocalDateTime? = null,
 
     @Column(nullable = true, length = 512)
     var profile: String? = null,
+
+    @OneToMany(mappedBy = "user")
+    var questStages: List<UserQuestStage> = listOf(),
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
