@@ -27,7 +27,6 @@ import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
-import Calendar from "./screens/Calendar"
 import Record from "./screens/Record";
 import customAxios from './API/axios';
 
@@ -64,6 +63,7 @@ export type RootStackParamList = {
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Calendar: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -115,11 +115,15 @@ function AppInner() {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
                 setIsLoggedIn(false);
                 setLoading(false);
+            } else {
+                setIsLoggedIn(false);
+                setLoading(false);
             }
         };
         checkIntegrity().then(() => checkToken());
     }, []);
 
+    // App 로딩 중에 폰트 로딩 및 토큰 체크
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");

@@ -3,7 +3,7 @@ import {Alert, Dimensions, Image, Modal, Text, TextInput, TouchableOpacity, View
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {signOut} from "../API/signAPI";
+import { signOut } from "../API/signAPI";
 import {GenderEnum, getUserInfo, putProfileImg, userInfoUpdate} from "../API/userInfoAPI";
 import userInfoStyles from "../styles/userInfoStyles";
 import {CommonActions, useNavigation} from "@react-navigation/native";
@@ -43,17 +43,19 @@ export default function UserInfo() {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const getGenderLabel = (gender: string | null | undefined | GenderEnum ): string => {
+  const getGenderLabel = (gender: GenderEnum | string | null | undefined): string => {
     switch (gender) {
       case GenderEnum.MALE:
       case "MALE":
+      case GenderEnum.MALE:
         return "남성";
       case GenderEnum.FEMALE:
       case "FEMALE":
+      case GenderEnum.FEMALE:
         return "여성";
-      case GenderEnum.THIRD_GENDER:
       case "THIRD_GENDER":
-        return "제 3의 성";
+      case GenderEnum.THIRD_GENDER:
+        return "제 3의 성"
       default:
         return "밝히지 않음"
     }
@@ -69,11 +71,11 @@ export default function UserInfo() {
       const initialData: UserData = {
         nickname: user.username,
         email: user.email,
-        password: null,
+        password: "",
         birthDate: user.birthDate,
         gender: getGenderLabel(user.gender),
         secondPassword: Number(await AsyncStorage.getItem("@secondPassword")) || 1111,
-        profilePic: user.profile || null,
+        profilePic: user.profile ?? null,
       };
 
       setUserData(initialData);
@@ -132,10 +134,24 @@ export default function UserInfo() {
     const hasChanges = JSON.stringify(userData) !== JSON.stringify(originalData);
     if (!hasChanges) return;
 
+    let gender: GenderEnum = GenderEnum.UNKNOWN
+
+    switch(userData.gender) {
+      case GenderEnum.MALE:
+        gender = GenderEnum.MALE;
+        break;
+      case GenderEnum.FEMALE:
+        gender = GenderEnum.FEMALE;
+        break;
+      case GenderEnum.THIRD_GENDER:
+        gender = GenderEnum.THIRD_GENDER;
+        break;
+    }
+
     try {
       const transformedUserData = {
         ...userData,
-        gender: userData.gender === "남성" ? "MALE" : userData.gender === "여성" ? "FEMALE" : "UNKNOWN",
+        gender
       };
 
       // 기본 정보 업데이트
