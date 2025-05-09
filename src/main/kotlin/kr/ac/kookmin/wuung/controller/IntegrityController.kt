@@ -5,6 +5,7 @@ import kr.ac.kookmin.wuung.service.IntegrityService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,7 +18,8 @@ data class ChallengeRequest(
 
 data class ChallengeResponse(
     val challenge: String,
-    val expiresInMinutes: Long
+    val expiresInMinutes: Long,
+    val message: String,
 )
 
 data class IntegrityVerificationRequest(
@@ -52,37 +54,34 @@ class IntegrityController(
             return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = challenge.first ?: "",
-                    expiresInMinutes = challenge.second
+                    expiresInMinutes = challenge.second,
+                    message = ""
                 )
             )
         } catch(e: Exception) {
             logger.error("Error on getting challenge: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(200).body(
+            return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = "",
-                    expiresInMinutes = 0
+                    expiresInMinutes = 0,
+                    message = "An error occurred while generating challenge. Please try again later."
                 )
             )
         }
     }
 
+    @Transactional(timeout = 20)
     @PostMapping("/verify")
     fun verifyIntegrity(
-        @Valid @RequestBody request: IntegrityVerificationRequest
+        @RequestBody request: IntegrityVerificationRequest
     ): ResponseEntity<IntegrityVerificationResponse> {
-        if(!challengeService.verifyChallenge(request.challenge, request.deviceId)) {
-            return ResponseEntity.ok(
-                IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Invalid or expired challenge. Please request a new challenge and try again."
-                )
-            )
-        }
+        val challengeErrors = challengeService.verifyChallenge(request.challenge, request.deviceId)
+        if(challengeErrors != null) return ResponseEntity.ok(challengeErrors)
 
         try {
             val result = when (request.platform.lowercase()) {
-                "android" -> integrityService.verifyAndroidIntegrity(request.attestation)
+                "android" -> integrityService.verifyAndroidIntegrity(request.attestation, request.challenge)
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
                     request.bundleId ?: "",
@@ -96,12 +95,11 @@ class IntegrityController(
             }
 
             integrityChallengeService.completeChallenge(request.challenge)
-
             return ResponseEntity.ok(result)
         } catch(e: Exception) {
             logger.error("Error on verifying integrity: ${e.message}")
             logger.debug(e.stackTraceToString())
-            return ResponseEntity.status(200).body(
+            return ResponseEntity.ok(
                 IntegrityVerificationResponse(
                     isValid = false,
                     message = "An error occurred while verifying integrity. Please try again later."

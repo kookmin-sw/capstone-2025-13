@@ -10,13 +10,13 @@ import EmotionChartBox from "../../components/EmotionChartBox";
 import SectionLabel from "../../components/SectionLabel";
 import MethodCard from "../../components/MethodCard";
 import styles from "../../styles/formalDialogueStyles";
-import { fetchDiagnosisList } from "../../API/diagnosisAPI";
+import { fetchDiagnosisList, type DiagnosisList } from "../../API/diagnosisAPI";
 
 export default function FormalDiagnosis() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const [diagnosisList, setDiagnosisList] = useState([]);
+    const [diagnosisList, setDiagnosisList] = useState<DiagnosisList[]>([]);
 
     useEffect(() => {
         const loadDiagnosis = async () => {
@@ -42,6 +42,7 @@ export default function FormalDiagnosis() {
                             console.log(
                                 `🟢 ${item.title} 버튼 클릭됨 (id: ${item.id})`
                             );
+                            // @ts-ignore
                             navigation.navigate("FormalDiagnosisSurvey", {
                                 diagnosisId: item.id,
                             });

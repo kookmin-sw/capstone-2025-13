@@ -34,7 +34,7 @@ export const signOut = async (accessToken: string, refreshToken: string) => {
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
 
-        return true;
+        return data;
     } catch (error) {
         console.error("Error during sign-out:", error);
         throw error;

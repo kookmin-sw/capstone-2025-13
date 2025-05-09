@@ -81,3 +81,19 @@ export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | 
     return data.data;
   });
 };
+
+export const fetchDiagnosisList = async (): Promise<DiagnosisList[] | null> => {
+    return handleAuthRequest(async () => {
+        const headers = await getAuthHeaders();
+        const { data } = await axios.get<ApiResponseDTO<DiagnosisList[]>>("/diagnosis/list", { headers });
+        return data.data;
+    });
+};
+
+export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | null> => {
+    return handleAuthRequest(async () => {
+        const headers = await getAuthHeaders();
+        const { data } = await axios.get<ApiResponseDTO<DiagnosisList>>(`/diagnosis/${id}`, { headers });
+        return data.data;
+    });
+};

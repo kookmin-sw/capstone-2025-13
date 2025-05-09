@@ -30,6 +30,11 @@ import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 import customAxios from './API/axios';
 
+import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
+
+const navigationRef = createNavigationContainerRef();
+
 export type RootStackParamList = {
     Home: undefined;
     SignIn: undefined;
@@ -83,16 +88,19 @@ function AppInner() {
                     return;
                 }
 
+                await requestChallenge();
                 const result = await verifyDeviceIntegrity();
 
-                if(result.isValid) {
+                if(result.valid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
-                    console.error('Integrity verification failed: ', result.message)
+                    console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
+                    setIsIntegrityVerified(false)
                 }
             } catch (error: any) {
                 console.error('Integrity check error:', error);
+                setIsIntegrityVerified(false)
             }
         };
 
@@ -105,6 +113,7 @@ function AppInner() {
                 setLoading(false);
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
+                setIsLoggedIn(false);
                 setLoading(false);
             } else {
                 setIsLoggedIn(false);

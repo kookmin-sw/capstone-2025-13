@@ -24,7 +24,9 @@
             "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-video"
     ],
     "ios": {
       "supportsTablet": true,
@@ -43,7 +45,12 @@
         "googleMaps": {
           "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
-      }
+      },
+      "versionCode": 69,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

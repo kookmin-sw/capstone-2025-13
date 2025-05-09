@@ -11,12 +11,20 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 import java.security.KeyFactory
 import java.security.PublicKey
-import java.util.Base64
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.auth.oauth2.AccessToken
+import com.google.gson.Gson
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
+import java.io.ByteArrayInputStream
+import java.util.Base64
 
 @Service
 class IntegrityService(
@@ -35,16 +43,22 @@ class IntegrityService(
 
     @Value("\${app.apple-key-id}")
     private val keyId: String,
+
+    @Value("\${app.google-account-json}")
+    private val googleAccountJson: String,
+    private val gson: Gson,
 ) {
     companion object {
         var applePublicKey: PublicKey? = null
         var appleParser: JwtParser? = null
+        private var googleAccessToken: AccessToken? = null
     }
 
     private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
-    private val objectMapper = ObjectMapper()
-    
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     init {
+        refreshGoogleAccessToken()
         val appleResponse = webClient.get()
             .uri("https://www.apple.com/certificateauthority/Apple_App_Attestation_Root_CA.pem")
             .accept(MediaType.APPLICATION_OCTET_STREAM)
@@ -68,88 +82,117 @@ class IntegrityService(
         } else {
             throw RuntimeException("Failed to fetch Apple public key")
         }
+
+
     }
 
-    fun verifyAndroidIntegrity(
-        attestationJwt: String
-    ): IntegrityVerificationResponse {
-        try {
-            val decodedToken = webClient.post()
+    @OptIn(DelicateCoroutinesApi::class)
+    @Scheduled(fixedRate = 3300000) // Refresh every 55 minutes
+    private fun refreshGoogleAccessToken() {
+        GlobalScope.launch {
+            try {
+                val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(googleAccountJson.toByteArray()))
+                    .createScoped("https://www.googleapis.com/auth/playintegrity")
+                credentials.refresh()
+                googleAccessToken = credentials.accessToken
+            } catch (e: Exception) {
+                throw RuntimeException("Failed to refresh Google access token: ${e.message}")
+            }
+        }
+    }
+
+    fun verifyAndroidIntegrity(challenge: String, nonce: String): IntegrityVerificationResponse {
+        return try {
+            val decodedTokenBytes = webClient.post()
                 .uri(decodeIntegrityTokenUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(mapOf("integrity_token" to attestationJwt)))
-                .header("Authorization", "Bearer $apiKey")
+                .bodyValue(mapOf("integrity_token" to challenge))
+                .header("Authorization", "Bearer ${googleAccessToken?.tokenValue}")
                 .retrieve()
                 .bodyToMono(ByteArray::class.java)
                 .block()
 
-            if (decodedToken == null) {
+            if (decodedTokenBytes == null) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Decoded token is null"
                 )
             }
 
-            val decodedTokenString = String(decodedToken)
-            val decodedTokenMap = objectMapper.readValue(decodedTokenString, Map::class.java) as Map<String, Any>
+            val decodedTokenJson = String(decodedTokenBytes)
 
-            val tokenPackageName = (decodedTokenMap["packageName"] as? String)
-            if (tokenPackageName != packageName) {
+            val decodeResponse: DecodeIntegrityTokenResponse = gson.fromJson(decodedTokenJson, DecodeIntegrityTokenResponse::class.java)
+            val tokenPayload = decodeResponse.tokenPayloadExternal
+
+            // Package Name Verification
+            if (tokenPayload.appIntegrity.packageName != packageName) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Package name mismatch",
                     details = mapOf(
                         "expected" to packageName,
-                        "actual" to (tokenPackageName ?: "null")
+                        "actual" to tokenPayload.requestDetails.requestPackageName
                     )
                 )
             }
 
-            val requestDetails = decodedTokenMap["requestDetails"] as? Map<String, Any>
-            val timestampMillis = requestDetails?.get("timestampMillis") as? Long
-            if (timestampMillis != null) {
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - timestampMillis > TimeUnit.MINUTES.toMillis(5)) {
-                    return IntegrityVerificationResponse(
-                        isValid = false,
-                        message = "Token has expired",
-                        details = mapOf("timestamp" to timestampMillis)
+            if (tokenPayload.requestDetails.nonce.replace("=", "").trim() !=
+                nonce.replace("=", "").trim()
+            ) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Challenge mismatch",
+                    details = mapOf(
+                        "expected" to nonce,
+                        "actual" to tokenPayload.requestDetails.nonce
                     )
-                }
+                )
             }
 
-            val appIntegrity = decodedTokenMap["appIntegrity"] as? Map<String, Any>
-            val appRecognitionVerdict = appIntegrity?.get("appRecognitionVerdict") as? String
-            if (appRecognitionVerdict != "PLAY_RECOGNIZED") {
+            // Timestamp Verification
+            if (isTokenExpired(tokenPayload.requestDetails.timestampMillis)) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Token has expired",
+                    details = mapOf("timestamp" to tokenPayload.requestDetails.timestampMillis)
+                )
+            }
+
+            // App Integrity Verification
+            if (tokenPayload.appIntegrity.appRecognitionVerdict != "PLAY_RECOGNIZED") {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "App not recognized by Google Play",
-                    details = mapOf("verdict" to (appRecognitionVerdict ?: "null"))
+                    details = mapOf("verdict" to tokenPayload.appIntegrity.appRecognitionVerdict)
                 )
             }
 
-            val deviceIntegrity = decodedTokenMap["deviceIntegrity"] as? Map<String, Any>
-            val deviceRecognitionVerdict = deviceIntegrity?.get("deviceRecognitionVerdict") as? List<String>
-            if (deviceRecognitionVerdict?.contains("MEETS_DEVICE_INTEGRITY") != true) {
+            // Device Integrity Verification
+            if (!tokenPayload.deviceIntegrity.deviceRecognitionVerdict.contains("MEETS_DEVICE_INTEGRITY")) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Device integrity check failed",
-                    details = mapOf("verdicts" to (deviceRecognitionVerdict ?: "null"))
+                    details = mapOf("verdicts" to tokenPayload.deviceIntegrity.deviceRecognitionVerdict)
                 )
             }
 
-            return IntegrityVerificationResponse(
+            IntegrityVerificationResponse(
                 isValid = true,
                 message = "Android app integrity verification successful"
             )
 
         } catch (e: Exception) {
-            return IntegrityVerificationResponse(
+            IntegrityVerificationResponse(
                 isValid = false,
                 message = "Error verifying integrity: ${e.message}",
                 details = mapOf("errorType" to e.javaClass.simpleName)
             )
         }
+    }
+
+    private fun isTokenExpired(timestampMillis: Long): Boolean {
+        val currentTime = System.currentTimeMillis()
+        return currentTime - timestampMillis > TimeUnit.MINUTES.toMillis(5)
     }
 
     fun verifyIosAppAttest(
@@ -252,3 +295,40 @@ class IntegrityService(
         }
     }
 }
+
+data class DecodeIntegrityTokenResponse(
+    val tokenPayloadExternal: TokenPayload
+)
+
+data class TokenPayload(
+    val appIntegrity: AppIntegrity,
+    val deviceIntegrity: DeviceIntegrity,
+    val requestDetails: RequestDetails,
+    val accountDetails: AccountDetails?,
+    val testingDetails: TestingDetails?
+)
+
+data class AppIntegrity(
+    val appRecognitionVerdict: String,
+    val packageName: String,
+    val certificateSha256Digest: List<String>,
+    val versionCode: String,
+)
+
+data class DeviceIntegrity(
+    val deviceRecognitionVerdict: List<String>
+)
+
+data class RequestDetails(
+    val requestPackageName: String,
+    val nonce: String,
+    val timestampMillis: Long
+)
+
+data class AccountDetails(
+    val appLicensingVerdict: String,
+)
+
+data class TestingDetails(
+    val isTestingResponse: Boolean,
+)

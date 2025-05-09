@@ -1,5 +1,7 @@
 package kr.ac.kookmin.wuung.service
 
+import kr.ac.kookmin.wuung.controller.ChallengeResponse
+import kr.ac.kookmin.wuung.controller.IntegrityVerificationResponse
 import kr.ac.kookmin.wuung.model.IntegrityChallenge
 import kr.ac.kookmin.wuung.model.IntegrityChallengeStatus
 import kr.ac.kookmin.wuung.repository.IntegrityChallengeRepository
@@ -36,7 +38,7 @@ class IntegrityChallengeService(
             }
         }
 
-        val bytes = ByteArray(128)
+        val bytes = ByteArray(16)
         secureRandom.nextBytes(bytes)
 
         val challenge = Base64.getUrlEncoder()
@@ -55,34 +57,34 @@ class IntegrityChallengeService(
         return Pair(challenge, ChronoUnit.MINUTES.between(LocalDateTime.now(), expiresAt))
     }
 
-    fun verifyChallenge(challenge: String, deviceId: String): Boolean {
+    fun verifyChallenge(challenge: String, deviceId: String): IntegrityVerificationResponse? {
         val challengeOpt = challengeRepository.findByChallenge(challenge).getOrNull()
 
-        if(challengeOpt == null) {
+        if (challengeOpt == null) {
             logger.info("Challenge not found for device: $deviceId")
-            return false
+            return IntegrityVerificationResponse(false, "Challenge not found")
         }
 
-        if(challengeOpt.deviceId != deviceId) {
+        if (challengeOpt.deviceId != deviceId) {
             logger.info("Device ID mismatch for challenge: $challenge, expected: $deviceId, actual: ${challengeOpt.deviceId}")
-            return false
+            return IntegrityVerificationResponse(false,"Device ID mismatch")
         }
 
+        val currentTime = LocalDateTime.now()
         challengeOpt.expiresAt?.let {
-            if(it.isBefore(LocalDateTime.now())) {
+            if (it.isBefore(currentTime)) {
                 challengeOpt.status = IntegrityChallengeStatus.EXPIRED
                 challengeRepository.save(challengeOpt)
                 logger.info("Challenge expired: $challenge")
-                return false
+                return IntegrityVerificationResponse(false,"Challenge expired")
             }
-        } ?: return false
-
-        if (challengeOpt.status != IntegrityChallengeStatus.PENDING) {
-            logger.info("Challenge already used or expired: $challenge")
-            return false
         }
 
-        return true
+        return when (challengeOpt.status) {
+            IntegrityChallengeStatus.COMPLETED -> IntegrityVerificationResponse(false, "Challenge already used")
+            IntegrityChallengeStatus.EXPIRED -> IntegrityVerificationResponse(false, "Challenge expired")
+            else -> null
+        }
     }
 
     fun completeChallenge(challenge: String): Boolean {
