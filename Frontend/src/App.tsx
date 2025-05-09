@@ -26,9 +26,11 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
+import Calendar from "./screens/Calendar";
+
 import customAxios from './API/axios';
+import { refreshAccessToken } from "./API/common";
 
 import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
 import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
@@ -113,9 +115,6 @@ function AppInner() {
                 setLoading(false);
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
-                setIsLoggedIn(false);
-                setLoading(false);
-            } else {
                 setIsLoggedIn(false);
                 setLoading(false);
             }

@@ -13,20 +13,9 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
-      "expo-secure-store",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "deploymentTarget": "15.1"
-          },
-          "android": {
-            "minSdkVersion": 24
-          }
-        }
-      ],
       "expo-audio",
-      "expo-video"
+      "expo-video",
+      "expo-secure-store"
     ],
     "ios": {
       "supportsTablet": true,
@@ -54,10 +43,6 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-audio",
-      "expo-video"
-    ]
+    }
   }
 }
