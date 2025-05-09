@@ -114,7 +114,7 @@ class EtcController(
                 null -> return@mapNotNull null
             }
 
-            val behaviorDesc = "${userQuest.id}-${quest.step} $status"
+            val behaviorDesc = "${userQuest.quest?.id ?: return@mapNotNull null}-${quest.step} $status"
             questType to behaviorDesc
         }
 
