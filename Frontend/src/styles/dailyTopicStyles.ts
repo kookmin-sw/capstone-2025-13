@@ -4,6 +4,7 @@ const { width, height } = Dimensions.get("window");
 
 const dailyTopicstyles = StyleSheet.create({
     container:{
+        flex: 1,
         backgroundColor:"#EEF7E8",
     },
     scrollContainer: {
@@ -43,7 +44,8 @@ const dailyTopicstyles = StyleSheet.create({
         flexDirection: "row",
         padding: 12,
         backgroundColor: "#E1EDDA",
-        gap: 10
+        gap: 10,
+        
     },
     textInput: {
         height: 45,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity, TextInput, ImageBackground } from "react-native";
+import { Text, View, TouchableOpacity, TextInput, ImageBackground, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
@@ -72,72 +72,87 @@ const SignUpStep3 = () => {
             style={{ flex: 1 }}
             resizeMode="cover"
         >
-            <View style={signUpStyles.overlay}>
-                <View style={signUpStyles.container}>
-                    <Text style={signUpStyles.title}>회원가입</Text>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0} // 필요 시 조절
+            >
+                <ScrollView style={{ flex: 1 }}
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        justifyContent: "center",
+                        paddingBottom: 20, 
+                    }}
+                    keyboardShouldPersistTaps="handled">
+                    <View style={signUpStyles.overlay}>
+                        <View style={signUpStyles.container}>
+                            <Text style={signUpStyles.title}>회원가입</Text>
 
-                    <View style={signUpStyles.inputContainer}>
-                        <Text style={signUpStyles.inputTitle}>이메일</Text>
-                        <TextInput
-                            placeholder="이메일"
-                            style={signUpStyles.input}
-                            value={email}
-                            onChangeText={setEmail} />
-                    </View>
+                            <View style={signUpStyles.inputContainer}>
+                                <Text style={signUpStyles.inputTitle}>이메일</Text>
+                                <TextInput
+                                    placeholder="이메일"
+                                    style={signUpStyles.input}
+                                    value={email}
+                                    onChangeText={setEmail} />
+                            </View>
 
-                    <View style={signUpStyles.inputContainer}>
-                        <Text style={signUpStyles.inputTitle}>비밀번호</Text>
-                        <TextInput
-                            placeholder="비밀번호"
-                            secureTextEntry
-                            style={signUpStyles.input}
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                    </View>
+                            <View style={signUpStyles.inputContainer}>
+                                <Text style={signUpStyles.inputTitle}>비밀번호</Text>
+                                <TextInput
+                                    placeholder="비밀번호"
+                                    secureTextEntry
+                                    style={signUpStyles.input}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                            </View>
 
-                    <View style={signUpStyles.inputContainer}>
-                        <Text style={signUpStyles.inputTitle}>비밀번호 확인</Text>
-                        <TextInput
-                            placeholder="비밀번호 확인"
-                            secureTextEntry
-                            style={signUpStyles.input}
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                        />
-                    </View>
-                    <View style={signUpStyles.inputContainer}>
-                        <Text style={signUpStyles.inputTitle}>2차 비밀번호</Text>
-                        <TextInput
-                            placeholder="2차 비밀번호"
-                            secureTextEntry
-                            keyboardType="numeric"
-                            maxLength={4}
-                            style={signUpStyles.input}
-                            value={secondPassword}
-                            onChangeText={setSecondPassword}
-                        />
-                    </View>
+                            <View style={signUpStyles.inputContainer}>
+                                <Text style={signUpStyles.inputTitle}>비밀번호 확인</Text>
+                                <TextInput
+                                    placeholder="비밀번호 확인"
+                                    secureTextEntry
+                                    style={signUpStyles.input}
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                />
+                            </View>
+                            <View style={signUpStyles.inputContainer}>
+                                <Text style={signUpStyles.inputTitle}>2차 비밀번호</Text>
+                                <TextInput
+                                    placeholder="2차 비밀번호"
+                                    secureTextEntry
+                                    keyboardType="numeric"
+                                    maxLength={4}
+                                    style={signUpStyles.input}
+                                    value={secondPassword}
+                                    onChangeText={setSecondPassword}
+                                />
+                            </View>
 
-                    {errorMessage !== "" && (
-                        <Text style={signUpStyles.errorText}>{errorMessage}</Text>
-                    )}
+                            {errorMessage !== "" && (
+                                <Text style={signUpStyles.errorText}>{errorMessage}</Text>
+                            )}
 
-                    <View style={signUpStyles.row}>
-                        <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
-                            <Text style={signUpStyles.backText}>뒤로가기</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[
-                                signUpStyles.signUpButton,
-                            ]}
-                            onPress={handleSignUp}
-                        >
-                            <Text style={signUpStyles.signUpText}>확인</Text>
-                        </TouchableOpacity>
+                            <View style={signUpStyles.row}>
+                                <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
+                                    <Text style={signUpStyles.backText}>뒤로가기</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[
+                                        signUpStyles.signUpButton,
+                                    ]}
+                                    onPress={handleSignUp}
+                                >
+                                    <Text style={signUpStyles.signUpText}>확인</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     </View>
-                </View>
-            </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+
         </ImageBackground>
     );
 };
