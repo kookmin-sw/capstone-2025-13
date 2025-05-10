@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Dimensions,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
@@ -11,8 +10,9 @@ import { ProgressChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
+import styles from "../../styles/formalDiagnsisResultStyles";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const DepressionResultScreen = () => {
   const depressionLevel = 0.7; // 70%
@@ -57,10 +57,10 @@ const DepressionResultScreen = () => {
                 labels: [],
                 data: [depressionLevel],
               }}
-              width={screenWidth * 0.6}
-              height={screenWidth * 0.6}
-              strokeWidth={screenWidth * 0.04}
-              radius={screenWidth * 0.18}
+              width={ width * 0.6}
+              height={ width * 0.6}
+              strokeWidth={ width * 0.04}
+              radius={ width * 0.18}
               chartConfig={{
                 backgroundGradientFrom: "#F9F9EB",
                 backgroundGradientTo: "#F9F9EB",
@@ -98,93 +98,3 @@ const DepressionResultScreen = () => {
 };
 
 export default DepressionResultScreen;
-
-const styles = StyleSheet.create({
-    scrollView: {
-      flex: 1,
-      backgroundColor: "#1BA663",
-    },
-    container: {
-      top: screenWidth * 0.02,
-      alignItems: "center",
-      backgroundColor: "#1BA663",
-    },
-    backButtonWrapper: {
-      position: "absolute",
-      left: screenWidth * 0.02,
-      top: screenWidth * 0.085,
-      padding: screenWidth * 0.05,
-      zIndex: 11,
-    },
-    headerText: {
-      marginTop: screenWidth * 0.15,
-      marginBottom: screenWidth * 0.05,
-      marginStart: screenWidth * 0.19,
-      fontSize: screenWidth * 0.055,
-      textAlign: "left",
-      color: "#F9F9EB",
-      fontWeight: "bold",
-    },
-    resultBox: {
-      width: "85%",
-      backgroundColor: "#F9F9EB",
-      borderRadius: 20,
-      padding: screenWidth * 0.05,
-      alignItems: "center",
-      elevation: 4,
-    },
-    title: {
-      fontSize: screenWidth * 0.045,
-      marginBottom: screenWidth * 0.02,
-      textAlign: "left",
-      alignSelf: "flex-start",
-    },
-    name: {
-      fontWeight: "bold",
-      color: "#4CAF50",
-    },
-    chartWrapper: {
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    chart: {
-      position: "relative",
-    },
-    percentText: {
-      position: "absolute",
-      fontSize: screenWidth * 0.07,
-      fontWeight: "bold",
-      color: "#333",
-    },
-    status: {
-      fontSize: screenWidth * 0.06,
-      fontWeight: "bold",
-      color: "#4CAF50",
-      marginBottom: screenWidth * 0.05,
-    },
-    section: {
-      width: "100%",
-      marginTop: screenWidth * 0.05,
-      marginBottom: screenWidth * 0.05,
-    },
-    sectionTitle: {
-      fontWeight: "bold",
-      fontSize: screenWidth * 0.045,
-      marginBottom: screenWidth * 0.015,
-    },
-    sectionText: {
-      fontSize: screenWidth * 0.035,
-      color: "#333",
-      lineHeight: screenWidth * 0.05,
-    },
-    closeButton: {
-      backgroundColor: "#4CAF50",
-      width: screenWidth * 0.1,
-      height: screenWidth * 0.1,
-      borderRadius: screenWidth * 0.05,
-      marginTop: screenWidth * 0.03,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
-  
