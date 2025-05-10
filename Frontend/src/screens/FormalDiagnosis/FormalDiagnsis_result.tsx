@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -10,12 +10,24 @@ import {
 import { ProgressChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const DepressionResultScreen = () => {
   const depressionLevel = 0.7; // 70%
   const navigation = useNavigation<NavigationProp<any>>();
+  const [user, setUser] = useState<UserInfoResponse | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const data = await getUserInfo();
+      setUser(data);
+    };
+    fetchUserInfo();
+  }, []);
+
+  const nickname = user?.username ?? "우웅";
 
   return (
     <View style={{ flex: 1, backgroundColor: "#1BA663" }}>
@@ -36,7 +48,7 @@ const DepressionResultScreen = () => {
       >
         <View style={styles.resultBox}>
           <Text style={styles.title}>
-            현재 <Text style={styles.name}>구슬이</Text>님의 상태는...
+            현재 <Text style={styles.name}>{nickname}</Text>님의 상태는...
           </Text>
 
           <View style={styles.chartWrapper}>
@@ -100,15 +112,16 @@ const styles = StyleSheet.create({
     backButtonWrapper: {
       position: "absolute",
       left: screenWidth * 0.02,
-      top: screenWidth * 0.09,
+      top: screenWidth * 0.085,
       padding: screenWidth * 0.05,
       zIndex: 11,
     },
     headerText: {
       marginTop: screenWidth * 0.15,
       marginBottom: screenWidth * 0.05,
+      marginStart: screenWidth * 0.19,
       fontSize: screenWidth * 0.055,
-      textAlign: "center",
+      textAlign: "left",
       color: "#F9F9EB",
       fontWeight: "bold",
     },
