@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, Modal, Dimensions, Keyboard } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -11,6 +11,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 import { Ionicons } from "@expo/vector-icons";
+
 
 // 화면 너비와 높이 가져오기
 const { width, height } = Dimensions.get("window");
@@ -395,24 +396,29 @@ function InfoRow({
   keyboardType = "default",
   maxLength = 20,
 }: InfoRowProps) {
+  const handleChange = (text: string) => {
+    if (onChangeText) onChangeText(text);
+    if (keyboardType === "number-pad" && text.length === maxLength) {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
     <View style={userInfoStyles.row}>
       <Text style={userInfoStyles.label}>{label}</Text>
       {editable ? (
         <TextInput
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={handleChange}
           style={userInfoStyles.input}
           secureTextEntry={secureTextEntry}
           editable={editable}
           keyboardType={keyboardType}
           maxLength={maxLength}
         />
-
       ) : (
         <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
   );
 }
-
