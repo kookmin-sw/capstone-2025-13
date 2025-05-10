@@ -1,4 +1,4 @@
-import React from "react";
+import React ,  {useState, useEffect} from "react";
 import { View, ScrollView, Dimensions,  Image} from "react-native";
 import Header_sky from "../../components/Header_sky";
 import Quest_circle from "../../components/Darkgreen_circle";
@@ -6,7 +6,7 @@ import Street from "../../components/Street";
 import Street_basic from "../../components/Street_basic";
 import questStyles from "../../styles/questStyles";
 import Tree from "../../components/Tree";
-import styles from "../../styles/homeStyles";
+import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 
@@ -19,10 +19,19 @@ const questData = [
   { title: "운동", subtitle: "몸을 움직여볼까요?" },
 ];
 
-//예시 닉네임
-const nickname = "우웅";
-
 export default function Quest() {
+  const [user, setUser] = useState<UserInfoResponse | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const data = await getUserInfo();
+      setUser(data);
+    };
+    fetchUserInfo();
+  }, []);
+
+  const nickname = user?.username ?? "우웅";
+
   return (
     <View style={questStyles.container}>
       <ScrollView
