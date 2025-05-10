@@ -5,11 +5,16 @@ const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     headerContainer: {
+        flexDirection:'row',
         paddingHorizontal: width * 0.07,
         paddingTop: 80,
         paddingBottom: 20,
         backgroundColor: "#3CB46E",
     },
+    backButtonWrapper: {
+        marginRight: width * 0.02,
+        zIndex:999,
+      },
     title: {
         fontSize: width * 0.07,
         fontWeight: "bold",
