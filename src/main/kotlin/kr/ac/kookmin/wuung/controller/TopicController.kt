@@ -356,7 +356,7 @@ class TopicController(
     @Operation(
         summary = "Request AI feedback", description = """
         [en] Initiates an AI feedback request for a specific topic. The feedback process runs asynchronously and updates the feedback status accordingly
-        [ko] 특정 기록에 대한 AI 피드백 요청을 시작합니다. 피드백 프로세스는 비동기적으로 실행되며 피드백 상태가 그에 따라 업데이트됩니다
+        [ko] 특정 기록에 대한 AI 피드백 요청을 시작합니다. 피드백 프로세스는 비동기적으로 실행되며 피드백 상태가 그에 따라 업데이트됩니다, 피드백의 개수가 5개 이상일 경우, 피드백을 받지 않는 사용자 데이터 저장 용도의 레코드를 생성합니다.
     """
     )
     @ApiResponses(
@@ -420,15 +420,32 @@ class TopicController(
 
         val feedbackNum = topic.topicFeedback.size
 
-        if(feedbackNum >= 5) throw LimitReachedException()
+        // Limit Reached 예외 대신 데이터베이스에 데이터 추가 후 ID 반환
+         if(feedbackNum >= 5) {
+             val feedback = TopicFeedback(
+                 topic = topic,
+                 data = request.data,
+                 status = TopicFeedbackStatus.NOFEEDBACK
+             )
+             topic.topicFeedback.add(feedback)
+             val saved = topicFeedbackRepository.save(feedback)
+
+             return ResponseEntity.ok(
+                 ApiResponseDTO(
+                     data = saved.id
+                 )
+             )
+         }
 
         val lastFeedback = topic.topicFeedback.lastOrNull()
-
+        
+        
         if (lastFeedback != null) when (lastFeedback.status) {
             TopicFeedbackStatus.QUEUED -> AiFeedbackNotCompleteException()
             TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
             TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
             TopicFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.NOFEEDBACK -> throw LimitReachedException() // 추가 예외 처리
         }
 
         val feedback = TopicFeedback(
@@ -454,7 +471,7 @@ class TopicController(
     @Operation(
         summary = "Get all feedback topic", description = """
         [en] Retrieves all completed AI feedback topics associated with a specific topic. Only shows feedback with COMPLETED status
-        [ko] 특정 기록과 관련된 모든 완료된 AI 피드백 기록을 조회합니다. COMPLETED 상태의 피드백만 표시됩니다
+        [ko] 특정 기록과 관련된 모든 피드백을 조회합니다. COMPLETED 상태의 피드백과 NOFEEDBACK 상태의 피드백도 표시됩니다
     """
     )
     @ApiResponses(
@@ -489,7 +506,7 @@ class TopicController(
 
         if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
-        val feedbacks = topic.topicFeedback.filter { it.status == TopicFeedbackStatus.COMPLETED }
+        val feedbacks = topic.topicFeedback.filter { it.status == TopicFeedbackStatus.COMPLETED || it.status == TopicFeedbackStatus.NOFEEDBACK }
 
         if (feedbacks.isEmpty()) throw NotFoundException()
 
@@ -502,7 +519,7 @@ class TopicController(
     @Operation(
         summary = "Get feedback topic", description = """
         [en] Retrieves detailed information about a specific feedback topic, including AI feedback content and user comments
-        [ko] 특정 피드백 기록의 상세 정보를 조회합니다. AI 피드백 내용과 사용자 댓글을 포함합니다
+        [ko] 특정 피드백 기록의 상세 정보를 조회합니다. AI 피드백 내용과 사용자 댓글을 포함합니다.
     """
     )
     @ApiResponses(
@@ -555,6 +572,7 @@ class TopicController(
             TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
             TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
             TopicFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.NOFEEDBACK -> Unit
         }
 
         return ResponseEntity.ok(
@@ -580,6 +598,13 @@ class TopicController(
             ),
             ApiResponse(
                 responseCode = "401", description = "Unauthorized",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "403", description = "No Feedback record can't update",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -626,6 +651,7 @@ class TopicController(
             TopicFeedbackStatus.PROCESSING -> throw AiFeedbackNotCompleteException()
             TopicFeedbackStatus.PROCESSING_ERROR -> throw AiFeedbackErrorException()
             TopicFeedbackStatus.COMPLETED -> Unit
+            TopicFeedbackStatus.NOFEEDBACK -> AiFeedbackNotEnableException()
         }
 
         // 데이터 업데이트
