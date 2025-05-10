@@ -25,7 +25,7 @@ const dailyTopicstyles = StyleSheet.create({
         width: 40,
         height: 40,
         marginLeft: 12,
-        marginTop: 12,
+        marginTop: 5,
     },
     cloverProfileImage: {
         width: 40,

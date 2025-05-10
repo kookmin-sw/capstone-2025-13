@@ -14,6 +14,7 @@ import Answer from "../components/Answer";
 import dailyTopicstyles from "../styles/dailyTopicStyles";
 import customAxios from "../API/axios";
 import ApiResponseDTO from "../API/common";
+import {UserInfoResponse, getUserInfo} from "../API/userInfoAPI";
 
 export interface TopicFeedbackResponse {
     id: string;
@@ -38,8 +39,15 @@ export default function DailyTopic() {
     const scrollRef = useRef<ScrollView>(null);
     const [inputDisabled, setInputDisabled] = useState(false);
     const [placeholderText, setPlaceholderText] = useState("메세지를 입력하세요.");
+    const [user, setUser] = useState<UserInfoResponse | null>(null);
 
     useEffect(() => {
+        const fetchUser = async () => {
+            const data = await getUserInfo();
+            if (data) setUser(data);
+        };
+
+        fetchUser();
         initializeChat();
     }, []);
     
@@ -203,7 +211,11 @@ export default function DailyTopic() {
                             <Answer answer={item.text} />
                         </View>
                         <Image
-                            source={require("../assets/Images/cloverProfile.png")}
+                            source={
+                                user?.profile
+                                    ? { uri: user.profile }
+                                    : require("../assets/Images/cloverProfile.png") // 기본 이미지
+                            }
                             style={dailyTopicstyles.userProfileImage}
                         />
                     </View>
