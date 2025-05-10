@@ -5,7 +5,7 @@ import { generateShuffledCards } from '../../utils/cardUtils';
 import { gameScreenstyles } from "../../styles/GameScreenStyles";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 
 type GameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "GameScreen">;
@@ -18,6 +18,8 @@ const GameScreen = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const matchSound = useRef<Audio.Sound | null>(null);
+  const route = useRoute<RouteProp<RootStackParamList, 'GameScreen'>>();
+  const score = route.params?.score ?? 0;
 
   useEffect(() => {
     const loadSound = async () => {
@@ -94,7 +96,7 @@ const GameScreen = () => {
         </View>
       </View>
 
-      {isGameFinished && (
+      {!isGameFinished && (
         <View style={gameScreenstyles.result}>
           <Text style={gameScreenstyles.success}>🎉 You Win!</Text>
           {timeTaken && (
@@ -104,7 +106,8 @@ const GameScreen = () => {
           <View style={{ height: 10 }}></View>
           <Button title="End" onPress={() => {
             navigation.navigate('SimpleDiagnosis', {
-              initialIndex: 33
+              initialIndex: 33,
+              score: score
             })
           }} />
         </View>

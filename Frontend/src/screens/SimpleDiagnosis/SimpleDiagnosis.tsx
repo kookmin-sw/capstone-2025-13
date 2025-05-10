@@ -30,6 +30,10 @@ const SimpleDiagnosis = () => {
     const script = SimpleDiagnosisScript({ nickname });
 
     useEffect(() => {
+        console.log(score)
+    }, [score]);
+
+    useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
             setCurrentSegmentIndex(route.params.initialIndex);
         }
@@ -61,17 +65,26 @@ const SimpleDiagnosis = () => {
     useEffect(() => {
         if (
             currentSegment.type === "navigate" &&
-            currentSegment.navigateTo &&
-            typeof currentSegment.navigateTo === "object" &&
-            "screen" in currentSegment.navigateTo &&
-            "params" in currentSegment.navigateTo
+            currentSegment.navigateTo
         ) {
-            navigation.navigate(
-                currentSegment.navigateTo.screen,
-                buildParams(currentSegment.navigateTo.params)
-            );
+            const navigateTo = currentSegment.navigateTo;
+            if (typeof navigateTo === "string") {
+                navigation.navigate(
+                    navigateTo as keyof RootStackParamList,
+                    buildParams()
+                );
+            } else if (
+                typeof navigateTo === "object" &&
+                "screen" in navigateTo
+            ) {
+                navigation.navigate(
+                    navigateTo.screen,
+                    buildParams(navigateTo.params || {})
+                );
+            }
         }
     }, [currentSegment]);
+
 
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
@@ -97,7 +110,7 @@ const SimpleDiagnosis = () => {
                     text={currentSegment.text || "No text available"}
                     onPress={() => {
                         const nextIndex =
-                            currentSegmentIndex === 21
+                            currentSegmentIndex === 20 || currentSegmentIndex === 21
                                 ? 23
                                 : currentSegmentIndex + 1;
                         const nextSegment = script[nextIndex];

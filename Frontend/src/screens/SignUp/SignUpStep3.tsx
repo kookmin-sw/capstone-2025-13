@@ -56,7 +56,7 @@ const SignUpStep3 = () => {
         try {
             await AsyncStorage.setItem("@secondPassword", trimmedSecondPassword);
             await signUp(trimmedEmail, trimmedPassword, nickname, birthDate, gender);
-            navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
+        navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
         } catch (error) {
             console.error("회원가입 실패:", error);
             if ((error as any).response?.status === 400) {
