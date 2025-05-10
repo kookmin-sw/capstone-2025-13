@@ -12,6 +12,10 @@ import { useState, useRef, useEffect } from "react";
 import Question from "../components/Question";
 import Answer from "../components/Answer";
 import dailyTopicstyles from "../styles/dailyTopicStyles";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../App";
+import { Ionicons } from "@expo/vector-icons";
 
 import { getUserInfo, UserInfoResponse } from "../API/userInfoAPI";
 import {
@@ -32,6 +36,9 @@ export default function DailyTopic() {
     const [inputDisabled, setInputDisabled] = useState(false);
     const [placeholderText, setPlaceholderText] = useState("메세지를 입력하세요.");
     const [user, setUser] = useState<UserInfoResponse | null>(null);
+    const navigation =
+            useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -198,6 +205,14 @@ export default function DailyTopic() {
             keyboardVerticalOffset={80}
         >
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
+                <TouchableOpacity
+                    style={dailyTopicstyles.backButtonWrapper}
+                    onPress={() => {
+                    navigation.navigate("Home")}}
+                >
+                    <Ionicons name="arrow-back-circle" size={40} color="#349C64" />
+                </TouchableOpacity>
+                <Text style={dailyTopicstyles.headerText}>매일 1주제</Text>
                 <ScrollView
                     contentContainerStyle={dailyTopicstyles.scrollContainer}
                     ref={scrollRef}
