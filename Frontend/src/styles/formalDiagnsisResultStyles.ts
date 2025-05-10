@@ -26,6 +26,7 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       marginBottom: width * 0.05,
       marginStart: width * 0.19,
       fontSize: width * 0.055,
+      fontFamily: fonts.semiBold,
       textAlign: "left",
       color: "#F9F9EB",
       fontWeight: "bold",
@@ -40,11 +41,13 @@ const formalDiagnsisResultStyles = StyleSheet.create({
     },
     title: {
       fontSize: width * 0.045,
+      fontFamily: fonts.semiBold,
       marginBottom: width * 0.02,
       textAlign: "left",
       alignSelf: "flex-start",
     },
     name: {
+      fontFamily: fonts.semiBold,
       fontWeight: "bold",
       color: "#4CAF50",
     },
@@ -56,12 +59,14 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       position: "relative",
     },
     percentText: {
+      fontFamily: fonts.extraBold,
       position: "absolute",
       fontSize: width * 0.07,
       fontWeight: "bold",
       color: "#333",
     },
     status: {
+      fontFamily: fonts.extraBold,
       fontSize: width * 0.06,
       fontWeight: "bold",
       color: "#4CAF50",
@@ -73,23 +78,16 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       marginBottom: width * 0.05,
     },
     sectionTitle: {
+      fontFamily: fonts.semiBold,
       fontWeight: "bold",
       fontSize: width * 0.045,
       marginBottom: width * 0.015,
     },
     sectionText: {
+      fontFamily: fonts.primary,
       fontSize: width * 0.035,
       color: "#333",
       lineHeight: width * 0.05,
-    },
-    closeButton: {
-      backgroundColor: "#4CAF50",
-      width: width * 0.1,
-      height: width * 0.1,
-      borderRadius: width * 0.05,
-      marginTop: width * 0.03,
-      alignItems: "center",
-      justifyContent: "center",
     },
   });
   
