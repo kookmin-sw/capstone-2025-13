@@ -14,9 +14,9 @@ const { height, width } = Dimensions.get("window");
 
 
 const questData = [
-  { title: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
-  { title: "명상", subtitle: "조용한 마음을 가져봐요." },
-  { title: "운동", subtitle: "몸을 움직여볼까요?" },
+  { title: "우웅의 술" },
+  { title: "명상"},
+  { title: "운동"},
 ];
 
 export default function Quest() {
@@ -76,7 +76,6 @@ export default function Quest() {
         <Tree
           type={treeTypes[index % treeTypes.length]}
           title={isFirst ? `${nickname}의 숲` : quest.title}
-          subtitle={quest.subtitle}
         />
       </View>
 

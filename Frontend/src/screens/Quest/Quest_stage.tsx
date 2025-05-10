@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { View, ScrollView, Image, Dimensions, Text, TouchableOpacity } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import Header_sky from "../../components/Header_sky";
@@ -7,6 +7,18 @@ import questStyles from "../../styles/questStyles";
 import questStageStyles from "../../styles/questStageStyles";
 import Quest_title from "../../components/Quest_title";
 import Grass from "../../components/GrassElement";
+import axios from "axios";
+
+const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
+  switch (title) {
+    case "명상":
+      return "MEDITATE";
+    case "운동":
+      return "ACTIVITY";
+    default:
+      return "EMOTION";
+  }
+};
 
 const { height, width } = Dimensions.get("window");
 
@@ -25,7 +37,19 @@ const lockPositions = [
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { title, subtitle } = route.params as { title: string; subtitle: string };
+  const { title } = route.params as { title: string;};
+
+  useEffect(() => {
+    const fetchLastQuest = async () => {
+      try {
+        const type = getQuestTypeFromTitle(title);
+      } catch (error: any) {
+        console.error("❌ /quest/last 호출 실패:", error.response?.data || error.message);
+      }
+    };
+  
+    fetchLastQuest();
+  }, [title]);
 
   return (
     <View style={questStageStyles.container}>
