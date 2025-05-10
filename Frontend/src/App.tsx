@@ -24,7 +24,8 @@ import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
-import customAxios from './API/axios';
+import customAxios from './API/axios'
+import SecondPassword from "./screens/SecondPassword";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -54,7 +55,7 @@ export type RootStackParamList = {
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Calendar: undefined;
-
+    SecondPassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -226,6 +227,11 @@ export default function App() {
                 <Stack.Screen
                     name="Record"
                     component={Record}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="SecondPassword"
+                    component={SecondPassword}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

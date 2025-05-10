@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
+import { useSecondPasswordGuard } from "../hooks/useSecondPasswordGuard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CalendarScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -14,7 +16,7 @@ export default function CalendarScreen() {
     const [attendanceRate, setAttendanceRate] = useState(0);
     const attendanceDates = ['2025-05-01', '2025-05-03', '2025-05-06', '2025-05-24'];
     const navigation =
-            useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const generateMarkedDates = (selectedDate: string) => {
         const marked: { [date: string]: any } = {};
@@ -50,16 +52,21 @@ export default function CalendarScreen() {
         setAttendanceRate(attendance / daysInMonth);
     }, [attendance, selectedDate]);
 
+    useSecondPasswordGuard("Calendar");
+    useEffect(() => {
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
+
     return (
         <View style={calendarStyles.container}>
             <View style={calendarStyles.header}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("Home")}
-                style={calendarStyles.backButtonWrapper}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Home")}
+                    style={calendarStyles.backButtonWrapper}
                 >
-                <Ionicons name="arrow-back-circle" size={40} color="#fff" />
-            </TouchableOpacity>
-                <Text style={calendarStyles.title}>달력</Text>  
+                    <Ionicons name="arrow-back-circle" size={40} color="#fff" />
+                </TouchableOpacity>
+                <Text style={calendarStyles.title}>달력</Text>
             </View>
             <Calendar
                 current={selectedDate}
