@@ -11,12 +11,19 @@ import SectionLabel from "../../components/SectionLabel";
 import MethodCard from "../../components/MethodCard";
 import styles from "../../styles/formalDialogueStyles";
 import { fetchDiagnosisList } from "../../API/diagnosisAPI";
+import { useSecondPasswordGuard } from "../../hooks/useSecondPasswordGuard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function FormalDiagnosis() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const [diagnosisList, setDiagnosisList] = useState([]);
+
+    useSecondPasswordGuard("FormalDiagnosis");
+    useEffect(() => {
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
 
     useEffect(() => {
         const loadDiagnosis = async () => {
