@@ -40,9 +40,38 @@ export default function DailyTopic() {
     const [placeholderText, setPlaceholderText] = useState("메세지를 입력하세요.");
 
     useEffect(() => {
-        handleCreateTopic();
+        initializeChat();
     }, []);
-
+    
+    const initializeChat = async () => {
+        try {
+            const response = await customAxios.get("/topic/me");
+            const topicData = response.data.data;
+    
+            const history: { type: "question" | "answer"; text: string }[] = [];
+    
+            // 처음 질문
+            history.push({ type: "question", text: topicData.data });
+    
+            // 피드백 대화 (answer → question 쌍)
+            topicData.feedbacks.forEach((feedback: any) => {
+                history.push({ type: "answer", text: feedback.data });
+                history.push({ type: "question", text: feedback.aiFeedback });
+            });
+    
+            setTopicId(topicData.id);
+            setChatHistory(history);
+        } catch (error: any) {
+            if (error.response?.status === 404 || error.response?.status === 409) {
+                console.log("🆕 오늘의 topic이 없어 새로 생성합니다.");
+                await handleCreateTopic(); // 기존 함수 활용
+            } else {
+                console.error("❌ 초기화 실패:", error.response?.data || error.message);
+            }
+        }
+    };
+    
+    
     const handleCreateTopic = async () => {
         try {
             const response = await customAxios.put("/topic/create", {
