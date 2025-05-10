@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
-import {GenderEnum, getUserInfo, putProfileImg, userInfoUpdate} from "../API/userInfoAPI";
+import { GenderEnum, getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
 import userInfoStyles from "../styles/userInfoStyles";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -21,7 +21,7 @@ type UserData = {
   password: string;
   birthDate: string;
   gender: string;
-  secondPassword: number;
+  secondPassword: string;
   profilePic: string | null;
 };
 
@@ -32,9 +32,21 @@ export default function UserInfo() {
     password: "password123",
     birthDate: "1990-01-01",
     gender: "남성",
-    secondPassword: 1234,
+    secondPassword: '1111',
     profilePic: null,
   });
+
+  useEffect(() => {
+    const fetchSecondPassword = async () => {
+      const storedPassword = await AsyncStorage.getItem("@secondPassword");
+      setUserData((prevData) => ({
+        ...prevData,
+        secondPassword: storedPassword || '1111',
+      }));
+    };
+
+    fetchSecondPassword();
+  }, []);
 
   const [editMode, setEditMode] = useState(false);
   const [originalData, setOriginalData] = useState<UserData | null>(null);
@@ -71,7 +83,7 @@ export default function UserInfo() {
         password: "",
         birthDate: user.birthDate,
         gender: getGenderLabel(user.gender),
-        secondPassword: Number(await AsyncStorage.getItem("@secondPassword")) || 1111,
+        secondPassword: (await AsyncStorage.getItem("@secondPassword")) || '1111',
         profilePic: user.profile ?? null,
       };
 
@@ -133,7 +145,7 @@ export default function UserInfo() {
 
     let gender: GenderEnum = GenderEnum.UNKNOWN
 
-    switch(userData.gender) {
+    switch (userData.gender) {
       case GenderEnum.MALE:
         gender = GenderEnum.MALE;
         break;
@@ -239,12 +251,12 @@ export default function UserInfo() {
 
     <View style={[userInfoStyles.container, { position: "relative" }]}>
       <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
-          style={userInfoStyles.backButton}
-        >
+        onPress={() => navigation.navigate("Home")}
+        style={userInfoStyles.backButton}
+      >
 
-          <Ionicons name="arrow-back-circle" size={40} color="#fff" />
-        </TouchableOpacity>
+        <Ionicons name="arrow-back-circle" size={40} color="#fff" />
+      </TouchableOpacity>
       <Text style={userInfoStyles.header}>My Profile</Text>
       <View style={userInfoStyles.whiteBox}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -286,21 +298,18 @@ export default function UserInfo() {
             <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
           )}
         </View>
-
         <InfoRow
           label="2차 비밀번호"
-          value={userData.secondPassword.toString()}
+          value={userData.secondPassword}
           onChangeText={(text) => {
             const numericText = text.replace(/[^0-9]/g, '').slice(0, 4);
-            setUserData({ ...userData, secondPassword: Number(numericText) });
+            setUserData({ ...userData, secondPassword: numericText });
           }}
           secureTextEntry={!editMode}
           editable={editMode}
           keyboardType="number-pad"
           maxLength={4}
         />
-
-
         <View style={userInfoStyles.buttonRow}>
           <TouchableOpacity
             style={userInfoStyles.cancelButton}
