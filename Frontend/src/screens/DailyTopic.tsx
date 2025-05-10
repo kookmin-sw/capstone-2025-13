@@ -12,25 +12,17 @@ import { useState, useRef, useEffect } from "react";
 import Question from "../components/Question";
 import Answer from "../components/Answer";
 import dailyTopicstyles from "../styles/dailyTopicStyles";
-import customAxios from "../API/axios";
-import ApiResponseDTO from "../API/common";
-import {UserInfoResponse, getUserInfo} from "../API/userInfoAPI";
 
-export interface TopicFeedbackResponse {
-    id: string;
-    aiFeedback: string;
-    data: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export enum TopicFeedbackStatus {
-    QUEUED = "QUEUED",
-    PROCESSING = "PROCESSING",
-    COMPLETED = "COMPLETED",
-    PROCESSING_ERROR = "PROCESSING_ERROR"
-}
+import { getUserInfo, UserInfoResponse } from "../API/userInfoAPI";
+import {
+    getTodayTopic,
+    createTopic,
+    getTopicDetails,
+    submitFeedback,
+    getFeedbackById,
+    TopicFeedbackResponse,
+    TopicFeedbackStatus
+} from "../API/topicAPI";
 
 export default function DailyTopic() {
     const [topicId, setTopicId] = useState<string | null>(null);
@@ -50,60 +42,47 @@ export default function DailyTopic() {
         fetchUser();
         initializeChat();
     }, []);
-    
+
     const initializeChat = async () => {
         try {
-            const response = await customAxios.get("/topic/me");
-            const topicData = response.data.data;
-    
+            const topicData = await getTodayTopic();
+
             const history: { type: "question" | "answer"; text: string }[] = [];
-    
-            // 처음 질문
             history.push({ type: "question", text: topicData.data });
-    
-            // 피드백 대화 (answer → question 쌍)
+
             topicData.feedbacks.forEach((feedback: any) => {
                 history.push({ type: "answer", text: feedback.data });
                 history.push({ type: "question", text: feedback.aiFeedback });
             });
-    
+
             setTopicId(topicData.id);
             setChatHistory(history);
         } catch (error: any) {
             if (error.response?.status === 404 || error.response?.status === 409) {
                 console.log("🆕 오늘의 topic이 없어 새로 생성합니다.");
-                await handleCreateTopic(); // 기존 함수 활용
+                await handleCreateTopic();
             } else {
                 console.error("❌ 초기화 실패:", error.response?.data || error.message);
             }
         }
     };
-    
-    
+
     const handleCreateTopic = async () => {
         try {
-            const response = await customAxios.put("/topic/create", {
-                rate: 75,
-                data: "",
-            });
+            const newTopic = await createTopic();
 
-            const topicId = response.data.data.id;
-            const questionText = response.data.data.data;
+            setTopicId(newTopic.id);
+            setChatHistory([{ type: "question", text: newTopic.data }]);
 
-            setTopicId(topicId);
-            setChatHistory([{ type: "question", text: questionText }]);
-
-            await handleFetchFeedback(topicId);
+            await handleFetchFeedback(newTopic.id);
         } catch (error: any) {
             if (error.response?.status === 409) {
-                const existingTopicResponse = await customAxios.get("/topic/me");
-                const existingTopicId = existingTopicResponse.data.data.id;
-                const existingQuestionText = existingTopicResponse.data.data.data;
+                const existingTopic = await getTodayTopic();
 
-                setTopicId(existingTopicId);
-                setChatHistory([{ type: "question", text: existingQuestionText }]);
+                setTopicId(existingTopic.id);
+                setChatHistory([{ type: "question", text: existingTopic.data }]);
 
-                await handleFetchFeedback(existingTopicId);
+                await handleFetchFeedback(existingTopic.id);
             } else {
                 console.error("❌ Failed to create topic:", error.response?.data || error.message);
             }
@@ -112,8 +91,7 @@ export default function DailyTopic() {
 
     const handleFetchFeedback = async (topicId: string) => {
         try {
-            const response = await customAxios.get(`/topic/${topicId}`);
-            const feedbacks = response.data.aiFeedback;
+            const feedbacks = await getTopicDetails(topicId);
             console.log("✅ Completed feedbacks fetched successfully!", feedbacks);
         } catch (error: any) {
             console.error("❌ Failed to fetch feedback:", error.response?.data || error.message);
@@ -127,11 +105,7 @@ export default function DailyTopic() {
         }
 
         try {
-            const response = await customAxios.get<ApiResponseDTO<TopicFeedbackResponse>>(
-                `/topic/feedback/${topicFeedbackId}`
-            );
-
-            const data = response.data.data;
+            const data: TopicFeedbackResponse = await getFeedbackById(topicFeedbackId);
 
             if (!data || data.status !== TopicFeedbackStatus.COMPLETED) {
                 console.log(`⏳ Feedback not ready (attempt ${retryCount + 1}), retrying in 3s...`);
@@ -141,7 +115,6 @@ export default function DailyTopic() {
 
             console.log("✅ AI Feedback fetched:", data.aiFeedback);
 
-            // AI 피드백(다음 질문) 추가
             setChatHistory((prev) => [
                 ...prev,
                 { type: "question", text: data.aiFeedback }
@@ -156,13 +129,7 @@ export default function DailyTopic() {
         if (!topicId) return;
 
         try {
-            const response = await customAxios.put(`/topic/feedback/${topicId}`, {
-                data: answer,
-            });
-
-            console.log("📬 Feedback sent:", response.data);
-            const topicFeedbackId = response.data.data;
-
+            const topicFeedbackId = await submitFeedback(topicId, answer);
             setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId), 3000);
         } catch (error: any) {
             if (error.response?.status === 403 && error.response?.data?.message === "Limit reached") {
@@ -214,7 +181,7 @@ export default function DailyTopic() {
                             source={
                                 user?.profile
                                     ? { uri: user.profile }
-                                    : require("../assets/Images/cloverProfile.png") // 기본 이미지
+                                    : require("../assets/Images/cloverProfile.png")
                             }
                             style={dailyTopicstyles.userProfileImage}
                         />
