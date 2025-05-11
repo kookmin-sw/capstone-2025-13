@@ -69,7 +69,7 @@ class TopicBatch(
         return ItemProcessor { record ->
             val prompt = recordPrompt.trimIndent()
 
-            if(record.status == TopicFeedbackStatus.PROCESSING || record.status == TopicFeedbackStatus.COMPLETED)
+            if(record.status == TopicFeedbackStatus.PROCESSING || record.status == TopicFeedbackStatus.COMPLETED || record.status == TopicFeedbackStatus.NOFEEDBACK)
                 return@ItemProcessor record
 
             record.status = TopicFeedbackStatus.PROCESSING

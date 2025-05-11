@@ -14,6 +14,7 @@ enum class TopicFeedbackStatus(val value: Short) {
     QUEUED(0),
     PROCESSING(1),
     COMPLETED(2),
+    NOFEEDBACK(3),
     PROCESSING_ERROR(10)
 }
 
