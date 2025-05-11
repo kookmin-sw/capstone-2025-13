@@ -11,11 +11,15 @@ import {
     View
 } from 'react-native';
 
-export default function RestrictedAccessScreen() {
+interface RestrictedAccessScreenProps {
+    error: string | null;
+}
+
+export default function RestrictedAccessScreen({error}: RestrictedAccessScreenProps) {
     useEffect(() => {
         Alert.alert(
             "보안 경고",
-            "기기 무결성 검증에 실패했습니다. 앱을 종료합니다.",
+            `기기 무결성 검증에 실패했습니다. 앱을 종료합니다.\n${error || ''}`,
             [
                 {
                     text: "확인",

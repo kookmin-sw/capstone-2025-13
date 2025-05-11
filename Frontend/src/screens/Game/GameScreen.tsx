@@ -6,7 +6,10 @@ import { gameScreenstyles } from "../../styles/GameScreenStyles";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { useNavigation } from '@react-navigation/native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
+
+// @ts-ignore
+import matchSound from '../../assets/sounds/success.mp3';
 
 type GameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "GameScreen">;
 
@@ -17,25 +20,9 @@ const GameScreen = () => {
   const [matched, setMatched] = useState<number[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
-  const matchSound = useRef<Audio.Sound | null>(null);
 
-  useEffect(() => {
-    const loadSound = async () => {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/success.mp3')
-      );
-      matchSound.current = sound;
-      await matchSound.current.setVolumeAsync(0.3);
-    };
-
-    loadSound();
-
-    return () => {
-      if (matchSound.current) {
-        matchSound.current.unloadAsync();
-      }
-    };
-  }, []);
+  const matchSoundPlayer = useAudioPlayer(matchSound)
+  matchSoundPlayer.volume = 0.3;
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -51,10 +38,7 @@ const GameScreen = () => {
         const [first, second] = newFlipped;
         if (cards[first].symbol === cards[second].symbol) {
           setMatched([...matched, first, second]);
-
-          if (matchSound.current) {
-            matchSound.current.replayAsync();
-          }
+          matchSoundPlayer.play()
         }
         setTimeout(() => setFlipped([]), 800);
       }

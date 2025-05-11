@@ -222,6 +222,8 @@ class IntegrityService(
                 )
             }
 
+            logger.debug(claims.toList().joinToString { "${it.first} = ${it.second}" })
+
             // 발급자(앱 번들 ID) 검증
             val tokenBundleId = claims["iss"] as? String
             if (tokenBundleId != bundleId) {

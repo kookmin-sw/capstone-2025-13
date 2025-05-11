@@ -38,11 +38,10 @@ class IntegrityChallengeService(
             }
         }
 
-        val bytes = ByteArray(16)
+        val bytes = ByteArray(32)
         secureRandom.nextBytes(bytes)
 
-        val challenge = Base64.getUrlEncoder()
-            .withoutPadding()
+        val challenge = Base64.getEncoder()
             .encodeToString(bytes)
         val expiresAt = LocalDateTime.now().plusMinutes(challengeExp.toLong())
 

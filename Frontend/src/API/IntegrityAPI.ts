@@ -2,6 +2,7 @@ import DeviceInfo from 'react-native-device-info'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Integrity from '@dalbodeule/expo-app-integrity';
 import {Platform} from "react-native";
+import axios from "./axios";
 
 const EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT = process.env.EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT;
 const apiUrl =  process.env.EXPO_PUBLIC_API_URL;
@@ -29,19 +30,16 @@ export const requestChallenge = async () => {
     const deviceId = await getDeviceId()
 
     try {
-        const response = await fetch(`${apiUrl}/api/integrity/challenge`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({deviceId})
-        });
+        const response = await axios.post<RequestChallengeResponse>(`${apiUrl}/api/integrity/challenge`,
+            { deviceId },
+            {}
+        )
 
-        if (!response.ok) {
+        const data = response.data;
+        if (response.status !== 200) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json() as RequestChallengeResponse;
         const expDate = new Date()
         expDate.setMinutes(expDate.getMinutes() + data.expiresInMinutes)
 
@@ -68,7 +66,16 @@ export const verifyDeviceIntegrity = async () => {
 
     try {
         const googleCloudProject: number = parseInt(EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT);
-        const attestation = await Integrity.attestKey(challenge, googleCloudProject);
+
+        let attestation = null
+
+        try {
+            if (platform == "ios" && Integrity.isSupported()) {
+                attestation = await Integrity.attestKey(challenge);
+            } else if (platform == "android") {
+                attestation = await Integrity.attestKey(challenge, googleCloudProject);
+            } else throw Error("Platform not supported");
+        } catch (error) { throw error }
 
         console.log({
             platform,
@@ -78,23 +85,18 @@ export const verifyDeviceIntegrity = async () => {
             deviceId
         })
 
-        const response = await fetch(`${apiUrl}/api/integrity/verify`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                platform,
-                attestation,
-                bundleId,
-                challenge,
-                deviceId
-            }),
-            keepalive: true
+        const response = await axios.post<VerifyDeviceIntegrityResponse>(`${apiUrl}/api/integrity/verify`, {
+            platform,
+            attestation,
+            bundleId,
+            challenge,
+            deviceId
+        }, {
+
         });
 
-        const data = await response.json() as VerifyDeviceIntegrityResponse;
-        if (!response.ok) {
+        const data = response.data
+        if (response.status !== 200 || !data.valid) {
             throw new Error(`HTTP error! status: ${response.status} / ${data.message} / ${data.details ? JSON.stringify(data.details) : ''}`);
         }
 
