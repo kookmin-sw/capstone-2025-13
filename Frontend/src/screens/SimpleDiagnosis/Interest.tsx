@@ -28,7 +28,7 @@ const Interest = () => {
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ImageBackground
-                source={require("../../assets/Images/simple-4.jpeg")}
+                source={require("../../assets/Images/simple-4-2.png")}
                 style={{ flex: 1 }}
                 resizeMode="cover"
             >

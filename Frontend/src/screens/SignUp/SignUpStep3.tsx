@@ -56,7 +56,7 @@ const SignUpStep3 = () => {
         try {
             await AsyncStorage.setItem("@secondPassword", trimmedSecondPassword);
             await signUp(trimmedEmail, trimmedPassword, nickname, birthDate, gender);
-        navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
+            navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
         } catch (error) {
             console.error("회원가입 실패:", error);
             if ((error as any).response?.status === 400) {
@@ -70,7 +70,7 @@ const SignUpStep3 = () => {
 
     return (
         <ImageBackground
-            source={require("../../assets/Images/simple-3.png")}
+            source={require("../../assets/Images/simple-3-2.png")}
             style={{ flex: 1 }}
             resizeMode="cover"
         >

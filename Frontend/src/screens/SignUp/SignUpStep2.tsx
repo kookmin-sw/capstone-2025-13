@@ -69,7 +69,7 @@ const SignUpStep2 = () => {
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ImageBackground
-                    source={require("../../assets/Images/simple-3.png")}
+                    source={require("../../assets/Images/simple-3-2.png")}
                     style={{ flex: 1 }}
                     resizeMode="cover"
                 >
