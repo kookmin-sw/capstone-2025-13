@@ -373,6 +373,13 @@ class TopicController(
                 )]
             ),
             ApiResponse(
+                responseCode = "403", description = "Limit Reached, Feedback can't add",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
                 responseCode = "404", description = "Feedback topic not found",
                 content = [Content(
                     mediaType = "application/json",
@@ -419,6 +426,9 @@ class TopicController(
         if(topic.user?.id != userDetails.id) throw UnauthorizedException()
 
         val feedbackNum = topic.topicFeedback.size
+
+        if (feedbackNum >= 7) throw LimitReachedException()
+
 
         // Limit Reached 예외 대신 데이터베이스에 데이터 추가 후 ID 반환
          if(feedbackNum >= 5) {
