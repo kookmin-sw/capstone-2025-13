@@ -27,12 +27,12 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.anonymous.wooong</string>
+          <string>kr.ac.kookmin.wooong</string>
         </array>
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>81</string>
+    <string>99</string>
     <key>GMSApiKey</key>
     <string>process.env.GOOGLE_MAPS_API_KEY</string>
     <key>LSMinimumSystemVersion</key>
@@ -78,5 +78,7 @@
     </array>
     <key>UIUserInterfaceStyle</key>
     <string>Light</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
   </dict>
 </plist>

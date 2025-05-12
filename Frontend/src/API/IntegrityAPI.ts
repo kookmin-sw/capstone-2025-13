@@ -3,6 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Integrity from '@dalbodeule/expo-app-integrity';
 import {Platform} from "react-native";
 import axios from "./axios";
+import * as SecureStore from "expo-secure-store";
+import {SECURE_STORAGE_KEYS} from "@dalbodeule/expo-app-integrity/src/config";
 
 const EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT = process.env.EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT;
 const apiUrl =  process.env.EXPO_PUBLIC_API_URL;
@@ -13,7 +15,7 @@ export interface RequestChallengeResponse {
 }
 
 export interface VerifyDeviceIntegrityResponse {
-    valid: boolean;
+    isValid: boolean;
     message: string;
     details: Map<string, any> | undefined
 }
@@ -68,10 +70,16 @@ export const verifyDeviceIntegrity = async () => {
         const googleCloudProject: number = parseInt(EXPO_PUBLIC_GOOGLE_CLOUD_PROJECT);
 
         let attestation = null
+        let keyId = null
 
         try {
-            if (platform == "ios" && Integrity.isSupported()) {
+            if (platform == "ios") {
+                if(!Integrity.isSupported())
+                    throw Error("Integrity is not supported on this device");
                 attestation = await Integrity.attestKey(challenge);
+                keyId = await SecureStore.getItemAsync(
+                    SECURE_STORAGE_KEYS.INTEGRITY_KEY_IDENTIFIER,
+                )
             } else if (platform == "android") {
                 attestation = await Integrity.attestKey(challenge, googleCloudProject);
             } else throw Error("Platform not supported");
@@ -82,7 +90,8 @@ export const verifyDeviceIntegrity = async () => {
             attestation,
             bundleId,
             challenge,
-            deviceId
+            deviceId,
+            keyId
         })
 
         const response = await axios.post<VerifyDeviceIntegrityResponse>(`${apiUrl}/api/integrity/verify`, {
@@ -90,21 +99,21 @@ export const verifyDeviceIntegrity = async () => {
             attestation,
             bundleId,
             challenge,
-            deviceId
+            deviceId,
+            keyId
         }, {
 
         });
 
         const data = response.data
-        if (response.status !== 200 || !data.valid) {
+        if (response.status !== 200 || !data.isValid) {
             throw new Error(`HTTP error! status: ${response.status} / ${data.message} / ${data.details ? JSON.stringify(data.details) : ''}`);
         }
 
-        if (data.valid) {
+        if (data.isValid) {
             await AsyncStorage.removeItem('integrityChallenge');
             await AsyncStorage.removeItem('integrityChallengeExp');
         }
-
         return data;
     } catch (error: any) {
         console.error(`Failed to verify integrity: ${error.message} / ${error.details ? JSON.stringify(error.details) : ''}`);

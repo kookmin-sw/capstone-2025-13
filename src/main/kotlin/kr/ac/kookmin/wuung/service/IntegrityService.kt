@@ -1,5 +1,9 @@
 package kr.ac.kookmin.wuung.service
 
+import ch.veehait.devicecheck.appattest.AppleAppAttest
+import ch.veehait.devicecheck.appattest.attestation.AttestationException
+import ch.veehait.devicecheck.appattest.common.App
+import ch.veehait.devicecheck.appattest.common.AppleAppAttestEnvironment
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtParser
@@ -24,6 +28,10 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 import java.util.Base64
 
 @Service
@@ -48,42 +56,18 @@ class IntegrityService(
     private val googleAccountJson: String,
     private val gson: Gson,
 ) {
-    companion object {
-        var applePublicKey: PublicKey? = null
-        var appleParser: JwtParser? = null
-        private var googleAccessToken: AccessToken? = null
-    }
-
     private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    lateinit var attest: AppleAppAttest
+    lateinit var googleAccessToken: AccessToken
+
     init {
         refreshGoogleAccessToken()
-        val appleResponse = webClient.get()
-            .uri("https://www.apple.com/certificateauthority/Apple_App_Attestation_Root_CA.pem")
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
-            .retrieve()
-            .bodyToMono(ByteArray::class.java)
-            .block()
-
-        if (appleResponse != null) {
-            try {
-                val keyFactory = KeyFactory.getInstance("RSA")
-                val certFactory = java.security.cert.CertificateFactory.getInstance("X.509")
-                val certificate = certFactory.generateCertificate(appleResponse.inputStream())
-                applePublicKey = certificate.publicKey
-
-                appleParser = Jwts.parser()
-                    .setSigningKey(applePublicKey)
-                    .build()
-            } catch (e: Exception) {
-                throw RuntimeException("Failed to process Apple public key: ${e.message}")
-            }
-        } else {
-            throw RuntimeException("Failed to fetch Apple public key")
-        }
-
-
+        attest = AppleAppAttest(
+            app = App(teamId, packageName),
+            appleAppAttestEnvironment = AppleAppAttestEnvironment.PRODUCTION
+        )
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -197,101 +181,37 @@ class IntegrityService(
 
     fun verifyIosAppAttest(
         attestation: String,
-        bundleId: String,
+        keyId: String?,
         challenge: String
     ): IntegrityVerificationResponse {
         try {
-            if (applePublicKey == null) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Apple public key not available"
-                )
-            }
+            val validator = attest.createAttestationValidator()
 
-            // JWT 클레임 검증
-            val claims: Claims
-            try {
-                claims = appleParser?.let {
-                    it.parseClaimsJws(attestation)?.body ?: throw RuntimeException("Invalid JWT format")
-                } ?: throw RuntimeException("JWT parser not initialized")
-            } catch (e: Exception) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Invalid JWT signature: ${e.message}",
-                    details = mapOf("errorType" to e.javaClass.simpleName)
-                )
-            }
-
-            logger.debug(claims.toList().joinToString { "${it.first} = ${it.second}" })
-
-            // 발급자(앱 번들 ID) 검증
-            val tokenBundleId = claims["iss"] as? String
-            if (tokenBundleId != bundleId) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Bundle ID mismatch",
-                    details = mapOf(
-                        "expected" to bundleId,
-                        "actual" to (tokenBundleId ?: "null")
-                    )
-                )
-            }
-
-            // 챌린지 검증
-            val tokenChallenge = claims["nonce"] as? String
-            if (tokenChallenge != challenge) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Challenge mismatch",
-                    details = mapOf(
-                        "expected" to challenge,
-                        "actual" to (tokenChallenge ?: "null")
-                    )
-                )
-            }
-
-            // 만료 시간 검증
-            val expirationTime = claims.expiration
-            if (expirationTime != null && expirationTime.before(Date())) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Token has expired",
-                    details = mapOf("expiration" to expirationTime)
-                )
-            }
-
-            // 앱 인증 타입 검증
-            val attestType = claims["attestation_type"] as? String
-            if (attestType != "appattestdevelop" && attestType != "appattestprod") {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Invalid attestation type",
-                    details = mapOf("type" to (attestType ?: "null"))
-                )
-            }
-
-            // 팀 ID 검증 (선택적)
-            val tokenTeamId = claims["team_id"] as? String
-            if (tokenTeamId != teamId) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Team ID mismatch",
-                    details = mapOf(
-                        "expected" to teamId,
-                        "actual" to (tokenTeamId ?: "null")
-                    )
-                )
-            }
-
+            val result = validator.validate(
+                Base64.getDecoder().decode(attestation),
+                keyId ?: "",
+                Base64.getDecoder().decode(challenge)
+            )
+            // 라이브러리의 validate 메소드는 검증 실패 시 AttestationException을 throw 합니다.
+            // 여기까지 도달했다는 것은 검증에 성공했다는 의미입니다.
             return IntegrityVerificationResponse(
                 isValid = true,
                 message = "iOS app attestation verified successfully"
+                // 필요한 경우 'result' 객체에서 추가 정보를 추출하여 details에 포함
             )
-
-        } catch (e: Exception) {
+        } catch (e: AttestationException) { // <-- 라이브러리의 특정 예외를 캐치
+            // Attestation 검증 자체에서 발생한 오류
+            logger.error("App attestation validation failed: ${e.message}", e)
             return IntegrityVerificationResponse(
                 isValid = false,
-                message = "Error verifying iOS attestation: ${e.message}",
+                message = "App attestation validation failed: ${e.message}",
+                details = mapOf("errorType" to e.javaClass.simpleName, "validationError" to (e.message ?: "unknown")) // 예외 메시지 포함
+            )
+        } catch (e: Exception) { // 그 외 예상치 못한 다른 오류
+            logger.error("Unexpected error during iOS app attestation verification", e)
+            return IntegrityVerificationResponse(
+                isValid = false,
+                message = "Unexpected error verifying iOS attestation: ${e.localizedMessage ?: e.message}",
                 details = mapOf("errorType" to e.javaClass.simpleName)
             )
         }

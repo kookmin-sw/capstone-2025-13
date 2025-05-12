@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.wooong",
+      "bundleIdentifier": "kr.ac.kookmin.wooong",
       "config": {
         "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
       },
@@ -29,7 +29,7 @@
         "aps-environment": "production",
         "com.apple.developer.healthkit": true
       },
-      "buildNumber": "81",
+      "buildNumber": "99",
       "appleTeamId": "Y56G5PTS2K"
     },
     "android": {
@@ -37,13 +37,13 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.wooong",
+      "package": "kr.ac.kookmin.wooong",
       "config": {
         "googleMaps": {
           "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
       },
-      "versionCode": 69,
+      "versionCode": 88,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
