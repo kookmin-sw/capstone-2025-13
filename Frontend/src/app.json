@@ -29,7 +29,7 @@
         "aps-environment": "production",
         "com.apple.developer.healthkit": true
       },
-      "buildNumber": "99",
+      "buildNumber": "102",
       "appleTeamId": "Y56G5PTS2K"
     },
     "android": {
@@ -43,7 +43,7 @@
           "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
       },
-      "versionCode": 88,
+      "versionCode": 90,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"

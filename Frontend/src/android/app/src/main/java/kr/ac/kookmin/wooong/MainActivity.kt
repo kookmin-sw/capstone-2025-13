@@ -1,4 +1,4 @@
-package com.anonymous.wooong
+package kr.ac.kookmin.wooong
 
 import android.os.Build
 import android.os.Bundle
