@@ -16,7 +16,23 @@
       "expo-audio",
       "expo-video",
       "expo-secure-store",
-      "expo-build-properties"
+      ["expo-build-properties",
+      {
+        "android": {
+          "compileSdkVersion": 35,
+          "targetSdkVersion": 35,
+          "minSdkVersion": 26
+        },
+        "ios": {
+          "deploymentTarget": "15.1"
+        }
+      }],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
