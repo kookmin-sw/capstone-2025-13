@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,16 @@ import {
 } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
 import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
 import styles from "../../styles/formalDiagnsisResultStyles";
 
 const { width } = Dimensions.get("window");
 
 const DepressionResultScreen = () => {
+  const route = useRoute();
+  const { diagnosisId } = route.params as { diagnosisId: number };
+  const { score } = route.params as { score: number };
   const depressionLevel = 0.7; // 70%
   const navigation = useNavigation<NavigationProp<any>>();
   const [user, setUser] = useState<UserInfoResponse | null>(null);
@@ -33,7 +36,7 @@ const DepressionResultScreen = () => {
     <View style={{ flex: 1, backgroundColor: "#1BA663" }}>
       <TouchableOpacity
         style={styles.backButtonWrapper}
-        onPress={() => navigation.navigate("FormalDiagnsis")}
+        onPress={() => navigation.goBack()}
       >
         <Ionicons name="arrow-back-circle" size={40} color="white" />
       </TouchableOpacity>
@@ -57,10 +60,10 @@ const DepressionResultScreen = () => {
                 labels: [],
                 data: [depressionLevel],
               }}
-              width={ width * 0.6}
-              height={ width * 0.6}
-              strokeWidth={ width * 0.04}
-              radius={ width * 0.18}
+              width={width * 0.6}
+              height={width * 0.6}
+              strokeWidth={width * 0.04}
+              radius={width * 0.18}
               chartConfig={{
                 backgroundGradientFrom: "#F9F9EB",
                 backgroundGradientTo: "#F9F9EB",

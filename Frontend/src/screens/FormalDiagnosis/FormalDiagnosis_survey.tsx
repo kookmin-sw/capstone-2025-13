@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, Text } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import SurveyHeader from "../../components/SurveyHeader";
 import SurveyQuestion from "../../components/SurveyQuestion";
 import ConfirmButton from "../../components/ConfirmButton";
 import styles from "../../styles/formalSurveyStyles";
 
-import { fetchDiagnosisDetail } from "../../API/diagnosisAPI";  // 새로 만든 API 모듈 경로 맞게 조정
-import type { DiagnosisList } from "../../API/diagnosisAPI"; 
+import { fetchDiagnosisDetail } from "../../API/diagnosisAPI";
+import type { DiagnosisList } from "../../API/diagnosisAPI";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../App";
 
 export default function FormalDiagnosisSurvey() {
     const route = useRoute();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { diagnosisId } = route.params as { diagnosisId: string };
-
     const [questions, setQuestions] = useState<DiagnosisList["questions"]>([]);
+    const [answers, setAnswers] = useState<number[]>([]);
 
     useEffect(() => {
         const loadDiagnosis = async () => {
@@ -27,6 +31,18 @@ export default function FormalDiagnosisSurvey() {
         loadDiagnosis();
     }, [diagnosisId]);
 
+    const handleAnswer = (index: number, value: number) => {
+        const updated = [...answers];
+        updated[index] = value;
+        setAnswers(updated);
+    };
+
+    const handleConfirm = () => {
+        const totalScore = answers.reduce((sum, val) => sum + val, 0);
+        console.log("총점:", totalScore);
+        navigation.navigate("FormalDiagnosisResult", { diagnosisId: Number(diagnosisId), score: totalScore });
+    };
+
     return (
         <View style={styles.container}>
             <SurveyHeader title="마음 건강 자가 문진" />
@@ -35,19 +51,18 @@ export default function FormalDiagnosisSurvey() {
                 {questions.length > 0 ? (
                     questions.map((q, idx) => (
                         <SurveyQuestion
-                            key={q.seq || idx}
+                            key={q.seq}
                             number={idx + 1}
                             question={q.text}
+                            answers={q.answers}
+                            onAnswer={(score: number) => handleAnswer(idx, score)}
                         />
+
                     ))
                 ) : (
                     <Text>질문지를 불러오는 중입니다...</Text>
                 )}
-
-                <ConfirmButton
-                    label="검사 결과 확인하기"
-                    onPress={() => console.log("확인")}
-                />
+                <ConfirmButton label="검사 결과 확인하기" onPress={handleConfirm} />
             </ScrollView>
         </View>
     );
