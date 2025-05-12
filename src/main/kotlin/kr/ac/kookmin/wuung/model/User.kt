@@ -49,6 +49,9 @@ data class User(
     var profile: String? = null,
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var quests: MutableList<UserQuests> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
     var questStages: MutableList<UserQuestStages> = mutableListOf(),
 
     @Column(nullable = false)

@@ -20,7 +20,9 @@ import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.model.Quests
 import kr.ac.kookmin.wuung.model.UserQuestStages
 import kr.ac.kookmin.wuung.model.UserQuestStatus
+import kr.ac.kookmin.wuung.repository.UserQuestImageRepository
 import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
+import kr.ac.kookmin.wuung.service.UserQuestImageS3Service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -117,7 +119,9 @@ class QuestsController(
     @Autowired private val userRepository: UserRepository,
     @Autowired private val questsRepository: QuestsRepository,
     @Autowired private val userQuestsRepository: UserQuestsRepository,
-    @Autowired private val userQuestStageRepository : UserQuestStageRepository
+    @Autowired private val userQuestStageRepository : UserQuestStageRepository,
+    @Autowired private val userQuestImageS3Service : UserQuestImageS3Service,
+    @Autowired private val userQuestImageRepository: UserQuestImageRepository
 ) {
     @GetMapping("/me")
     @Operation(
@@ -744,5 +748,7 @@ class QuestsController(
 
         return ResponseEntity.ok(ApiResponseDTO(data = quest.quest?.step))
     }
+
+
 
 }
