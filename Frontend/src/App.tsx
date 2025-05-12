@@ -81,7 +81,7 @@ function AppInner() {
     const routeNameRef = useRef();
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
     const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
