@@ -1,28 +1,48 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     wrapper: {
-        marginTop: 20,
-        marginHorizontal: 24,
-        backgroundColor: "#fff",
+        width: "100%",
+        marginTop: height * 0.02,
+        marginHorizontal: width * 0.06,
+        justifyContent: "center",
+        alignItems: "center", // 중앙 정렬 추가
+    },
+    imageBackground: {
+        width: "100%",
+        height: height * 0.2,
+        paddingVertical: height * 0.01,
+        justifyContent: "center", // 내용물 수직 중앙 정렬
+        alignItems: "center", // 내용물 수평 중앙 정렬
         borderRadius: 16,
-        padding: 16,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
+        overflow: "hidden",
     },
     input: {
-        minHeight: 120,
-        fontSize: 14,
+        minHeight: height * 0.15,
+        fontSize: width * 0.035,
         textAlignVertical: "top",
-    },
-    caption: {
-        marginTop: 12,
-        fontWeight: "bold",
+        paddingVertical: height * 0.01,
+        paddingHorizontal: height * 0.02,
         color: "#000",
-        textAlign: "center",
+        width: "100%", // 입력란이 부모 크기에 맞게 확장되도록 설정
+    },
+    button: {
+        backgroundColor: "#F6914D",
+        width: width * 0.4,
+        borderRadius: 16,
+        paddingVertical: 16,
+        position: "absolute", // 절대 위치 지정
+        bottom: height * 0.02, // 화면 하단에서의 간격 조정
+        right: width * 0.06, // 화면 오른쪽에서의 간격 조정
+        justifyContent: "center", // 버튼 텍스트 중앙 정렬
+        alignItems: "center", // 버튼 텍스트 중앙 정렬
+    },
+    buttontext: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 
