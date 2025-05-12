@@ -10,10 +10,11 @@ import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import java.time.LocalDateTime
 
-enum class RecordFeedbackStatus(val value: Short) {
+enum class TopicFeedbackStatus(val value: Short) {
     QUEUED(0),
     PROCESSING(1),
     COMPLETED(2),
+    NOFEEDBACK(3),
     PROCESSING_ERROR(10)
 }
 
@@ -25,7 +26,7 @@ data class TopicFeedback(
     var id: String? = null,
 
     @Column(nullable = false)
-    var status: RecordFeedbackStatus = RecordFeedbackStatus.QUEUED,
+    var status: TopicFeedbackStatus = TopicFeedbackStatus.QUEUED,
 
     @Column(nullable = true, columnDefinition = "TEXT")
     var aiFeedback: String? = null,

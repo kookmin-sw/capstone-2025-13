@@ -2,7 +2,7 @@ package kr.ac.kookmin.wuung.batch
 
 import groovy.util.logging.Slf4j
 import kr.ac.kookmin.wuung.model.TopicFeedback
-import kr.ac.kookmin.wuung.model.RecordFeedbackStatus
+import kr.ac.kookmin.wuung.model.TopicFeedbackStatus
 import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.batch.core.Job
@@ -57,8 +57,8 @@ class TopicBatch(
         return RepositoryItemReaderBuilder<TopicFeedback>()
             .name("recordFeedbackReader")
             .repository(topicFeedbackRepository)
-            .methodName("findRecordFeedbacksByStatus")
-            .arguments(listOf(RecordFeedbackStatus.QUEUED))
+            .methodName("findTopicFeedbacksByStatus")
+            .arguments(listOf(TopicFeedbackStatus.QUEUED))
             .sorts(sortKeys)
             .pageSize(10)
             .build()
@@ -69,17 +69,17 @@ class TopicBatch(
         return ItemProcessor { record ->
             val prompt = recordPrompt.trimIndent()
 
-            if(record.status == RecordFeedbackStatus.PROCESSING || record.status == RecordFeedbackStatus.COMPLETED)
+            if(record.status == TopicFeedbackStatus.PROCESSING || record.status == TopicFeedbackStatus.COMPLETED || record.status == TopicFeedbackStatus.NOFEEDBACK)
                 return@ItemProcessor record
 
-            record.status = RecordFeedbackStatus.PROCESSING
+            record.status = TopicFeedbackStatus.PROCESSING
             if(record.data?.isBlank() == true) {
-                RecordFeedbackStatus.PROCESSING_ERROR
+                TopicFeedbackStatus.PROCESSING_ERROR
                 return@ItemProcessor record
             }
 
             val previousData = record.topic?.topicFeedback?.filter {
-                it.status == RecordFeedbackStatus.COMPLETED
+                it.status == TopicFeedbackStatus.COMPLETED
             }?.map {
                 Pair(it.data ?: "", it.aiFeedback ?: "")
             }
@@ -103,7 +103,7 @@ class TopicBatch(
                 .content()
 
             record.aiFeedback = aiResponse
-            record.status = RecordFeedbackStatus.COMPLETED
+            record.status = TopicFeedbackStatus.COMPLETED
 
             record
         }
@@ -115,7 +115,7 @@ class TopicBatch(
             // 처리 완료 후 DB 업데이트, 로그 기록 등 필요한 로직 구현
             // 예시로 단순 로그 출력
             items.forEach { record ->
-                println("Processed RecordFeedback id: ${record.id}")
+                println("Processed TopicFeedback id: ${record.id}")
             }
         }
     }

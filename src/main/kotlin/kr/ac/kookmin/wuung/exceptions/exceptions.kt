@@ -17,4 +17,5 @@ class AiFeedbackErrorException : CustomException("AI Feedback error raised", 500
 class RecordAlreadyCreatedException : CustomException("Record already created", 409)
 
 class LimitReachedException : CustomException("Limit reached", 403)
+class AiFeedbackNotEnableException : CustomException("No feedback record, can\'t update", 403)
 class InvalidIssuerException : CustomException("Invalid Issuer", 403)
