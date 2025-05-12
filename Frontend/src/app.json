@@ -13,37 +13,41 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
+      "expo-audio",
+      "expo-video",
       "expo-secure-store",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "deploymentTarget": "15.1"
-          },
-          "android": {
-            "minSdkVersion": 24
-          }
-        }
-      ]
+      "expo-build-properties"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.wooong",
+      "bundleIdentifier": "kr.ac.kookmin.wooong",
       "config": {
-        "googleMapsApiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
-      }
+        "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
+      },
+      "entitlements": {
+        "com.apple.developer.devicecheck.appattest-environment": "development",
+        "aps-environment": "production",
+        "com.apple.developer.healthkit": true
+      },
+      "buildNumber": "99",
+      "appleTeamId": "Y56G5PTS2K"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.wooong",
+      "package": "kr.ac.kookmin.wooong",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc"
+          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
-      }
+      },
+      "versionCode": 88,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

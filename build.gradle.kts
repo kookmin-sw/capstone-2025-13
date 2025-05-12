@@ -63,10 +63,14 @@ dependencies {
 	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 	implementation("javax.xml.bind:jaxb-api:2.3.1")
 
+	implementation("ch.veehait.devicecheck:devicecheck-appattest:0.9.6")
+
 	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:${property("springAiVersion")}")
 	implementation("org.springframework.ai:spring-ai-core:${property("springAiVersion")}")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
+	implementation("com.google.auth:google-auth-library-oauth2-http:1.34.0")
 
 	// Google Play Integrity API 클라이언트 라이브러리
 	implementation("com.google.android.play:integrity:1.4.0")

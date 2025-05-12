@@ -1,103 +1,68 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AxiosResponse } from "axios";
+import ApiResponseDTO, { RefreshAccessTokenResponse } from "./common";
+import axios from "./axios";
 
-export const refreshAccessToken = async () => {
-    try {
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
+export type SignOutResponse = string;
 
-        const response = await fetch("https://wuung.mori.space/auth/refresh", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to refresh tokens");
-        }
-
-        const data = await response.json();
-
-        await AsyncStorage.setItem("accessToken", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
-
-        return data;
-    } catch (error) {
-        console.error("Error refreshing tokens:", error);
-        throw error;
-    }
-};
-
+// 로그인
 export const signIn = async (email: string, password: string) => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-        });
+        const response = await axios.post("/auth/login", {
+            email,
+            password
+        }) as AxiosResponse<ApiResponseDTO<RefreshAccessTokenResponse>>;
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data.data;
     } catch (error) {
         console.error("Error during sign-in:", error);
         throw error;
     }
-}
+};
 
+// 로그아웃
 export const signOut = async (accessToken: string, refreshToken: string) => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ accessToken, refreshToken }),
-        });
+        const response = await axios.post("/auth/logout", {
+            accessToken,
+            refreshToken
+        }) as AxiosResponse<ApiResponseDTO<SignOutResponse>>;
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
+        const data = response.data.data;
 
-        const data = await response.json();
+        // Clear tokens from AsyncStorage
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
+
         return data;
     } catch (error) {
         console.error("Error during sign-out:", error);
         throw error;
     }
-}
+};
 
-export const signUp = async (email: string, password: string, nickname: string, birthDate:string, gender: string) => {
+// 회원가입
+export const signUp = async (
+    email: string,
+    password: string,
+    nickname: string,
+    birthDate: string,
+    gender: string
+) => {
     try {
-        const response = await fetch("https://wuung.mori.space/auth/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json",
-            },
-            body: JSON.stringify({  
-                email,
-                password,
-                gender: gender.toUpperCase(), 
-                user_name: nickname,
-                birth_date: birthDate, }),
-        });
+        const upperGender = gender.toUpperCase();
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
+        const response = await axios.post("/auth/signup", {
+            email,
+            password,
+            gender: upperGender,
+            user_name: nickname,
+            birth_date: birthDate,
+        }) as AxiosResponse<ApiResponseDTO<RefreshAccessTokenResponse>>;
 
-        const data = await response.json();
-        return data;
+        return response.data.data;
     } catch (error) {
         console.error("Error during sign-up:", error);
         throw error;
     }
-}   
+};

@@ -680,16 +680,19 @@ class QuestsController(
     )
     fun getCurrentQuests(
         @AuthenticationPrincipal userDetails: User?
-    ): ResponseEntity<ApiResponseDTO<List<Int>>> {
+    ): ResponseEntity<ApiResponseDTO<Map<QuestType, Int>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val questSteps = userQuestsRepository.findByUser(userDetails)
-            .filter { it.status == UserQuestStatus.PROCESSING }
+        val questMaps = userQuestsRepository.findByUser(userDetails)
+            .filter { it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED}
             .groupBy { it.quest?.type }
-            .mapValues { (_, quests) -> quests.maxByOrNull { it.createdAt } }
-            .mapNotNull { it.value?.quest?.step }
+            .mapValues { (_, quests) -> quests.maxByOrNull { it.createdAt }?.quest?.step }
+            .filterKeys { it != null }
+            .filterValues { it != null }
+            .mapKeys { it.key!! }
+            .mapValues { it.value!! }
 
-        return ResponseEntity.ok(ApiResponseDTO(data = questSteps))
+        return ResponseEntity.ok(ApiResponseDTO(data = questMaps))
     }
     @GetMapping("/last/{type}")
     @Operation(
@@ -742,7 +745,7 @@ class QuestsController(
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findByUser(userDetails)
-            .filter { it.quest?.type == type && it.status == UserQuestStatus.PROCESSING }
+            .filter { it.quest?.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED )}
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 

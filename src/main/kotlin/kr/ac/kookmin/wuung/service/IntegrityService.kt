@@ -1,21 +1,38 @@
 package kr.ac.kookmin.wuung.service
 
+import ch.veehait.devicecheck.appattest.AppleAppAttest
+import ch.veehait.devicecheck.appattest.attestation.AttestationException
+import ch.veehait.devicecheck.appattest.common.App
+import ch.veehait.devicecheck.appattest.common.AppleAppAttestEnvironment
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtParser
-import io.jsonwebtoken.JwtParserBuilder
 import io.jsonwebtoken.Jwts
 import kr.ac.kookmin.wuung.controller.IntegrityVerificationResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import java.security.KeyFactory
 import java.security.PublicKey
-import java.util.Base64
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.auth.oauth2.AccessToken
+import com.google.gson.Gson
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
+import java.util.Base64
 
 @Service
 class IntegrityService(
@@ -34,126 +51,122 @@ class IntegrityService(
 
     @Value("\${app.apple-key-id}")
     private val keyId: String,
-) {
-    companion object {
-        var applePublicKey: PublicKey? = null
-        var parser: JwtParser? = null
-    }
 
-    private val objectMapper = ObjectMapper()
+    @Value("\${app.google-account-json}")
+    private val googleAccountJson: String,
+    private val gson: Gson,
+) {
+    private val decodeIntegrityTokenUrl = "https://playintegrity.googleapis.com/v1/$packageName:decodeIntegrityToken"
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+    lateinit var attest: AppleAppAttest
+    lateinit var googleAccessToken: AccessToken
 
     init {
-        val response = webClient.get()
-            .uri("https://www.apple.com/certificateauthority/Apple_App_Attestation_Root_CA.pem")
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
-            .retrieve()
-            .bodyToMono(ByteArray::class.java)
-            .block()
+        refreshGoogleAccessToken()
+        attest = AppleAppAttest(
+            app = App(teamId, packageName),
+            appleAppAttestEnvironment = AppleAppAttestEnvironment.PRODUCTION
+        )
+    }
 
-        if (response != null) {
+    @OptIn(DelicateCoroutinesApi::class)
+    @Scheduled(fixedRate = 3300000) // Refresh every 55 minutes
+    private fun refreshGoogleAccessToken() {
+        GlobalScope.launch {
             try {
-                val keyFactory = KeyFactory.getInstance("RSA")
-                val certFactory = java.security.cert.CertificateFactory.getInstance("X.509")
-                val certificate = certFactory.generateCertificate(response.inputStream())
-                applePublicKey = certificate.publicKey
-
-                parser = Jwts.parser()
-                    .setSigningKey(applePublicKey)
-                    .build()
+                val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(googleAccountJson.toByteArray()))
+                    .createScoped("https://www.googleapis.com/auth/playintegrity")
+                credentials.refresh()
+                googleAccessToken = credentials.accessToken
             } catch (e: Exception) {
-                throw RuntimeException("Failed to process Apple public key: ${e.message}")
+                throw RuntimeException("Failed to refresh Google access token: ${e.message}")
             }
-        } else {
-            throw RuntimeException("Failed to fetch Apple public key")
         }
     }
 
-    fun verifyAndroidIntegrity(
-        attestationJwt: String
-    ): IntegrityVerificationResponse {
-        try {
-            // JWT 파싱
-            val parts = attestationJwt.split(".")
-            if (parts.size != 3) {
+    fun verifyAndroidIntegrity(challenge: String, nonce: String): IntegrityVerificationResponse {
+        return try {
+            val decodedTokenBytes = webClient.post()
+                .uri(decodeIntegrityTokenUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mapOf("integrity_token" to challenge))
+                .header("Authorization", "Bearer ${googleAccessToken?.tokenValue}")
+                .retrieve()
+                .bodyToMono(ByteArray::class.java)
+                .block()
+
+            if (decodedTokenBytes == null) {
                 return IntegrityVerificationResponse(
                     isValid = false,
-                    message = "Invalid JWT format"
+                    message = "Decoded token is null"
                 )
             }
 
-            // 페이로드 디코딩
-            val payload = String(Base64.getUrlDecoder().decode(parts[1]))
-            val jsonPayload = objectMapper.readValue(payload, Map::class.java) as Map<String, Any>
+            val decodedTokenJson = String(decodedTokenBytes)
 
-            // 토큰 페이로드 검사
-            val tokenPayload = jsonPayload["tokenPayload"] as? Map<String, Any> ?: return IntegrityVerificationResponse(
-                isValid = false,
-                message = "Invalid token payload"
-            )
+            val decodeResponse: DecodeIntegrityTokenResponse = gson.fromJson(decodedTokenJson, DecodeIntegrityTokenResponse::class.java)
+            val tokenPayload = decodeResponse.tokenPayloadExternal
 
-            // 앱 무결성 검증
-            val appIntegrity = tokenPayload["appIntegrity"] as? Map<String, Any>
-            val appRecognitionVerdict = appIntegrity?.get("appRecognitionVerdict") as? String
-
-            if (appRecognitionVerdict != "PLAY_RECOGNIZED") {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "App not recognized by Google Play",
-                    details = mapOf("verdict" to (appRecognitionVerdict ?: "UNKNOWN"))
-                )
-            }
-
-            // 디바이스 무결성 검증
-            val deviceIntegrity = tokenPayload["deviceIntegrity"] as? Map<String, Any>
-            @Suppress("UNCHECKED_CAST")
-            val deviceRecognitionVerdict = deviceIntegrity?.get("deviceRecognitionVerdict") as? List<String>
-
-            if (deviceRecognitionVerdict == null || !deviceRecognitionVerdict.contains("MEETS_BASIC_INTEGRITY")) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Device does not meet basic integrity requirements",
-                    details = mapOf("verdicts" to (deviceRecognitionVerdict ?: emptyList<String>()))
-                )
-            }
-
-            // 패키지 이름 확인
-            val requestDetails = tokenPayload["requestDetails"] as? Map<String, Any>
-            val requestPackageName = requestDetails?.get("requestPackageName") as? String
-
-            if (requestPackageName != packageName) {
+            // Package Name Verification
+            if (tokenPayload.appIntegrity.packageName != packageName) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Package name mismatch",
                     details = mapOf(
                         "expected" to packageName,
-                        "actual" to (requestPackageName ?: "null")
+                        "actual" to tokenPayload.requestDetails.requestPackageName
                     )
                 )
             }
 
-            // 타임스탬프 검증
-            val timestampMillis = requestDetails?.get("timestampMillis") as? Long ?: 0
-            val currentTimeMillis = System.currentTimeMillis()
+            if (tokenPayload.requestDetails.nonce.replace("=", "").trim() !=
+                nonce.replace("=", "").trim()
+            ) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Challenge mismatch",
+                    details = mapOf(
+                        "expected" to nonce,
+                        "actual" to tokenPayload.requestDetails.nonce
+                    )
+                )
+            }
 
-            // 5분 이상 지난 토큰 거부
-            if (currentTimeMillis - timestampMillis > TimeUnit.MINUTES.toMillis(5)) {
+            // Timestamp Verification
+            if (isTokenExpired(tokenPayload.requestDetails.timestampMillis)) {
                 return IntegrityVerificationResponse(
                     isValid = false,
                     message = "Token has expired",
-                    details = mapOf(
-                        "tokenTime" to timestampMillis,
-                        "currentTime" to currentTimeMillis
-                    )
+                    details = mapOf("timestamp" to tokenPayload.requestDetails.timestampMillis)
                 )
             }
 
-            return IntegrityVerificationResponse(
+            // App Integrity Verification
+            if (tokenPayload.appIntegrity.appRecognitionVerdict != "PLAY_RECOGNIZED") {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "App not recognized by Google Play",
+                    details = mapOf("verdict" to tokenPayload.appIntegrity.appRecognitionVerdict)
+                )
+            }
+
+            // Device Integrity Verification
+            if (!tokenPayload.deviceIntegrity.deviceRecognitionVerdict.contains("MEETS_DEVICE_INTEGRITY")) {
+                return IntegrityVerificationResponse(
+                    isValid = false,
+                    message = "Device integrity check failed",
+                    details = mapOf("verdicts" to tokenPayload.deviceIntegrity.deviceRecognitionVerdict)
+                )
+            }
+
+            IntegrityVerificationResponse(
                 isValid = true,
                 message = "Android app integrity verification successful"
             )
 
         } catch (e: Exception) {
-            return IntegrityVerificationResponse(
+            IntegrityVerificationResponse(
                 isValid = false,
                 message = "Error verifying integrity: ${e.message}",
                 details = mapOf("errorType" to e.javaClass.simpleName)
@@ -161,103 +174,83 @@ class IntegrityService(
         }
     }
 
+    private fun isTokenExpired(timestampMillis: Long): Boolean {
+        val currentTime = System.currentTimeMillis()
+        return currentTime - timestampMillis > TimeUnit.MINUTES.toMillis(5)
+    }
+
     fun verifyIosAppAttest(
         attestation: String,
-        bundleId: String,
+        keyId: String?,
         challenge: String
     ): IntegrityVerificationResponse {
         try {
-            if (applePublicKey == null) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Apple public key not available"
-                )
-            }
+            val validator = attest.createAttestationValidator()
 
-            // JWT 클레임 검증
-            val claims: Claims
-            try {
-                claims = parser?.let {
-                    it.parseClaimsJws(attestation)?.body ?: throw RuntimeException("Invalid JWT format")
-                } ?: throw RuntimeException("JWT parser not initialized")
-            } catch (e: Exception) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Invalid JWT signature: ${e.message}",
-                    details = mapOf("errorType" to e.javaClass.simpleName)
-                )
-            }
-
-            // 발급자(앱 번들 ID) 검증
-            val tokenBundleId = claims["iss"] as? String
-            if (tokenBundleId != bundleId) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Bundle ID mismatch",
-                    details = mapOf(
-                        "expected" to bundleId,
-                        "actual" to (tokenBundleId ?: "null")
-                    )
-                )
-            }
-
-            // 챌린지 검증
-            val tokenChallenge = claims["nonce"] as? String
-            if (tokenChallenge != challenge) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Challenge mismatch",
-                    details = mapOf(
-                        "expected" to challenge,
-                        "actual" to (tokenChallenge ?: "null")
-                    )
-                )
-            }
-
-            // 만료 시간 검증
-            val expirationTime = claims.expiration
-            if (expirationTime != null && expirationTime.before(Date())) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Token has expired",
-                    details = mapOf("expiration" to expirationTime)
-                )
-            }
-
-            // 앱 인증 타입 검증
-            val attestType = claims["attestation_type"] as? String
-            if (attestType != "appattestdevelop" && attestType != "appattestprod") {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Invalid attestation type",
-                    details = mapOf("type" to (attestType ?: "null"))
-                )
-            }
-
-            // 팀 ID 검증 (선택적)
-            val tokenTeamId = claims["team_id"] as? String
-            if (tokenTeamId != teamId) {
-                return IntegrityVerificationResponse(
-                    isValid = false,
-                    message = "Team ID mismatch",
-                    details = mapOf(
-                        "expected" to teamId,
-                        "actual" to (tokenTeamId ?: "null")
-                    )
-                )
-            }
-
+            val result = validator.validate(
+                Base64.getDecoder().decode(attestation),
+                keyId ?: "",
+                Base64.getDecoder().decode(challenge)
+            )
+            // 라이브러리의 validate 메소드는 검증 실패 시 AttestationException을 throw 합니다.
+            // 여기까지 도달했다는 것은 검증에 성공했다는 의미입니다.
             return IntegrityVerificationResponse(
                 isValid = true,
                 message = "iOS app attestation verified successfully"
+                // 필요한 경우 'result' 객체에서 추가 정보를 추출하여 details에 포함
             )
-
-        } catch (e: Exception) {
+        } catch (e: AttestationException) { // <-- 라이브러리의 특정 예외를 캐치
+            // Attestation 검증 자체에서 발생한 오류
+            logger.error("App attestation validation failed: ${e.message}", e)
             return IntegrityVerificationResponse(
                 isValid = false,
-                message = "Error verifying iOS attestation: ${e.message}",
+                message = "App attestation validation failed: ${e.message}",
+                details = mapOf("errorType" to e.javaClass.simpleName, "validationError" to (e.message ?: "unknown")) // 예외 메시지 포함
+            )
+        } catch (e: Exception) { // 그 외 예상치 못한 다른 오류
+            logger.error("Unexpected error during iOS app attestation verification", e)
+            return IntegrityVerificationResponse(
+                isValid = false,
+                message = "Unexpected error verifying iOS attestation: ${e.localizedMessage ?: e.message}",
                 details = mapOf("errorType" to e.javaClass.simpleName)
             )
         }
     }
 }
+
+data class DecodeIntegrityTokenResponse(
+    val tokenPayloadExternal: TokenPayload
+)
+
+data class TokenPayload(
+    val appIntegrity: AppIntegrity,
+    val deviceIntegrity: DeviceIntegrity,
+    val requestDetails: RequestDetails,
+    val accountDetails: AccountDetails?,
+    val testingDetails: TestingDetails?
+)
+
+data class AppIntegrity(
+    val appRecognitionVerdict: String,
+    val packageName: String,
+    val certificateSha256Digest: List<String>,
+    val versionCode: String,
+)
+
+data class DeviceIntegrity(
+    val deviceRecognitionVerdict: List<String>
+)
+
+data class RequestDetails(
+    val requestPackageName: String,
+    val nonce: String,
+    val timestampMillis: Long
+)
+
+data class AccountDetails(
+    val appLicensingVerdict: String,
+)
+
+data class TestingDetails(
+    val isTestingResponse: Boolean,
+)

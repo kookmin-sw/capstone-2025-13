@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useLoading, LoadingProvider } from "./hooks/LoadingContext";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+    NavigationContainer,
+    createNavigationContainerRef,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
 import SignIn from "./screens/SignIn";
@@ -22,13 +26,16 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/signAPI";
 import Record from "./screens/Record";
+import Calendar from "./screens/Calendar";
 
-import * as Integrity from "expo-app-integrity"
-import {Alert, Platform} from "react-native";
-import {verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import customAxios from './API/axios';
+import { refreshAccessToken } from "./API/common";
+
+import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
 import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
+
+const navigationRef = createNavigationContainerRef();
 
 export type RootStackParamList = {
     Home: undefined;
@@ -57,14 +64,23 @@ export type RootStackParamList = {
     Record: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
+    Calendar: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function AppInner() {
     // 하드코딩된 로그인 상태
 
-    const [isIntegrityVerified, setIsIntegrityVerified] = useState(false);
+    const { isLoading, setLoading } = useLoading();
+
+    // @ts-ignore
+    const routeNameRef = useRef();
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
+    const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
         const checkIntegrity = async () => {
@@ -75,40 +91,45 @@ export default function App() {
                     return;
                 }
 
+                await requestChallenge();
+                console.log('Device integrity challenge sent');
+
                 const result = await verifyDeviceIntegrity();
+                console.log('Device integrity verification result:', result);
 
                 if(result.isValid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
-                    console.error('Integrity verification failed: ', result.message)
+                    console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
+                    setIntegrityError(`${result.message} / ${result.details ?? 'No details provided'}`)
+                    setIsIntegrityVerified(false)
                 }
             } catch (error: any) {
-                console.error('Integrity check error:', error);
+                console.error('Integrity check error: ', error);
+                console.debug(error)
+                setIsIntegrityVerified(false)
+                setIntegrityError(`${error}`)
             }
         };
 
-        checkIntegrity();
-    }, []);
-
-    if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen />;
-    }
-
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem("accessToken");
+            console.log("🔍 accessToken:", token);
             if (token) {
                 setIsLoggedIn(true);
+                console.log("✅ Token exists. setLoading(false) 호출됨");
+                setLoading(false);
+            } else {
+                console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
+                setIsLoggedIn(false);
                 setLoading(false);
             }
         };
-        checkToken();
+        checkIntegrity().then(() => checkToken());
     }, []);
 
+    // App 로딩 중에 폰트 로딩 및 토큰 체크
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");
@@ -127,7 +148,7 @@ export default function App() {
                     }
                 }
             }
-        }, 5 * 60 * 1000); // 5분마다 토큰 갱신 체크
+        }, 4 * 60 * 1000);
 
         return () => clearInterval(interval); // cleanup
     }, []);
@@ -147,37 +168,69 @@ export default function App() {
         "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
     });
 
-    if (!fontsLoaded) return null;
+    console.log("📦 fontsLoaded:", fontsLoaded, "| isLoading:", isLoading);
+
+    if (!fontsLoaded) return <Spinner />;
+
+    if(!isIntegrityVerified) {
+        return <RestrictedAccessScreen error={integrityError} />;
+    }
 
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Quest"}>
-                <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen name="SignIn" options={{ headerShown: false }}>
-                    {() => <SignIn />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="SignUpStep1"
-                    options={{ headerShown: false }}
-                    component={SignUpStep1}
-                />
-                <Stack.Screen
-                    name="SignUpStep2"
-                    options={{ headerShown: false }}
+        <NavigationContainer
+            ref={navigationRef}
+            onReady={() => {
+                // @ts-ignore
+                routeNameRef.current = navigationRef.getCurrentRoute().name;
+            }}
+            onStateChange={() => {
+                const previous = routeNameRef.current;
+                const current = navigationRef.getCurrentRoute()?.name;
+
+                if (!previous || previous === current) return;
+
+                console.log("🌀 Navigation changed:", previous, "→", current);
+                setLoading(true);
+                setTimeout(() => setLoading(false), 500);
+
+                routeNameRef.current = current;
+            }}
+        >
+            {isLoading ? (
+                <Spinner />
+            ) : (
+                <Stack.Navigator
+                    initialRouteName={isLoggedIn ? "Home" : "Quest"}
                 >
-                    {() => <SignUpStep2 />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="SignUpStep3"
-                    options={{ headerShown: false }}
-                >
-                    {() => <SignUpStep3 />}
-                </Stack.Screen>
-                <Stack.Screen
+                    <Stack.Screen
+                        name="Home"
+                        component={Home}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="SignIn"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignIn />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="SignUpStep1"
+                        options={{ headerShown: false }}
+                        component={SignUpStep1}
+                    />
+                    <Stack.Screen
+                        name="SignUpStep2"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignUpStep2 />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="SignUpStep3"
+                        options={{ headerShown: false }}
+                    >
+                        {() => <SignUpStep3 />}
+                    </Stack.Screen>
+                    <Stack.Screen
                     name="SimpleDiagnosis"
                     options={{ headerShown: false }}
                     component={SimpleDiagnosis}
@@ -248,7 +301,19 @@ export default function App() {
                     name="HelpCall2" 
                     component={HelpCall2}
                     options={{ headerShown: false }} />
-            </Stack.Navigator>
+                <Stack.Screen
+                    name="Calendar" 
+                    component={Calendar}
+                    options={{ headerShown: false }} />
+              </Stack.Navigator>)}
         </NavigationContainer>
+    );
+}
+
+export default function App() {
+    return (
+        <LoadingProvider>
+            <AppInner />
+        </LoadingProvider>
     );
 }

@@ -97,6 +97,7 @@ class EtcController(
             behaviors = behaviors + recordBehavior
         }
 
+        /*
         val userQuests = userQuestRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startDate,
@@ -120,6 +121,7 @@ class EtcController(
 
 
         behaviors = behaviors + userQuestBehaviors
+         */
 
         return ResponseEntity.ok(
             ApiResponseDTO(

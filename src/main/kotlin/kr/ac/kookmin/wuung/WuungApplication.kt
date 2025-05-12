@@ -37,6 +37,7 @@ fun main(args: Array<String>) {
 		"PACKAGE_NAME" to dotenv["PACKAGE_NAME"],
 		"GOOGLE_CLOUD_PROJECT_NUMBER" to dotenv["GOOGLE_CLOUD_PROJECT_NUMBER"],
 		"GOOGLE_CLOUD_API_KEY" to dotenv["GOOGLE_CLOUD_API_KEY"],
+		"GOOGLE_ACCOUNT_JSON" to dotenv["GOOGLE_ACCOUNT_JSON"],
 		"APPLE_TEAM_ID" to dotenv["APPLE_TEAM_ID"],
 		"APPLE_KEY_ID" to dotenv["APPLE_KEY_ID"],
 	)
