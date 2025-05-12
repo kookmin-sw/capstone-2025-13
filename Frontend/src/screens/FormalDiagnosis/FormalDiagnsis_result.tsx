@@ -19,11 +19,15 @@ const DepressionResultScreen = () => {
   const { diagnosisId } = route.params as { diagnosisId: number };
   const { score } = route.params as { score: number };
   const { totalScore } = route.params as { totalScore: number };
-  const depressionLevel = score / totalScore // 70%
+  const { scaleName } = route.params as { scaleName: string };
+  const { description } = route.params as { description: string };
+  const depressionLevel = score / totalScore
   const navigation = useNavigation<NavigationProp<any>>();
   const [user, setUser] = useState<UserInfoResponse | null>(null);
 
+
   useEffect(() => {
+    console.log(scaleName, description)
     const fetchUserInfo = async () => {
       const data = await getUserInfo();
       setUser(data);
@@ -78,15 +82,12 @@ const DepressionResultScreen = () => {
             </Text>
           </View>
 
-          <Text style={styles.status}>다소 우울한 상태예요 😢</Text>
-
+          <Text style={styles.status}>{scaleName}</Text>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
               지금 내가 겪을 수 있는 상황과 생각은?
             </Text>
-            <Text style={styles.sectionText}>
-              이유없이 눈물이 나거나 평소보다 잠을 잘 자지 못하거나 설치는 경우가 많아요
-            </Text>
+            <Text style={styles.sectionText}>{description}</Text>
           </View>
 
           <View style={styles.section}>

@@ -58,7 +58,13 @@ export type RootStackParamList = {
     Quest_exercise: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
-    FormalDiagnosisResult: { diagnosisId: number, score: number, totalScore: number };
+    FormalDiagnosisResult: {
+        diagnosisId: number,
+        score: number,
+        totalScore: number,
+        scaleName: string,
+        description: string,
+    };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

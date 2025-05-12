@@ -12,6 +12,12 @@ import type { DiagnosisList } from "../../API/diagnosisAPI";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 
+type Scale = {
+    start: number;
+    scaleName: string;
+    description: string;
+};
+
 export default function FormalDiagnosisSurvey() {
     const route = useRoute();
     const navigation =
@@ -19,17 +25,30 @@ export default function FormalDiagnosisSurvey() {
     const { diagnosisId } = route.params as { diagnosisId: string };
     const [questions, setQuestions] = useState<DiagnosisList["questions"]>([]);
     const [answers, setAnswers] = useState<number[]>([]);
-
+    const [scales, setScales] = useState<Scale[]>([]);
+    const [scaleName, setScaleName] = useState<string>();
+    const [description, setDescription] = useState<string>();
     useEffect(() => {
         const loadDiagnosis = async () => {
             const result = await fetchDiagnosisDetail(Number(diagnosisId));
             if (result) {
                 setQuestions(result.questions || []);
+                setScales(result.scale || []);
             }
         };
-
         loadDiagnosis();
     }, [diagnosisId]);
+
+    const getScaleResult = (
+        totalScore: number,
+        scaleList: Scale[]
+    ): { scaleName: string; description: string } | null => {
+        if (!Array.isArray(scaleList)) return null;
+        const sorted = [...scaleList].sort((a, b) => b.start - a.start);
+        const matched = sorted.find((s) => totalScore >= s.start);
+        return matched ? { scaleName: matched.scaleName, description: matched.description } : null;
+    };
+
 
     const getMaxTotalScore = () => {
         return questions.reduce((sum, q) => {
@@ -47,9 +66,18 @@ export default function FormalDiagnosisSurvey() {
     const handleConfirm = () => {
         const totalScore = answers.reduce((sum, val) => sum + val, 0);
         const maxTotalScore = getMaxTotalScore();
-
-        console.log("총점:", totalScore, maxTotalScore);
-        navigation.navigate("FormalDiagnosisResult", { diagnosisId: Number(diagnosisId), score: totalScore, totalScore: maxTotalScore });
+        const scaleResult = getScaleResult(totalScore, scales);
+        if (scaleResult) {
+            setScaleName(scaleResult.scaleName);
+            setDescription(scaleResult.description);
+        }
+        navigation.navigate("FormalDiagnosisResult", {
+            diagnosisId: Number(diagnosisId),
+            score: totalScore,
+            totalScore: maxTotalScore,
+            scaleName: scaleName ?? "",
+            description: description ?? "",
+        });
     };
 
     return (
