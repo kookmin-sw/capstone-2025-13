@@ -9,7 +9,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
-import { signIn } from "../../API/signAPI";
 
 type SimpleDiagnosisRouteProp = RouteProp<
     RootStackParamList,
@@ -60,30 +59,33 @@ const SimpleDiagnosis = () => {
         ...(birthDate && { birthDate }),
         ...(gender !== null && { gender }),
         ...(score !== undefined && { score }),
+        last: currentSegmentIndex === 44 ? true : false,
     });
 
     useEffect(() => {
-        if (
-            currentSegment.type === "navigate" &&
-            currentSegment.navigateTo
-        ) {
+        if (route.params?.initialIndex !== undefined) {
+            setCurrentSegmentIndex(route.params.initialIndex);
+        }
+        if (route.params?.score !== undefined) {
+            setScore(route.params.score);
+        }
+    }, [route.params?.initialIndex, route.params?.score]);
+
+    useEffect(() => {
+        if (currentSegment.type === "navigate" && currentSegment.navigateTo) {
             const navigateTo = currentSegment.navigateTo;
             if (typeof navigateTo === "string") {
                 navigation.navigate(
                     navigateTo as keyof RootStackParamList,
                     buildParams()
                 );
-            } else if (
-                typeof navigateTo === "object" &&
-                "screen" in navigateTo
-            ) {
-                navigation.navigate(
-                    navigateTo.screen,
-                    buildParams(navigateTo.params || {})
-                );
+            } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
+                const params = buildParams(navigateTo.params || {});
+                navigation.navigate(navigateTo.screen, params);
             }
         }
     }, [currentSegment]);
+
 
 
     useEffect(() => {

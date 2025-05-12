@@ -29,7 +29,7 @@ import Interest from "./screens/SimpleDiagnosis/Interest";
 
 export type RootStackParamList = {
     Home: undefined;
-    SignIn: undefined;
+    SignIn: { score?: number, last?: boolean; };
     SignUpStep1: undefined;
     Quest: undefined;
     Quest_stage: { title: string; subtitle?: string };

@@ -1,6 +1,6 @@
 import axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ApiResponseDTO, { refreshAccessToken } from "./common";
+import ApiResponseDTO, { refreshAccessToken, } from "./common";
 
 export enum DiagnosisTypeEnum {
   "Simple" = "Simple",
@@ -81,3 +81,15 @@ export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | 
     return data.data;
   });
 };
+
+
+export const putDiagnosisResult = async (id: number, scale: number, result: number) => {
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const body = { id, scale, result };
+    console.log(body);
+    const { data } = await axios.put<ApiResponseDTO<DiagnosisList>>("/diagnosis/submit", body, { headers });
+    return data.data;
+  });
+};
+

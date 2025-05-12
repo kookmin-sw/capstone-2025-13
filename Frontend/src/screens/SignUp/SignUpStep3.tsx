@@ -159,7 +159,6 @@ const SignUpStep3 = () => {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-
         </ImageBackground>
     );
 };
