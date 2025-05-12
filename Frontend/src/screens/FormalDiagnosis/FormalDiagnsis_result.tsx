@@ -18,7 +18,8 @@ const DepressionResultScreen = () => {
   const route = useRoute();
   const { diagnosisId } = route.params as { diagnosisId: number };
   const { score } = route.params as { score: number };
-  const depressionLevel = 0.7; // 70%
+  const { totalScore } = route.params as { totalScore: number };
+  const depressionLevel = score / totalScore // 70%
   const navigation = useNavigation<NavigationProp<any>>();
   const [user, setUser] = useState<UserInfoResponse | null>(null);
 

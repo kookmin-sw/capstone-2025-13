@@ -31,6 +31,13 @@ export default function FormalDiagnosisSurvey() {
         loadDiagnosis();
     }, [diagnosisId]);
 
+    const getMaxTotalScore = () => {
+        return questions.reduce((sum, q) => {
+            const maxScore = Math.max(...q.answers.map(a => a.score));
+            return sum + maxScore;
+        }, 0);
+    };
+
     const handleAnswer = (index: number, value: number) => {
         const updated = [...answers];
         updated[index] = value;
@@ -39,8 +46,10 @@ export default function FormalDiagnosisSurvey() {
 
     const handleConfirm = () => {
         const totalScore = answers.reduce((sum, val) => sum + val, 0);
-        console.log("총점:", totalScore);
-        navigation.navigate("FormalDiagnosisResult", { diagnosisId: Number(diagnosisId), score: totalScore });
+        const maxTotalScore = getMaxTotalScore();
+
+        console.log("총점:", totalScore, maxTotalScore);
+        navigation.navigate("FormalDiagnosisResult", { diagnosisId: Number(diagnosisId), score: totalScore, totalScore: maxTotalScore });
     };
 
     return (
