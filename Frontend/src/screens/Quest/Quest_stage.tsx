@@ -34,6 +34,11 @@ const lockPositions = [
   { top: height * 1.16, left: width * 0.4 },
 ];
 
+export const getQuestsList = async () => {
+  const response = await axios.get("/quests/list");
+  return response.data;
+};
+
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation();

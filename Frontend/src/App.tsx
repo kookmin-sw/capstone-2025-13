@@ -16,6 +16,7 @@ import Quest_exercise from "./screens/Quest/Quest_exercise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
+import FormalDiagnosisResult from "./screens/FormalDiagnosis/FormalDiagnsis_result";
 import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
@@ -56,6 +57,7 @@ export type RootStackParamList = {
     Quest_exercise: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
+    FormalDiagnosisResult: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -192,6 +194,11 @@ export default function App() {
                 <Stack.Screen
                     name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
                     component={FormalDiagnosisSurvey}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="FormalDiagnosisResult"
+                    component={FormalDiagnosisResult}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
