@@ -7,7 +7,7 @@ import SurveyQuestion from "../../components/SurveyQuestion";
 import ConfirmButton from "../../components/ConfirmButton";
 import styles from "../../styles/formalSurveyStyles";
 
-import { fetchDiagnosisDetail } from "../../API/diagnosisAPI";
+import { fetchDiagnosisDetail, putDiagnosisResult } from "../../API/diagnosisAPI";
 import type { DiagnosisList } from "../../API/diagnosisAPI";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
@@ -22,10 +22,11 @@ export default function FormalDiagnosisSurvey() {
     const route = useRoute();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const { diagnosisId } = route.params as { diagnosisId: string };
+    const { diagnosisId } = route.params as { diagnosisId: number };
     const [questions, setQuestions] = useState<DiagnosisList["questions"]>([]);
     const [answers, setAnswers] = useState<number[]>([]);
     const [scales, setScales] = useState<Scale[]>([]);
+    const [scale, setScale] = useState<number>();
     const [scaleName, setScaleName] = useState<string>();
     const [description, setDescription] = useState<string>();
     useEffect(() => {
@@ -42,11 +43,13 @@ export default function FormalDiagnosisSurvey() {
     const getScaleResult = (
         totalScore: number,
         scaleList: Scale[]
-    ): { scaleName: string; description: string } | null => {
+    ): { scaleName: string; description: string; start: number } | null => {
         if (!Array.isArray(scaleList)) return null;
         const sorted = [...scaleList].sort((a, b) => b.start - a.start);
         const matched = sorted.find((s) => totalScore >= s.start);
-        return matched ? { scaleName: matched.scaleName, description: matched.description } : null;
+        return matched
+            ? { scaleName: matched.scaleName, description: matched.description, start: matched.start }
+            : null;
     };
 
 
@@ -63,13 +66,24 @@ export default function FormalDiagnosisSurvey() {
         setAnswers(updated);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         const totalScore = answers.reduce((sum, val) => sum + val, 0);
         const maxTotalScore = getMaxTotalScore();
         const scaleResult = getScaleResult(totalScore, scales);
         if (scaleResult) {
             setScaleName(scaleResult.scaleName);
             setDescription(scaleResult.description);
+            setScale(scaleResult.start);
+        }
+        try {
+            if (scale !== undefined) {
+                await putDiagnosisResult(diagnosisId, scale, totalScore);
+                console.log("✅ 진단 결과 저장 성공");
+            } else {
+                console.error("❌ scale값 없음");
+            }
+        } catch (err) {
+            console.error("❌ 진단 결과 저장 실패:", err);
         }
         navigation.navigate("FormalDiagnosisResult", {
             diagnosisId: Number(diagnosisId),
