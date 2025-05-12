@@ -46,7 +46,7 @@ export type RootStackParamList = {
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined;
-    FormalDiagnosisSurvey: undefined;
+    FormalDiagnosisSurvey: { diagnosisId: number };
     GameScreen: { score?: number };
     DailyTopic: undefined;
     Spinner: undefined;
