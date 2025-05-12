@@ -27,7 +27,8 @@ data class IntegrityVerificationRequest(
     val attestation: String,
     val bundleId: String? = null,
     val challenge: String,
-    val deviceId: String
+    val deviceId: String,
+    val keyId: String? = null
 )
 
 data class IntegrityVerificationResponse(
@@ -84,7 +85,7 @@ class IntegrityController(
                 "android" -> integrityService.verifyAndroidIntegrity(request.attestation, request.challenge)
                 "ios" -> integrityService.verifyIosAppAttest(
                     request.attestation,
-                    request.bundleId ?: "",
+                    request.keyId ?: "",
                     request.challenge
                 )
 

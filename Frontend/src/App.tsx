@@ -80,6 +80,7 @@ function AppInner() {
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
+    const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
         const checkIntegrity = async () => {
@@ -91,18 +92,24 @@ function AppInner() {
                 }
 
                 await requestChallenge();
-                const result = await verifyDeviceIntegrity();
+                console.log('Device integrity challenge sent');
 
-                if(result.valid) {
+                const result = await verifyDeviceIntegrity();
+                console.log('Device integrity verification result:', result);
+
+                if(result.isValid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
                     console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
+                    setIntegrityError(`${result.message} / ${result.details ?? 'No details provided'}`)
                     setIsIntegrityVerified(false)
                 }
             } catch (error: any) {
-                console.error('Integrity check error:', error);
+                console.error('Integrity check error: ', error);
+                console.debug(error)
                 setIsIntegrityVerified(false)
+                setIntegrityError(`${error}`)
             }
         };
 
@@ -166,7 +173,7 @@ function AppInner() {
     if (!fontsLoaded) return <Spinner />;
 
     if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen />;
+        return <RestrictedAccessScreen error={integrityError} />;
     }
 
     return (

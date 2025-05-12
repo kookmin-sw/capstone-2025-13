@@ -27,14 +27,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.anonymous.wooong</string>
+          <string>kr.ac.kookmin.wooong</string>
         </array>
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>67</string>
+    <string>99</string>
     <key>GMSApiKey</key>
-    <string>AIzaSyCqCdC75UXjnGIYFY-fzQkYgufefR7t4cc</string>
+    <string>process.env.GOOGLE_MAPS_API_KEY</string>
     <key>LSMinimumSystemVersion</key>
     <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
@@ -46,22 +46,14 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
-    <key>NSCameraUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your camera</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>We will sync your data with the Apple Health app to give you better insights.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>We will sync your data with the Apple Health app to give you better insights.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
-    <key>NSMotionUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your device motion</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your photos</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
@@ -86,8 +78,6 @@
     </array>
     <key>UIUserInterfaceStyle</key>
     <string>Light</string>
-    <key>UIViewControllerBasedStatusBarAppearance</key>
-    <false/>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
   </dict>
