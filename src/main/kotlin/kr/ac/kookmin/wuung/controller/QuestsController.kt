@@ -102,7 +102,31 @@ fun UserQuestStages.toDTO() = UserQuestStagesDTO(
     updatedAt = this.updatedAt
 )
 
+data class UserQuestLastDTO(
+    val id: String,
+    val name: String,
+    val description: String,
+    val type: QuestType,
+    val progress: Int,
+    val target: Int,
+    val status: UserQuestStatus,
+    val step: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
 
+fun UserQuestLastDTO.toDTO() = UserQuestLastDTO(
+    id = this.id ?: "",
+    name = this.name ?: "",
+    description = this.description ?: "",
+    type = this.type ?: QuestType.ACTIVITY,
+    progress = this.progress,
+    target = this.target,
+    status = this.status,
+    step = this.step,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt
+)
 @RestController
 @RequestMapping("/quests")
 @Tag(name = "Quests API", description = """
@@ -676,13 +700,28 @@ class QuestsController(
     )
     fun getCurrentQuests(
         @AuthenticationPrincipal userDetails: User?
-    ): ResponseEntity<ApiResponseDTO<Map<QuestType, Int>>> {
+    ): ResponseEntity<ApiResponseDTO<Map<QuestType, UserQuestLastDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val questMaps = userQuestsRepository.findByUser(userDetails)
-            .filter { it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED}
+            .filter { it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED }
             .groupBy { it.quest?.type }
-            .mapValues { (_, quests) -> quests.maxByOrNull { it.createdAt }?.quest?.step }
+            .mapValues { (_, quests) ->
+                quests.maxByOrNull { it.createdAt }?.let { lastQuest ->
+                    UserQuestLastDTO(
+                        id = lastQuest.id ?: "",
+                        name = lastQuest.quest?.name ?: "",
+                        description = lastQuest.quest?.description ?: "",
+                        type = lastQuest.quest?.type ?: QuestType.ACTIVITY,
+                        progress = lastQuest.progress,
+                        target = lastQuest.target,
+                        status = lastQuest.status,
+                        step = lastQuest.quest?.step ?: 0,
+                        createdAt = lastQuest.createdAt,
+                        updatedAt = lastQuest.updatedAt
+                    )
+                }
+            }
             .filterKeys { it != null }
             .filterValues { it != null }
             .mapKeys { it.key!! }
@@ -690,6 +729,7 @@ class QuestsController(
 
         return ResponseEntity.ok(ApiResponseDTO(data = questMaps))
     }
+
     @GetMapping("/last/{type}")
     @Operation(
         summary = "Get current quest by type",
@@ -737,15 +777,28 @@ class QuestsController(
     fun getCurrentQuestByType(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable type: QuestType
-    ): ResponseEntity<ApiResponseDTO<Int>> {
+    ): ResponseEntity<ApiResponseDTO<UserQuestLastDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findByUser(userDetails)
-            .filter { it.quest?.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED )}
+            .filter { it.quest?.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED) }
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 
-        return ResponseEntity.ok(ApiResponseDTO(data = quest.quest?.step))
+        val lastQuest = UserQuestLastDTO(
+            id = quest.id ?: "",
+            name = quest.quest?.name ?: "",
+            description = quest.quest?.description ?: "",
+            type = quest.quest?.type ?: QuestType.ACTIVITY,
+            progress = quest.progress,
+            target = quest.target,
+            status = quest.status,
+            step = quest.quest?.step ?: 0,
+            createdAt = quest.createdAt,
+            updatedAt = quest.updatedAt
+        )
+
+        return ResponseEntity.ok(ApiResponseDTO(data = lastQuest))
     }
 
 }
