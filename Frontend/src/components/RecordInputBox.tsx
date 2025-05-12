@@ -1,19 +1,26 @@
 import React from "react";
-import { View, TextInput, Text } from "react-native";
+import { View, TextInput, Text, ImageBackground, TouchableOpacity } from "react-native";
 import styles from "../styles/recordInputBoxStyles";
 
 export default function RecordInputBox() {
     return (
         <View style={styles.wrapper}>
-            <TextInput
-                multiline
-                placeholder="오늘 하루는 어땠어?\n오늘 있었던 일과 그때 느꼈던 감정들에 대해 자유롭게 적어봐!"
-                placeholderTextColor="#999"
-                style={styles.input}
-            />
-            <Text style={styles.caption}>
-                오늘 하루는 별 몇 개 붙여줄 거야~?
-            </Text>
+            <ImageBackground
+                source={require("../assets/Images/record_input.png")}
+                resizeMode="stretch"
+                style={styles.imageBackground}
+            >
+                <TextInput
+                    multiline
+                    placeholder={`오늘 하루는 어땠어?\n오늘 있었던 일과 그때 느꼈던\n감정들에 대해 자유롭게 적어봐!`}
+                    placeholderTextColor="#555"
+                    style={styles.input}
+                />
+
+            <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttontext}>일기 제출하기</Text>
+            </TouchableOpacity>
+            </ImageBackground>
         </View>
     );
 }

@@ -7,6 +7,7 @@ import questStyles from "../../styles/questStyles";
 import questStageStyles from "../../styles/questStageStyles";
 import Quest_title from "../../components/Quest_title";
 import Grass from "../../components/GrassElement";
+import axios from "axios";
 
 const { height, width } = Dimensions.get("window");
 
@@ -22,11 +23,15 @@ const lockPositions = [
   { top: height * 1.16, left: width * 0.4 },
 ];
 
+export const getQuestsList = async () => {
+  const response = await axios.get("/quests/list");
+  return response.data;
+};
+
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation();
   const { title, subtitle } = route.params as { title: string; subtitle: string };
-
   return (
     <View style={questStageStyles.container}>
       <ScrollView contentContainerStyle={questStyles.scrollContainer} bounces={false} overScrollMode="never">
