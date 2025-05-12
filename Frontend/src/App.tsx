@@ -25,12 +25,12 @@ import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
-import customAxios from './API/axios'
 import SecondPassword from "./screens/SecondPassword";
+import Interest from "./screens/SimpleDiagnosis/Interest";
 
 export type RootStackParamList = {
     Home: undefined;
-    SignIn: undefined;
+    SignIn: { score?: number, last?: boolean; };
     SignUpStep1: undefined;
     Quest: undefined;
     Quest_stage: { title: string; subtitle?: string };
@@ -41,12 +41,13 @@ export type RootStackParamList = {
         birthDate?: string;
         gender?: string;
     };
+    Interest: { score?: number };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined;
     FormalDiagnosisSurvey: undefined;
-    GameScreen: undefined;
+    GameScreen: { score?: number };
     DailyTopic: undefined;
     Spinner: undefined;
     HelpCall: undefined;
@@ -162,6 +163,11 @@ export default function App() {
                     name="SimpleDiagnosis"
                     options={{ headerShown: false }}
                     component={SimpleDiagnosis}
+                />
+                <Stack.Screen
+                    name="Interest"
+                    component={Interest}
+                    options={{ headerShown: false }}
                 />
                 <Stack.Screen name="Game" options={{ headerShown: false }}>
                     {() => <Game />}

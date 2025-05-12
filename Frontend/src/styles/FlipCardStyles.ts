@@ -24,7 +24,7 @@ export const cardStyles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     back: {
-        backgroundColor: '#bbb',
+        backgroundColor: '#B7DF9D',
     },
     text: {
         fontSize: 28,

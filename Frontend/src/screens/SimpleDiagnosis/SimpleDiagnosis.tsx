@@ -9,7 +9,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
-import { signIn } from "../../API/signAPI";
 
 type SimpleDiagnosisRouteProp = RouteProp<
     RootStackParamList,
@@ -28,6 +27,10 @@ const SimpleDiagnosis = () => {
     const [score, setScore] = useState(route.params?.score ?? 0);
 
     const script = SimpleDiagnosisScript({ nickname });
+
+    useEffect(() => {
+        console.log(score)
+    }, [score]);
 
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
@@ -56,22 +59,34 @@ const SimpleDiagnosis = () => {
         ...(birthDate && { birthDate }),
         ...(gender !== null && { gender }),
         ...(score !== undefined && { score }),
+        last: currentSegmentIndex === 44 ? true : false,
     });
 
     useEffect(() => {
-        if (
-            currentSegment.type === "navigate" &&
-            currentSegment.navigateTo &&
-            typeof currentSegment.navigateTo === "object" &&
-            "screen" in currentSegment.navigateTo &&
-            "params" in currentSegment.navigateTo
-        ) {
-            navigation.navigate(
-                currentSegment.navigateTo.screen,
-                buildParams(currentSegment.navigateTo.params)
-            );
+        if (route.params?.initialIndex !== undefined) {
+            setCurrentSegmentIndex(route.params.initialIndex);
+        }
+        if (route.params?.score !== undefined) {
+            setScore(route.params.score);
+        }
+    }, [route.params?.initialIndex, route.params?.score]);
+
+    useEffect(() => {
+        if (currentSegment.type === "navigate" && currentSegment.navigateTo) {
+            const navigateTo = currentSegment.navigateTo;
+            if (typeof navigateTo === "string") {
+                navigation.navigate(
+                    navigateTo as keyof RootStackParamList,
+                    buildParams()
+                );
+            } else if (typeof navigateTo === "object" && "screen" in navigateTo) {
+                const params = buildParams(navigateTo.params || {});
+                navigation.navigate(navigateTo.screen, params);
+            }
         }
     }, [currentSegment]);
+
+
 
     useEffect(() => {
         if (route.params?.initialIndex !== undefined) {
@@ -97,7 +112,7 @@ const SimpleDiagnosis = () => {
                     text={currentSegment.text || "No text available"}
                     onPress={() => {
                         const nextIndex =
-                            currentSegmentIndex === 21
+                            currentSegmentIndex === 20 || currentSegmentIndex === 21
                                 ? 23
                                 : currentSegmentIndex + 1;
                         const nextSegment = script[nextIndex];

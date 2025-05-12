@@ -12,40 +12,41 @@ import {
     ScrollView
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
 
-type SignUpStep1NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep1">;
 
-const SignUpStep1 = () => {
-    const navigation = useNavigation<SignUpStep1NavigationProp>();
-    const [nickname, setNickname] = useState("");
+const Interest = () => {
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [interest, setInterest] = useState("");
     const [showError, setShowError] = useState(false);
-
+    const route = useRoute<RouteProp<RootStackParamList, 'Interest'>>();
+    const score = route.params?.score ?? 0;
     return (
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ImageBackground
-                source={require("../../assets/Images/simple-3-2.png")}
+                source={require("../../assets/Images/simple-4-2.png")}
                 style={{ flex: 1 }}
                 resizeMode="cover"
             >
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                     <ScrollView contentContainerStyle={signUpStyles.overlay}>
                         <View style={signUpStyles.container}>
-                            <Text style={signUpStyles.title}>회원가입</Text>
+                            <Text style={signUpStyles.title}>관심사</Text>
                             <View style={signUpStyles.inputContainer}>
-                                <Text style={signUpStyles.inputTitle}>닉네임</Text>
+                                <Text style={signUpStyles.inputTitle}>관심사</Text>
                                 <TextInput
-                                    placeholder="닉네임"
+                                    placeholder="관심사를 알려줘!"
                                     style={signUpStyles.input}
-                                    value={nickname}
-                                    onChangeText={setNickname}
+                                    value={interest}
+                                    onChangeText={setInterest}
                                 />
                             </View>
                             <Text style={signUpStyles.errorText}>
-                                {showError && !nickname.trim() ? "닉네임을 입력하세요." : ""}
+                                {showError && !interest.trim() ? "관심사를 알려줘!" : ""}
                             </Text>
 
                             <View style={signUpStyles.row}>
@@ -55,14 +56,14 @@ const SignUpStep1 = () => {
                                 <TouchableOpacity
                                     style={signUpStyles.signUpButton}
                                     onPress={() => {
-                                        if (!nickname.trim()) {
+                                        if (!interest.trim()) {
                                             setShowError(true);
                                             return;
                                         }
                                         setShowError(false);
                                         navigation.navigate('SimpleDiagnosis', {
-                                            initialIndex: 9,
-                                            nickname,
+                                            initialIndex: 20,
+                                            score: score
                                         });
                                     }}
                                 >
@@ -79,4 +80,4 @@ const SignUpStep1 = () => {
     );
 };
 
-export default SignUpStep1;
+export default Interest;
