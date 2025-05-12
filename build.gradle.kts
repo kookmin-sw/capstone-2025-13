@@ -63,6 +63,8 @@ dependencies {
 	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 	implementation("javax.xml.bind:jaxb-api:2.3.1")
 
+	implementation("ch.veehait.devicecheck:devicecheck-appattest:0.9.6")
+
 	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:${property("springAiVersion")}")
 	implementation("org.springframework.ai:spring-ai-core:${property("springAiVersion")}")
 

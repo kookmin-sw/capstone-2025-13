@@ -26,9 +26,11 @@ import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
+import Calendar from "./screens/Calendar";
+
 import customAxios from './API/axios';
+import { refreshAccessToken } from "./API/common";
 
 import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
 import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
@@ -78,6 +80,7 @@ function AppInner() {
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
+    const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
         const checkIntegrity = async () => {
@@ -89,18 +92,24 @@ function AppInner() {
                 }
 
                 await requestChallenge();
-                const result = await verifyDeviceIntegrity();
+                console.log('Device integrity challenge sent');
 
-                if(result.valid) {
+                const result = await verifyDeviceIntegrity();
+                console.log('Device integrity verification result:', result);
+
+                if(result.isValid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
                     console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
+                    setIntegrityError(`${result.message} / ${result.details ?? 'No details provided'}`)
                     setIsIntegrityVerified(false)
                 }
             } catch (error: any) {
-                console.error('Integrity check error:', error);
+                console.error('Integrity check error: ', error);
+                console.debug(error)
                 setIsIntegrityVerified(false)
+                setIntegrityError(`${error}`)
             }
         };
 
@@ -113,9 +122,6 @@ function AppInner() {
                 setLoading(false);
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
-                setIsLoggedIn(false);
-                setLoading(false);
-            } else {
                 setIsLoggedIn(false);
                 setLoading(false);
             }
@@ -167,7 +173,7 @@ function AppInner() {
     if (!fontsLoaded) return <Spinner />;
 
     if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen />;
+        return <RestrictedAccessScreen error={integrityError} />;
     }
 
     return (
