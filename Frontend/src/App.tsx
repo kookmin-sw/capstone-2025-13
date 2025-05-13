@@ -46,7 +46,7 @@ export type RootStackParamList = {
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined;
-    FormalDiagnosisSurvey: undefined;
+    FormalDiagnosisSurvey: { diagnosisId: number };
     GameScreen: { score?: number };
     DailyTopic: undefined;
     Spinner: undefined;
@@ -58,7 +58,13 @@ export type RootStackParamList = {
     Quest_exercise: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
-    FormalDiagnosisResult: undefined;
+    FormalDiagnosisResult: {
+        diagnosisId: number,
+        score: number,
+        totalScore: number,
+        scaleName: string,
+        description: string,
+    };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

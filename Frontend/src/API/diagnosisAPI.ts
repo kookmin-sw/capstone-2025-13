@@ -8,7 +8,6 @@ export enum DiagnosisTypeEnum {
   "GAD-7" = "GAD-7",
   "BDI" = "BDI"
 }
-
 export interface DiagnosisList {
   id: number;
   type: DiagnosisTypeEnum;
@@ -18,6 +17,23 @@ export interface DiagnosisList {
   scale: DiagnosisScale[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DiagnosisQuestion {
+  seq: number;
+  text: string;
+  answers: DiagnosisAnswers[]; 
+}
+
+export interface DiagnosisAnswers {
+  text: string;
+  score: number;
+}
+
+export interface DiagnosisScale {
+  start: number;
+  scaleName: string;
+  description: string;
 }
 
 export interface DiagnosisQuestion {
