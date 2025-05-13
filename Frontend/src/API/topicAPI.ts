@@ -4,7 +4,8 @@ import ApiResponseDTO from "./common";
 export enum TopicFeedbackStatus {
     PENDING = "PENDING",
     COMPLETED = "COMPLETED",
-    FAILED = "FAILED"
+    FAILED = "FAILED",
+    NOFEEDBACK = "NOFEEDBACK",
 }
 
 export interface TopicFeedbackResponse {
