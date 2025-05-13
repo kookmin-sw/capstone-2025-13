@@ -21,6 +21,7 @@ const chartWidth = screenWidth * 0.85;
 const chartHeight = screenWidth * 0.5;
 
 export default function EmotionChartBox({ subtitle, data }: EmotionChartBoxProps) {
+    console.log(data)
     const getIconColor = useDiagnosisColor();
     // x축 라벨(가장 긴 dates 배열 사용)
     const labels =
@@ -28,20 +29,20 @@ export default function EmotionChartBox({ subtitle, data }: EmotionChartBoxProps
             ? data.reduce((a, b) => (a.dates.length > b.dates.length ? a : b)).dates
             : [];
 
-    // datasets 생성 (각 진단별로 색상 다르게)
     const datasets = data.map((d) => ({
         data: d.data,
         color: (opacity = 1) => getIconColor(d.diagnosisId),
         strokeWidth: 3,
     }));
     if (!data || data.length === 0) {
-        <View style={styles.wrapper}>
-            <View style={styles.box}>
-                <Text style={styles.emptyText}>최근 진단 결과가 없어요!</Text>
+        return (
+            <View style={styles.wrapper}>
+                <View style={styles.box}>
+                    <Text style={styles.emptyText}>최근 진단 결과가 없어요!</Text>
+                </View>
             </View>
-        </View>
+        );
     }
-
     return (
         <View style={styles.wrapper}>
             <View style={styles.box}>

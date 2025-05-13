@@ -93,13 +93,11 @@ export default function FormalDiagnosis() {
             groupedResults[diagnosisId].push(result);
         });
 
-        // Process data for each diagnosisId to be passed to the chart
         const formattedData = Object.keys(groupedResults).map((diagnosisId) => {
-            const sortedResults = groupedResults[diagnosisId].sort(
+            const sortedResults = groupedResults[diagnosisId]?.sort(
                 (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            );
+            ) ?? [];
 
-            // Extract dates and scores in YYYY-MM-DD format
             const dates = sortedResults.map((result) => {
                 const date = new Date(result.createdAt);
                 const yyyy = date.getFullYear();
@@ -111,12 +109,13 @@ export default function FormalDiagnosis() {
 
             return {
                 diagnosisId: Number(diagnosisId),
-                data: scores,
-                dates: dates,
+                data: scores ?? [],
+                dates: dates ?? [],
             };
         });
 
-        return formattedData;
+        // 혹시라도 data가 없는 객체는 필터링
+        return formattedData.filter(item => Array.isArray(item.data) && item.data.length > 0);
     };
 
 
