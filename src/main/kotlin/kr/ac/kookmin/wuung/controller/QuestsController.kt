@@ -990,7 +990,7 @@ class QuestsController(
             [en] Get a random life quote from the database.
             AccessToken is required on Authorization header.
             
-            [ko] 데이터베이스에서 랜덤한 명언을 가져옵니다.
+            [ko] 데이터베이스에서 랜덤한 명언을 조회합니다.
             Authorization 헤더에 AccessToken이 필요합니다.
         """
     )
