@@ -30,7 +30,6 @@ import {
     TopicFeedbackStatus
 } from "../API/topicAPI";
 
-// ✅ ChatItem 타입 정의
 type ChatItem =
     | { type: "question"; text: string }
     | { type: "answer"; text: string; isLoading?: boolean };
@@ -155,8 +154,14 @@ export default function DailyTopic() {
                 setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
             }
         } catch (error: any) {
-            setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
+            if (error.response?.status === 404) {
+                setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
+            } else {
+                console.error("❌ Feedback fetch failed:", error.response?.data || error.message);
+                setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
+            }
         }
+        
     };
 
     const handleSendFeedback = async (answer: string) => {
@@ -271,7 +276,6 @@ export default function DailyTopic() {
                 </View>
             </View>
 
-            {/* 모달 */}
             <ModalComponent
                 visible={isModalVisible}
                 onClose={closeModal}
