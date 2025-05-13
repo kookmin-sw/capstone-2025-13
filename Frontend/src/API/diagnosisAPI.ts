@@ -1,6 +1,6 @@
 import axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ApiResponseDTO, { refreshAccessToken } from "./common";
+import ApiResponseDTO, { refreshAccessToken, } from "./common";
 
 export enum DiagnosisTypeEnum {
   "Simple" = "Simple",
@@ -8,7 +8,6 @@ export enum DiagnosisTypeEnum {
   "GAD-7" = "GAD-7",
   "BDI" = "BDI"
 }
-
 export interface DiagnosisList {
   id: number;
   type: DiagnosisTypeEnum;
@@ -18,6 +17,23 @@ export interface DiagnosisList {
   scale: DiagnosisScale[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DiagnosisQuestion {
+  seq: number;
+  text: string;
+  answers: DiagnosisAnswers[]; 
+}
+
+export interface DiagnosisAnswers {
+  text: string;
+  score: number;
+}
+
+export interface DiagnosisScale {
+  start: number;
+  scaleName: string;
+  description: string;
 }
 
 export interface DiagnosisQuestion {
@@ -81,3 +97,15 @@ export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | 
     return data.data;
   });
 };
+
+
+export const putDiagnosisResult = async (id: number, scale: number, result: number) => {
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const body = { id, scale, result };
+    console.log(body);
+    const { data } = await axios.put<ApiResponseDTO<DiagnosisList>>("/diagnosis/submit", body, { headers });
+    return data.data;
+  });
+};
+

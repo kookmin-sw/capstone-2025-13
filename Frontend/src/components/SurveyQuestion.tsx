@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/surveyQuestionStyles";
 
-const choices = ["매우 아니다", "아니다", "보통이다", "그렇다", "매우 그렇다"];
+interface SurveyQuestionProps {
+    number: number;
+    question: string;
+    answers: { text: string; score: number }[];
+    onAnswer: (score: number) => void; 
+}
 
 export default function SurveyQuestion({
     number,
     question,
-}: {
-    number: number;
-    question: string;
-}) {
+    answers,
+    onAnswer,
+}: SurveyQuestionProps) {
     const [selected, setSelected] = useState<number | null>(null);
+
+    useEffect(() => {
+        setSelected(null);
+    }, [question]);
 
     return (
         <View style={styles.questionBox}>
@@ -26,23 +34,25 @@ export default function SurveyQuestion({
                 </View>
 
                 <View style={styles.choicesWrapper}>
-                    {choices.map((label, index) => (
+                    {answers.map((answer, index) => (
                         <View key={index} style={styles.choiceItem}>
                             <TouchableOpacity
                                 style={[
                                     styles.circle,
                                     selected === index && styles.circleSelected,
                                 ]}
-                                onPress={() => setSelected(index)}
+                                onPress={() => {
+                                    setSelected(index);
+                                    onAnswer(answer.score); 
+                                }}
                             ></TouchableOpacity>
                             <Text
                                 style={[
                                     styles.choiceLabel,
-                                    selected === index &&
-                                        styles.choiceLabelSelected,
+                                    selected === index && styles.choiceLabelSelected,
                                 ]}
                             >
-                                {label}
+                                {answer.text}
                             </Text>
                         </View>
                     ))}

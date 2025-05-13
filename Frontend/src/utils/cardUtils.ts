@@ -1,5 +1,5 @@
 export const generateShuffledCards = () => {
-    const symbols = ['🍎', '🍌', '🍇', '🍒', '🍍', '🥝', '🍓', '🥥']; // 8개!
+    const symbols = ['😀', '😂', '😍', '😎', '😢', '😡', '😱', '🥶']; // 8개!
     const cards = [...symbols, ...symbols] // 두 번 복제해서 짝을 맞춤
       .map((symbol, index) => ({
         id: index,

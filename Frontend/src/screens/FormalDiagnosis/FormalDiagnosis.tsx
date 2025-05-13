@@ -14,11 +14,17 @@ import { fetchDiagnosisList } from "../../API/diagnosisAPI";
 import { useSecondPasswordGuard } from "../../hooks/useSecondPasswordGuard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export interface DiagnosisList {
+    id: number;
+    title: string;
+}
+
+
 export default function FormalDiagnosis() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const [diagnosisList, setDiagnosisList] = useState([]);
+    const [diagnosisList, setDiagnosisList] = useState<DiagnosisList[]>([]);
 
     useSecondPasswordGuard("FormalDiagnosis");
     useEffect(() => {
