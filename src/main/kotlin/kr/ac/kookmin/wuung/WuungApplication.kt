@@ -28,6 +28,7 @@ fun main(args: Array<String>) {
 		"S3_ACCESS_KEY" to dotenv["S3_ACCESS_KEY"],
 		"S3_SECRET_KEY" to dotenv["S3_SECRET_KEY"],
 		"S3_PROFILE_BUCKET" to dotenv["S3_PROFILE_BUCKET"],
+		"S3_QUEST_BUCKET" to dotenv["S3_QUEST_BUCKET"],
 		"S3_PUBLIC_ENDPOINT" to dotenv["S3_PUBLIC_ENDPOINT"],
 		"GPT_API_KEY" to dotenv["GPT_API_KEY"],
 		"GPT_BASE_URL" to (dotenv["GPT_BASE_URL"]?.let {
