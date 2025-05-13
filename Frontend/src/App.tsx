@@ -66,6 +66,7 @@ export type RootStackParamList = {
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Quest_emotion: undefined;
+    Quest_emotion_sy: undefined;
     Calendar: undefined;
 
 };
@@ -165,7 +166,7 @@ function AppInner() {
         "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
         "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
         "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
-        DungGeunMo: require("./assets/fonts/DungGeunMo.ttf"),
+        "DungGeunMo": require("./assets/fonts/DungGeunMo.ttf"),
         "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
         "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
     });
@@ -178,6 +179,34 @@ function AppInner() {
         return <RestrictedAccessScreen error={integrityError} />;
     }
 
+    console.log("🧪 스크린 등록 확인:");
+    [
+        Home,
+        SignIn,
+        SignUpStep1,
+        SignUpStep2,
+        SignUpStep3,
+        SimpleDiagnosis,
+        Game,
+        Quest,
+        Quest_stage,
+        Quest_meditation,
+        Quest_exercise,
+        Quest_emotion,
+        FormalDiagnosis,
+        FormalDiagnosisSurvey,
+        GameScreen,
+        DailyTopic,
+        Spinner,
+        HelpCall,
+        HelpCall2,
+        UserInfo,
+        Record,
+        Calendar,
+    ].forEach((comp, i) => {
+        if (!comp) console.warn(`❌ [component ${i}] is undefined`);
+    });
+    
     return (
         <NavigationContainer
             ref={navigationRef}
