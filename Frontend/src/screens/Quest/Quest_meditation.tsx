@@ -4,7 +4,7 @@ import styles from "../../styles/questMeditationStyles";
 import Youtube_playlist from "../../components/Youtube_playlist";
 import { dynamic } from '../../styles/questMeditaionDynamicStyles';
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp} from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -93,7 +93,7 @@ export default function Quest_meditation() {
               // 최초 실행 시 알림창 띄우기
               Alert.alert(
                  "명상 타이머 설명",
-                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌",
+                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌",
                 [{ text: '확인' }]
               );
               await AsyncStorage.setItem('hasVisitedMeditation', 'true');
@@ -139,12 +139,12 @@ export default function Quest_meditation() {
             onPress={() =>
               Alert.alert(
                 "명상 타이머 설명",
-                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른 화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌", [{ text: '확인' }]
+                "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌", [{ text: '확인' }]
               )
             }
             style={styles.timerDescription}
           >
-            <Ionicons name="information-circle-outline" size={22} color="red" />
+            <Ionicons name="information-circle-outline" size={22} color="#fff94f" />
           </TouchableOpacity>
         </View>
 
