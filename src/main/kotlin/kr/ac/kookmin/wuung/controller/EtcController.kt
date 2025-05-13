@@ -55,11 +55,12 @@ class EtcController(
     @Autowired private val userQuestStageRepository: UserQuestStageRepository
 ) {
     @GetMapping("/behavior")
-    @Operation(summary = "Get behavior information successfully")
+    @Operation(summary = "Get User behavior information by date",
+        description = "Get behavior information by date")
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get behavior information successfully",
+                responseCode = "200", description = "Get user behavior information successfully",
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
