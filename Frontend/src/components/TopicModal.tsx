@@ -22,8 +22,9 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ visible, onClose, onGoT
                 <View style={styles.modalContainer}>
                     <Text style={styles.modalText}>오늘은 여기까지!</Text>
                     <Text style={styles.modalSubText}>
-                        세잎이가 더 이상 피드백을 줄 수 없어요.
-                        {"\n"}내일 다시 이야기 나눠보는 건 어때요?
+                        오늘 세잎이와 대화는 종료되었어요!
+                        {"\n"}오늘 대화를 기반으로 일기를 써보는 건 어떄요?
+                        {"\n"}내일 세잎이랑 다시 만나요! ☘️
                     </Text>
                     <View style={styles.modalButtons}>
                         <TouchableOpacity
@@ -36,7 +37,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ visible, onClose, onGoT
                             style={[styles.modalButton, styles.diaryButton]}
                             onPress={onGoToDiary}
                         >
-                            <Text style={styles.modalButtonText}>일기화면으로 이동</Text>
+                            <Text style={styles.modalButtonText}>일기로 이동</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

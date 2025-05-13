@@ -1,61 +1,74 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from '../constants/fonts';
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     modalBackdrop: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        position: "absolute", // 화면 전체에 걸쳐서 모달을 표시
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 9999, // zIndex 더 높게 설정
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 배경에 반투명 처리 추가
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 
     modalContainer: {
-        width: "80%",
-        maxWidth: 350,
+        width: width * 0.8,
+        maxWidth: 360,
+        minHeight: height * 0.2,
         backgroundColor: "#F9FAEC",
-        padding: 20,
-        borderRadius: 10,
+        paddingVertical: height * 0.03,
+        paddingHorizontal: width * 0.05,
+        borderRadius: 20,
         alignItems: "center",
-        zIndex: 10000, // modal 자체에도 zIndex를 추가해서 다른 컴포넌트들보다 위에 표시되도록
+        zIndex: 10000,
     },
 
     modalText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    modalSubText: {
-        fontSize: 14,
+        fontSize: width * 0.045,
+        fontFamily: fonts.extraBold,
+        marginBottom: height * 0.02,
         textAlign: "center",
-        marginBottom: 20,
     },
+
+    modalSubText: {
+        fontSize: width * 0.035,
+        fontFamily: fonts.primary,
+        textAlign: "center",
+        marginBottom: height * 0.03,
+    },
+
     modalButtons: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-evenly",
         width: "100%",
     },
+
     modalButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: height * 0.015,
+        paddingHorizontal: width * 0.05,
         borderRadius: 8,
+        fontFamily: fonts.medium,
     },
+
     closeButton: {
         backgroundColor: "#C8B6A1",
     },
+
     diaryButton: {
         backgroundColor: "#1BA663",
     },
+
     modalButtonText: {
         color: "white",
-        fontSize: 16,
+        fontSize: width * 0.04,
         fontWeight: "bold",
+        textAlign: "center",
     },
 });
 
