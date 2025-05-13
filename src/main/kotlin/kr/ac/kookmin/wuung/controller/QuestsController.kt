@@ -1,5 +1,7 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -21,10 +23,14 @@ import kr.ac.kookmin.wuung.model.Quests
 import kr.ac.kookmin.wuung.model.UserQuestStages
 import kr.ac.kookmin.wuung.model.UserQuestStatus
 import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
+import kr.ac.kookmin.wuung.service.UserQuestS3Service
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -33,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
 
@@ -44,9 +51,37 @@ data class UserQuestsDTO(
     val progress: Int,
     val target: Int,
     val status: UserQuestStatus,
+    @JsonIgnore
+    val photoSrc: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
-)
+) {
+    @JsonIgnore
+    private var _photoEndpoint: String = ""
+    @JsonIgnore
+    private var _photoBucketName: String = ""
+
+    @get:JsonIgnore
+    var photoEndpoint: String
+        get() = _photoEndpoint
+        set(value) {
+            _photoEndpoint = value
+        }
+    @get:JsonIgnore
+    var photoBucketName: String
+        get() = _photoEndpoint
+        set(value) {
+            _photoBucketName = value
+        }
+
+    @get:JsonProperty("photo")
+    val photo: String?
+        get() {
+            return if (photoSrc?.isBlank() == true || _photoEndpoint.isBlank() || _photoBucketName.isBlank()) null
+            else return "$_photoEndpoint/$_photoBucketName/$photoSrc"
+        }
+}
+
 fun UserQuests.toDTO() = UserQuestsDTO(
     this.id ?: "",
     this.quest?.name ?: "",
@@ -55,6 +90,7 @@ fun UserQuests.toDTO() = UserQuestsDTO(
     this.progress,
     this.target,
     this.status,
+    this.photo,
     this.createdAt,
     this.updatedAt
 )
@@ -137,11 +173,12 @@ fun UserQuestLastDTO.toDTO() = UserQuestLastDTO(
     모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
 """)
 class QuestsController(
-    @Autowired private val authenticationManager: AuthenticationManager,
-    @Autowired private val userRepository: UserRepository,
     @Autowired private val questsRepository: QuestsRepository,
     @Autowired private val userQuestsRepository: UserQuestsRepository,
-    @Autowired private val userQuestStageRepository : UserQuestStageRepository
+    @Autowired private val userQuestStageRepository : UserQuestStageRepository,
+    @Autowired private val userQuestS3Service: UserQuestS3Service,
+    @Value("\${s3.public-endpoint}") private val s3PublicEndpoint: String,
+    @Value("\${s3.quest-bucket}") private val s3BucketName: String,
 ) {
     @GetMapping("/me")
     @Operation(
@@ -180,7 +217,13 @@ class QuestsController(
         } ?: userQuestsRepository.findByUser(userDetails)
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = quests.map { it.toDTO() })
+            ApiResponseDTO(data = quests.map {
+                val dto = it.toDTO()
+                dto.photoEndpoint = s3PublicEndpoint
+                dto.photoBucketName = s3BucketName
+
+                dto
+            })
         )
     }
 
@@ -242,8 +285,12 @@ class QuestsController(
 
         userQuestsRepository.save(data)
 
+        val dto = data.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
+
         return ResponseEntity.ok(
-            ApiResponseDTO(data = data.toDTO())
+            ApiResponseDTO(data = dto)
         )
     }
 
@@ -304,10 +351,12 @@ class QuestsController(
         quest.status = request.status
         userQuestsRepository.save(quest)
 
-
+        val dto = quest.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = quest.toDTO())
+            ApiResponseDTO(data = dto)
         )
     }
 
@@ -801,4 +850,133 @@ class QuestsController(
         return ResponseEntity.ok(ApiResponseDTO(data = lastQuest))
     }
 
+    @PutMapping(
+        "/photo/{userQuestID}",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    @Operation(
+        summary = "Upload quest photo",
+        description = """
+            [en] Upload a photo for a specific quest.
+            AccessToken is required on Authorization header.
+            
+            [ko] 특정 퀘스트에 사진을 업로드합니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully uploaded photo",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Quest not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun uploadQuestPhoto(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable userQuestID: String,
+        @RequestParam("file") file: MultipartFile,
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
+        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+
+        val file = userQuestS3Service.uploadPhoto(userQuests, file)
+
+        userQuests.photo = file
+
+        val dto = userQuests.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = dto))
+    }
+
+    @DeleteMapping("/photo/{userQuestID}")
+    @Operation(
+        summary = "Delete quest photo",
+        description = """
+            [en] Delete the photo of a specific quest.
+            AccessToken is required on Authorization header.
+            
+            [ko] 특정 퀘스트의 사진을 삭제합니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully deleted photo",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Quest not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal server error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun deleteQuestPhoto(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable userQuestID: String,
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
+        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+
+        userQuestS3Service.removePhoto(userQuests)
+
+        userQuests.photo = null
+        userQuestsRepository.save(userQuests)
+
+        return ResponseEntity.ok(ApiResponseDTO(data = userQuests.toDTO()))
+    }
 }
