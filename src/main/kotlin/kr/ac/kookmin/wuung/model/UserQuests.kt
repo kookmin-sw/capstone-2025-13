@@ -42,6 +42,9 @@ data class UserQuests(
     @Column(nullable = false)
     var status : UserQuestStatus = UserQuestStatus.INCOMPLETE,
 
+    @Column(nullable = true)
+    var photo: String? = null,
+
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
