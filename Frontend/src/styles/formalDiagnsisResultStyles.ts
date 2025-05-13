@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 import fonts from "../constants/fonts";
 
-const { width } = Dimensions.get("window");
+const { width ,height} = Dimensions.get("window");
 
 
 const formalDiagnsisResultStyles = StyleSheet.create({
@@ -55,6 +55,13 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
     },
+    chartTitle:{
+      fontSize: width * 0.04,
+      marginTop: height * 0.02,
+      fontFamily: fonts.semiBold,
+      fontWeight: "bold",
+      color: "#4CAF50",
+    },
     chart: {
       position: "relative",
     },
@@ -89,6 +96,10 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       color: "#333",
       lineHeight: width * 0.05,
     },
+    warn:{
+      fontSize: width * 0.03,
+      color:"#808080"
+    }
   });
   
   export default formalDiagnsisResultStyles;

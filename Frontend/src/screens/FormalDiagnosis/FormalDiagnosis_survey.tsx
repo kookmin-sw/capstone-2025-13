@@ -70,29 +70,27 @@ export default function FormalDiagnosisSurvey() {
         const totalScore = answers.reduce((sum, val) => sum + val, 0);
         const maxTotalScore = getMaxTotalScore();
         const scaleResult = getScaleResult(totalScore, scales);
-        if (scaleResult) {
-            setScaleName(scaleResult.scaleName);
-            setDescription(scaleResult.description);
-            setScale(scaleResult.start);
+
+        if (!scaleResult) {
+            console.error("❌ scale값 없음");
+            return;
         }
+
         try {
-            if (scale !== undefined) {
-                await putDiagnosisResult(diagnosisId, scale, totalScore);
-                console.log("✅ 진단 결과 저장 성공");
-            } else {
-                console.error("❌ scale값 없음");
-            }
+            await putDiagnosisResult(diagnosisId, scaleResult.start, totalScore);
+            console.log("✅ 진단 결과 저장 성공");
+            navigation.navigate("FormalDiagnosisResult", {
+                diagnosisId: Number(diagnosisId),
+                score: totalScore,
+                totalScore: maxTotalScore,
+                scaleName: scaleResult.scaleName,
+                description: scaleResult.description,
+            });
         } catch (err) {
             console.error("❌ 진단 결과 저장 실패:", err);
         }
-        navigation.navigate("FormalDiagnosisResult", {
-            diagnosisId: Number(diagnosisId),
-            score: totalScore,
-            totalScore: maxTotalScore,
-            scaleName: scaleName ?? "",
-            description: description ?? "",
-        });
     };
+
 
     return (
         <View style={styles.container}>
