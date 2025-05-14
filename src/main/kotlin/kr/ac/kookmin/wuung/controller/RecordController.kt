@@ -31,6 +31,7 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -39,7 +40,7 @@ import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
 data class RecordDTO(
-    val id: Long,
+    val id: String,
     val rate: Int,
     val data: String,
     val luckyVicky: String,
@@ -50,7 +51,7 @@ data class RecordDTO(
 )
 
 fun Record.toDTO() = RecordDTO(
-    this.id ?: 0,
+    this.id ?: "",
     this.rate,
     this.data ?: "",
     this.luckyVicky ?: "",
@@ -212,8 +213,8 @@ class RecordController(
     )
     fun getRecordById(
         @AuthenticationPrincipal userDetails: User?,
-        @Schema(description = "Record ID", example = "1")
-        @RequestParam recordId: Long,
+        @Schema(description = "Record ID")
+        @RequestParam recordId: String,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
@@ -256,7 +257,7 @@ class RecordController(
     fun modifyRecord(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: RecordUpdateRequest,
-        @PathVariable recordId: Long,
+        @PathVariable recordId: String,
     ): ResponseEntity<ApiResponseDTO<RecordDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
@@ -277,6 +278,7 @@ class RecordController(
         )
     }
 
+    @Scheduled(fixedRate = 10000L)
     private fun runJob() {
         val jobParameters = JobParametersBuilder()
             .addLong("time", System.currentTimeMillis())

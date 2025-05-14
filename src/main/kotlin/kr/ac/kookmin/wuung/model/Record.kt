@@ -15,8 +15,8 @@ enum class LuckyVickyStatus(val value: Short) {
 @Table(name = "user_records")
 data class Record(
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    var id : Long? = null,
+    @GeneratedValue(strategy =  GenerationType.UUID)
+    var id : String? = null,
 
     @Column(nullable = false)
     var rate : Int = 0,
