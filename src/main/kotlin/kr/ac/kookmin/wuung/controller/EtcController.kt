@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import java.time.format.DateTimeFormatter
 
 enum class BehaviorType(val value : String){
     DIARY("DIARY"),
@@ -52,22 +53,36 @@ class EtcController(
     @Autowired private val diagnosisResultsRepository: DiagnosisResultsRepository,
     @Autowired private val recordRepository: RecordRepository,
     @Autowired private val userQuestRepository: UserQuestsRepository,
-    @Autowired private val userQuestStageRepository: UserQuestStageRepository
+    @Autowired private val userQuestStageRepository: UserQuestStageRepository,
 ) {
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
     @GetMapping("/behavior")
-    @Operation(summary = "Get User behavior information by date",
-        description = "Get behavior information by date")
+    @Operation(
+        summary = "[En] Get User behavior information by date / [Kr] 특정 날짜의 사용자 활동 정보 조회",
+        description = """
+            [En] Returns a list of user activities including diagnosis tests, diaries and quests completed on a specific date.
+            The date parameter should be in yyyy-MM-dd format.
+            [Kr] 특정 날짜에 수행한 검사, 일기 작성, 퀘스트 완료 등의 사용자 활동 목록을 반환합니다.
+            날짜 파라미터는 yyyy-MM-dd 형식이어야 합니다.
+        """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get user behavior information successfully",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
+                responseCode = "200",
+                description = """
+                    [En] Successfully retrieved user behavior information for the specified date
+                    [Kr] 지정된 날짜의 사용자 활동 정보를 성공적으로 조회했습니다
+                """,
+                useReturnTypeSchema = true,
             ),
             ApiResponse(
-                responseCode = "403", description = "Unauthorized access",
+                responseCode = "403",
+                description = """
+                    [En] Unauthorized access - Valid authentication token required
+                    [Kr] 인증되지 않은 접근 - 유효한 인증 토큰이 필요합니다
+                """,
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -77,7 +92,7 @@ class EtcController(
     )
     fun getBehaviorByDate(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") date: String
+        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") date: String,
     ): ResponseEntity<ApiResponseDTO<List<DailyBehaviorDTO>>> {
 
         if (userDetails == null) throw UnauthorizedException()
@@ -145,7 +160,7 @@ class EtcController(
                 BehaviorType.QUEST
             )
         }
-        
+
         behaviors = behaviors + questBehaviors
 
         return ResponseEntity.ok(
@@ -153,5 +168,80 @@ class EtcController(
                 data = behaviors
             )
         )
+    }
+
+    @GetMapping("/behavior/summary")
+    @Operation(
+        summary = "[En] Get User behavior summary by month / [Kr] 월별 사용자 활동 요약 조회",
+        description = """
+            [En] Returns a list of dates in the specified month where the user had any activity (diagnosis tests or diary entries).
+            The date parameter should be in yyyy-MM format.
+            [Kr] 지정된 달에 사용자가 활동(검사 또는 일기 작성)을 한 날짜 목록을 반환합니다.
+            날짜 파라미터는 yyyy-MM 형식이어야 합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = """
+                    [En] Successfully retrieved user behavior summary for the specified month
+                    [Kr] 지정된 월의 사용자 활동 요약을 성공적으로 조회했습니다
+                """,
+                useReturnTypeSchema = true,
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = """
+                    [En] Unauthorized access - Valid authentication token required
+                    [Kr] 인증되지 않은 접근 - 유효한 인증 토큰이 필요합니다
+                """,
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getBehaviorByMontly(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM") date: String,
+    ): ResponseEntity<ApiResponseDTO<List<String>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val startDate = "${date}-01".datetimeParser()
+        val endDate = "${date}-31".datetimeParser().withHour(23).withMinute(59).withSecond(59)
+
+        val records = recordRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val diagnosis = diagnosisResultsRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val behaviors = userQuestRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val date = mutableListOf<String>()
+
+        records.forEach { record ->
+            date.add(record.createdAt.format(dateFormatter))
+        }
+        diagnosis.forEach { diagnosis ->
+            date.add(diagnosis.createdAt.format(dateFormatter))
+        }
+        behaviors.forEach { behavior ->
+            date.add(behavior.createdAt.format(dateFormatter))
+        }
+
+        return ResponseEntity.ok(ApiResponseDTO(data = date.distinct()))
     }
 }
