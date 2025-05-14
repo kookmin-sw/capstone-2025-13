@@ -50,8 +50,8 @@ export default function Quest_stage() {
   const [questDescription, setQuestDescription] = useState("");
   const [questTarget, setQuestTarget] = useState(0);
   const [questStep, setQuestStep] = useState(1);
-  const [questStage, setQuestStage] = useState<any>(null); // 전체 스테이지 상태 (타입 나중에 구체화)
-  const currentStageIndex = useMemo(() => questStep + 5, [questStep]);
+  const [questStage, setQuestStage] = useState<any>(null);
+  const currentStageIndex = useMemo(() => 7 - questStep, [questStep]);
 
   useEffect(() => {
     const type = getQuestTypeFromTitle(title);
@@ -62,18 +62,65 @@ export default function Quest_stage() {
         const lastData = response.data.data;
 
         if (lastData) {
+          console.log("✅ 마지막 퀘스트:", lastData);
+
+          if (lastData.status === "COMPLETED") {
+            const lastUpdatedAt = new Date(lastData.updatedAt);
+            const now = new Date();
+            const timeDifference = now.getTime() - lastUpdatedAt.getTime();
+            const oneDayInMillis = 24 * 60 * 60 * 1000; // 하루의 밀리초
+
+            // 하루가 지났으면 다음 스텝으로 진행, 하루가 안 지났으면 "미션을 완료했어-! 내일 다시 만나!"
+            if (timeDifference >= oneDayInMillis) {
+              // 하루 지났으면 다음 스텝으로 진행
+              const nextStep = lastData.step + 1;
+              console.log("🔁 다음 스텝으로 진행:", nextStep);
+
+              const listRes = await customAxios.get(`/quests/list/${type}/${nextStep}`);
+              const newQuest = listRes.data.data;
+
+              if (!newQuest?.id) {
+                console.warn("⚠️ 다음 스텝 퀘스트 없음");
+                return;
+              }
+
+              const putRes = await customAxios.put("/quests", { id: newQuest.id });
+              await customAxios.post("/quests", {
+                id: putRes.data.data.id,
+                current: 0,
+                status: "PROCESSING",
+              });
+
+              setQuestTitle(newQuest.name);
+              setQuestDescription(newQuest.description);
+              setQuestTarget(newQuest.target);
+              setQuestStep(1);
+
+              const stageRes = await customAxios.get(`/quests/stage/${type}`);
+              setQuestStage(stageRes.data.data);
+
+              console.log("🆕 새 퀘스트 설정 완료:", newQuest);
+              return;
+            } else {
+              const stageRes = await customAxios.get(`/quests/stage/${type}`);
+              const stageData = stageRes.data.data;
+              setQuestStage(stageData);
+              if (stageData?.step) setQuestStep(stageData.step);
+              console.log("📌 퀘스트 스테이지 전체:", stageData);
+              setQuestTitle("내일 다시 만나-!");
+              return;
+            }
+          }
+
           setQuestTitle(lastData.name);
           setQuestDescription(lastData.description);
           setQuestTarget(lastData.target);
           setQuestStep(lastData.step);
-          console.log("✅ 마지막 퀘스트:", lastData);
-          
+
           const stageRes = await customAxios.get(`/quests/stage/${type}`);
           const stageData = stageRes.data.data;
-          setQuestStage(stageData); 
-          if (stageData?.step) {
-            setQuestStep(stageData.step); 
-          }
+          setQuestStage(stageData);
+          if (stageData?.step) setQuestStep(stageData.step);
           console.log("📌 퀘스트 스테이지 전체:", stageData);
         } else {
           console.log("ℹ️ 마지막 퀘스트 없음. 새로 생성 시도");
