@@ -19,6 +19,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: embedded
+    job:
+      enabled: false
 springdoc:
   api-docs:
     enabled: true

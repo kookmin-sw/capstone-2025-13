@@ -23,4 +23,13 @@ val recordPrompt: String
                     return it.value ?: throw RuntimeException("Record Prompt is not configured")
                 }
         }
+    @get:Bean
+    val luckyVickyPrompt: String
+        get() {
+            configurationsRepository.findByKey(ConfigurationKey.LUCKY_VICKY)
+                .orElseThrow { RuntimeException("Lucky Vicky Prompt is not configured") }
+                .let {
+                    return it.value ?: throw RuntimeException("Lucky Vicky Prompt is not configured")
+                }
+        }
 }
