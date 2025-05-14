@@ -9,8 +9,9 @@ import Quest_title from "../../components/Quest_title";
 import Grass from "../../components/GrassElement";
 import customAxios from "../../API/axios";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { Alert } from "react-native"; 
 
-// 타입 정의
+
 type RootStackParamList = {
   Quest_meditation: { questTitle: string; questDescription: string; questTarget: number };
   Quest_exercise: { questTitle: string; questDescription: string; questTarget: number };
@@ -20,7 +21,7 @@ type QuestNavigationProp =
   | StackNavigationProp<RootStackParamList, "Quest_meditation">
   | StackNavigationProp<RootStackParamList, "Quest_exercise">;
 
-// 퀘스트 타입 매핑
+
 const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
   switch (title) {
     case "명상": return "MEDITATE";
@@ -46,7 +47,8 @@ export default function Quest_stage() {
   const navigation = useNavigation<QuestNavigationProp>();
   const { title } = route.params as { title: string };
 
-  const [questTitle, setQuestTitle] = useState("");
+  const [questTitle, setQuestTitle] = useState(""); 
+  const [displayQuestTitle, setDisplayQuestTitle] = useState("");
   const [questDescription, setQuestDescription] = useState("");
   const [questTarget, setQuestTarget] = useState(0);
   const [questStep, setQuestStep] = useState(1);
@@ -56,72 +58,74 @@ export default function Quest_stage() {
   useEffect(() => {
     const type = getQuestTypeFromTitle(title);
 
+    const setQuestData = async (
+      questData: any,
+      type: "MEDITATE" | "ACTIVITY" | "EMOTION",
+      overwriteDisplayTitle?: string // 표시용 제목만 덮어쓰기
+    ) => {
+      setQuestTitle(questData.name); // 항상 실제 제목 저장
+      setDisplayQuestTitle(overwriteDisplayTitle ?? questData.name); // UI용 제목 저장
+    
+      setQuestDescription(questData.description);
+      setQuestTarget(questData.target);
+      setQuestStep(questData.step);
+    
+      const stageRes = await customAxios.get(`/quests/stage/${type}`);
+      const stageData = stageRes.data.data;
+      setQuestStage(stageData);
+    
+      if (stageData?.step) {
+        setQuestStep(stageData.step);
+      }
+    
+      console.log("📌 퀘스트 스테이지 전체:", stageData);
+    };
+    
     const fetchOrCreateQuest = async () => {
+      const type = getQuestTypeFromTitle(title);
+    
       try {
         const response = await customAxios.get(`/quests/last/${type}`);
         const lastData = response.data.data;
-
+    
         if (lastData) {
           console.log("✅ 마지막 퀘스트:", lastData);
-
+    
           if (lastData.status === "COMPLETED") {
             const lastUpdatedAt = new Date(lastData.updatedAt);
             const now = new Date();
             const timeDifference = now.getTime() - lastUpdatedAt.getTime();
-            const oneDayInMillis = 24 * 60 * 60 * 1000; // 하루의 밀리초
-
-            // 하루가 지났으면 다음 스텝으로 진행, 하루가 안 지났으면 "미션을 완료했어-! 내일 다시 만나!"
+            const oneDayInMillis = 24 * 60 * 60 * 1000;
+    
             if (timeDifference >= oneDayInMillis) {
-              // 하루 지났으면 다음 스텝으로 진행
               const nextStep = lastData.step + 1;
               console.log("🔁 다음 스텝으로 진행:", nextStep);
-
+    
               const listRes = await customAxios.get(`/quests/list/${type}/${nextStep}`);
               const newQuest = listRes.data.data;
-
+    
               if (!newQuest?.id) {
                 console.warn("⚠️ 다음 스텝 퀘스트 없음");
                 return;
               }
-
+    
               const putRes = await customAxios.put("/quests", { id: newQuest.id });
               await customAxios.post("/quests", {
                 id: putRes.data.data.id,
                 current: 0,
                 status: "PROCESSING",
               });
-
-              setQuestTitle(newQuest.name);
-              setQuestDescription(newQuest.description);
-              setQuestTarget(newQuest.target);
-              setQuestStep(1);
-
-              const stageRes = await customAxios.get(`/quests/stage/${type}`);
-              setQuestStage(stageRes.data.data);
-
+    
+              await setQuestData({ ...newQuest, step: 1 }, type);
               console.log("🆕 새 퀘스트 설정 완료:", newQuest);
               return;
             } else {
-              const stageRes = await customAxios.get(`/quests/stage/${type}`);
-              const stageData = stageRes.data.data;
-              setQuestStage(stageData);
-              if (stageData?.step) setQuestStep(stageData.step);
-              console.log("📌 퀘스트 스테이지 전체:", stageData);
-              setQuestTitle("내일 다시 만나-!");
+              await setQuestData(lastData, type, "끝! 내일 다시 만나!");
               return;
             }
           }
-
-          setQuestTitle(lastData.name);
-          setQuestDescription(lastData.description);
-          setQuestTarget(lastData.target);
-          setQuestStep(lastData.step);
-
-          const stageRes = await customAxios.get(`/quests/stage/${type}`);
-          const stageData = stageRes.data.data;
-          setQuestStage(stageData);
-          if (stageData?.step) setQuestStep(stageData.step);
-          console.log("📌 퀘스트 스테이지 전체:", stageData);
+    
+          await setQuestData(lastData, type);
         } else {
           console.log("ℹ️ 마지막 퀘스트 없음. 새로 생성 시도");
           await handleFirstQuestFlow(type);
@@ -135,6 +139,7 @@ export default function Quest_stage() {
         }
       }
     };
+    
 
     const handleFirstQuestFlow = async (type: "MEDITATE" | "ACTIVITY" | "EMOTION") => {
       try {
@@ -181,6 +186,27 @@ export default function Quest_stage() {
     }
   };
 
+  const navigateToQuestWithCheck = () => {
+    if (displayQuestTitle === "끝! 내일 다시 만나!") {
+      Alert.alert(
+        "오늘의 퀘스트 완료!",
+        "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?",
+        [
+          {
+            text: "아니요",
+            style: "cancel",
+          },
+          {
+            text: "한 번 더!",
+            onPress: navigateToQuest,
+          },
+        ]
+      );
+    } else {
+      navigateToQuest();
+    }
+  };
+
   return (
     <View style={questStageStyles.container}>
       <ScrollView contentContainerStyle={questStyles.scrollContainer} bounces={false} overScrollMode="never">
@@ -213,9 +239,9 @@ export default function Quest_stage() {
         })}
 
         <Quest_title
-          text={questTitle || "퀘스트 불러오는 중..."}
+          text={displayQuestTitle || "퀘스트 불러오는 중..."}
           style={questStageStyles.questTitle}
-          onPress={navigateToQuest}
+          onPress={navigateToQuestWithCheck}
         />
 
         <View style={questStageStyles.textWrapper}>
@@ -240,7 +266,12 @@ export default function Quest_stage() {
           const imageStyle = [questStageStyles.stage, { top: pos.top, left: pos.left }];
 
           return isCurrent ? (
-            <TouchableOpacity key={index} style={imageStyle} onPress={navigateToQuest} activeOpacity={0.8}>
+            <TouchableOpacity
+              key={index}
+              style={imageStyle}
+              onPress={navigateToQuestWithCheck}
+              activeOpacity={0.8}
+            >
               <View style={questStageStyles.iconWrapper}>
                 <Image
                   source={
