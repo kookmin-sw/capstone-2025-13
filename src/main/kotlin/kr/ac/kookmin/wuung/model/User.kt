@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
@@ -55,6 +56,9 @@ data class User(
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
     var questStages: MutableList<UserQuestStages> = mutableListOf(),
 
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    var pot : Pot? = null,
+
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
@@ -97,6 +101,15 @@ data class User(
             )
             questStages.add(questStage)
         }
+
+        pot = Pot(
+            user = this,
+            exp = 0,
+            level = 1,
+            coupon = 0,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        )
     }
 
     @get:DisplayName
