@@ -11,8 +11,13 @@ data class RevokedToken(
     val id: Long? = null,
 
     @Column(nullable = false, unique = true, length = 2048)
-    val token: String? = null,
+    val token: String,
 
     @Column(name = "revoked_at", nullable = false)
     val revokedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    constructor(token: String) : this(
+        token = token,
+        revokedAt = LocalDateTime.now(),
+    )
+}

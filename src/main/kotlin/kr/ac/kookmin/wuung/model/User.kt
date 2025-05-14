@@ -30,23 +30,23 @@ data class User(
     var id: String? = null,
 
     @Column(nullable = false, length = 32, name = "username")
-    var userName: String? = null,
+    var userName: String,
 
     @Column(nullable = false, length = 255)
-    var email: String? = null,
+    var email: String,
 
     @Column(nullable = false, length = 255, name = "password")
-    private var password: String? = null,
+    private var password: String,
 
     @Column(nullable = false)
-    var roles: String? = null,
+    var roles: String,
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var gender: GenderEnum? = null,
+    var gender: GenderEnum,
 
     @Column(nullable = false)
-    var birthDate: LocalDateTime? = null,
+    var birthDate: LocalDateTime,
 
     @HiddenColumn
     @Column(nullable = true, length = 512)
@@ -60,14 +60,24 @@ data class User(
 
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-    ): UserDetails {
+): UserDetails {
+   constructor(): this(
+       "",
+       "",
+       "",
+       "",
+       "",
+       GenderEnum.UNKNOWN,
+       LocalDateTime.now()
+    )
+  
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role.trim()) }?.toMutableList()
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 
     override fun getPassword(): String {
-        return password ?: ""
+        return password
     }
     fun setPassword(password: String) {
         this.password = password
@@ -75,10 +85,10 @@ data class User(
     override fun isEnabled(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isAccountNonExpired(): Boolean = true
-    override fun getUsername(): String = email ?: ""
+    override fun getUsername(): String = email
 
     val age: Long?
-        get() = birthDate?.let { ChronoUnit.YEARS.between(it, LocalDateTime.now()) }
+        get() = birthDate.let { ChronoUnit.YEARS.between(it, LocalDateTime.now()) }
 
     @PreUpdate
     private fun onUpdate() {

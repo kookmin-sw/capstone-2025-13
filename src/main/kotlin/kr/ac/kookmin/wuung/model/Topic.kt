@@ -14,7 +14,7 @@ data class Topic(
     var rate : Int = 0,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var data : String? = null,
+    var data : String,
 
     @Column(nullable = false)
     var innerSeq : Int = 0,
@@ -31,6 +31,15 @@ data class Topic(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        rate = 0,
+        data = "",
+        innerSeq = 0,
+        user = User(),
+        topicFeedback = mutableListOf(),
+        createdAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

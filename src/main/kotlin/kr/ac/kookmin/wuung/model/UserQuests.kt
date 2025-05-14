@@ -27,13 +27,13 @@ data class UserQuests(
     var id: String? = null,
 
     @ManyToOne
-    var user: User? = null,
+    var user: User,
 
     @ManyToOne
-    var quest: Quests? = null,
+    var quest: Quests,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var description: String? = null,
+    var description: String,
 
     @Column(nullable = false)
     var progress: Int = 0,
@@ -53,6 +53,17 @@ data class UserQuests(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        id = null,
+        user = User(),
+        quest = Quests(),
+        description = "",
+        progress = 0,
+        target = 0,
+        status = UserQuestStatus.INCOMPLETE,
+        photo = null,
+        createdAt = LocalDateTime.now(),
+    )
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
