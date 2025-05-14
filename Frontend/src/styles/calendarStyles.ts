@@ -85,6 +85,23 @@ const calendarStyles = StyleSheet.create({
         width: '100%',
         marginVertical: height * 0.005,
     },
+    emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    },
+
+    emptyText: {
+        fontSize: 16,
+        color: '#89673F',
+        fontFamily: fonts.laundryBold
+    },
+    icon: {
+        width: 24,
+        height: 24,
+        marginRight: 10,
+    },
+
 });
 
 export default calendarStyles;
