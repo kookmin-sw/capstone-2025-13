@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp} from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
+import customAxios from "../../API/axios";
 
 type RouteParams = {
   questTitle: string;
@@ -54,9 +55,49 @@ export default function Quest_meditation() {
     }, 1000);
   };
 
-  const handleComplete = () => {
-    alert("명상이 완료되었습니다! 🎉");
+  const handleComplete = async () => {
+    try {
+      const type = "MEDITATE";
+      const response = await customAxios.get(`/quests/last/${type}`);
+      const lastDataID = response.data.data.id;
+      const lastDataStatus = response.data.data.status;
+      console.log(lastDataID);
+  
+      if (lastDataStatus !== "COMPLETED") {
+        const postRes = await customAxios.post("/quests", {
+          id: lastDataID,
+          current: 0,
+          status: "COMPLETED",
+        });
+  
+        if (postRes.status === 200 || postRes.status === 201) {
+          Alert.alert("완료!", "명상이 성공적으로 완료되었어요! 🎉", [
+            {
+              text: "확인",
+              onPress: () => navigation.navigate("Quest_stage", { title: "명상" }),
+            },
+          ]);
+          return;
+        } else {
+          Alert.alert("오류", "명상 완료 처리 중 문제가 발생했어요.");
+          return;
+        }
+      }
+      
+      Alert.alert("알림", "이미 완료된 미션이에요!", [
+        {
+          text: "확인",
+          onPress: () => navigation.navigate("Quest_stage", { title: "명상" }),
+        },
+      ]);
+  
+    } catch (error) {
+      console.error("명상 완료 처리 중 오류 발생:", error);
+      Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+    }
   };
+  
+  
 
   const mainVideo = {
     id: "FjHGZj2IjBk",
