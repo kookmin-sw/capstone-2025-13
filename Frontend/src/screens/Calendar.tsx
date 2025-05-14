@@ -64,15 +64,15 @@ export default function CalendarScreen() {
     };
 
     const selectIcon = (type: string) => {
-        if (type === "quest") {
+        if (type === "QUEST") {
             return require("../assets/Images/quest_icon.png");
-        } else if (type === "topic") {
+        } else if (type === "TOPIC") {
             return require("../assets/Images/topic_icon.png");
         }
-        else if (type === "diary") {
+        else if (type === "DIARY") {
             return require("../assets/Images/diary_icon.png");
         }
-        else if (type === "diagnosis") {
+        else if (type === "DIAGNOSIS") {
             return require("../assets/Images/diagnosis_icon.png");
         }
         // else {
@@ -85,7 +85,7 @@ export default function CalendarScreen() {
             try {
                 const response = await getBehaviors(selectedDate);
                 console.log(response)
-                // setBehaviors(response);
+                setBehaviors(response);
             } catch (error) {
                 console.error("데이터 불러오기 실패:", error);
             }
@@ -152,22 +152,30 @@ export default function CalendarScreen() {
                     style={{ flexGrow: 1, maxHeight: 400 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {behaviors.map((item, index) => (
-                        <View key={index}>
-                            <View style={calendarStyles.taskItem}>
-                                <Image
-                                    source={selectIcon(item.type)}
-                                    style={{ width: 24, height: 24, marginRight: 10 }}
-                                />
-                                <View>
-                                    <Text style={calendarStyles.taskTitle}>{item.title}</Text>
-                                    <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                    {behaviors.length > 0 ? (
+                        behaviors.map((item, index) => (
+                            <View key={index}>
+                                <View style={calendarStyles.taskItem}>
+                                    <Image
+                                        source={selectIcon(item.type)}
+                                        style={calendarStyles.icon}
+                                    />
+                                    <View>
+                                        <Text style={calendarStyles.taskTitle}>{item.title}</Text>
+                                        <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                                    </View>
                                 </View>
+                                {index !== behaviors.length - 1 && <View style={calendarStyles.divider} />}
                             </View>
-                            {index !== behaviors.length - 1 && <View style={calendarStyles.divider} />}
+                        ))
+                    ) : (
+                        <View style={calendarStyles.emptyContainer}>
+                            <Text style={calendarStyles.emptyText}>이 날에는 기록된 활동이 없어요.</Text>
                         </View>
-                    ))}
+                    )}
+
                 </ScrollView>
+
             </View>
         </View>
     );
