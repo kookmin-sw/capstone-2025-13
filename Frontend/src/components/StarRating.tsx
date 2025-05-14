@@ -3,8 +3,16 @@ import { View, TouchableOpacity, Text } from "react-native"; // ⬅️ Text 추�
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styles from "../styles/starRatingStyles";
 
-export default function StarRating() {
+type StarRatingProps = {
+    onRecordEtcUpdate: (rating: number) => void;
+};
+
+export default function StarRating({ onRecordEtcUpdate }: StarRatingProps) {
     const [rating, setRating] = useState(0);
+    const handleRatingChange = (rating: number) => {
+        setRating(rating);
+        onRecordEtcUpdate(rating);
+    };
 
     return (
         <View style={styles.container}>
@@ -15,7 +23,7 @@ export default function StarRating() {
                 {Array.from({ length: 5 }).map((_, index) => (
                     <TouchableOpacity
                         key={index}
-                        onPress={() => setRating(index + 1)}
+                        onPress={() => handleRatingChange(index + 1)}
                     >
                         <MaterialCommunityIcons
                             name={index < rating ? "star" : "star-outline"}

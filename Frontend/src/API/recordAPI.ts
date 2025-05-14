@@ -11,3 +11,10 @@ export const getRecord = async (recordId:string) => {
     const response = await customAxios.get(`/records/{recordId}?recordId=${recordId}`, {});
     return response.data.data;
 };
+
+export const postRecord = async (recordId:string, rate: number, comment:string) => {
+    const response = await customAxios.post(`/records/${recordId}`, {
+        rate, comment
+    });
+    return response.data.data;
+};
