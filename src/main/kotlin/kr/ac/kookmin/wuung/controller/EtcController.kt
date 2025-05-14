@@ -127,22 +127,21 @@ class EtcController(
 
         val questBehaviors = userQuests.mapNotNull { quest ->
             val stage = userMainStages.find { it.type == quest.quest?.type }?.stage ?: return@mapNotNull null
+            val questType = when (quest.quest?.type) {
+                QuestType.MEDITATE -> "명상하기"
+                QuestType.ACTIVITY -> "운동하기"
+                QuestType.EMOTION -> "감정 표현하기"
+                else -> return@mapNotNull null
+            }
+
+            val status = when (quest.status) {
+                UserQuestStatus.COMPLETED -> "수행 완료"
+                else -> return@mapNotNull null
+            }
+
             DailyBehaviorDTO(
                 "퀘스트",
-                "${stage}-${quest.quest?.step} ${
-                    when (quest.quest?.type) {
-                        QuestType.MEDITATE -> "명상하기"
-                        QuestType.ACTIVITY -> "운동하기"
-                        QuestType.EMOTION -> "감정 표현하기"
-                        else -> ""
-                    }
-                } ${
-                    when (quest.status) {
-                        UserQuestStatus.COMPLETED -> "수행 완료"
-                        UserQuestStatus.PROCESSING -> "수행 중"
-                        UserQuestStatus.INCOMPLETE -> "수행 예정"
-                    }
-                }",
+                "${stage}-${quest.quest?.step} $questType $status",
                 BehaviorType.QUEST
             )
         }
