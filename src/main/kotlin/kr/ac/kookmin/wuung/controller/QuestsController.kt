@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.ac.kookmin.wuung.model.LifeQuotes
+import kr.ac.kookmin.wuung.repository.LifeQuoteRepository
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.QuestType
@@ -173,6 +175,7 @@ fun UserQuestLastDTO.toDTO() = UserQuestLastDTO(
     모든 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
 """)
 class QuestsController(
+    @Autowired private val lifeQuoteRepository: LifeQuoteRepository,
     @Autowired private val questsRepository: QuestsRepository,
     @Autowired private val userQuestsRepository: UserQuestsRepository,
     @Autowired private val userQuestStageRepository : UserQuestStageRepository,
@@ -978,5 +981,42 @@ class QuestsController(
         userQuestsRepository.save(userQuests)
 
         return ResponseEntity.ok(ApiResponseDTO(data = userQuests.toDTO()))
+    }
+
+    @GetMapping("/quote")
+    @Operation(
+        summary = "Get random life quote",
+        description = """
+            [en] Get a random life quote from the database.
+            AccessToken is required on Authorization header.
+            
+            [ko] 데이터베이스에서 랜덤한 명언을 조회합니다.
+            Authorization 헤더에 AccessToken이 필요합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "return life quotes successfully",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getRandomQuote(
+        @AuthenticationPrincipal userDetails: User?
+    ): ResponseEntity<ApiResponseDTO<String>> {
+        if (userDetails == null) throw UnauthorizedException()
+        val quotes = lifeQuoteRepository.findAll()
+        val randomQuote = quotes.random()
+        return ResponseEntity.ok(ApiResponseDTO(data = randomQuote.quote))
     }
 }
