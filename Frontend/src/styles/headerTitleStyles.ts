@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
         paddingTop: 80,
         paddingBottom: 20,
         backgroundColor: "#3CB46E",
+        alignItems:'center'
     },
     backButtonWrapper: {
         marginRight: width * 0.02,
