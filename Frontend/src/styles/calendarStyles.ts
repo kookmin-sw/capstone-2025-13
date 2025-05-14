@@ -42,6 +42,7 @@ const calendarStyles = StyleSheet.create({
         color: colors.white,
     },
     taskList: {
+        flex: 1,
         marginTop: height * 0.02,
         backgroundColor: '#F2F3E5',
         borderRadius: width * 0.1,
@@ -50,6 +51,7 @@ const calendarStyles = StyleSheet.create({
     dateTitle: {
         fontSize: width * 0.045,
         fontWeight: 'bold',
+        fontFamily: fonts.laundryBold,
         marginBottom: height * 0.012,
         color: "#714E25"
     },

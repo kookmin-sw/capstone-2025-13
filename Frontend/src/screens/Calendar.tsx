@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { SetStateAction, useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
@@ -9,18 +9,37 @@ import type { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
 import { useSecondPasswordGuard } from "../hooks/useSecondPasswordGuard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getBehaviors } from "../API/calendarAPI";
+
+type BehaviorType = "diagnosis" | "topic" | "quest" | "diary";
+
+interface Behavior {
+    title: string;
+    content: string;
+    type: BehaviorType;
+}
 
 export default function CalendarScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [attendance, setAttendance] = useState(5);
     const [attendanceRate, setAttendanceRate] = useState(0);
+    const [behaviors, setBehaviors] = useState<Behavior[]>([
+        { title: "PHQ-9", content: "우울 검사 시행", type: "diagnosis" },
+        { title: "매일 1주제", content: "소소한 대화 기록 보러 가기", type: "topic" },
+        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
+        { title: "일기", content: "일기 작성", type: "diary" },
+        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
+        { title: "일기", content: "일기 작성", type: "diary" },
+    ]);
+
+    // const [behaviors, setBehaviors] = useState<Behavior[]>([]);
+
     const attendanceDates = ['2025-05-01', '2025-05-03', '2025-05-06', '2025-05-24'];
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const generateMarkedDates = (selectedDate: string) => {
         const marked: { [date: string]: any } = {};
-
         attendanceDates.forEach(date => {
             marked[date] = {
                 selected: date === selectedDate,
@@ -44,6 +63,36 @@ export default function CalendarScreen() {
         return marked;
     };
 
+    const selectIcon = (type: string) => {
+        if (type === "quest") {
+            return require("../assets/Images/quest_icon.png");
+        } else if (type === "topic") {
+            return require("../assets/Images/topic_icon.png");
+        }
+        else if (type === "diary") {
+            return require("../assets/Images/diary_icon.png");
+        }
+        else if (type === "diagnosis") {
+            return require("../assets/Images/diagnosis_icon.png");
+        }
+        // else {
+        //     return require("../assets/Images/default_icon.png"); 
+        // }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getBehaviors(selectedDate);
+                console.log(response)
+                // setBehaviors(response);
+            } catch (error) {
+                console.error("데이터 불러오기 실패:", error);
+            }
+        };
+
+        fetchData();
+    }, [selectedDate]);
     useEffect(() => {
         const date = new Date(selectedDate);
         const year = date.getFullYear();
@@ -54,7 +103,7 @@ export default function CalendarScreen() {
 
     useSecondPasswordGuard("Calendar");
     useEffect(() => {
-        AsyncStorage.setItem("secondPasswordPassed", "false");
+        AsyncStorage.setItem("contentPasswordPassed", "false");
     }, []);
 
     return (
@@ -98,19 +147,27 @@ export default function CalendarScreen() {
 
             <View style={calendarStyles.taskList}>
                 <Text style={calendarStyles.dateTitle}>{formatDate(selectedDate)}</Text>
-                {[1, 2, 3].map((_, index, array) => (
-                    <View key={index}>
-                        <View style={calendarStyles.taskItem}>
-                            <View style={calendarStyles.dot} />
-                            <View>
-                                <Text style={calendarStyles.taskTitle}>마음 건강 검사 진행</Text>
-                                <Text style={calendarStyles.taskSubtitle}>BDI 기반 검사</Text>
+                <ScrollView
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    style={{ flexGrow: 1, maxHeight: 400 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {behaviors.map((item, index) => (
+                        <View key={index}>
+                            <View style={calendarStyles.taskItem}>
+                                <Image
+                                    source={selectIcon(item.type)}
+                                    style={{ width: 24, height: 24, marginRight: 10 }}
+                                />
+                                <View>
+                                    <Text style={calendarStyles.taskTitle}>{item.title}</Text>
+                                    <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                                </View>
                             </View>
+                            {index !== behaviors.length - 1 && <View style={calendarStyles.divider} />}
                         </View>
-                        {index !== array.length - 1 && <View style={calendarStyles.divider} />}
-                    </View>
-                ))}
-
+                    ))}
+                </ScrollView>
             </View>
         </View>
     );
