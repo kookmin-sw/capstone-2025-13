@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "DiagnosisText")
+@Table(name = "diagnosis_text")
 data class DiagnosisText(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

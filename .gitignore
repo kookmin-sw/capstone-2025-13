@@ -221,3 +221,4 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/dotenv,kotlin,gradle,intellij+iml,macos,windows,linux
 
 *.pem
+*.db

@@ -4,20 +4,12 @@ import ch.veehait.devicecheck.appattest.AppleAppAttest
 import ch.veehait.devicecheck.appattest.attestation.AttestationException
 import ch.veehait.devicecheck.appattest.common.App
 import ch.veehait.devicecheck.appattest.common.AppleAppAttestEnvironment
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.JwtParser
-import io.jsonwebtoken.Jwts
 import kr.ac.kookmin.wuung.controller.IntegrityVerificationResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import java.security.KeyFactory
-import java.security.PublicKey
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.AccessToken
@@ -28,10 +20,6 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 import java.util.Base64
 
 @Service

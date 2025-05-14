@@ -12,7 +12,7 @@ enum class DiagnosisType(val value : String) {
 }
 
 @Entity
-@Table(name = "Diagnosis")
+@Table(name = "diagnosis")
 data class Diagnosis(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
