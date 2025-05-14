@@ -13,6 +13,8 @@ export const useCustomFonts = () => {
         [fonts.extraBold]: require("../assets/fonts/Pretendard-ExtraBold.otf"),
         [fonts.black]: require("../assets/fonts/Pretendard-Black.otf"),
         [fonts.thin]: require("../assets/fonts/Pretendard-Thin.otf"),
+        [fonts.laundry]: require("../assets/fonts/LaundryGothic-Regular.ttf"),
+        [fonts.laundryBold]: require("../assets/fonts/LaundryGothic-Bold.ttf"),
     });
 
     return fontsLoaded;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
@@ -27,6 +26,7 @@ import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
 import Interest from "./screens/SimpleDiagnosis/Interest";
+import { useCustomFonts } from "./hooks/useCustomFonts";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -119,21 +119,7 @@ export default function App() {
         return () => clearInterval(interval); // cleanup
     }, []);
 
-
-    const [fontsLoaded] = useFonts({
-        "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),
-        "Pretendard-Bold": require("./assets/fonts/Pretendard-Bold.otf"),
-        "Pretendard-SemiBold": require("./assets/fonts/Pretendard-SemiBold.otf"),
-        "Pretendard-Medium": require("./assets/fonts/Pretendard-Medium.otf"),
-        "Pretendard-Light": require("./assets/fonts/Pretendard-Light.otf"),
-        "Pretendard-ExtraLight": require("./assets/fonts/Pretendard-ExtraLight.otf"),
-        "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
-        "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
-        "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
-        DungGeunMo: require("./assets/fonts/DungGeunMo.ttf"),
-        "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
-        "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
-    });
+    const fontsLoaded = useCustomFonts();
 
     if (!fontsLoaded) return null;
 

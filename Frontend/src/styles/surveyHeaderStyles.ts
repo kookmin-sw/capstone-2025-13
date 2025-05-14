@@ -11,8 +11,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 26,
-        fontWeight: "bold",
-        fontFamily: fonts.laundry,
+        fontFamily: fonts.laundryBold,
         color: "white",
         marginTop: 20,
     },

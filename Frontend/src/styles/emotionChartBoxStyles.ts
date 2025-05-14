@@ -26,8 +26,7 @@ const styles = StyleSheet.create({
     emptyText: {
         color: "#1AA85C",
         fontSize: 20,
-        fontWeight:"bold",
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.laundryBold,
         textAlign: "center",
     },
 });
