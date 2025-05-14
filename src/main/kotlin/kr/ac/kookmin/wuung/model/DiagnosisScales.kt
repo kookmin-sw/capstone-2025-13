@@ -16,7 +16,7 @@ data class DiagnosisScale(
 
     @Column(nullable = false)
     var start: Int,
-
+  
     @Column(nullable = false, length = 128)
     var scaleName: String,
 

@@ -69,10 +69,10 @@ data class User(
        "",
        GenderEnum.UNKNOWN,
        LocalDateTime.now()
-   )
-
+    )
+  
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles.split(",")?.map { role -> SimpleGrantedAuthority(role.trim()) }?.toMutableList()
+        return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role.trim()) }?.toMutableList()
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 

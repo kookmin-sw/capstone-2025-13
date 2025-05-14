@@ -33,6 +33,15 @@ data class Record(
     @Enumerated
     var status : LuckyVickyStatus = LuckyVickyStatus.QUEUED,
 
+    @Column(nullable = true, columnDefinition = "TEXT")
+    var luckyVicky: String? = null,
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    var comment : String? = null,
+
+    @Enumerated
+    var status : LuckyVickyStatus = LuckyVickyStatus.QUEUED,
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     val user: User,
