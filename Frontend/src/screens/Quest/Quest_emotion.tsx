@@ -50,11 +50,11 @@ export default function QuestEmotion() {
 
     console.log('✅ 감정 분석 요청됨:', { uri, face });
     const result = await EmotionModelRunner(uri, model);
-    console.log('🧠 감정 예측 결과:', result);
     if (result) {
       const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
       const topIndex = result.indexOf(Math.max(...result));
       const predictedLabel = labels[topIndex];
+      console.log('🧠 감정 예측 결과:', result);
 
       const updated = [...emotionLog, predictedLabel];
       if (updated.length > quest_save_pre_log) updated.shift();
