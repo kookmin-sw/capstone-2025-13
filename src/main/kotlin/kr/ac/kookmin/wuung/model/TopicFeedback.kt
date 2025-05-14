@@ -34,13 +34,13 @@ data class TopicFeedback(
     var aiFeedback: String? = null,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    var data: String? = null,
+    var data: String,
 
     @Column(nullable = true, columnDefinition = "TEXT")
     var comment : String? = null,
 
     @ManyToOne
-    val topic: Topic? = null,
+    val topic: Topic,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -48,6 +48,14 @@ data class TopicFeedback(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        id = null,
+        status = TopicFeedbackStatus.QUEUED,
+        data = "",
+        topic = Topic(),
+        createdAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

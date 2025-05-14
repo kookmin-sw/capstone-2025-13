@@ -309,49 +309,6 @@ class TopicController(
         return ResponseEntity.ok(ApiResponseDTO(data = topic.toFullDTO()))
     }
 
-    @PutMapping("/feedback")
-    @Operation(
-        summary = "Create new feedback topic", description = """
-        [en] Initializes a new empty feedback topic associated with an existing daily topic. This is the first step in the AI feedback process
-        [ko] 기존 일일 기록에 연결된 새로운 빈 피드백 기록을 초기화합니다. AI 피드백 프로세스의 첫 단계입니다
-    """
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200", description = "Create feedback topic successfully",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
-            ),
-            ApiResponse(
-                responseCode = "401", description = "Unauthorized",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
-            ),
-            ApiResponse(
-                responseCode = "404", description = "Topic not found",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
-            )
-        ]
-    )
-    fun createFeedback(
-        @AuthenticationPrincipal userDetails: User?,
-        @RequestParam topicId: String
-    ): ResponseEntity<ApiResponseDTO<String>> {
-        if (userDetails == null) throw UnauthorizedException()
-        val topic = topicRepository.findById(topicId).getOrNull() ?: throw NotFoundException()
-        val feedback = TopicFeedback(topic = topic)
-        val saved = topicFeedbackRepository.save(feedback)
-        return ResponseEntity.ok(ApiResponseDTO(data = saved.id))
-    }
-
     @OptIn(DelicateCoroutinesApi::class)
     @PutMapping("/feedback/{topicId}")
     @Operation(

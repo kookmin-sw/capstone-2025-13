@@ -18,16 +18,16 @@ data class DiagnosisResults(
     var id: String? = null,
 
     @ManyToOne
-    var user: User? = null,
+    var user: User,
 
     @ManyToOne
-    var diagnosis: Diagnosis? = null,
+    var diagnosis: Diagnosis,
 
     @Column(nullable = false)
-    var result: Int? = 0,
+    var result: Int,
 
     @Column(nullable = false)
-    var scale: Int? = 0,
+    var scale: Int,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -35,6 +35,14 @@ data class DiagnosisResults(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        id = null,
+        user = User(),
+        diagnosis = Diagnosis(),
+        result = 0,
+        scale = 0,
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

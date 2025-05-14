@@ -25,6 +25,11 @@ class LifeQuotes (
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        quote = "",
+        createdAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
