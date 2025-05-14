@@ -1,10 +1,21 @@
-import React from "react";
-import { View, TextInput, ImageBackground } from "react-native";
+import React, { useState } from "react";
+import { View, TextInput } from "react-native";
 import styles from "../styles/recordEtcStyles";
 
-export default function RecordEtc() {
+type RecordEtcProps = {
+    onRecordEtcUpdate: (text: string) => void;
+};
+
+export default function RecordEtc({ onRecordEtcUpdate }: RecordEtcProps) {
+    const [etcText, setEtcText] = useState<string>("");
+
+    const handleTextChange = (text: string) => {
+        setEtcText(text);
+        onRecordEtcUpdate(text);
+    };
+
     return (
-        <View style={styles.shadowWrapper}>  {/* 그림자만 담당 */}
+        <View style={styles.shadowWrapper}>
             <View style={styles.inputBox}>
                 <TextInput
                     style={styles.textInput}
@@ -12,9 +23,10 @@ export default function RecordEtc() {
                     placeholderTextColor="#AFAFAF"
                     multiline
                     textAlignVertical="top"
+                    value={etcText}
+                    onChangeText={handleTextChange}
                 />
             </View>
         </View>
-
     );
 }

@@ -1,0 +1,13 @@
+import customAxios from "./axios";
+
+export const createRecord = async (data:string) => {
+    const response = await customAxios.put("/records/create", {
+        data: `${data}`,
+    });
+    return response.data.data;
+};
+
+export const getRecord = async (recordId:string) => {
+    const response = await customAxios.get(`/records/{recordId}?recordId=${recordId}`, {});
+    return response.data.data;
+};
