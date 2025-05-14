@@ -21,3 +21,4 @@ class AiFeedbackNotEnableException : CustomException("No feedback record, can\'t
 class InvalidIssuerException : CustomException("Invalid Issuer", 403)
 
 class CouponNotEnoughException : CustomException("coupon not enough", 444)
+class PotMaxLevelReachedException : CustomException("max level reached", 445)

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.exceptions.NotFoundException
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.exceptions.CouponNotEnoughException
+import kr.ac.kookmin.wuung.exceptions.PotMaxLevelReachedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.PotLevelRepository
@@ -167,6 +168,7 @@ class PotController(
         [ko]
         쿠폰 하나를 사용하여 경험치를 획득합니다. 경험치가 필요량에 도달하면
         화분의 레벨이 올라가고 경험치가 0으로 초기화됩니다.
+        개발자가 정의한 레벨을 초과한 레벨업 시도시 상태값 445를 반환합니다.
         이 엔드포인트는 보호되어 있으며 사용을 위해서 accessToken이 필요합니다.
     """
     )
@@ -189,9 +191,14 @@ class PotController(
             ),
             ApiResponse(
                 responseCode = "444",
-                description = "Not enough coup / 쿠폰 부족",
+                description = "Not enough coupon",
                 content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
-            )
+            ),
+            ApiResponse(
+                responseCode = "445",
+                description = "Max level reached",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
         ]
     )
     fun useCoupon(
@@ -222,7 +229,7 @@ class PotController(
         potRepository.save(pot)
 
         // 새로운 레벨 정보 조회
-        val newPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        val newPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
 
         // 새 레벨 정보를 포함한 pot 정보 반환
         return ResponseEntity.ok(
