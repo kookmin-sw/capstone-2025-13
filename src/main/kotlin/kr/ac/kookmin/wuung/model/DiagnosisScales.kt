@@ -20,6 +20,6 @@ data class DiagnosisScale(
     @Column(nullable = false, length = 32)
     var scaleName: String? = null,
 
-    @Column(nullable = false, length = 128)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var description: String? = null
 )
