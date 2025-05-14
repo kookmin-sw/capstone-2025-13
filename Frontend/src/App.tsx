@@ -27,6 +27,7 @@ import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
 import Interest from "./screens/SimpleDiagnosis/Interest";
 import { useCustomFonts } from "./hooks/useCustomFonts";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -225,6 +226,11 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="HelpCall2"
+                    component={HelpCall2}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="Calendar"
                     component={Calendar}
                     options={{ headerShown: false }}
@@ -240,6 +246,7 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
+
         </NavigationContainer>
     );
 }
