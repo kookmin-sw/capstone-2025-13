@@ -52,6 +52,14 @@ export interface DiagnosisScale {
   scaleName: string;
   description: string;
 }
+export interface DiagnosisResult {
+    id: string;
+    diagnosisId: number;
+    result: number;
+    scale: number;
+    createdAt: string;
+    updatedAt: string;
+}
 
 const getAuthHeaders = async () => {
   const token = await AsyncStorage.getItem("accessToken");
@@ -109,3 +117,15 @@ export const putDiagnosisResult = async (id: number, scale: number, result: numb
   });
 };
 
+
+export const getDiagnosisResult = async (start: string): Promise<DiagnosisResult[] | null> => {
+  console.log(start);
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisResult[]>>(
+      `/diagnosis/results?start=${start}`,
+      { headers }
+    );
+    return data.data;
+  });
+};
