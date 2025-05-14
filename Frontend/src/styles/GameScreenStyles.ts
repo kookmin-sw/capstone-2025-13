@@ -11,7 +11,6 @@ export const gameScreenstyles = StyleSheet.create({
   },
   title: { 
     fontSize: 28, 
-    fontWeight: 'bold', 
     marginBottom: 50, 
     marginTop:30 , 
     fontFamily: fonts.laundryBold, 
@@ -36,14 +35,14 @@ export const gameScreenstyles = StyleSheet.create({
     color: '#349C64', 
     marginBottom: 10, 
     textAlign:'center', 
-    fontFamily:fonts.bold 
+    fontFamily:fonts.laundryBold 
   },
   timeTaken: {
     fontSize: 18,
     fontWeight: '600',
     color: '#349C64',
     marginTop: 10,
-    fontFamily:fonts.bold,
+    fontFamily:fonts.laundryBold,
     textAlign:'center'
   },
   row: {
@@ -70,7 +69,7 @@ export const gameScreenstyles = StyleSheet.create({
   },
   endText: {
     color: colors.white,
-    fontFamily: fonts.bold,
+    fontFamily: fonts.laundryBold,
   },
   againButton: {
     paddingVertical: 10,
@@ -89,7 +88,7 @@ export const gameScreenstyles = StyleSheet.create({
   },
   againText:{
     color: colors.white,
-    fontFamily: fonts.bold,
+    fontFamily: fonts.laundryBold,
   },
   modalOverlay: {
     flex: 1,

@@ -6,7 +6,7 @@ interface SurveyQuestionProps {
     number: number;
     question: string;
     answers: { text: string; score: number }[];
-    onAnswer: (score: number) => void; 
+    onAnswer: (score: number) => void;
 }
 
 export default function SurveyQuestion({
@@ -43,7 +43,7 @@ export default function SurveyQuestion({
                                 ]}
                                 onPress={() => {
                                     setSelected(index);
-                                    onAnswer(answer.score); 
+                                    onAnswer(answer.score);
                                 }}
                             ></TouchableOpacity>
                             <Text
