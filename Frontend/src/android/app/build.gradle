@@ -95,6 +95,9 @@ android {
         versionCode 90
         versionName = VERSION_NAME
     }
+    aaptOptions {
+        noCompress "tflite"
+    }
     signingConfigs {
         debug {
             storeFile = file('debug.keystore')

@@ -17,6 +17,7 @@ import Quest from "./screens/Quest/Quest";
 import Quest_stage from "./screens/Quest/Quest_stage";
 import Quest_meditation from "./screens/Quest/Quest_meditation";
 import Quest_exercise from "./screens/Quest/Quest_exercise";
+import Quest_emotion from "./screens/Quest/Quest_emotion";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -64,6 +65,8 @@ export type RootStackParamList = {
     Record: undefined;
     Quest_meditation: undefined;
     Quest_exercise: undefined;
+    Quest_emotion: undefined;
+    Quest_emotion_sy: undefined;
     Calendar: undefined;
 
 };
@@ -79,7 +82,7 @@ function AppInner() {
     const routeNameRef = useRef();
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(false);
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
     const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -163,7 +166,7 @@ function AppInner() {
         "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
         "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
         "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
-        DungGeunMo: require("./assets/fonts/DungGeunMo.ttf"),
+        "DungGeunMo": require("./assets/fonts/DungGeunMo.ttf"),
         "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
         "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
     });
@@ -176,6 +179,34 @@ function AppInner() {
         return <RestrictedAccessScreen error={integrityError} />;
     }
 
+    console.log("🧪 스크린 등록 확인:");
+    [
+        Home,
+        SignIn,
+        SignUpStep1,
+        SignUpStep2,
+        SignUpStep3,
+        SimpleDiagnosis,
+        Game,
+        Quest,
+        Quest_stage,
+        Quest_meditation,
+        Quest_exercise,
+        Quest_emotion,
+        FormalDiagnosis,
+        FormalDiagnosisSurvey,
+        GameScreen,
+        DailyTopic,
+        Spinner,
+        HelpCall,
+        HelpCall2,
+        UserInfo,
+        Record,
+        Calendar,
+    ].forEach((comp, i) => {
+        if (!comp) console.warn(`❌ [component ${i}] is undefined`);
+    });
+    
     return (
         <NavigationContainer
             ref={navigationRef}
@@ -257,6 +288,11 @@ function AppInner() {
                     name="Quest_exercise"
                     component={Quest_exercise}
                     options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Quest_emotion"
+                    component={Quest_emotion}
+                    options={{ headerShown: false}}
                 />
                 <Stack.Screen
                     name="FormalDiagnosis" // FormalDiagnosis 화면 추가

@@ -72,6 +72,8 @@ export default function Quest_stage() {
               navigation.navigate("Quest_meditation" as never);
             } else if (title === "운동") {
               navigation.navigate("Quest_exercise" as never);
+            } else if(title === "감정") {
+                navigation.navigate("Quest_emotion" as never);
             } else {
               console.warn("알 수 없는 title 값:", title);
             }
@@ -112,6 +114,8 @@ export default function Quest_stage() {
                     navigation.navigate("Quest_meditation" as never);
                   } else if (title === "운동") {
                     navigation.navigate("Quest_exercise" as never);
+                  } else if(title === "감정") {
+                    navigation.navigate("Quest_emotion" as never);
                   }
                 }}
                 activeOpacity={0.8}
