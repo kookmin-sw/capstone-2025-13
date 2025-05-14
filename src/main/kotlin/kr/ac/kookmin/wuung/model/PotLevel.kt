@@ -23,6 +23,15 @@ data class PotLevel(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
+
+    constructor(): this(
+        id = null,
+        level = 1,
+        need = 0,
+        createdAt = LocalDateTime.now(),
+        updatedAt = LocalDateTime.now()
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

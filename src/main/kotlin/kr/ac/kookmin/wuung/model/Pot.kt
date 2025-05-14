@@ -28,6 +28,16 @@ data class Pot(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
+    constructor(): this(
+        id = null,
+        user = null,
+        exp = 0,
+        level = 1,
+        coupon = 0,
+        createdAt = LocalDateTime.now(),
+        updatedAt = LocalDateTime.now()
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
