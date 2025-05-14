@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 
-@Entity
+@Entity(name="Quests")
 @Table(name = "quests")
 data class Quests(
     @Id

@@ -2,6 +2,8 @@ package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -39,7 +41,7 @@ data class UserQuests(
     @Column(nullable = false)
     var target: Int = 0,
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     var status : UserQuestStatus = UserQuestStatus.INCOMPLETE,
 
     @Column(nullable = true)

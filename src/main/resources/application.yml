@@ -53,3 +53,7 @@ app:
   google-account-json: ${GOOGLE_ACCOUNT_JSON}
   apple-team-id: ${APPLE_TEAM_ID}
   apple-key-id: ${APPLE_KEY_ID}
+snapadmin:
+  enabled: true
+  baseUrl: admin
+  models-package: kr.ac.kookmin.wuung.model
