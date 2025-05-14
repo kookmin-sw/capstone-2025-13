@@ -72,4 +72,10 @@ class ExceptionHandlerFilter(private val objectMapper: ObjectMapper) : OncePerRe
             code = error.status
         )
     }
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val excludePath = listOf("/admin", "/admin/**", "/login")
+
+        return excludePath.any { request.requestURI.contains(it) }
+    }
 }

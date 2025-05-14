@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.model
 
+import io.swagger.v3.oas.annotations.Hidden
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -15,6 +16,8 @@ import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import space.mori.dalbodeule.snapadmin.external.annotations.DisplayName
+import space.mori.dalbodeule.snapadmin.external.annotations.HiddenColumn
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -45,6 +48,7 @@ data class User(
     @Column(nullable = false)
     var birthDate: LocalDateTime? = null,
 
+    @HiddenColumn
     @Column(nullable = true, length = 512)
     var profile: String? = null,
 
@@ -56,9 +60,9 @@ data class User(
 
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-): UserDetails {
+    ): UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role) }?.toMutableList()
+        return roles?.split(",")?.map { role -> SimpleGrantedAuthority(role.trim()) }?.toMutableList()
             ?: mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 
@@ -95,6 +99,9 @@ data class User(
         }
     }
 
+    @get:DisplayName
+    val displayName: String?
+        get() = this.userName
 }
 
 enum class GenderEnum(val value: String) {

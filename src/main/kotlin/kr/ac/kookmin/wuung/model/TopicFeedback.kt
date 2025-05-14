@@ -2,6 +2,8 @@ package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -25,7 +27,7 @@ data class TopicFeedback(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: String? = null,
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     var status: TopicFeedbackStatus = TopicFeedbackStatus.QUEUED,
 
     @Column(nullable = true, columnDefinition = "TEXT")
