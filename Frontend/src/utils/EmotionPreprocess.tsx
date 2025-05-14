@@ -13,7 +13,7 @@ export const imageToGrayscale = async (uri: string): Promise<[Float32Array]> => 
       64,
       'JPEG',
       100,
-      0,
+      270,
       undefined,
       false,
       { mode: 'stretch' }
