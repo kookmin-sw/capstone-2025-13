@@ -58,7 +58,7 @@ class LuckyVickyBatch(
         return RepositoryItemReaderBuilder<Record>()
             .name("recordFeedbackReader")
             .repository(recordRepository)
-            .methodName("findRecordByStatus")
+            .methodName("findRecordsByStatus")
             .arguments(listOf(LuckyVickyStatus.QUEUED))
             .sorts(sortKeys)
             .pageSize(10)
