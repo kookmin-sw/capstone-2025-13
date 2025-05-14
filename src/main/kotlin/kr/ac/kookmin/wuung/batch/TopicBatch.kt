@@ -15,6 +15,7 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.data.RepositoryItemReader
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.Sort
@@ -25,7 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager
 class TopicBatch(
     @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
     @Autowired private val chatClient: ChatClient,
-    @Autowired private val recordPrompt: String
+    @Qualifier("getRecordPrompt") @Autowired private val recordPrompt: String
 ) {
     companion object {
         private const val CHUNK_SIZE = 10

@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.controller
 
+import io.swagger.v3.oas.annotations.Hidden
 import kr.ac.kookmin.wuung.service.IntegrityChallengeService
 import kr.ac.kookmin.wuung.service.IntegrityService
 import org.slf4j.LoggerFactory
@@ -39,6 +40,7 @@ data class IntegrityVerificationResponse(
 
 @RestController
 @RequestMapping("/api/integrity")
+@Hidden
 class IntegrityController(
     @Autowired private val integrityService: IntegrityService,
     @Autowired private val challengeService: IntegrityChallengeService,

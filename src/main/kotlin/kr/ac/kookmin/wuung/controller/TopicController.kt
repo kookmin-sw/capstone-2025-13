@@ -34,6 +34,7 @@ import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
 import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -675,6 +676,7 @@ class TopicController(
         ))
     }
 
+    @Scheduled(fixedRate = 10000L)
     private fun runJob() {
         val jobParameters = JobParametersBuilder()
             .addLong("time", System.currentTimeMillis())
