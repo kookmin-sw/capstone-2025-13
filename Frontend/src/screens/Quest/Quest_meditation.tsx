@@ -6,15 +6,29 @@ import { dynamic } from '../../styles/questMeditaionDynamicStyles';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp} from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
+type RouteParams = {
+  questTitle: string;
+  questDescription: string;
+  questTarget: number;
+};
 
 export default function Quest_meditation() {
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isMeditationDone, setIsMeditationDone] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { width } = useWindowDimensions();
   const navigation = useNavigation<NavigationProp<any>>();
+  const route = useRoute();
+  const { questTitle, questDescription, questTarget } = route.params as RouteParams;
+  const descriptionLines = questDescription.split('\n');
+
+  useEffect(() => {
+    setTimeLeft(questTarget * 60);
+  }, [questTarget]);
+  
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -128,7 +142,7 @@ export default function Quest_meditation() {
           오늘의 미션 🔥
         </Text>
         <Text style={[styles.mainText, dynamic.mainText]}>
-          5분 간 명상하기
+          {questTitle}
         </Text>
       </View>
     </View>
@@ -152,9 +166,11 @@ export default function Quest_meditation() {
           오늘의 명상 가이드 🧘🏻‍♀️
         </Text>
 
-        <Text style={[styles.description, dynamic.description]}>・ 자연스럽게 들이쉬고 내쉬는 호흡에 집중하세요. </Text>
-        <Text style={[styles.description, dynamic.description]}>・ 숨이 지나는 감각, 가슴이 움직이는 느낌에 주의해보세요.</Text>
-        <Text style={[styles.description, dynamic.description]}>・ 생각이 떠오르면 판단하지 말고 다시 호흡으로 돌아옵니다</Text>
+        {descriptionLines.map((line, index) => (
+        <Text key={index} style={styles.description}>
+          ・ {line}
+        </Text>
+        ))}
 
         <Text style={[styles.sectionTitle, dynamic.sectionTitle]}>'우웅'의 추천 플레이리스트 🎧</Text>
 
