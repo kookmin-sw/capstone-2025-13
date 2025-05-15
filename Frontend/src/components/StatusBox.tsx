@@ -3,6 +3,8 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { getPotStatus, useCoupon } from "../API/potAPI";
 import potImage from "../assets/Images/pot_seed.png";
+import potClover from "../assets/Images/pot_clover.png";
+import potFlower from "../assets/Images/pot_flower.png";
 import styles from "../styles/statusBoxStyles";
 
 export default function StatusBox() {
@@ -40,13 +42,20 @@ export default function StatusBox() {
 
     const progressRatio = Math.min(potData.exp / potData.need, 1);
 
+    let potImageSource = potImage;
+    if (progressRatio > 0.9) {
+        potImageSource = potFlower;
+    } else if (progressRatio > 0.2) {
+        potImageSource = potClover;
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.levelWrapper}>
                 <Text style={styles.levelText}>{potData.level - 1}송이</Text>
             </View>
 
-            <Image source={potImage} style={styles.potImage} />
+            <Image source={potImageSource} style={styles.potImage} />
 
             <View style={styles.progressButtonRow}>
                 <View style={styles.progressContainer}>
