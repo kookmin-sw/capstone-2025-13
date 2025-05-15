@@ -77,7 +77,7 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       fontSize: width * 0.06,
       fontWeight: "bold",
       color: "#4CAF50",
-      marginBottom: width * 0.05,
+      marginBottom: width * 0.02,
     },
     section: {
       width: "100%",
