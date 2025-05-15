@@ -25,7 +25,7 @@ type QuestNavigationProp =
 const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
   switch (title) {
     case "명상": return "MEDITATE";
-    case "운동": return "ACTIVITY";
+    case "산책": return "ACTIVITY";
     default: return "EMOTION";
   }
 };
@@ -94,28 +94,33 @@ export default function Quest_stage() {
           if (lastData.status === "COMPLETED") {
             const lastUpdatedAt = new Date(lastData.updatedAt);
             const now = new Date();
-            const timeDifference = now.getTime() - lastUpdatedAt.getTime();
-            const oneDayInMillis = 24 * 60 * 60 * 1000;
-    
-            if (timeDifference >= oneDayInMillis) {
+          
+            const isNextDay = (lastDate: Date, currentDate: Date) => {
+              const last = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+              const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+              const diffInDays = (current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24);
+              return diffInDays >= 1;
+            };
+          
+            if (isNextDay(lastUpdatedAt, now)) {
               const nextStep = lastData.step + 1;
               console.log("🔁 다음 스텝으로 진행:", nextStep);
-    
+          
               const listRes = await customAxios.get(`/quests/list/${type}/${nextStep}`);
               const newQuest = listRes.data.data;
-    
+          
               if (!newQuest?.id) {
                 console.warn("⚠️ 다음 스텝 퀘스트 없음");
                 return;
               }
-    
+          
               const putRes = await customAxios.put("/quests", { id: newQuest.id });
               await customAxios.post("/quests", {
                 id: putRes.data.data.id,
                 current: 0,
                 status: "PROCESSING",
               });
-    
+          
               await setQuestData({ ...newQuest, step: 1 }, type);
               console.log("🆕 새 퀘스트 설정 완료:", newQuest);
               return;
@@ -123,7 +128,7 @@ export default function Quest_stage() {
               await setQuestData(lastData, type, "끝! 내일 다시 만나!");
               return;
             }
-          }
+          }          
     
           await setQuestData(lastData, type);
         } else {
@@ -179,7 +184,7 @@ export default function Quest_stage() {
     const params = { questTitle, questDescription, questTarget };
     if (title === "명상") {
       navigation.navigate("Quest_meditation", params);
-    } else if (title === "운동") {
+    } else if (title === "산책") {
       navigation.navigate("Quest_exercise", params);
     } else {
       console.warn("❓ 알 수 없는 퀘스트 타입:", title);
@@ -188,20 +193,37 @@ export default function Quest_stage() {
 
   const navigateToQuestWithCheck = () => {
     if (displayQuestTitle === "끝! 내일 다시 만나!") {
-      Alert.alert(
-        "오늘의 퀘스트 완료!",
-        "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?",
-        [
-          {
-            text: "아니요",
-            style: "cancel",
-          },
-          {
-            text: "한 번 더!",
-            onPress: navigateToQuest,
-          },
-        ]
-      );
+      if (title === "명상") {
+        Alert.alert(
+          "오늘의 퀘스트 완료!",
+          "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?",
+          [
+            {
+              text: "아니요",
+              style: "cancel",
+            },
+            {
+              text: "한 번 더!",
+              onPress: navigateToQuest,
+            },
+          ]
+        );
+      } else if (title === "산책") {
+        Alert.alert(
+          "오늘의 퀘스트 완료!",
+          "이미 오늘 미션을 완료했어요.",
+          [
+            {
+              text: "닫기",
+              style: "cancel",
+            },
+            {
+              text: "한번 더 볼래",
+              onPress: navigateToQuest,
+            },
+          ]
+        );
+      }
     } else {
       navigateToQuest();
     }
