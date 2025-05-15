@@ -909,11 +909,12 @@ class QuestsController(
         if (userDetails == null) throw UnauthorizedException()
 
         val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
-        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+        if (userQuests.user.id != userDetails.id) throw UnauthorizedException()
 
         val file = userQuestS3Service.uploadPhoto(userQuests, file)
 
         userQuests.photo = file
+        userQuestsRepository.save(userQuests)
 
         val dto = userQuests.toDTO()
         dto.photoEndpoint = s3PublicEndpoint
@@ -973,7 +974,7 @@ class QuestsController(
         if (userDetails == null) throw UnauthorizedException()
 
         val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
-        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+        if (userQuests.user.id != userDetails.id) throw UnauthorizedException()
 
         userQuestS3Service.removePhoto(userQuests)
 
