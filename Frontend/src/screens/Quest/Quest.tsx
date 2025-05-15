@@ -16,7 +16,7 @@ const { height, width } = Dimensions.get("window");
 const questData = [
   { title: "우웅의 술" },
   { title: "명상"},
-  { title: "운동"},
+  { title: "산책"},
 ];
 
 export default function Quest() {
