@@ -10,12 +10,21 @@ type RecordInputBoxProps = {
     setIsLoading: (loading: boolean) => void;
     setModalOpen: (isOpen: boolean) => void;
     isSubmmitAgreed: boolean;
+    initialRecord?: string;
 };
 
-export default function RecordInputBox({ onRecordIdUpdate, onLuckyVickyUpdate, setIsLoading, setModalOpen, isSubmmitAgreed }: RecordInputBoxProps) {
-    const [record, setRecord] = useState<string>("");
+export default function RecordInputBox({ onRecordIdUpdate, onLuckyVickyUpdate, setIsLoading, setModalOpen, isSubmmitAgreed, initialRecord = "" }: RecordInputBoxProps) {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [submitRequested, setSubmitRequested] = useState<boolean>(false);
+
+    const [record, setRecord] = useState<string>(initialRecord);
+
+    useEffect(() => {
+        setRecord(initialRecord);
+        if (initialRecord) {
+            setIsSubmitted(true);
+        }
+    }, [initialRecord]);
 
     const submitRecord = () => {
         if (!record) {

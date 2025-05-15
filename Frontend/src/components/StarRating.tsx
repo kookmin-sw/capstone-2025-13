@@ -1,18 +1,22 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native"; // ⬅️ Text 추가
+import React, { useEffect, useState } from "react";
+import { View, TouchableOpacity, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styles from "../styles/starRatingStyles";
 
 type StarRatingProps = {
     onRecordEtcUpdate: (rating: number) => void;
+    initialRating?: number;
 };
 
-export default function StarRating({ onRecordEtcUpdate }: StarRatingProps) {
+export default function StarRating({ onRecordEtcUpdate, initialRating = 0 }: StarRatingProps) {
     const [rating, setRating] = useState(0);
     const handleRatingChange = (rating: number) => {
         setRating(rating);
         onRecordEtcUpdate(rating);
     };
+    useEffect(() => {
+        setRating(initialRating);
+    }, [initialRating]);
 
     return (
         <View style={styles.container}>

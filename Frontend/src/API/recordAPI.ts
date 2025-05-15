@@ -18,3 +18,8 @@ export const postRecord = async (recordId:string, rate: number, comment:string) 
     });
     return response.data.data;
 };
+
+export const getRecordMe = async (date:string) => {
+    const response = await customAxios.get(`/records/me?date=${date}`, {});
+    return response.data.data;
+};

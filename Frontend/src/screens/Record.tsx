@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, Image, Text, TouchableOpacity, Modal } from "react-native";
 import Toast from 'react-native-toast-message';
 import RecordHeader from "../components/RecordHeader";
@@ -7,18 +7,41 @@ import StarRating from "../components/StarRating";
 import RecordChat from "../components/Record_chat";
 import RecordEtc from "../components/Record_etc";
 import styles from "../styles/recordStyles";
-import { postRecord } from "../API/recordAPI";
+import { getRecordMe, postRecord } from "../API/recordAPI";
 
 export default function Record() {
     const [recordId, setRecordId] = useState<string>("");
     const [luckyVicky, setLuckyVicky] = useState<string>("이거 완전 럭키비키 잖아~");
     const [isLuckyLoading, setIsLuckyLoading] = useState<boolean>(false);
+    const [recordText, setRecordText] = useState<string>("");
     const [recordEtcText, setRecordEtcText] = useState<string>("");
     const [rating, setRating] = useState(0);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSubmmitAgreed, setIsSubmitAgreed] = useState<boolean>(false);
     const [isSaved, setIsSaved] = useState<boolean>(false);
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    useEffect(() => {
+        const fetchRecord = async () => {
+            try {
+                const response = await getRecordMe(formattedDate);
+                setRecordText(response.data || "");
+                setIsSaved(response.status === "COMPLETED");
+                setRecordId(response.id || "");
+                setRating(response.rate || 0);
+                setRecordEtcText(response.comment || "");
+                setLuckyVicky(response.luckyVicky || "");
+            } catch (error) {
+
+            }
+        };
+        fetchRecord();
+    }, [formattedDate]);
 
     const handleRecordIdUpdate = (id: string) => {
         setRecordId(id);
@@ -68,10 +91,17 @@ export default function Record() {
         <View style={styles.container}>
             <RecordHeader />
             <ScrollView contentContainerStyle={[styles.scroll, { alignItems: 'center' }]}>
-                <StarRating onRecordEtcUpdate={handleRatingChange} />
-                <RecordInputBox onRecordIdUpdate={handleRecordIdUpdate} onLuckyVickyUpdate={handleLuckyVickyUpdate} setIsLoading={setIsLuckyLoading} setModalOpen={setModalOpen} isSubmmitAgreed={isSubmmitAgreed} />
+                <StarRating onRecordEtcUpdate={handleRatingChange} initialRating={rating} />
+                <RecordInputBox
+                    initialRecord={recordText}
+                    onRecordIdUpdate={handleRecordIdUpdate}
+                    onLuckyVickyUpdate={handleLuckyVickyUpdate}
+                    setIsLoading={setIsLoading}
+                    setModalOpen={setModalOpen}
+                    isSubmmitAgreed={isSubmmitAgreed}
+                />
                 <RecordChat luckyVicky={luckyVicky} isLoading={isLuckyLoading} />
-                <RecordEtc onRecordEtcUpdate={setRecordEtcText} />
+                <RecordEtc onRecordEtcUpdate={setRecordEtcText} initialEtcText={recordEtcText} />
                 <TouchableOpacity style={styles.submitButton} onPress={handleSave} disabled={isSaved || isLoading}>
                     <Image
                         source={require("../assets/Images/save_bttn.png")}

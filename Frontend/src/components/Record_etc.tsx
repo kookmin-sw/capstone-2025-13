@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TextInput } from "react-native";
 import styles from "../styles/recordEtcStyles";
 
 type RecordEtcProps = {
     onRecordEtcUpdate: (text: string) => void;
+    initialEtcText?: string;
 };
 
-export default function RecordEtc({ onRecordEtcUpdate }: RecordEtcProps) {
+export default function RecordEtc({ onRecordEtcUpdate, initialEtcText = "" }: RecordEtcProps) {
     const [etcText, setEtcText] = useState<string>("");
 
     const handleTextChange = (text: string) => {
         setEtcText(text);
         onRecordEtcUpdate(text);
     };
+
+    useEffect(() => {
+        setEtcText(initialEtcText);
+    }, [initialEtcText]);
 
     return (
         <View style={styles.shadowWrapper}>
