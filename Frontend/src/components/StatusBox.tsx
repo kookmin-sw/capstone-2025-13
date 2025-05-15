@@ -61,14 +61,17 @@ export default function StatusBox() {
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleWater}>
-                <Text style={styles.buttonText}>
+                <View style={styles.buttonContent}>
                     <MaterialCommunityIcons
                         name="water"
                         size={16}
                         color="#fff"
-                    />{" "}
-                    X{potData.coupon} 물 주기
-                </Text>
+                        style={styles.waterIcon}
+                    />
+                    <Text style={styles.buttonText}>
+                        X {potData.coupon} 물 주기
+                    </Text>
+                </View>
             </TouchableOpacity>
         </View>
     );

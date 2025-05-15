@@ -3,7 +3,7 @@ import fonts from "../constants/fonts";
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#FDF6E4",
+        backgroundColor: "#F0F0D9",
         borderRadius: 12,
         padding: 16,
         marginHorizontal: 20,
@@ -16,8 +16,10 @@ const styles = StyleSheet.create({
         left: 12,
     },
     levelText: {
-        fontSize: 16,
-        fontWeight: "bold",
+        fontSize: 30,
+        fontFamily: fonts.laundryBold,
+        marginTop: 10,
+        marginLeft: 10,
         color: "#795548",
     },
     potImage: {
@@ -47,21 +49,31 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: "#4FC3F7",
-        paddingVertical: 8,
+        paddingVertical: 11,
         paddingHorizontal: 16,
         borderRadius: 20,
         alignSelf: "flex-end",
         // ✅ 그림자 스타일 추가
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowColor: "#3186AD",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 10,
+        shadowRadius: 0,
         elevation: 4, // Android 그림자
     },
     buttonText: {
+        fontSize: 15,
+        letterSpacing: 0.25,
         color: "#fff",
-        fontWeight: "600",
         fontFamily: fonts.laundryBold,
+    },
+    buttonContent: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    waterIcon: {
+        marginRight: 2,
+        marginBottom: 0.5, // adjust vertical alignment slightly
     },
 });
 
