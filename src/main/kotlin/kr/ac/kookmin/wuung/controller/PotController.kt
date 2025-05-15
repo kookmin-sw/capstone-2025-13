@@ -11,13 +11,17 @@ import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.exceptions.CouponNotEnoughException
 import kr.ac.kookmin.wuung.exceptions.PotMaxLevelReachedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
+import kr.ac.kookmin.wuung.model.Pot
+import kr.ac.kookmin.wuung.model.PotLevel
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.PotLevelRepository
 import kr.ac.kookmin.wuung.repository.PotRepository
+import kr.ac.kookmin.wuung.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import kotlin.jvm.optionals.getOrNull
 
 data class PotStatusDTO(
     val level: Int,
@@ -44,7 +48,8 @@ data class PotStatusDTO(
 )
 class PotController(
     @Autowired private val potRepository: PotRepository,
-    @Autowired private val potLevelRepository: PotLevelRepository
+    @Autowired private val potLevelRepository: PotLevelRepository,
+    @Autowired private val userRepository: UserRepository
 ) {
 
     @GetMapping("/status")
@@ -83,9 +88,18 @@ class PotController(
         @AuthenticationPrincipal userDetails: User?
     ): ResponseEntity<ApiResponseDTO<PotStatusDTO>> {
         if (userDetails == null) throw UnauthorizedException()
+        val user = userRepository.findUserById(userDetails.id ?: "").getOrNull() ?: throw NotFoundException()
 
         // 사용자가 가진 pot 정보 조회 및 pot Level 정보에 대한 요구치 조회
-        val pot = potRepository.findPotByUser(userDetails).orElseThrow { NotFoundException() }
+        var pot = potRepository.findPotByUser(user).getOrNull()
+
+        if(pot == null) {
+            pot = Pot(
+                user = user,
+            )
+            potRepository.save(pot)
+        }
+
         val potLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
         
         // 결과 반환
