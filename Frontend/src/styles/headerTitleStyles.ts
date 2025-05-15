@@ -17,9 +17,8 @@ const styles = StyleSheet.create({
       },
     title: {
         fontSize: width * 0.07,
-        fontWeight: "bold",
         color: "#fff",
-        fontFamily: fonts.laundry,
+        fontFamily: fonts.laundryBold,
     },
 });
 

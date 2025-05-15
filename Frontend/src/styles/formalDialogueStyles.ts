@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     },
     chartSubtitle: {
         fontSize: 16,
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.laundryBold,
         color: "#fff",
         paddingHorizontal: 24,
         marginTop: 10,
