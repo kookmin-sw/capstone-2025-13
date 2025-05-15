@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        marginTop:20,
     },
     imageContainer: {
         flexDirection: "row", // 이미지 두 개를 가로로 배치
@@ -21,9 +22,6 @@ const styles = StyleSheet.create({
         marginTop: width * 0.03, 
         marginRight: width * 0.01, // 이미지 사이의 간격
     },
-    imageWrapper: {
-        position: "relative", // 텍스트를 절대적으로 배치할 수 있도록 설정
-    },
     inputImage: {
         width: width * 0.7, // 입력창 이미지 크기
         height: height * 0.2, // 높이를 동일하게 설정
@@ -31,14 +29,28 @@ const styles = StyleSheet.create({
         borderRadius: 12, // 둥근 테두리
     },
     overlayText: {
-        position: "absolute", // 텍스트를 이미지 위에 배치
-        top: width * 0.1, // 이미지의 상단에서 10px 위치
-        left: width * 0.05, // 이미지의 좌측에서 10px 위치
         fontSize: width * 0.035,
         fontFamily: fonts.medium,
         color: "black", // 텍스트 색상
         textAlign: "left", // 텍스트 왼쪽 정렬
         zIndex: 10,
+    },
+    shadowWrapper: {
+        width: width * 0.75,
+        minHeight: height * 0.157,  
+        marginBottom: 20,
+        backgroundColor: "#B2C9A6", 
+        borderRadius: 30,  
+    },
+    inputBox: {
+        flex: 1,
+        // width: width * 0.75,
+        // height: height * 0.15,
+        marginBottom: 7,
+        backgroundColor: "#EEF7E8",
+        borderRadius: 25,
+        padding: 20,
+        zIndex: 1, 
     },
 });
 

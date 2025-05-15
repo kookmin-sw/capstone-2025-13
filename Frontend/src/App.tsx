@@ -25,6 +25,7 @@ import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
+import Toast from "react-native-toast-message";
 import Interest from "./screens/SimpleDiagnosis/Interest";
 import { useCustomFonts } from "./hooks/useCustomFonts";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
@@ -246,6 +247,7 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
+            <Toast />
 
         </NavigationContainer>
     );

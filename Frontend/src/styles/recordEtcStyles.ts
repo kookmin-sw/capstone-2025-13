@@ -8,16 +8,27 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    imageBackground: {
+    shadowWrapper: {
+        width: width * 0.9,
+        height: height * 0.207,  
+        marginBottom: 20,
+        backgroundColor: "#E8ECD0", 
+        borderRadius: 30,  
+    },
+    inputBox: {
         width: width * 0.9,
         height: height * 0.2,
-        justifyContent: "center", 
+        marginBottom: 20,
+        backgroundColor: "#F9FAEC",
+        borderRadius: 25,
+        padding: 20,
+        zIndex: 1,  // Make sure it appears on top of the shadow
     },
     textInput: {
-        width: "90%", 
-        padding: 30,
+        flex: 1,
         fontSize: 16,
-        borderRadius: 8,
+        color: "#333",
+        textAlignVertical: "top",
     },
 });
 
