@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, Text, } from "react-native";
+import { View, Image, Text, ScrollView, } from "react-native";
 import styles from "../styles/recordChatStyles";
 
 interface RecordChatProps {
@@ -17,12 +17,11 @@ export default function RecordChat({ luckyVicky, isLoading }: RecordChatProps) {
                 />
                 <View style={styles.shadowWrapper}>
                     <View style={styles.inputBox}>
-                        {
-                            isLoading ?
-                                <Text style={styles.overlayText}>이거 완전 럭키비키 잖아~</Text>
-                                :
-                                <Text style={styles.overlayText}>{luckyVicky}</Text>
-                        }
+                        <ScrollView>
+                            <Text style={styles.overlayText}>
+                                {isLoading ? "답변 준비 중~~" : luckyVicky}
+                            </Text>
+                        </ScrollView>
                     </View>
                 </View>
 

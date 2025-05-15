@@ -67,6 +67,44 @@ const styles = StyleSheet.create({
         padding: 20,
         zIndex: 1,  
     },
+    // recordStyles.ts에 추가
+
+modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+},
+modalContainer: {
+    backgroundColor: '#FDFCEC',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+},
+modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+},
+modalButtonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+},
+modalButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    backgroundColor: '#4FA55C',
+    padding: 12,
+    borderRadius: 40,
+},
+modalButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+},
+
 });
 
 export default styles;

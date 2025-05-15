@@ -25,8 +25,8 @@ import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
-import customAxios from './API/axios'
 import SecondPassword from "./screens/SecondPassword";
+import Toast from "react-native-toast-message";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -242,6 +242,7 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
+            <Toast />
         </NavigationContainer>
     );
 }
