@@ -79,16 +79,16 @@ data class UserQuestsDTO(
     @get:JsonProperty("photo")
     val photo: String?
         get() {
-            return if (photoSrc?.isBlank() == true || _photoEndpoint.isBlank() || _photoBucketName.isBlank()) null
+            return if (photoSrc == null || photoSrc.isBlank() || _photoEndpoint.isBlank() || _photoBucketName.isBlank()) null
             else return "$_photoEndpoint/$_photoBucketName/$photoSrc"
         }
 }
 
 fun UserQuests.toDTO() = UserQuestsDTO(
     this.id ?: "",
-    this.quest?.name ?: "",
-    this.quest?.description ?: "",
-    this.quest?.type ?: QuestType.ACTIVITY,
+    this.quest.name,
+    this.quest.description,
+    this.quest.type,
     this.progress,
     this.target,
     this.status,
@@ -981,7 +981,11 @@ class QuestsController(
         userQuests.photo = null
         userQuestsRepository.save(userQuests)
 
-        return ResponseEntity.ok(ApiResponseDTO(data = userQuests.toDTO()))
+        val dto = userQuests.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = dto))
     }
 
     @GetMapping("/quote")

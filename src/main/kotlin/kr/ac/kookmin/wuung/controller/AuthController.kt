@@ -84,7 +84,7 @@ data class UserInfoDTO(
     @get:JsonProperty("profile")
     val profile: String?
         get() {
-            return if (profileSrc?.isBlank() == true || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
+            return if (profileSrc == null || profileSrc.isBlank() || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
             else return "$_profileEndpoint/$_profileBucketName/$profileSrc"
         }
 }
