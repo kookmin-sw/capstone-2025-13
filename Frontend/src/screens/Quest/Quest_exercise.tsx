@@ -67,7 +67,7 @@ export default function QuestExercise() {
     if (isCompleted) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -97,7 +97,7 @@ export default function QuestExercise() {
           const uriParts = image.split('.');
           const fileType = uriParts[uriParts.length - 1];
 
-          formData.append('photo', {
+          formData.append('file', {
             uri: image,
             name: `photo.${fileType}`,
             type: `image/${fileType}`,
