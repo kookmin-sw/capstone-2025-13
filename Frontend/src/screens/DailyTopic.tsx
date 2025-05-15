@@ -49,7 +49,7 @@ export default function DailyTopic() {
     const closeModal = () => setIsModalVisible(false);
     const goToDiary = () => {
         setIsModalVisible(false);
-        navigation.navigate("Record");
+        navigation.replace("Record");
     };
 
     useEffect(() => {
@@ -102,18 +102,16 @@ export default function DailyTopic() {
             const newTopic = await createTopic();
             setTopicId(newTopic.id);
             setChatHistory([{ type: "question", text: newTopic.data }]);
-            await handleFetchFeedback(newTopic.id);
         } catch (error: any) {
             if (error.response?.status === 409) {
                 const existingTopic = await getTodayTopic();
                 setTopicId(existingTopic.id);
                 setChatHistory([{ type: "question", text: existingTopic.data }]);
-                await handleFetchFeedback(existingTopic.id);
             } else {
                 console.error("❌ Failed to create topic:", error.response?.data || error.message);
             }
         }
-    };
+    };    
 
     const handleFetchFeedback = async (topicId: string) => {
         try {
@@ -154,13 +152,19 @@ export default function DailyTopic() {
                 setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
             }
         } catch (error: any) {
-            if (error.response?.status === 404) {
+            const status = error.response?.status ?? null;
+            if (status === 404) {
+                setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
+            } else if (status === null) {
+                // error.response가 null인 경우 (네트워크 오류 등)
+                console.error("❌ Feedback fetch failed: No response received", error.message);
                 setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
             } else {
                 console.error("❌ Feedback fetch failed:", error.response?.data || error.message);
                 setTimeout(() => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1), 3000);
             }
         }
+        
         
     };
 
