@@ -162,7 +162,7 @@ export default function Quest_meditation() {
   ];
 
   const buttonText = isMeditationDone
-    ? "완 료 !"
+    ? "완 - 료 !"
     : isRunning
     ? "명상중 🧘🏻‍♀️"
     : "시 - 작 !";
@@ -177,11 +177,13 @@ export default function Quest_meditation() {
     <View style={styles.page}>
       <ScrollView contentContainerStyle={[styles.container, { paddingBottom: width*0.2 }]} bounces={false} overScrollMode="never">
         <View style={styles.backButtonWrapper}>
+          <View style={{ marginTop: width * 0.03}}>
           <TouchableOpacity
             onPress={() => navigation.navigate("Quest_stage", { title: "명상" })}
           >
             <Ionicons name="arrow-back-circle" size={40} color="#6c63ff" />
           </TouchableOpacity>
+          </View>
 
           <View>
             <Text style={[styles.missionTitle, dynamic.missionTitle]}>오늘의 미션 🔥</Text>
