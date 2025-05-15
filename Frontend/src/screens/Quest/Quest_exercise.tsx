@@ -7,12 +7,13 @@ import { Pedometer } from 'expo-sensors';
 import { dynamic } from '../../styles/questExerciseDynamicStyles';
 import { styles } from '../../styles/questExerciseStyles';
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
+import customAxios from "../../API/axios";
 
 const { width } = Dimensions.get('window');
 
 const mainVideo = {
-  id: "58uXqbAfAVg",  
+  id: "58uXqbAfAVg",
   title: "[Playlist] 차분하게 즐기는 플레이리스트 | 인센스 음악 | WOODLAND Playlist",
 };
 
@@ -40,11 +41,20 @@ const exerciseVideos = [
   },
 ];
 
+type RouteParams = {
+  questTitle: string;
+  questDescription: string;
+  questTarget: number;
+};
 
 export default function QuestExercise() {
   const [steps, setSteps] = useState(0);
   const [image, setImage] = useState<string | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
   const navigation = useNavigation<NavigationProp<any>>();
+  const route = useRoute();
+  const { questTitle, questDescription, questTarget } = route.params as RouteParams;
+  const descriptionLines = questDescription.split('\n');
 
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -54,6 +64,8 @@ export default function QuestExercise() {
   };
 
   const pickImage = async () => {
+    if (isCompleted) return;
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -66,8 +78,80 @@ export default function QuestExercise() {
     }
   };
 
+  const handleComplete = async () => {
+    try {
+      const type = "ACTIVITY";
+      const response = await customAxios.get(`/quests/last/${type}`);
+      const lastDataID = response.data.data.id;
+      const lastDataStatus = response.data.data.status;
+
+      if (lastDataStatus !== "COMPLETED") {
+        const postRes = await customAxios.post("/quests", {
+          id: lastDataID,
+          current: 0,
+          status: "COMPLETED",
+        });
+
+        if (image) {
+          const formData = new FormData();
+          const uriParts = image.split('.');
+          const fileType = uriParts[uriParts.length - 1];
+
+          formData.append('photo', {
+            uri: image,
+            name: `photo.${fileType}`,
+            type: `image/${fileType}`,
+          } as any);
+
+          await customAxios.put(`/quests/photo/${lastDataID}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+        }
+
+        if (postRes.status === 200 || postRes.status === 201) {
+          Alert.alert("완료!", "산책이 성공적으로 완료되었어요! 🎉", [
+            {
+              text: "확인",
+              onPress: () => navigation.navigate("Quest_stage", { title: "산책" }),
+            },
+          ]);
+        } else {
+          Alert.alert("오류", "산책 완료 처리 중 문제가 발생했어요.");
+        }
+      } else {
+        Alert.alert("알림", "이미 완료된 미션이에요!", [
+          {
+            text: "확인",
+            onPress: () => navigation.navigate("Quest_stage", { title: "산책" }),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("산책 완료 처리 중 오류 발생:", error);
+      Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+    }
+  };
+
   useEffect(() => {
-    const subscribe = async () => {
+    const init = async () => {
+      const type = "ACTIVITY";
+      try {
+        const response = await customAxios.get(`/quests/last/${type}`);
+        const lastData = response.data.data;
+        const lastDataStatus = lastData.status;
+
+        if (lastDataStatus === "COMPLETED") {
+          setIsCompleted(true);
+          if (lastData.photo) {
+            setImage(lastData.photo);
+          }
+        }
+      } catch (error) {
+        console.error("퀘스트 상태 확인 중 오류:", error);
+      }
+
       const isAvailable = await Pedometer.isAvailableAsync();
       if (!isAvailable) {
         Alert.alert('걸음 수 추적 불가', '이 기기는 걸음 수 추적을 지원하지 않습니다.');
@@ -88,47 +172,38 @@ export default function QuestExercise() {
       return () => subscription.remove();
     };
 
-    subscribe();
+    requestPermissions();
+    init();
   }, []);
 
   return (
     <View style={styles.container}>
-       <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        bounces={false}
-        overScrollMode="never"
-      >
-      <View style={styles.backButtonWrapper}>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("Quest_stage", {
-            title: "운동",
-          });
-        }}
-      >
-        <Ionicons name="arrow-back-circle" size={40} color="#FF6188" />
-      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContent} bounces={false} overScrollMode="never">
+        <View style={styles.backButtonWrapper}>
+          <View style={{ marginTop: width * 0.03 }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Quest_stage", { title: "산책" })}
+            >
+              <Ionicons name="arrow-back-circle" size={40} color="#FF6188" />
+            </TouchableOpacity>
+          </View>
 
-      <View>
-        <Text style={[dynamic.missionTitle, styles.title]}>
-          오늘의 미션 🔥
-        </Text>
-        <Text style={[dynamic.mainText, styles.mission]}>
-          10000걸음 걷기
-        </Text>
-      </View>
-    </View>
+          <View>
+            <Text style={[dynamic.missionTitle, styles.title]}>오늘의 미션 🔥</Text>
+            <Text style={[dynamic.mainText, styles.mission]}>{questTitle}</Text>
+          </View>
+        </View>
 
         <View style={styles.chartContainer}>
           <ProgressChart
             data={{
               labels: ['걸음 수'],
-              data: [Math.min(steps / 10000, 1)],
+              data: [Math.min(steps / questTarget, 1)],
             }}
             width={width * 0.9}
             height={width * 0.6}
             strokeWidth={16}
-            radius={width * 0.25}
+            radius={width * 0.21}
             chartConfig={{
               backgroundColor: '#000',
               backgroundGradientFrom: '#000',
@@ -142,14 +217,16 @@ export default function QuestExercise() {
           />
           <View style={styles.centerTextContainer}>
             <Text style={dynamic.stepCount}>{steps}</Text>
-            <Text style={dynamic.stepGoal}>/ 10000 걸음</Text>
+            <Text style={dynamic.stepGoal}>/{questTarget}</Text>
           </View>
         </View>
 
-        <Text style={[styles.sectionText, dynamic.missionTitle]}>
-          오운완! 오늘 활동을 기록으로 남겨볼까? 💪
-        </Text>
-        <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+        <Text style={[styles.warningTitle, dynamic.warningTitle]}>오늘의 산책 가이드 🌿</Text>
+        {descriptionLines.map((line, index) => (
+          <Text key={index} style={styles.description}>・ {line}</Text>
+        ))}
+
+        <TouchableOpacity style={styles.uploadBox} onPress={pickImage} disabled={isCompleted}>
           {image ? (
             <Image source={{ uri: image }} style={styles.uploadedImage} />
           ) : (
@@ -161,7 +238,7 @@ export default function QuestExercise() {
           '우웅'의 추천 플레이리스트 🎧
         </Text>
 
-        <Youtube_playlist 
+        <Youtube_playlist
           title="추천 플레이리스트"
           videos={exerciseVideos}
           backgroundColor="#222"
@@ -171,8 +248,19 @@ export default function QuestExercise() {
       </ScrollView>
 
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity style={styles.completeButton}>
-           <Text style={[dynamic.buttonText]}>오늘 미션 끝!</Text>
+        <TouchableOpacity
+          style={[
+            styles.completeButton,
+            {
+              backgroundColor: steps >= questTarget && image && !isCompleted ? '#FF6188' : '#ccc',
+            },
+          ]}
+          disabled={!(steps >= questTarget && image && !isCompleted)}
+          onPress={handleComplete}
+        >
+          <Text style={[dynamic.buttonText]}>
+            {isCompleted ? "오늘은 끝 - !" : "완 - 료 !"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
