@@ -15,6 +15,11 @@ export const dynamic = StyleSheet.create({
         marginTop: width * 0.15,
         marginBottom: width * 0.03,
     },
+    warningTitle: {
+        fontSize: width * 0.045,
+        marginTop: width * 0.04,
+        marginBottom: width * 0.02,
+    },
     uploadText: {
         fontSize: width * 0.04,
     },
