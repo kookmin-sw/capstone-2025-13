@@ -18,4 +18,13 @@ export default StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+    badge: {
+        position: "absolute",
+        top: 1,
+        right: 1,
+        width: 15,
+        height: 15,
+        borderRadius: 15,
+        backgroundColor: "#E8270A",
+      },
 });
