@@ -16,17 +16,17 @@ const styles = StyleSheet.create({
         left: 12,
     },
     levelText: {
-        fontSize: 30,
+        fontSize: 35,
         fontFamily: fonts.laundryBold,
-        marginTop: 10,
-        marginLeft: 10,
+        marginTop: 15,
+        marginLeft: 20,
         color: "#795548",
     },
     potImage: {
-        width: 80,
         height: 80,
+        resizeMode: "contain",
         alignSelf: "center",
-        marginTop: 20,
+        marginTop: 40,
         marginBottom: 12,
     },
     progressWrapper: {
@@ -35,6 +35,19 @@ const styles = StyleSheet.create({
         marginTop: 4,
         marginBottom: 8,
         marginHorizontal: 16,
+    },
+    progressButtonRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginHorizontal: 16,
+        marginTop: 6,
+    },
+    progressContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+        marginRight: 15,
     },
     progressBar: {
         flex: 1,
@@ -53,12 +66,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderRadius: 20,
         alignSelf: "flex-end",
-        // ✅ 그림자 스타일 추가
         shadowColor: "#3186AD",
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 10,
         shadowRadius: 0,
-        elevation: 4, // Android 그림자
+        elevation: 4,
     },
     buttonText: {
         fontSize: 15,

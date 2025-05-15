@@ -48,31 +48,43 @@ export default function StatusBox() {
 
             <Image source={potImage} style={styles.potImage} />
 
-            <View style={styles.progressWrapper}>
-                <View
-                    style={[
-                        styles.progressBar,
-                        { width: `${progressRatio * 100}%` },
-                    ]}
-                />
-                <Text style={styles.progressText}>
-                    {potData.exp}/{potData.need}
-                </Text>
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleWater}>
-                <View style={styles.buttonContent}>
-                    <MaterialCommunityIcons
-                        name="water"
-                        size={16}
-                        color="#fff"
-                        style={styles.waterIcon}
-                    />
-                    <Text style={styles.buttonText}>
-                        X {potData.coupon} 물 주기
+            <View style={styles.progressButtonRow}>
+                <View style={styles.progressContainer}>
+                    <View
+                        style={{
+                            flex: 1,
+                            height: 8,
+                            borderRadius: 4,
+                            backgroundColor: "#E0E0E0",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <View
+                            style={[
+                                styles.progressBar,
+                                { width: `${progressRatio * 100}%` },
+                            ]}
+                        />
+                    </View>
+                    <Text style={styles.progressText}>
+                        {potData.exp}/{potData.need}
                     </Text>
                 </View>
-            </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={handleWater}>
+                    <View style={styles.buttonContent}>
+                        <MaterialCommunityIcons
+                            name="water"
+                            size={16}
+                            color="#fff"
+                            style={styles.waterIcon}
+                        />
+                        <Text style={styles.buttonText}>
+                            X {potData.coupon} 물 주기
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
