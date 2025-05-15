@@ -29,12 +29,9 @@ const DialogueChoice = ({ options, onSelect }: DialogueChoiceProps) => {
                         onPress={() => onSelect(option)}
                     >
                         <Text style={dialogueChoiceStyles.dialogueText}>{option.text}</Text>
-                        <TouchableOpacity
-                            style={dialogueChoiceStyles.button}
-                            onPress={() => onSelect(option)}
-                        >
+                        <View style={dialogueChoiceStyles.button}>
                             <View style={dialogueChoiceStyles.triangle} />
-                        </TouchableOpacity>
+                        </View>
                     </TouchableOpacity>
                 </View>
             ))}

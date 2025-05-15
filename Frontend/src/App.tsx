@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
@@ -27,10 +26,13 @@ import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
 import Toast from "react-native-toast-message";
+import Interest from "./screens/SimpleDiagnosis/Interest";
+import { useCustomFonts } from "./hooks/useCustomFonts";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 export type RootStackParamList = {
     Home: undefined;
-    SignIn: undefined;
+    SignIn: { score?: number, last?: boolean; };
     SignUpStep1: undefined;
     Quest: undefined;
     Quest_stage: { title: string; subtitle?: string };
@@ -41,12 +43,13 @@ export type RootStackParamList = {
         birthDate?: string;
         gender?: string;
     };
+    Interest: { score?: number };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined;
-    FormalDiagnosisSurvey: undefined;
-    GameScreen: undefined;
+    FormalDiagnosisSurvey: { diagnosisId: number };
+    GameScreen: { score?: number };
     DailyTopic: undefined;
     Spinner: undefined;
     HelpCall: undefined;
@@ -57,7 +60,13 @@ export type RootStackParamList = {
     Quest_exercise: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
-    FormalDiagnosisResult: undefined;
+    FormalDiagnosisResult: {
+        diagnosisId: number,
+        score: number,
+        totalScore: number,
+        scaleName: string,
+        description: string,
+    };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -112,21 +121,7 @@ export default function App() {
         return () => clearInterval(interval); // cleanup
     }, []);
 
-
-    const [fontsLoaded] = useFonts({
-        "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),
-        "Pretendard-Bold": require("./assets/fonts/Pretendard-Bold.otf"),
-        "Pretendard-SemiBold": require("./assets/fonts/Pretendard-SemiBold.otf"),
-        "Pretendard-Medium": require("./assets/fonts/Pretendard-Medium.otf"),
-        "Pretendard-Light": require("./assets/fonts/Pretendard-Light.otf"),
-        "Pretendard-ExtraLight": require("./assets/fonts/Pretendard-ExtraLight.otf"),
-        "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
-        "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
-        "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
-        DungGeunMo: require("./assets/fonts/DungGeunMo.ttf"),
-        "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
-        "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
-    });
+    const fontsLoaded = useCustomFonts();
 
     if (!fontsLoaded) return null;
 
@@ -162,6 +157,11 @@ export default function App() {
                     name="SimpleDiagnosis"
                     options={{ headerShown: false }}
                     component={SimpleDiagnosis}
+                />
+                <Stack.Screen
+                    name="Interest"
+                    component={Interest}
+                    options={{ headerShown: false }}
                 />
                 <Stack.Screen name="Game" options={{ headerShown: false }}>
                     {() => <Game />}
@@ -227,6 +227,11 @@ export default function App() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="HelpCall2"
+                    component={HelpCall2}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="Calendar"
                     component={Calendar}
                     options={{ headerShown: false }}
@@ -243,6 +248,7 @@ export default function App() {
                 />
             </Stack.Navigator>
             <Toast />
+
         </NavigationContainer>
     );
 }

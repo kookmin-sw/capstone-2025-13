@@ -138,13 +138,14 @@ export default function HelpCall() {
                 {!isLoading && (
                     <>
                         <View style={helpCallStyles.headerBox}>
-                        <TouchableOpacity
-                            style={helpCallStyles.backButtonWrapper}
-                            onPress={() => {
-                            navigation.navigate("Home")}}
-                        >
-                            <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={helpCallStyles.backButtonWrapper}
+                                onPress={() => {
+                                    navigation.navigate("Home")
+                                }}
+                            >
+                                <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
+                            </TouchableOpacity>
 
 
                             <Text style={helpCallStyles.headerText}>마음 케어 정보 지도</Text>
