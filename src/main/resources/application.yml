@@ -19,6 +19,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: embedded
+    job:
+      enabled: false
 springdoc:
   api-docs:
     enabled: true
@@ -42,6 +44,7 @@ s3:
   access-key: ${S3_ACCESS_KEY}
   secret-key: ${S3_SECRET_KEY}
   profile-bucket: ${S3_PROFILE_BUCKET}
+  quest-bucket: ${S3_QUEST_BUCKET}
   public-endpoint: ${S3_PUBLIC_ENDPOINT}
 app:
   package-name: ${PACKAGE_NAME}
@@ -50,3 +53,7 @@ app:
   google-account-json: ${GOOGLE_ACCOUNT_JSON}
   apple-team-id: ${APPLE_TEAM_ID}
   apple-key-id: ${APPLE_KEY_ID}
+snapadmin:
+  enabled: true
+  baseUrl: admin
+  models-package: kr.ac.kookmin.wuung.model

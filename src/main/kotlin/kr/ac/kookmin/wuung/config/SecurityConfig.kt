@@ -18,7 +18,10 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import kr.ac.kookmin.wuung.security.JwtAuthenticationFilter
 import kr.ac.kookmin.wuung.service.UserService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.config.Customizer
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.logout.LogoutFilter
 
 @Configuration
@@ -32,7 +35,7 @@ class SecurityConfig(
     private val host: String
 ) {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): DefaultSecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity, userDetailsService: UserDetailsService): DefaultSecurityFilterChain {
         return http
             .csrf {
                 it.disable()
@@ -57,9 +60,12 @@ class SecurityConfig(
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests {
+                it.requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                it.requestMatchers("/login").permitAll()
+
                 it.requestMatchers("/auth/**").permitAll()
                 it.requestMatchers("/api/integrity/**").permitAll()
-                it.requestMatchers("/").permitAll()
+                it.requestMatchers("/**").permitAll()
                 it.requestMatchers(
                     "/swagger-ui.html",
                     "/swagger-ui/**",
@@ -71,10 +77,26 @@ class SecurityConfig(
                 ).permitAll()
                 it.anyRequest().authenticated()
             }
+            .formLogin {
+                it.loginPage("/login")
+                    .defaultSuccessUrl("/admin").permitAll()
+            }
+            .logout {
+                it.logoutUrl("/logout")
+                    .logoutSuccessUrl("/login")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                    .permitAll()
+            }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            }
+            .httpBasic(Customizer.withDefaults())
             .addFilterBefore(exceptionHandlerFilter, LogoutFilter::class.java)
             // JWT 인증 필터는 예외 처리 필터 다음에 배치
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .authenticationProvider(authenticationProvider())
+            .userDetailsService(userDetailsService)
             .build()
     }
 

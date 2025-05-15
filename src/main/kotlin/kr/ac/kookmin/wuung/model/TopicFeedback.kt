@@ -2,6 +2,8 @@ package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -25,20 +27,20 @@ data class TopicFeedback(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: String? = null,
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     var status: TopicFeedbackStatus = TopicFeedbackStatus.QUEUED,
 
     @Column(nullable = true, columnDefinition = "TEXT")
     var aiFeedback: String? = null,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    var data: String? = null,
+    var data: String,
 
     @Column(nullable = true, columnDefinition = "TEXT")
     var comment : String? = null,
 
     @ManyToOne
-    val topic: Topic? = null,
+    val topic: Topic,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -46,6 +48,14 @@ data class TopicFeedback(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        id = null,
+        status = TopicFeedbackStatus.QUEUED,
+        data = "",
+        topic = Topic(),
+        createdAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

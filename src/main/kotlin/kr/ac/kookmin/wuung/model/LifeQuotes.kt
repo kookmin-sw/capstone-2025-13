@@ -5,29 +5,19 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "diagnosis_results")
-data class DiagnosisResults(
+@Table(name = "life_quotes")
+class LifeQuotes (
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    var id: String? = null,
-
-    @ManyToOne
-    var user: User,
-
-    @ManyToOne
-    var diagnosis: Diagnosis,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
 
     @Column(nullable = false)
-    var result: Int,
-
-    @Column(nullable = false)
-    var scale: Int,
+    val quote: String = "",
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -36,11 +26,8 @@ data class DiagnosisResults(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor(): this(
-        id = null,
-        user = User(),
-        diagnosis = Diagnosis(),
-        result = 0,
-        scale = 0,
+        quote = "",
+        createdAt = LocalDateTime.now(),
     )
 
     @PreUpdate
@@ -48,4 +35,3 @@ data class DiagnosisResults(
         updatedAt = LocalDateTime.now()
     }
 }
-

@@ -12,8 +12,10 @@ import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.QuestType
 import kr.ac.kookmin.wuung.model.User
+import kr.ac.kookmin.wuung.model.UserQuestStatus
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
 import kr.ac.kookmin.wuung.repository.RecordRepository
+import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
 import kr.ac.kookmin.wuung.repository.UserQuestsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
@@ -23,7 +25,19 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import java.time.format.DateTimeFormatter
 
+enum class BehaviorType(val value : String){
+    DIARY("DIARY"),
+    QUEST("QUEST"),
+    DIAGNOSIS("DIAGNOSIS")
+}
+
+data class DailyBehaviorDTO(
+    val title : String,
+    val content : String,
+    val type : BehaviorType,
+)
 
 @RestController
 @RequestMapping("/etc")
@@ -38,21 +52,37 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 class EtcController(
     @Autowired private val diagnosisResultsRepository: DiagnosisResultsRepository,
     @Autowired private val recordRepository: RecordRepository,
-    @Autowired private val userQuestRepository: UserQuestsRepository
+    @Autowired private val userQuestRepository: UserQuestsRepository,
+    @Autowired private val userQuestStageRepository: UserQuestStageRepository,
 ) {
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
     @GetMapping("/behavior")
-    @Operation(summary = "Get behavior information successfully")
+    @Operation(
+        summary = "[En] Get User behavior information by date / [Kr] 특정 날짜의 사용자 활동 정보 조회",
+        description = """
+            [En] Returns a list of user activities including diagnosis tests, diaries and quests completed on a specific date.
+            The date parameter should be in yyyy-MM-dd format.
+            [Kr] 특정 날짜에 수행한 검사, 일기 작성, 퀘스트 완료 등의 사용자 활동 목록을 반환합니다.
+            날짜 파라미터는 yyyy-MM-dd 형식이어야 합니다.
+        """
+    )
     @ApiResponses(
         value = [
             ApiResponse(
-                responseCode = "200", description = "Get behavior information successfully",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponseDTO::class)
-                )]
+                responseCode = "200",
+                description = """
+                    [En] Successfully retrieved user behavior information for the specified date
+                    [Kr] 지정된 날짜의 사용자 활동 정보를 성공적으로 조회했습니다
+                """,
+                useReturnTypeSchema = true,
             ),
             ApiResponse(
-                responseCode = "401", description = "Unauthorized",
+                responseCode = "403",
+                description = """
+                    [En] Unauthorized access - Valid authentication token required
+                    [Kr] 인증되지 않은 접근 - 유효한 인증 토큰이 필요합니다
+                """,
                 content = [Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ApiResponseDTO::class)
@@ -62,8 +92,8 @@ class EtcController(
     )
     fun getBehaviorByDate(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") date: String
-    ): ResponseEntity<ApiResponseDTO<List<Pair<String, String>>>> {
+        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") date: String,
+    ): ResponseEntity<ApiResponseDTO<List<DailyBehaviorDTO>>> {
 
         if (userDetails == null) throw UnauthorizedException()
 
@@ -76,12 +106,12 @@ class EtcController(
             endDate
         )
 
-        var behaviors: List<Pair<String, String>> = diagnosis.mapNotNull { result ->
+        var behaviors: List<DailyBehaviorDTO> = diagnosis.mapNotNull { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.`GAD-7` -> "GAD-7" to "불안 검사 시행"
-                DiagnosisType.`PHQ-9` -> "PHQ-9" to "우울 검사 시행"
-                DiagnosisType.Simple -> "SIMPLE" to "간단 검사 시행"
-                DiagnosisType.BDI -> "BDI" to "우울 검사 시행"
+                DiagnosisType.`GAD-7` -> DailyBehaviorDTO("검사", "GAD-7 검사 시행 완료", BehaviorType.DIAGNOSIS)
+                DiagnosisType.`PHQ-9` -> DailyBehaviorDTO("검사", "PHQ-9 검사 시행 완료", BehaviorType.DIAGNOSIS)
+                DiagnosisType.Simple -> DailyBehaviorDTO("검사", "약식 검사 시행 완료", BehaviorType.DIAGNOSIS)
+                DiagnosisType.BDI -> DailyBehaviorDTO("검사", "BDI 검사 시행 완료", BehaviorType.DIAGNOSIS)
                 else -> null
             }
         }
@@ -93,40 +123,125 @@ class EtcController(
         )
 
         if (records.isNotEmpty()) {
-            val recordBehavior = "기록" to "${startDate.monthValue}월 ${startDate.dayOfMonth}일 기록 작성"
+            val recordBehavior = DailyBehaviorDTO(
+                "일기",
+                "${startDate.monthValue}월 ${startDate.dayOfMonth}일 일기 작성 완료",
+                BehaviorType.DIARY
+            )
             behaviors = behaviors + recordBehavior
         }
 
-        /*
+
         val userQuests = userQuestRepository.findByUserAndCreatedAtBetween(
             userDetails,
             startDate,
             endDate
         )
 
-        val userQuestBehaviors = userQuests.mapNotNull { userQuest ->
-            val status = if (userQuest.target == userQuest.progress) "완료" else "수행 중"
-            val quest = userQuest.quest ?: return@mapNotNull null
+        val userMainStages = userQuestStageRepository.findByUser(userDetails)
 
-            val questType = when (quest.type) {
+        val questBehaviors = userQuests.mapNotNull { quest ->
+            val stage = userMainStages.find { it.type == quest.quest?.type }?.stage ?: return@mapNotNull null
+            val questType = when (quest.quest?.type) {
                 QuestType.MEDITATE -> "명상하기"
                 QuestType.ACTIVITY -> "운동하기"
                 QuestType.EMOTION -> "감정 표현하기"
-                null -> return@mapNotNull null
+                else -> return@mapNotNull null
             }
 
-            val behaviorDesc = "${userQuest.quest?.id ?: return@mapNotNull null}-${quest.step} $status"
-            questType to behaviorDesc
+            val status = when (quest.status) {
+                UserQuestStatus.COMPLETED -> "수행 완료"
+                else -> return@mapNotNull null
+            }
+
+            DailyBehaviorDTO(
+                "퀘스트",
+                "${stage}-${quest.quest?.step} $questType $status",
+                BehaviorType.QUEST
+            )
         }
 
-
-        behaviors = behaviors + userQuestBehaviors
-         */
+        behaviors = behaviors + questBehaviors
 
         return ResponseEntity.ok(
             ApiResponseDTO(
                 data = behaviors
             )
         )
+    }
+
+    @GetMapping("/behavior/summary")
+    @Operation(
+        summary = "[En] Get User behavior summary by month / [Kr] 월별 사용자 활동 요약 조회",
+        description = """
+            [En] Returns a list of dates in the specified month where the user had any activity (diagnosis tests or diary entries).
+            The date parameter should be in yyyy-MM format.
+            [Kr] 지정된 달에 사용자가 활동(검사 또는 일기 작성)을 한 날짜 목록을 반환합니다.
+            날짜 파라미터는 yyyy-MM 형식이어야 합니다.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = """
+                    [En] Successfully retrieved user behavior summary for the specified month
+                    [Kr] 지정된 월의 사용자 활동 요약을 성공적으로 조회했습니다
+                """,
+                useReturnTypeSchema = true,
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = """
+                    [En] Unauthorized access - Valid authentication token required
+                    [Kr] 인증되지 않은 접근 - 유효한 인증 토큰이 필요합니다
+                """,
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getBehaviorByMontly(
+        @AuthenticationPrincipal userDetails: User?,
+        @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM") date: String,
+    ): ResponseEntity<ApiResponseDTO<List<String>>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val startDate = "${date}-01".datetimeParser()
+        val endDate = "${date}-31".datetimeParser().withHour(23).withMinute(59).withSecond(59)
+
+        val records = recordRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val diagnosis = diagnosisResultsRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val behaviors = userQuestRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        val date = mutableListOf<String>()
+
+        records.forEach { record ->
+            date.add(record.createdAt.format(dateFormatter))
+        }
+        diagnosis.forEach { diagnosis ->
+            date.add(diagnosis.createdAt.format(dateFormatter))
+        }
+        behaviors.forEach { behavior ->
+            date.add(behavior.createdAt.format(dateFormatter))
+        }
+
+        return ResponseEntity.ok(ApiResponseDTO(data = date.distinct()))
     }
 }
