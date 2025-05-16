@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 data class ChallengeRequest(
+    val platform: String,
     val deviceId: String
 )
 

@@ -23,7 +23,7 @@ class IntegrityChallengeService(
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val secureRandom = SecureRandom()
 
-    fun generateChallenge(deviceId: String): Pair<String?, Long> {
+    fun generateChallenge(platform: String, deviceId: String): Pair<String?, Long> {
        val pendingChallenges = challengeRepository.findByDeviceIdAndStatus(
            deviceId,
            IntegrityChallengeStatus.PENDING
@@ -32,7 +32,7 @@ class IntegrityChallengeService(
         if(pendingChallenges.isNotEmpty()) {
             val latestChallenge = pendingChallenges.maxByOrNull { it.createdAt }
 
-            if (latestChallenge != null && latestChallenge.expiresAt?.isAfter(LocalDateTime.now()) == true) {
+            if (latestChallenge != null && latestChallenge.expiresAt.isAfter(LocalDateTime.now())) {
                 logger.info("Challenge already exists for device: $deviceId")
                 return Pair(latestChallenge.challenge, ChronoUnit.MINUTES.between(LocalDateTime.now(), latestChallenge.expiresAt))
             }
@@ -41,8 +41,11 @@ class IntegrityChallengeService(
         val bytes = ByteArray(32)
         secureRandom.nextBytes(bytes)
 
-        val challenge = Base64.getEncoder()
-            .encodeToString(bytes)
+        val challenge = when(platform.lowercase()) {
+            "ios" -> Base64.getEncoder().encodeToString(bytes)
+            "android" -> Base64.getUrlEncoder().encodeToString(bytes)
+            else -> throw RuntimeException("Unsupported platform: $platform")
+        }
         val expiresAt = LocalDateTime.now().plusMinutes(challengeExp.toLong())
 
         val integrityChallenge = IntegrityChallenge(
