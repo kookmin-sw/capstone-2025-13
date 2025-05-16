@@ -132,7 +132,6 @@ export default function Record() {
                         <RecordChat
                             luckyVicky={luckyVicky}
                             isLoading={isLuckyLoading}
-                            textStyle={styles.luckyText}
                         />
                         {!isLuckyLoading &&
                             recordEtcText !== defaultLuckyText && (

@@ -138,7 +138,6 @@ export default function RecordInputBox({
                         />
                         <Text
                             style={[
-                                styles.submitButtonText,
                                 { marginHorizontal: 6 },
                                 isSubmitted && { opacity: 0.5 },
                             ]}
