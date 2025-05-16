@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
         color: "#795548",
     },
     potImage: {
-        height: 80,
+        height: 120,
         resizeMode: "contain",
         alignSelf: "center",
-        marginTop: 40,
+        marginTop: 20,
         marginBottom: 12,
     },
     progressWrapper: {
