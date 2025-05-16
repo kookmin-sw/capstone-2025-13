@@ -1,4 +1,4 @@
-import React from "react";
+import React ,  {useState, useEffect} from "react";
 import { View, ScrollView, Dimensions,  Image} from "react-native";
 import Header_sky from "../../components/Header_sky";
 import Quest_circle from "../../components/Darkgreen_circle";
@@ -6,7 +6,7 @@ import Street from "../../components/Street";
 import Street_basic from "../../components/Street_basic";
 import questStyles from "../../styles/questStyles";
 import Tree from "../../components/Tree";
-import styles from "../../styles/homeStyles";
+import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 
@@ -14,15 +14,24 @@ const { height, width } = Dimensions.get("window");
 
 
 const questData = [
-  { title: "돌아보기", subtitle: "스스로를 돌아보는 시간이에요." },
-  { title: "명상", subtitle: "조용한 마음을 가져봐요." },
-  { title: "운동", subtitle: "몸을 움직여볼까요?" },
+  { title: "우웅의 술" },
+  { title: "명상"},
+  { title: "산책"},
 ];
 
-//예시 닉네임
-const nickname = "우웅";
-
 export default function Quest() {
+  const [user, setUser] = useState<UserInfoResponse | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const data = await getUserInfo();
+      setUser(data);
+    };
+    fetchUserInfo();
+  }, []);
+
+  const nickname = user?.username ?? "우웅";
+
   return (
     <View style={questStyles.container}>
       <ScrollView
@@ -67,7 +76,6 @@ export default function Quest() {
         <Tree
           type={treeTypes[index % treeTypes.length]}
           title={isFirst ? `${nickname}의 숲` : quest.title}
-          subtitle={quest.subtitle}
         />
       </View>
 

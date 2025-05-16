@@ -35,7 +35,7 @@ export type RootStackParamList = {
     SignIn: { score?: number, last?: boolean; };
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title: string; subtitle?: string };
+    Quest_stage: { title: string};
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
