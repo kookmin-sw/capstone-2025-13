@@ -6,6 +6,10 @@ import {
     Text,
     TouchableOpacity,
     Modal,
+    KeyboardAvoidingView,
+    Platform,
+    Keyboard,
+    TouchableWithoutFeedback,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import RecordHeader from "../components/RecordHeader";
@@ -99,91 +103,104 @@ export default function Record() {
     };
 
     return (
-        <View style={styles.container}>
-            <RecordHeader />
-            <ScrollView
-                contentContainerStyle={[
-                    styles.scroll,
-                    { alignItems: "center" },
-                ]}
-            >
-                <StarRating
-                    onRecordEtcUpdate={handleRatingChange}
-                    initialRating={rating}
-                />
-                <RecordInputBox
-                    initialRecord={recordText}
-                    onRecordIdUpdate={handleRecordIdUpdate}
-                    onLuckyVickyUpdate={handleLuckyVickyUpdate}
-                    setIsLoading={setIsLoading}
-                    setModalOpen={setModalOpen}
-                    isSubmmitAgreed={isSubmmitAgreed}
-                />
-                <RecordChat
-                    luckyVicky={luckyVicky}
-                    isLoading={isLuckyLoading}
-                    textStyle={styles.luckyText}
-                />
-                {!isLuckyLoading && recordEtcText !== defaultLuckyText && (
-                    <RecordEtc
-                        onRecordEtcUpdate={setRecordEtcText}
-                        initialEtcText={recordEtcText}
-                    />
-                )}
-                <TouchableOpacity
-                    style={[styles.submitButton, styles.saveButton]}
-                    onPress={handleSave}
-                    disabled={isSaved || isLoading}
-                >
-                    <Text
-                        style={[
-                            styles.submitButtonText,
-                            (isSaved || isLoading) && { opacity: 0.5 },
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={0}
+        >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.container}>
+                    <RecordHeader />
+                    <ScrollView
+                        contentContainerStyle={[
+                            styles.scroll,
+                            { alignItems: "center" },
                         ]}
                     >
-                        저 장
-                    </Text>
-                </TouchableOpacity>
-                <Modal
-                    visible={modalOpen}
-                    transparent
-                    animationType="fade"
-                    onRequestClose={() => setModalOpen(false)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContainer}>
-                            <Text style={styles.modalText}>
-                                일기 제출은 한 번만 가능해!{"\n"}정말 다 쓴 거
-                                맞지?
+                        <StarRating
+                            onRecordEtcUpdate={handleRatingChange}
+                            initialRating={rating}
+                        />
+                        <RecordInputBox
+                            initialRecord={recordText}
+                            onRecordIdUpdate={handleRecordIdUpdate}
+                            onLuckyVickyUpdate={handleLuckyVickyUpdate}
+                            setIsLoading={setIsLoading}
+                            setModalOpen={setModalOpen}
+                            isSubmmitAgreed={isSubmmitAgreed}
+                        />
+                        <RecordChat
+                            luckyVicky={luckyVicky}
+                            isLoading={isLuckyLoading}
+                            textStyle={styles.luckyText}
+                        />
+                        {!isLuckyLoading &&
+                            recordEtcText !== defaultLuckyText && (
+                                <RecordEtc
+                                    onRecordEtcUpdate={setRecordEtcText}
+                                    initialEtcText={recordEtcText}
+                                />
+                            )}
+                        <TouchableOpacity
+                            style={[styles.submitButton, styles.saveButton]}
+                            onPress={handleSave}
+                            disabled={isSaved || isLoading}
+                        >
+                            <Text
+                                style={[
+                                    styles.submitButtonText,
+                                    (isSaved || isLoading) && { opacity: 0.5 },
+                                ]}
+                            >
+                                저 장
                             </Text>
-                            <View style={styles.modalButtonGroup}>
-                                <TouchableOpacity
-                                    style={styles.modalButton}
-                                    onPress={() => {
-                                        setIsSubmitAgreed(true);
-                                        setModalOpen(false);
-                                    }}
-                                >
-                                    <Text style={styles.modalButtonText}>
-                                        맞아
+                        </TouchableOpacity>
+                        <Modal
+                            visible={modalOpen}
+                            transparent
+                            animationType="fade"
+                            onRequestClose={() => setModalOpen(false)}
+                        >
+                            <View style={styles.modalOverlay}>
+                                <View style={styles.modalContainer}>
+                                    <Text style={styles.modalText}>
+                                        일기 제출은 한 번만 가능해!{"\n"}정말 다
+                                        쓴 거 맞지?
                                     </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.modalButton,
-                                        { backgroundColor: "#D8BDA1" },
-                                    ]}
-                                    onPress={() => setModalOpen(false)}
-                                >
-                                    <Text style={styles.modalButtonText}>
-                                        아니야
-                                    </Text>
-                                </TouchableOpacity>
+                                    <View style={styles.modalButtonGroup}>
+                                        <TouchableOpacity
+                                            style={styles.modalButton}
+                                            onPress={() => {
+                                                setIsSubmitAgreed(true);
+                                                setModalOpen(false);
+                                            }}
+                                        >
+                                            <Text
+                                                style={styles.modalButtonText}
+                                            >
+                                                맞아
+                                            </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[
+                                                styles.modalButton,
+                                                { backgroundColor: "#D8BDA1" },
+                                            ]}
+                                            onPress={() => setModalOpen(false)}
+                                        >
+                                            <Text
+                                                style={styles.modalButtonText}
+                                            >
+                                                아니야
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
                             </View>
-                        </View>
-                    </View>
-                </Modal>
-            </ScrollView>
-        </View>
+                        </Modal>
+                    </ScrollView>
+                </View>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 }
