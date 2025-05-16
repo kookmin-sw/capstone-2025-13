@@ -829,28 +829,19 @@ class QuestsController(
     fun getCurrentQuestByType(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable type: QuestType
-    ): ResponseEntity<ApiResponseDTO<UserQuestLastDTO>> {
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findByUser(userDetails)
-            .filter { it.quest?.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED) }
+            .filter { it.quest.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED) }
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 
-        val lastQuest = UserQuestLastDTO(
-            id = quest.id ?: "",
-            name = quest.quest?.name ?: "",
-            description = quest.quest?.description ?: "",
-            type = quest.quest?.type ?: QuestType.ACTIVITY,
-            progress = quest.progress,
-            target = quest.target,
-            status = quest.status,
-            step = quest.quest?.step ?: 0,
-            createdAt = quest.createdAt,
-            updatedAt = quest.updatedAt
-        )
+        val dto = quest.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
 
-        return ResponseEntity.ok(ApiResponseDTO(data = lastQuest))
+        return ResponseEntity.ok(ApiResponseDTO(data = dto))
     }
 
     @PutMapping(
