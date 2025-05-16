@@ -11,7 +11,7 @@ data class Pot(
     var id: Long? = null,
 
     @OneToOne(cascade = [CascadeType.ALL])
-    val user: User? = null,
+    val user: User,
 
     @Column(nullable = false)
     var exp: Int = 0,
@@ -30,7 +30,7 @@ data class Pot(
 ) {
     constructor(): this(
         id = null,
-        user = null,
+        user = User(),
         exp = 0,
         level = 1,
         coupon = 0,

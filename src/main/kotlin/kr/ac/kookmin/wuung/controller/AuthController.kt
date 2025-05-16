@@ -65,6 +65,7 @@ data class UserInfoDTO(
 ) {
     @JsonIgnore
     private var _profileEndpoint: String = ""
+
     @JsonIgnore
     private var _profileBucketName: String = ""
 
@@ -74,6 +75,7 @@ data class UserInfoDTO(
         set(value) {
             _profileEndpoint = value
         }
+
     @get:JsonIgnore
     var profileBucketName: String
         get() = _profileEndpoint
@@ -84,7 +86,7 @@ data class UserInfoDTO(
     @get:JsonProperty("profile")
     val profile: String?
         get() {
-            return if (profileSrc?.isBlank() == true || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
+            return if (profileSrc == null || profileSrc.isBlank() || _profileEndpoint.isBlank() || _profileBucketName.isBlank()) null
             else return "$_profileEndpoint/$_profileBucketName/$profileSrc"
         }
 }
@@ -110,7 +112,7 @@ data class SignUpRequest(
 
     @field:Schema(description = "Birth date in format yyyy-MM-dd", example = "2000-01-01")
     @field:JsonProperty("birth_date")
-    val birthDate: String
+    val birthDate: String,
 )
 
 data class SignUpResponse(val accessToken: String, val refreshToken: String)
@@ -135,7 +137,8 @@ data class UpdateUserResponse(
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth API", description = """
+@Tag(
+    name = "Auth API", description = """
     [en]
     Endpoints for authentication and token management.
     Tokens are valid for 15 minutes.
@@ -149,7 +152,8 @@ data class UpdateUserResponse(
     새로고침된 토큰은 이전 토큰을 무효화합니다.
     리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
     보호된 엔드포인트에는 Authorization 헤더에 AccessToken이 필요합니다.
-""")
+"""
+)
 class AuthController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val userRepository: UserRepository,
@@ -161,10 +165,10 @@ class AuthController(
     @Value("\${s3.public-endpoint}") private val s3PublicEndpoint: String,
     @Value("\${s3.profile-bucket}") private val s3BucketName: String,
 ) {
-   @PostMapping("/login")
-   @Operation(
-       summary = "Authenticate user and generate JWT tokens / 사용자 인증 및 JWT 토큰 생성", description =
-           """
+    @PostMapping("/login")
+    @Operation(
+        summary = "Authenticate user and generate JWT tokens / 사용자 인증 및 JWT 토큰 생성", description =
+            """
         [en]
         Validates user credentials and provides access and refresh tokens.
         Tokens are valid for 15 minutes.
@@ -179,35 +183,45 @@ class AuthController(
         리프레시 토큰은 만료될 때까지 새로운 액세스 토큰을 얻는 데 사용할 수 있습니다.
         이 엔드포인트는 보호되지 않으며 인증되지 않은 클라이언트가 사용할 수 있습니다.
     """
-   )
-   @ApiResponses(
-       value = [
-           ApiResponse(responseCode = "200", description = "Successfully authenticated", useReturnTypeSchema = true),
-           ApiResponse(responseCode = "401", description = "Invalid credentials", content = [Content(schema=Schema(implementation=ApiResponseDTO::class))]),
-           ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema=Schema(implementation=ApiResponseDTO::class))]),
-       ]
-   )
-   fun authenticateUser(
-       @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email and password for authentication") 
-       @Valid @RequestBody loginRequest: LoginRequest
-   ): ResponseEntity<ApiResponseDTO<LoginResponse>> {
-       val authentication = authenticationManager.authenticate(
-           UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)
-       )
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully authenticated", useReturnTypeSchema = true),
+            ApiResponse(
+                responseCode = "401",
+                description = "Invalid credentials",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad Request",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+        ]
+    )
+    fun authenticateUser(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email and password for authentication")
+        @Valid @RequestBody loginRequest: LoginRequest,
+    ): ResponseEntity<ApiResponseDTO<LoginResponse>> {
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)
+        )
 
-       val user = userRepository.findByEmail(loginRequest.email).get()
+        val user = userRepository.findByEmail(loginRequest.email).get()
 
-       val accessToken = jwtProvider.generateAccessToken(user)
-       val refreshToken = jwtProvider.generateRefreshToken(user)
+        val accessToken = jwtProvider.generateAccessToken(user)
+        val refreshToken = jwtProvider.generateRefreshToken(user)
 
-       refreshTokenRepository.save(RefreshToken(
-           token = refreshToken,
-           user = user,
-           expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
-       ))
+        refreshTokenRepository.save(
+            RefreshToken(
+                token = refreshToken,
+                user = user,
+                expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
+            )
+        )
 
-       return ResponseEntity.ok(ApiResponseDTO(data = LoginResponse(accessToken, refreshToken)))
-   }
+        return ResponseEntity.ok(ApiResponseDTO(data = LoginResponse(accessToken, refreshToken)))
+    }
 
     @PostMapping("/refresh")
     @Operation(
@@ -228,13 +242,21 @@ class AuthController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully refreshed tokens", useReturnTypeSchema = true),
-            ApiResponse(responseCode = "400", description = "Invalid or expired refresh token", content = [Content(schema=Schema(implementation=java.lang.Exception::class))])
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully refreshed tokens",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid or expired refresh token",
+                content = [Content(schema = Schema(implementation = java.lang.Exception::class))]
+            )
         ]
     )
     fun refreshToken(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token to generate new tokens")
-        @RequestBody tokenRefreshRequest: TokenRefreshRequest
+        @RequestBody tokenRefreshRequest: TokenRefreshRequest,
     ): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
         val requestRefreshToken = tokenRefreshRequest.refreshToken
 
@@ -253,19 +275,24 @@ class AuthController(
             }
     }
 
-    private fun processRefreshToken(refreshToken: RefreshToken, requestRefreshToken: String): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
+    private fun processRefreshToken(
+        refreshToken: RefreshToken,
+        requestRefreshToken: String,
+    ): ResponseEntity<ApiResponseDTO<TokenRefreshResponse>> {
         // 토큰 만료 검증
         tokenService.verifyExpiration(refreshToken)
 
         // 사용자 확인
         val user = refreshToken.user ?: throw UnauthorizedException()
 
+        val refresh = refreshToken.expiryDate.isBefore(LocalDateTime.now().plusDays(1))
         // 새 액세스 토큰 생성
-        val accessToken = jwtProvider.generateAccessToken(user)
+        val accessToken = tokenService.generateAccessToken(user)
+        val refreshToken = if (refresh) tokenService.generateRefreshToken(user) else requestRefreshToken
 
         // 응답 생성
         return ResponseEntity.ok(
-            ApiResponseDTO(data = TokenRefreshResponse(accessToken, requestRefreshToken))
+            ApiResponseDTO(data = TokenRefreshResponse(accessToken, refreshToken))
         )
     }
 
@@ -279,20 +306,25 @@ class AuthController(
         [ko]
         사용자의 리프레시 토큰을 무효화합니다. 사용자는 새로운 토큰을 얻기 위해 다시 인증해야 합니다.
         이 엔드포인트는 보호되어 있으며 유효한 액세스 토큰이 필요합니다.
-    """)
+    """
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successfully logged out", useReturnTypeSchema = true),
-            ApiResponse(responseCode = "400", description = "Invalid refresh token", content = [Content(schema=Schema(implementation=java.lang.Exception::class))])
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid refresh token",
+                content = [Content(schema = Schema(implementation = java.lang.Exception::class))]
+            )
         ]
     )
     fun logoutUser(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Refresh token to invalidate")
-        @RequestBody tokenRevokeRequest: LogoutRequest
+        @RequestBody tokenRevokeRequest: LogoutRequest,
     ): ResponseEntity<ApiResponseDTO<String>> {
         val requestRefreshToken = tokenRevokeRequest.refreshToken
 
-        tokenService.findByToken(requestRefreshToken).ifPresent {refreshToken ->
+        tokenService.findByToken(requestRefreshToken).ifPresent { refreshToken ->
             refreshToken.user?.let { tokenService.deleteByUser(it) }
         }
 
@@ -332,8 +364,8 @@ class AuthController(
         ]
     )
     fun signUpUser(
-        @RequestBody signUpRequest: SignUpRequest
-    ): ResponseEntity<ApiResponseDTO<SignUpResponse>>{
+        @RequestBody signUpRequest: SignUpRequest,
+    ): ResponseEntity<ApiResponseDTO<SignUpResponse>> {
 
         // 이메일 중복 여부 검사
         if (userRepository.findByEmail(signUpRequest.email).isPresent)
@@ -359,11 +391,13 @@ class AuthController(
         val accessToken = jwtProvider.generateAccessToken(newUser)
         val refreshToken = jwtProvider.generateRefreshToken(newUser)
 
-        refreshTokenRepository.save(RefreshToken(
-            token = refreshToken,
-            user = newUser,
-            expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
-        ))
+        refreshTokenRepository.save(
+            RefreshToken(
+                token = refreshToken,
+                user = newUser,
+                expiryDate = LocalDateTime.now().plusSeconds(tokenService.getRefreshTokenValidity())
+            )
+        )
 
         // 생성된 토큰을 포함한 응답 전송
         return ResponseEntity.ok(ApiResponseDTO(data = SignUpResponse(accessToken, refreshToken)))
@@ -403,7 +437,7 @@ class AuthController(
     fun getUserInfo(
         @AuthenticationPrincipal userDetails: User?,
     ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
-        if(userDetails?.id == null) throw UnauthorizedException()
+        if (userDetails?.id == null) throw UnauthorizedException()
 
         val user = userRepository.findById(userDetails.id ?: "").get()
 
@@ -411,7 +445,7 @@ class AuthController(
         userDTO.profileEndpoint = s3PublicEndpoint
         userDTO.profileBucketName = s3BucketName
 
-        return ResponseEntity.ok(ApiResponseDTO(data = userDTO ))
+        return ResponseEntity.ok(ApiResponseDTO(data = userDTO))
     }
 
     @PostMapping("/update")
@@ -472,7 +506,8 @@ class AuthController(
         )
     }
 
-    @PutMapping("/profile",
+    @PutMapping(
+        "/profile",
         consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
@@ -522,7 +557,7 @@ class AuthController(
         @RequestPart("multipartFile", required = true)
         multipartFile: MultipartFile,
     ): ResponseEntity<ApiResponseDTO<UserInfoDTO>> {
-        if(userDetails?.id == null) throw UnauthorizedException()
+        if (userDetails?.id == null) throw UnauthorizedException()
 
         val file = profileS3Service.uploadProfile(userDetails, multipartFile)
 

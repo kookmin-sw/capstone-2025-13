@@ -53,6 +53,7 @@ data class UserQuestsDTO(
     val progress: Int,
     val target: Int,
     val status: UserQuestStatus,
+    val step: Int,
     @JsonIgnore
     val photoSrc: String?,
     val createdAt: LocalDateTime,
@@ -79,19 +80,20 @@ data class UserQuestsDTO(
     @get:JsonProperty("photo")
     val photo: String?
         get() {
-            return if (photoSrc?.isBlank() == true || _photoEndpoint.isBlank() || _photoBucketName.isBlank()) null
+            return if (photoSrc == null || photoSrc.isBlank() || _photoEndpoint.isBlank() || _photoBucketName.isBlank()) null
             else return "$_photoEndpoint/$_photoBucketName/$photoSrc"
         }
 }
 
 fun UserQuests.toDTO() = UserQuestsDTO(
     this.id ?: "",
-    this.quest?.name ?: "",
-    this.quest?.description ?: "",
-    this.quest?.type ?: QuestType.ACTIVITY,
+    this.quest.name,
+    this.quest.description,
+    this.quest.type,
     this.progress,
     this.target,
     this.status,
+    this.quest.step,
     this.photo,
     this.createdAt,
     this.updatedAt
@@ -111,15 +113,17 @@ data class QuestsDTO(
     val name: String,
     val description: String,
     val target: Int,
+    val step: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
 fun Quests.toDTO() = QuestsDTO(
     id = this.id ?: 0,
-    type = this.type ?: QuestType.ACTIVITY,
-    name = this.name ?: "",
-    description = this.description ?: "",
+    type = this.type,
+    name = this.name,
+    description = this.description,
     target = this.target,
+    step = this.step,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )
@@ -134,37 +138,12 @@ data class UserQuestStagesDTO(
 
 fun UserQuestStages.toDTO() = UserQuestStagesDTO(
     id = this.id ?: 0,
-    type = this.type ?: QuestType.ACTIVITY,
+    type = this.type,
     stage = this.stage,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )
 
-data class UserQuestLastDTO(
-    val id: String,
-    val name: String,
-    val description: String,
-    val type: QuestType,
-    val progress: Int,
-    val target: Int,
-    val status: UserQuestStatus,
-    val step: Int,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
-
-fun UserQuestLastDTO.toDTO() = UserQuestLastDTO(
-    id = this.id ?: "",
-    name = this.name ?: "",
-    description = this.description ?: "",
-    type = this.type ?: QuestType.ACTIVITY,
-    progress = this.progress,
-    target = this.target,
-    status = this.status,
-    step = this.step,
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt
-)
 @RestController
 @RequestMapping("/quests")
 @Tag(name = "Quests API", description = """
@@ -752,31 +731,22 @@ class QuestsController(
     )
     fun getCurrentQuests(
         @AuthenticationPrincipal userDetails: User?
-    ): ResponseEntity<ApiResponseDTO<Map<QuestType, UserQuestLastDTO>>> {
+    ): ResponseEntity<ApiResponseDTO<Map<QuestType, UserQuestsDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val questMaps = userQuestsRepository.findByUser(userDetails)
             .filter { it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED }
-            .groupBy { it.quest?.type }
+            .groupBy { it.quest.type }
             .mapValues { (_, quests) ->
                 quests.maxByOrNull { it.createdAt }?.let { lastQuest ->
-                    UserQuestLastDTO(
-                        id = lastQuest.id ?: "",
-                        name = lastQuest.quest?.name ?: "",
-                        description = lastQuest.quest?.description ?: "",
-                        type = lastQuest.quest?.type ?: QuestType.ACTIVITY,
-                        progress = lastQuest.progress,
-                        target = lastQuest.target,
-                        status = lastQuest.status,
-                        step = lastQuest.quest?.step ?: 0,
-                        createdAt = lastQuest.createdAt,
-                        updatedAt = lastQuest.updatedAt
-                    )
+                    val dto = lastQuest.toDTO()
+                    dto.photoEndpoint = s3PublicEndpoint
+                    dto.photoBucketName = s3BucketName
+
+                    dto
                 }
             }
-            .filterKeys { it != null }
             .filterValues { it != null }
-            .mapKeys { it.key!! }
             .mapValues { it.value!! }
 
         return ResponseEntity.ok(ApiResponseDTO(data = questMaps))
@@ -829,28 +799,19 @@ class QuestsController(
     fun getCurrentQuestByType(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable type: QuestType
-    ): ResponseEntity<ApiResponseDTO<UserQuestLastDTO>> {
+    ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
         val quest = userQuestsRepository.findByUser(userDetails)
-            .filter { it.quest?.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED) }
+            .filter { it.quest.type == type && (it.status == UserQuestStatus.PROCESSING || it.status == UserQuestStatus.COMPLETED) }
             .maxByOrNull { it.createdAt }
             ?: throw NotFoundException()
 
-        val lastQuest = UserQuestLastDTO(
-            id = quest.id ?: "",
-            name = quest.quest?.name ?: "",
-            description = quest.quest?.description ?: "",
-            type = quest.quest?.type ?: QuestType.ACTIVITY,
-            progress = quest.progress,
-            target = quest.target,
-            status = quest.status,
-            step = quest.quest?.step ?: 0,
-            createdAt = quest.createdAt,
-            updatedAt = quest.updatedAt
-        )
+        val dto = quest.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
 
-        return ResponseEntity.ok(ApiResponseDTO(data = lastQuest))
+        return ResponseEntity.ok(ApiResponseDTO(data = dto))
     }
 
     @PutMapping(
@@ -909,11 +870,12 @@ class QuestsController(
         if (userDetails == null) throw UnauthorizedException()
 
         val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
-        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+        if (userQuests.user.id != userDetails.id) throw UnauthorizedException()
 
         val file = userQuestS3Service.uploadPhoto(userQuests, file)
 
         userQuests.photo = file
+        userQuestsRepository.save(userQuests)
 
         val dto = userQuests.toDTO()
         dto.photoEndpoint = s3PublicEndpoint
@@ -973,14 +935,18 @@ class QuestsController(
         if (userDetails == null) throw UnauthorizedException()
 
         val userQuests = userQuestsRepository.findById(userQuestID).getOrNull() ?: throw NotFoundException()
-        if (userQuests.user?.id != userDetails.id) throw UnauthorizedException()
+        if (userQuests.user.id != userDetails.id) throw UnauthorizedException()
 
         userQuestS3Service.removePhoto(userQuests)
 
         userQuests.photo = null
         userQuestsRepository.save(userQuests)
 
-        return ResponseEntity.ok(ApiResponseDTO(data = userQuests.toDTO()))
+        val dto = userQuests.toDTO()
+        dto.photoEndpoint = s3PublicEndpoint
+        dto.photoBucketName = s3BucketName
+
+        return ResponseEntity.ok(ApiResponseDTO(data = dto))
     }
 
     @GetMapping("/quote")
