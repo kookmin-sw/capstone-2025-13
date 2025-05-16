@@ -32,7 +32,6 @@ const questMeditationStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginBottom: width * 0.01,
   },
   button: {
     borderRadius: 20,
@@ -60,7 +59,6 @@ const questMeditationStyles = StyleSheet.create({
     color: "#fff",
     fontSize: width * 0.045,
     alignSelf: "flex-start", // 왼쪽 정렬
-    marginBottom: height * 0.005,
   },
   timerWrapper:{
     flexDirection: "row",
