@@ -8,7 +8,10 @@ type StarRatingProps = {
     initialRating?: number;
 };
 
-export default function StarRating({ onRecordEtcUpdate, initialRating = 0 }: StarRatingProps) {
+export default function StarRating({
+    onRecordEtcUpdate,
+    initialRating = 0,
+}: StarRatingProps) {
     const [rating, setRating] = useState(0);
     const handleRatingChange = (rating: number) => {
         setRating(rating);
@@ -31,7 +34,7 @@ export default function StarRating({ onRecordEtcUpdate, initialRating = 0 }: Sta
                     >
                         <MaterialCommunityIcons
                             name={index < rating ? "star" : "star-outline"}
-                            size={32}
+                            size={45}
                             color="#FFD700"
                         />
                     </TouchableOpacity>

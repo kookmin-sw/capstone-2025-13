@@ -20,7 +20,7 @@ import { getCoupon } from "../API/potAPI";
 export default function Record() {
     const [recordId, setRecordId] = useState<string>("");
     const [luckyVicky, setLuckyVicky] =
-        useState<string>("이거 완전 럭키비키 잖아~");
+        useState<string>("이거 완전 럭키비키잖아~");
     const [isLuckyLoading, setIsLuckyLoading] = useState<boolean>(false);
     const [recordText, setRecordText] = useState<string>("");
     const [recordEtcText, setRecordEtcText] = useState<string>("");
@@ -34,6 +34,8 @@ export default function Record() {
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
+
+    const defaultLuckyText = "이거 완전 럭키비키잖아~";
 
     useEffect(() => {
         // const fetchRecord = async () => {
@@ -120,25 +122,27 @@ export default function Record() {
                 <RecordChat
                     luckyVicky={luckyVicky}
                     isLoading={isLuckyLoading}
+                    textStyle={styles.luckyText}
                 />
-                {!isLuckyLoading && recordEtcText !== "이거 완전 럭키비키 잖아~" && (
+                {!isLuckyLoading && recordEtcText !== defaultLuckyText && (
                     <RecordEtc
                         onRecordEtcUpdate={setRecordEtcText}
                         initialEtcText={recordEtcText}
                     />
                 )}
                 <TouchableOpacity
-                    style={styles.submitButton}
+                    style={[styles.submitButton, styles.saveButton]}
                     onPress={handleSave}
                     disabled={isSaved || isLoading}
                 >
-                    <Image
-                        source={require("../assets/Images/save_bttn.png")}
+                    <Text
                         style={[
-                            styles.submitButtonImg,
+                            styles.submitButtonText,
                             (isSaved || isLoading) && { opacity: 0.5 },
                         ]}
-                    />
+                    >
+                        저 장
+                    </Text>
                 </TouchableOpacity>
                 <Modal
                     visible={modalOpen}
@@ -183,4 +187,3 @@ export default function Record() {
         </View>
     );
 }
-
