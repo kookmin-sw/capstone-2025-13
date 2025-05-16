@@ -32,7 +32,11 @@ class IntegrityChallengeService(
         if(pendingChallenges.isNotEmpty()) {
             val latestChallenge = pendingChallenges.maxByOrNull { it.createdAt }
 
-            if (latestChallenge != null && latestChallenge.expiresAt.isAfter(LocalDateTime.now())) {
+            if (
+                latestChallenge != null &&
+                latestChallenge.expiresAt.isAfter(LocalDateTime.now()) &&
+                latestChallenge.status == IntegrityChallengeStatus.PENDING
+            ) {
                 logger.info("Challenge already exists for device: $deviceId")
                 return Pair(latestChallenge.challenge, ChronoUnit.MINUTES.between(LocalDateTime.now(), latestChallenge.expiresAt))
             }
