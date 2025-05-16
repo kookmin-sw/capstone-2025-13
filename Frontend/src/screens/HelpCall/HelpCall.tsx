@@ -22,7 +22,8 @@ import { RootStackParamList } from "../../App";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function HelpCall() {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const [location, setLocation] = useState<{
         latitude: number;
@@ -32,14 +33,16 @@ export default function HelpCall() {
     } | null>(null);
 
     const [selected, setSelected] = useState("all");
-    const [markers, setMarkers] = useState<{
-        id: string;
-        latitude: number;
-        longitude: number;
-        title: string;
-        type: string;
-        details: any;
-    }[]>([]);
+    const [markers, setMarkers] = useState<
+        {
+            id: string;
+            latitude: number;
+            longitude: number;
+            title: string;
+            type: string;
+            details: any;
+        }[]
+    >([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
@@ -64,7 +67,8 @@ export default function HelpCall() {
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            const { status } = await Location.requestForegroundPermissionsAsync();
+            const { status } =
+                await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
                 setIsLoading(false);
@@ -129,9 +133,7 @@ export default function HelpCall() {
     ];
 
     return (
-        <TouchableWithoutFeedback
-            onPress={() => setSelectedMarker(null)}
-        >
+        <TouchableWithoutFeedback onPress={() => setSelectedMarker(null)}>
             <View style={helpCallStyles.container}>
                 <StatusBar style="auto" />
                 {isLoading && <Spinner />}
@@ -141,19 +143,26 @@ export default function HelpCall() {
                             <TouchableOpacity
                                 style={helpCallStyles.backButtonWrapper}
                                 onPress={() => {
-                                    navigation.navigate("Home")
+                                    navigation.navigate("Home");
                                 }}
                             >
-                                <Ionicons name="arrow-back-circle" size={40} color="#1AA85C" />
+                                <Ionicons
+                                    name="arrow-back-circle"
+                                    size={40}
+                                    color="#1AA85C"
+                                />
                             </TouchableOpacity>
 
-
-                            <Text style={helpCallStyles.headerText}>마음 케어 정보 지도</Text>
+                            <Text style={helpCallStyles.headerText}>
+                                마음 케어 정보 지도
+                            </Text>
                             <ScrollView
                                 style={{ marginTop: 10 }}
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={helpCallStyles.scrollContainer}
+                                contentContainerStyle={
+                                    helpCallStyles.scrollContainer
+                                }
                             >
                                 {buttons.map((btn) => (
                                     <TouchableOpacity
@@ -195,9 +204,17 @@ export default function HelpCall() {
                                         longitude: marker.longitude,
                                     }}
                                     title={marker.title}
-                                    image={getMarkerImageByType(marker.type)}
-                                    onCalloutPress={() => setSelectedMarker(marker.details)}
-                                />
+                                    onCalloutPress={() =>
+                                        setSelectedMarker(marker.details)
+                                    }
+                                >
+                                    <Image
+                                        source={getMarkerImageByType(
+                                            marker.type
+                                        )}
+                                        style={helpCallStyles.markerIcon}
+                                    />
+                                </Marker>
                             ))}
                         </MapView>
 
@@ -208,8 +225,7 @@ export default function HelpCall() {
                             />
                         )}
                         <TouchableOpacity
-                            style={helpCallStyles.callButton
-                            }
+                            style={helpCallStyles.callButton}
                             onPress={() => {
                                 navigation.navigate("HelpCall2");
                             }}
@@ -219,8 +235,6 @@ export default function HelpCall() {
                                 style={{ width: 60, height: 60 }}
                             />
                         </TouchableOpacity>
-
-
                     </>
                 )}
             </View>
