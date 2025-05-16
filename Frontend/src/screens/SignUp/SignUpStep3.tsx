@@ -6,6 +6,7 @@ import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
 import { signUp } from "../../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TermsModal from "../../components/TermsModal";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;
 type SignUpStep3RouteProp = RouteProp<RootStackParamList, "SignUpStep3">;
@@ -17,54 +18,61 @@ const SignUpStep3 = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [secondPassword, setSecondPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [agreeSeviceTerms, setAgreeServiceTerms] = useState(false);
+    const [agreeInfoTerms, setAgreeInfoTerms] = useState(false);
+    const [modalType, setModalType] = useState<"service" | "info" | null>(null);
 
     const route = useRoute<SignUpStep3RouteProp>();
 
     const { nickname, gender, birthDate } = route.params;
 
     const handleSignUp = async () => {
-        // const trimmedEmail = email.trim();
-        // const trimmedPassword = password.trim();
-        // const trimmedConfirmPassword = confirmPassword.trim();
-        // const trimmedSecondPassword = secondPassword.trim();
+        const trimmedEmail = email.trim();
+        const trimmedPassword = password.trim();
+        const trimmedConfirmPassword = confirmPassword.trim();
+        const trimmedSecondPassword = secondPassword.trim();
 
-        // if (!trimmedEmail) {
-        //     setErrorMessage("이메일을 입력하세요.");
-        //     return;
-        // }
-        // if (!trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
-        //     setErrorMessage("유효한 이메일 형식을 입력하세요.");
-        //     return;
-        // }
-        // if (!trimmedPassword) {
-        //     setErrorMessage("비밀번호를 입력하세요.");
-        //     return;
-        // }
-        // if (trimmedPassword.length < 8 || !/[A-Za-z]/.test(trimmedPassword) || !/\d/.test(trimmedPassword)) {
-        //     setErrorMessage("비밀번호는 8자 이상, 영문과 숫자를 포함해야 합니다.");
-        //     return;
-        // }
-        // if (trimmedPassword !== trimmedConfirmPassword) {
-        //     setErrorMessage("비밀번호가 일치하지 않습니다.");
-        //     return;
-        // }
-        // if (!/^\d{4}$/.test(trimmedSecondPassword)) {
-        //     setErrorMessage("2차 비밀번호는 4자리 숫자여야 합니다.");
-        //     return;
-        // }
 
-        // try {
-        //     await AsyncStorage.setItem("@secondPassword", trimmedSecondPassword);
-        //     await signUp(trimmedEmail, trimmedPassword, nickname, birthDate, gender);
-        navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
-        // } catch (error) {
-        //     console.error("회원가입 실패:", error);
-        //     if ((error as any).response?.status === 400) {
-        //         setErrorMessage("이미 사용 중인 이메일입니다.");
-        //     } else {
-        //         setErrorMessage("회원가입에 실패했습니다. 다시 시도해주세요.");
-        //     }
-        // }
+        if (!trimmedEmail) {
+            setErrorMessage("이메일을 입력하세요.");
+            return;
+        }
+        if (!trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
+            setErrorMessage("유효한 이메일 형식을 입력하세요.");
+            return;
+        }
+        if (!trimmedPassword) {
+            setErrorMessage("비밀번호를 입력하세요.");
+            return;
+        }
+        if (trimmedPassword.length < 8 || !/[A-Za-z]/.test(trimmedPassword) || !/\d/.test(trimmedPassword)) {
+            setErrorMessage("비밀번호는 8자 이상, 영문과 숫자를 포함해야 합니다.");
+            return;
+        }
+        if (trimmedPassword !== trimmedConfirmPassword) {
+            setErrorMessage("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+        if (!/^\d{4}$/.test(trimmedSecondPassword)) {
+            setErrorMessage("2차 비밀번호는 4자리 숫자여야 합니다.");
+            return;
+        }
+        if (!agreeSeviceTerms || !agreeInfoTerms) {
+            setErrorMessage("모든 필수 약관에 동의해주세요.");
+            return;
+        }
+        try {
+            await AsyncStorage.setItem("@secondPassword", trimmedSecondPassword);
+            await signUp(trimmedEmail, trimmedPassword, nickname, birthDate, gender);
+            navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
+        } catch (error) {
+            console.error("회원가입 실패:", error);
+            if ((error as any).response?.status === 400) {
+                setErrorMessage("이미 사용 중인 이메일입니다.");
+            } else {
+                setErrorMessage("회원가입에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
     };
 
 
@@ -141,6 +149,31 @@ const SignUpStep3 = () => {
                             {errorMessage !== "" && (
                                 <Text style={signUpStyles.errorText}>{errorMessage}</Text>
                             )}
+                            <View style={signUpStyles.termsContainer}>
+                                <TouchableOpacity
+                                    onPress={() => setAgreeServiceTerms(!agreeSeviceTerms)}
+                                    style={[signUpStyles.checkbox, agreeSeviceTerms && signUpStyles.checkboxChecked]}
+                                >
+                                    {agreeSeviceTerms && <Text style={signUpStyles.checkmark}>✓</Text>}
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setModalType("service")}>
+                                    <Text style={signUpStyles.termsText}>[필수] 서비스 이용약관</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={signUpStyles.termsContainer}>
+                                <TouchableOpacity
+                                    onPress={() => setAgreeInfoTerms(!agreeInfoTerms)}
+                                    style={[signUpStyles.checkbox, agreeInfoTerms && signUpStyles.checkboxChecked]}
+                                >
+                                    {agreeInfoTerms && <Text style={signUpStyles.checkmark}>✓</Text>}
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setModalType("info")}>
+                                    <Text style={signUpStyles.termsText}>[필수] 개인정보 수집 및 이용 동의</Text>
+                                </TouchableOpacity>
+                            </View>
 
                             <View style={signUpStyles.row}>
                                 <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
@@ -159,7 +192,18 @@ const SignUpStep3 = () => {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
+            <TermsModal
+                visible={modalType !== null}
+                onClose={() => setModalType(null)}
+                title={modalType === "service" ? "[필수] 서비스 이용약관" : "[필수] 개인정보 수집 및 이용 동의"}
+                content={
+                    modalType === "service"
+                        ? require("../../constants/serviceTerms").default
+                        : require("../../constants/infoTerms").default
+                }
+            />
         </ImageBackground>
+
     );
 };
 
