@@ -54,7 +54,7 @@ class IntegrityController(
         @Valid @RequestBody request: ChallengeRequest
     ): ResponseEntity<ChallengeResponse> {
         try {
-        val challenge = challengeService.generateChallenge(request.deviceId)
+        val challenge = challengeService.generateChallenge(request.platform, request.deviceId)
             return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = challenge.first ?: "",
