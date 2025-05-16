@@ -149,48 +149,32 @@ const SignUpStep3 = () => {
                             {errorMessage !== "" && (
                                 <Text style={signUpStyles.errorText}>{errorMessage}</Text>
                             )}
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                            <View style={signUpStyles.termsContainer}>
                                 <TouchableOpacity
                                     onPress={() => setAgreeServiceTerms(!agreeSeviceTerms)}
-                                    style={{
-                                        width: 24,
-                                        height: 24,
-                                        borderWidth: 1,
-                                        borderColor: '#89673F',
-                                        backgroundColor: agreeSeviceTerms ? '#89673F' : '#fff',
-                                        marginRight: 10,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
+                                    style={[signUpStyles.checkbox, agreeSeviceTerms && signUpStyles.checkboxChecked]}
                                 >
-                                    {agreeSeviceTerms && <Text style={{ color: '#fff' }}>✓</Text>}
+                                    {agreeSeviceTerms && <Text style={signUpStyles.checkmark}>✓</Text>}
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={() => setModalType("service")}>
-                                    <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>[필수] 서비스 이용약관 </Text>
+                                    <Text style={signUpStyles.termsText}>[필수] 서비스 이용약관</Text>
                                 </TouchableOpacity>
                             </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+
+                            <View style={signUpStyles.termsContainer}>
                                 <TouchableOpacity
                                     onPress={() => setAgreeInfoTerms(!agreeInfoTerms)}
-                                    style={{
-                                        width: 24,
-                                        height: 24,
-                                        borderWidth: 1,
-                                        borderColor: '#89673F',
-                                        backgroundColor: agreeInfoTerms ? '#89673F' : '#fff',
-                                        marginRight: 10,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
+                                    style={[signUpStyles.checkbox, agreeInfoTerms && signUpStyles.checkboxChecked]}
                                 >
-                                    {agreeInfoTerms && <Text style={{ color: '#fff' }}>✓</Text>}
+                                    {agreeInfoTerms && <Text style={signUpStyles.checkmark}>✓</Text>}
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={() => setModalType("info")}>
-                                    <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>[필수] 개인정보 수집 및 이용 동의</Text>
+                                    <Text style={signUpStyles.termsText}>[필수] 개인정보 수집 및 이용 동의</Text>
                                 </TouchableOpacity>
                             </View>
+
                             <View style={signUpStyles.row}>
                                 <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
                                     <Text style={signUpStyles.backText}>뒤로가기</Text>
