@@ -352,7 +352,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 113;
 				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				ENABLE_BITCODE = NO;
@@ -401,7 +401,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 113;
 				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				INFOPLIST_FILE = wooong/Info.plist;
