@@ -30,10 +30,14 @@ const getBundleId = () => {
 
 export const requestChallenge = async () => {
     const deviceId = await getDeviceId()
+    const platform = Platform.OS;
 
     try {
         const response = await axios.post<RequestChallengeResponse>(`${apiUrl}/api/integrity/challenge`,
-            { deviceId },
+            {
+                deviceId,
+                platform,
+            },
             {}
         )
 

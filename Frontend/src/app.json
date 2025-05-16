@@ -16,17 +16,19 @@
       "expo-audio",
       "expo-video",
       "expo-secure-store",
-      ["expo-build-properties",
-      {
-        "android": {
-          "compileSdkVersion": 35,
-          "targetSdkVersion": 35,
-          "minSdkVersion": 26
-        },
-        "ios": {
-          "deploymentTarget": "15.1"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 26
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
         }
-      }],
+      ],
       [
         "react-native-vision-camera",
         {
@@ -45,8 +47,11 @@
         "aps-environment": "production",
         "com.apple.developer.healthkit": true
       },
-      "buildNumber": "102",
-      "appleTeamId": "Y56G5PTS2K"
+      "buildNumber": "109",
+      "appleTeamId": "Y56G5PTS2K",
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -62,7 +67,8 @@
       "versionCode": 90,
       "permissions": [
         "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
       ]
     },
     "web": {
