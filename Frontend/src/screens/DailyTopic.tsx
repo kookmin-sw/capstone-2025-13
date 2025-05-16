@@ -309,7 +309,7 @@ export default function DailyTopic() {
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={80}
+            keyboardVerticalOffset={0}
         >
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
                 <TouchableOpacity
