@@ -9,8 +9,10 @@ import { shouldCaptureFace } from '../../utils/faceChecker';
 import { EmotionModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
 
+import EmotionChartBox from '../../components/Quest_emotionBox';
+import styles from '../../styles/questEmotionStyles';
+
 export default function QuestEmotion() {
-  const quest_name = 'happy5sec';
   const [emotionLog, setEmotionLog] = useState<string[]>([]);
   const device = useCameraDevice('front');
   const cameraRef = useRef<any>(null);
@@ -18,18 +20,14 @@ export default function QuestEmotion() {
   const [hasPermission, setHasPermission] = useState(false);
   const { isLoaded, model } = useLoadEmotionModel();
 
+  const [photoPath, setPhotoPath] = useState<string | null>(null);
+  const [latestResult, setLatestResult] = useState<number[] | null>(null);
+
   // 타이밍 제어
   const lastPhotoTimeRef = useRef(0);
   const isPhotoTaken = useRef(false);
-  const [photoPath, setPhotoPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
+  
+  const quest_name = '5초 간 웃어보기';
   const quest = QUESTS.find(q => q.id === quest_name);
   if (!quest) {
     return (
@@ -41,41 +39,6 @@ export default function QuestEmotion() {
 
   const quest_capture_interval = quest.interval ?? 1000;
   const quest_save_pre_log = quest.logLength ?? 20;
-
-  const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-    if (!faces?.length || !isLoaded || !model) return;
-    const face = faces[0];
-    const uri = await capturePhoto(face);
-    if (!uri) return;
-
-    console.log('✅ 감정 분석 요청됨:', { uri, face });
-    const result = await EmotionModelRunner(uri, model);
-    if (result) {
-      const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-      const topIndex = result.indexOf(Math.max(...result));
-      const predictedLabel = labels[topIndex];
-      console.log('🧠 감정 예측 결과:', result);
-
-      const updated = [...emotionLog, predictedLabel];
-      if (updated.length > quest_save_pre_log) updated.shift();
-      setEmotionLog(updated);
-
-      if (quest.check(updated)) {
-        console.log('🎯 퀘스트 완료');
-      }
-    }
-  });
-
-  const frameProcessor = useFrameProcessor((frame) => {
-    "worklet";
-    const now = Date.now();
-    const last = (globalThis as any).lastProcessTime ?? 0;
-    if (now - last < quest_capture_interval) return;
-    (globalThis as any).lastProcessTime = now;
-
-    const faces = detectFaces(frame);
-    handleDetectedFaces(faces);
-  }, [handleDetectedFaces]);
 
   const capturePhoto = async (face: Face | undefined) => {
     if (isPhotoTaken.current) return null;
@@ -104,52 +67,71 @@ export default function QuestEmotion() {
     }
   };
 
+  const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
+    if (!faces?.length || !isLoaded || !model) return;
+    const face = faces[0];
+    const uri = await capturePhoto(face);
+    if (!uri) return;
+
+    const result = await EmotionModelRunner(uri, model);
+    if (result) {
+      const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+      const topIndex = result.indexOf(Math.max(...result));
+      const predictedLabel = labels[topIndex];
+      const updated = [...emotionLog, predictedLabel];
+      setLatestResult(Array.from(result));
+
+      if (updated.length > quest_save_pre_log) updated.shift();
+      setEmotionLog(updated);
+
+      if (quest.check(updated)) {
+        console.log('🎯 퀘스트 완료');
+      }
+    }
+  });
+
+  const frameProcessor = useFrameProcessor((frame) => {
+    "worklet";
+    const now = Date.now();
+    const last = (globalThis as any).lastProcessTime ?? 0;
+    if (now - last < quest_capture_interval) return;
+    (globalThis as any).lastProcessTime = now;
+
+    const faces = detectFaces(frame);
+    handleDetectedFaces(faces);
+  }, [handleDetectedFaces]);
+
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
   if (!device || !hasPermission) {
     return (
-      <View style={styles.centered}>
-        <Text>📷 카메라 준비 중...</Text>
-      </View>
-    );
-  }
+        <View style={styles.centered}>
+          <Text>📷 카메라 준비 중...</Text>
+        </View>
+      );
+    }
 
   return (
     <View style={styles.container}>
-      <Camera
-        ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        device={device}
-        photo
-        isActive
-        frameProcessor={frameProcessor}
-      />
-
-      {photoPath && (
-        <Image
-          source={{ uri: photoPath }}
-          style={styles.previewImage}
+      <View style={styles.half}>
+        <Camera
+          ref={cameraRef}
+          style={styles.camera}
+          device={device}
+          photo
+          isActive
+          frameProcessor={frameProcessor}
         />
-      )}
+      </View>
 
-      <View style={styles.logBox}>
-        <Text style={styles.logText}>
-          {emotionLog.slice(-5).join(' > ')}
-        </Text>
+      <View style={[styles.half, styles.bottom]}>
+        {latestResult && <EmotionChartBox result={latestResult} />}
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  logBox: {
-    position: 'absolute', bottom: 20, right: 20,
-    padding: 8, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 6,
-  },
-  logText: { color: 'white', fontSize: 12 },
-  previewImage: {
-    width: 150, height: 150,
-    position: 'absolute', top: 60, right: 20,
-    borderWidth: 1, borderColor: 'white',
-  },
-});
