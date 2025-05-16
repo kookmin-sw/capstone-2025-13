@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, Image, Text, TouchableOpacity, Modal } from "react-native";
-import Toast from 'react-native-toast-message';
+import {
+    View,
+    ScrollView,
+    Image,
+    Text,
+    TouchableOpacity,
+    Modal,
+} from "react-native";
+import Toast from "react-native-toast-message";
 import RecordHeader from "../components/RecordHeader";
 import RecordInputBox from "../components/RecordInputBox";
 import StarRating from "../components/StarRating";
@@ -8,10 +15,12 @@ import RecordChat from "../components/Record_chat";
 import RecordEtc from "../components/Record_etc";
 import styles from "../styles/recordStyles";
 import { getRecordMe, postRecord } from "../API/recordAPI";
+import { getCoupon } from "../API/potAPI";
 
 export default function Record() {
     const [recordId, setRecordId] = useState<string>("");
-    const [luckyVicky, setLuckyVicky] = useState<string>("이거 완전 럭키비키 잖아~");
+    const [luckyVicky, setLuckyVicky] =
+        useState<string>("이거 완전 럭키비키 잖아~");
     const [isLuckyLoading, setIsLuckyLoading] = useState<boolean>(false);
     const [recordText, setRecordText] = useState<string>("");
     const [recordEtcText, setRecordEtcText] = useState<string>("");
@@ -22,8 +31,8 @@ export default function Record() {
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
 
     useEffect(() => {
@@ -36,9 +45,7 @@ export default function Record() {
                 setRating(response.rate || 0);
                 setRecordEtcText(response.comment || "");
                 setLuckyVicky(response.luckyVicky || "");
-            } catch (error) {
-
-            }
+            } catch (error) {}
         };
         fetchRecord();
     }, [formattedDate]);
@@ -56,10 +63,10 @@ export default function Record() {
     const handleSave = async () => {
         if (rating === 0) {
             Toast.show({
-                type: 'error',
-                text1: '저장 실패',
-                text2: '별점을 입력해주세요',
-                position: 'bottom',
+                type: "error",
+                text1: "저장 실패",
+                text2: "별점을 입력해주세요",
+                position: "bottom",
             });
             return;
         }
@@ -69,18 +76,20 @@ export default function Record() {
             if (response) {
                 setIsSaved(true);
                 Toast.show({
-                    type: 'success',
-                    text1: '저장 완료',
-                    text2: '일기가 성공적으로 저장되었습니다! 🎉',
-                    position: 'bottom',
+                    type: "success",
+                    text1: "저장 완료",
+                    text2: "일기가 성공적으로 저장되었습니다! 🎉",
+                    position: "bottom",
                 });
+
+                await getCoupon();
             }
         } catch (error) {
             Toast.show({
-                type: 'error',
-                text1: '저장 실패',
-                text2: '일기 저장 중 오류가 발생했습니다. 다시 시도해주세요.',
-                position: 'bottom',
+                type: "error",
+                text1: "저장 실패",
+                text2: "일기 저장 중 오류가 발생했습니다. 다시 시도해주세요.",
+                position: "bottom",
             });
         } finally {
             setIsLoading(false);
@@ -90,8 +99,16 @@ export default function Record() {
     return (
         <View style={styles.container}>
             <RecordHeader />
-            <ScrollView contentContainerStyle={[styles.scroll, { alignItems: 'center' }]}>
-                <StarRating onRecordEtcUpdate={handleRatingChange} initialRating={rating} />
+            <ScrollView
+                contentContainerStyle={[
+                    styles.scroll,
+                    { alignItems: "center" },
+                ]}
+            >
+                <StarRating
+                    onRecordEtcUpdate={handleRatingChange}
+                    initialRating={rating}
+                />
                 <RecordInputBox
                     initialRecord={recordText}
                     onRecordIdUpdate={handleRecordIdUpdate}
@@ -100,14 +117,24 @@ export default function Record() {
                     setModalOpen={setModalOpen}
                     isSubmmitAgreed={isSubmmitAgreed}
                 />
-                <RecordChat luckyVicky={luckyVicky} isLoading={isLuckyLoading} />
-                <RecordEtc onRecordEtcUpdate={setRecordEtcText} initialEtcText={recordEtcText} />
-                <TouchableOpacity style={styles.submitButton} onPress={handleSave} disabled={isSaved || isLoading}>
+                <RecordChat
+                    luckyVicky={luckyVicky}
+                    isLoading={isLuckyLoading}
+                />
+                <RecordEtc
+                    onRecordEtcUpdate={setRecordEtcText}
+                    initialEtcText={recordEtcText}
+                />
+                <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={handleSave}
+                    disabled={isSaved || isLoading}
+                >
                     <Image
                         source={require("../assets/Images/save_bttn.png")}
                         style={[
                             styles.submitButtonImg,
-                            (isSaved || isLoading) && { opacity: 0.5 }
+                            (isSaved || isLoading) && { opacity: 0.5 },
                         ]}
                     />
                 </TouchableOpacity>
@@ -119,7 +146,10 @@ export default function Record() {
                 >
                     <View style={styles.modalOverlay}>
                         <View style={styles.modalContainer}>
-                            <Text style={styles.modalText}>일기 제출은 한 번만 가능해!{'\n'}정말 다 쓴 거 맞지?</Text>
+                            <Text style={styles.modalText}>
+                                일기 제출은 한 번만 가능해!{"\n"}정말 다 쓴 거
+                                맞지?
+                            </Text>
                             <View style={styles.modalButtonGroup}>
                                 <TouchableOpacity
                                     style={styles.modalButton}
@@ -128,13 +158,20 @@ export default function Record() {
                                         setModalOpen(false);
                                     }}
                                 >
-                                    <Text style={styles.modalButtonText}>맞아</Text>
+                                    <Text style={styles.modalButtonText}>
+                                        맞아
+                                    </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={[styles.modalButton, { backgroundColor: "#D8BDA1" }]}
+                                    style={[
+                                        styles.modalButton,
+                                        { backgroundColor: "#D8BDA1" },
+                                    ]}
                                     onPress={() => setModalOpen(false)}
                                 >
-                                    <Text style={styles.modalButtonText}>아니야</Text>
+                                    <Text style={styles.modalButtonText}>
+                                        아니야
+                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -145,6 +182,4 @@ export default function Record() {
     );
 }
 
-
 // 한번만 일기 제출하게 수정, css 수정, 최종 테스트트
-

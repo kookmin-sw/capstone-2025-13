@@ -7,7 +7,11 @@ import SurveyQuestion from "../../components/SurveyQuestion";
 import ConfirmButton from "../../components/ConfirmButton";
 import styles from "../../styles/formalSurveyStyles";
 
-import { fetchDiagnosisDetail, putDiagnosisResult } from "../../API/diagnosisAPI";
+import {
+    fetchDiagnosisDetail,
+    putDiagnosisResult,
+} from "../../API/diagnosisAPI";
+import { getCoupon } from "../../API/potAPI";
 import type { DiagnosisList } from "../../API/diagnosisAPI";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
@@ -48,14 +52,17 @@ export default function FormalDiagnosisSurvey() {
         const sorted = [...scaleList].sort((a, b) => b.start - a.start);
         const matched = sorted.find((s) => totalScore >= s.start);
         return matched
-            ? { scaleName: matched.scaleName, description: matched.description, start: matched.start }
+            ? {
+                  scaleName: matched.scaleName,
+                  description: matched.description,
+                  start: matched.start,
+              }
             : null;
     };
 
-
     const getMaxTotalScore = () => {
         return questions.reduce((sum, q) => {
-            const maxScore = Math.max(...q.answers.map(a => a.score));
+            const maxScore = Math.max(...q.answers.map((a) => a.score));
             return sum + maxScore;
         }, 0);
     };
@@ -77,8 +84,16 @@ export default function FormalDiagnosisSurvey() {
         }
 
         try {
-            await putDiagnosisResult(diagnosisId, scaleResult.start, totalScore);
+            await putDiagnosisResult(
+                diagnosisId,
+                scaleResult.start,
+                totalScore
+            );
             console.log("✅ 진단 결과 저장 성공");
+
+            // 👉 쿠폰 하나 받기
+            await getCoupon();
+
             navigation.navigate("FormalDiagnosisResult", {
                 diagnosisId: Number(diagnosisId),
                 score: totalScore,
@@ -90,7 +105,6 @@ export default function FormalDiagnosisSurvey() {
             console.error("❌ 진단 결과 저장 실패:", err);
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -104,14 +118,18 @@ export default function FormalDiagnosisSurvey() {
                             number={idx + 1}
                             question={q.text}
                             answers={q.answers}
-                            onAnswer={(score: number) => handleAnswer(idx, score)}
+                            onAnswer={(score: number) =>
+                                handleAnswer(idx, score)
+                            }
                         />
-
                     ))
                 ) : (
                     <Text>질문지를 불러오는 중입니다...</Text>
                 )}
-                <ConfirmButton label="검사 결과 확인하기" onPress={handleConfirm} />
+                <ConfirmButton
+                    label="검사 결과 확인하기"
+                    onPress={handleConfirm}
+                />
             </ScrollView>
         </View>
     );
