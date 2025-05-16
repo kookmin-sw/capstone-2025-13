@@ -353,7 +353,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 81;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -374,7 +374,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong develop profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -400,7 +400,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 81;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				INFOPLIST_FILE = wooong/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -416,7 +416,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong appstore";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

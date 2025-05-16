@@ -4,11 +4,11 @@
     "slug": "wooong",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/Images/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/Images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,7 +16,23 @@
       "expo-audio",
       "expo-video",
       "expo-secure-store",
-      "expo-build-properties"
+      ["expo-build-properties",
+      {
+        "android": {
+          "compileSdkVersion": 35,
+          "targetSdkVersion": 35,
+          "minSdkVersion": 26
+        },
+        "ios": {
+          "deploymentTarget": "15.1"
+        }
+      }],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
@@ -29,12 +45,12 @@
         "aps-environment": "production",
         "com.apple.developer.healthkit": true
       },
-      "buildNumber": "99",
+      "buildNumber": "102",
       "appleTeamId": "Y56G5PTS2K"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/Images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "kr.ac.kookmin.wooong",
@@ -43,14 +59,14 @@
           "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
         }
       },
-      "versionCode": 88,
+      "versionCode": 90,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/Images/favicon.png"
     },
     "extra": {
       "eas": {

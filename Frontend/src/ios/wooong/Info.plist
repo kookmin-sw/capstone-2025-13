@@ -32,7 +32,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>99</string>
+    <string>102</string>
     <key>GMSApiKey</key>
     <string>process.env.GOOGLE_MAPS_API_KEY</string>
     <key>LSMinimumSystemVersion</key>
@@ -46,14 +46,26 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSCameraUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs access to your Camera.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
     <key>NSHealthShareUsageDescription</key>
     <string>We will sync your data with the Apple Health app to give you better insights.</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>We will sync your data with the Apple Health app to give you better insights.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your device motion</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your photos</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
@@ -78,7 +90,5 @@
     </array>
     <key>UIUserInterfaceStyle</key>
     <string>Light</string>
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
   </dict>
 </plist>
