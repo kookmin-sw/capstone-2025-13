@@ -8,7 +8,6 @@ import { checkEmotionCycleQuest } from './EmotionCycleQuest';
 
 export type EmotionQuest = {
   id: string;
-  label: string;
   interval?: number;
   logLength?: number;
   check: (log: string[]) => boolean;
@@ -19,40 +18,45 @@ export type EmotionQuest = {
  */
 export const QUESTS: EmotionQuest[] = [
   {
-    id: 'angryToRelax',
-    label: '화났다가 풀어보기',
+    id: '화났다가 풀어보기',
+    interval: 1000,
+    logLength: 10,
     check: checkAngryToRelax,
   },
   {
-    id: 'disgustToAcceptance',
-    label: '싫음을 받아들이기',
+    id: '싫음을 받아들이기',
+    interval: 1000,
+    logLength: 10,
     check: checkDisgustToAcceptance,
   },
   {
-    id: 'fearToCalm',
-    label: '두려움에서 안정 찾기',
+    id: '두려움에서 안정 찾기',
+    interval: 1000,
+    logLength: 10,
     check: checkFearToCalm,
   },
   {
-    id: 'happy5sec',
-    label: '5초 간 웃어보기',
-    interval: 2000,
+    id: '5초 간 웃어보기',
+    interval: 1000,
     logLength: 10,
     check: checkHappy5Sec,
   },
   {
-    id: 'sadToWarm',
-    label: '슬픔에서 따뜻함으로',
+    id: '슬픔에서 따뜻함으로',
+    interval: 1000,
+    logLength: 10,
     check: checkSadToWarm,
   },
   {
-    id: 'surpriseToSmile',
-    label: '놀람에서 웃음으로',
+    id: '놀람에서 웃음으로',
+    interval: 1000,
+    logLength: 10,
     check: checkSurpriseToSmile,
   },
   {
-    id: 'emotionCycleQuest',
-    label: '감정 순환 마스터',
+    id: '감정 순환 마스터',
+    interval: 1000,
+    logLength: 10,
     check: checkEmotionCycleQuest,
   },
 ];
