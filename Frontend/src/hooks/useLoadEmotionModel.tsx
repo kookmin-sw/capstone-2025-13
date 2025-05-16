@@ -3,7 +3,7 @@ import { TensorflowModel, useTensorflowModel } from 'react-native-fast-tflite';
 
 export const useLoadEmotionModel = () => {
   const { model, state } = useTensorflowModel(
-    require('../assets/models/emotion_model.tflite')
+    require('../assets/models/emotion_model_re.tflite')
   );
   const isLoaded = state === 'loaded' && model != null;
 

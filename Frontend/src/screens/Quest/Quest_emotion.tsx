@@ -19,10 +19,11 @@ export default function QuestEmotion() {
   const { detectFaces } = useFaceDetector();
   const [hasPermission, setHasPermission] = useState(false);
   const { isLoaded, model } = useLoadEmotionModel();
+  const [noFaceWarning, setNoFaceWarning] = useState(false);
 
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [latestResult, setLatestResult] = useState<number[] | null>(null);
-
+const [success, setSuccess] = useState<boolean>(false);
   // 타이밍 제어
   const lastPhotoTimeRef = useRef(0);
   const isPhotoTaken = useRef(false);
@@ -67,28 +68,42 @@ export default function QuestEmotion() {
     }
   };
 
-  const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-    if (!faces?.length || !isLoaded || !model) return;
-    const face = faces[0];
-    const uri = await capturePhoto(face);
-    if (!uri) return;
+const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
+  // faces 배열이 들어오긴 했지만 길이가 0이면 경고 켜고 리턴
+  if (faces && faces.length === 0) {
+    setNoFaceWarning(true);
+    return;
+  }
+  // 얼굴이 하나라도 잡히면 경고 끄기
+  setNoFaceWarning(false);
 
-    const result = await EmotionModelRunner(uri, model);
-    if (result) {
-      const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-      const topIndex = result.indexOf(Math.max(...result));
-      const predictedLabel = labels[topIndex];
-      const updated = [...emotionLog, predictedLabel];
-      setLatestResult(Array.from(result));
+  // 모델 로드 여부 체크
+  if (!faces?.length || !isLoaded || !model) return;
 
-      if (updated.length > quest_save_pre_log) updated.shift();
-      setEmotionLog(updated);
+  const face = faces[0];
+  const uri = await capturePhoto(face);
+  if (!uri) return;
 
-      if (quest.check(updated)) {
-        console.log('🎯 퀘스트 완료');
-      }
+  const result = await EmotionModelRunner(uri, model);
+  if (result) {
+    const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+    const topIndex = result.indexOf(Math.max(...result));
+    const predictedLabel = labels[topIndex];
+    const updated = [...emotionLog, predictedLabel];
+
+    setLatestResult(Array.from(result));
+    console.log('Predicted Label:', predictedLabel);
+
+    if (updated.length > quest_save_pre_log) updated.shift();
+    setEmotionLog(updated);
+
+    if (quest.check(updated)) {
+      setSuccess(true);
+      console.log('🎯 퀘스트 완료');
     }
-  });
+  }
+});
+
 
   const frameProcessor = useFrameProcessor((frame) => {
     "worklet";
@@ -118,20 +133,28 @@ export default function QuestEmotion() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.half}>
-        <Camera
-          ref={cameraRef}
-          style={styles.camera}
-          device={device}
-          photo
-          isActive
-          frameProcessor={frameProcessor}
-        />
-      </View>
+  <View style={[styles.half, { flex: 7 }]}>
+    <Camera
+      ref={cameraRef}
+      style={styles.camera}
+      device={device}
+      photo
+      isActive
+      frameProcessor={frameProcessor}
+    />
+  </View>
 
-      <View style={[styles.half, styles.bottom]}>
-        {latestResult && <EmotionChartBox result={latestResult} />}
+    {latestResult !== null ? (
+      <View style={styles.overlay}>
+        <EmotionChartBox result={latestResult} success= {success} />
       </View>
-    </View>
+    ) : (
+      <View style={styles.overlay}>
+        <View style={styles.centered}>
+          <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
+        </View>
+      </View>
+    )}
+</View>
   );
 }
