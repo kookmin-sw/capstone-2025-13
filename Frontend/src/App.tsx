@@ -31,6 +31,7 @@ import { useCustomFonts } from "./hooks/useCustomFonts";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 import { LoadingProvider, useLoading } from "./API/contextAPI";
+import Splash from "./screens/Splash";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -225,11 +226,12 @@ export default function App() {
             const token = await AsyncStorage.getItem("accessToken");
             if (token) {
                 setIsLoggedIn(true);
-                setLoading(false);
             } else {
                 setIsLoggedIn(false);
-                setLoading(false);
             }
+            setTimeout(() => {
+                setLoading(false);
+            }, 5500); // Delay splash screen for 1.5 seconds
         };
         checkToken();
     }, []);
@@ -268,7 +270,8 @@ export default function App() {
     const AppContent = () => {
         const fontsLoaded = useCustomFonts();
 
-        if (!fontsLoaded) return null;
+        // Show Splash while fonts are loading
+        if (!fontsLoaded) return <Splash />;
 
         return (
             <NavigationContainer>
@@ -404,7 +407,7 @@ export default function App() {
 
     return (
         <LoadingProvider>
-            <AppContent />
+            {loading ? <Splash /> : <AppContent />}
         </LoadingProvider>
     );
 }
