@@ -73,26 +73,29 @@ const DepressionResultScreen = () => {
 
           <View style={styles.chartWrapper}>
             <Text style={styles.chartTitle}>나의 현재 감정 지수는?</Text>
-            <ProgressChart
-              data={{
-                labels: [],
-                data: [depressionLevel],
-              }}
-              width={width * 0.6}
-              height={width * 0.6}
-              strokeWidth={width * 0.04}
-              radius={width * 0.18}
-              chartConfig={{
-                backgroundGradientFrom: "#F9F9EB",
-                backgroundGradientTo: "#F9F9EB",
-                color: (opacity = 1) => `rgba(60, 60, 60, ${opacity})`,
-              }}
-              hideLegend={true}
-              style={styles.chart}
-            />
-            <Text style={styles.percentText}>
-              {Math.round(depressionLevel * 100)}%
-            </Text>
+            <View style={{ width: width * 0.6, height: width * 0.6, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+              <ProgressChart
+                data={{
+                  labels: [],
+                  data: [depressionLevel],
+                }}
+                width={width * 0.6}
+                height={width * 0.6}
+                strokeWidth={width * 0.04}
+                radius={width * 0.18}
+                chartConfig={{
+                  backgroundGradientFrom: "#F9F9EB",
+                  backgroundGradientTo: "#F9F9EB",
+                  color: (opacity = 1) => `rgba(60, 60, 60, ${opacity})`,
+                }}
+                hideLegend={true}
+                style={styles.chart}
+              />
+              <Text style={styles.percentText}>
+                {Math.round(depressionLevel * 100)}%
+              </Text>
+            </View>
+
           </View>
 
           <Text style={styles.status}>{scaleName}</Text>

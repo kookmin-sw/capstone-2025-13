@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: "#F6914D",
-        width: width * 0.4,
+        width: width * 0.3,
         borderRadius: 16,
         paddingVertical: 16,
         position: "absolute", // 절대 위치 지정
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     buttontext: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
     },
 });

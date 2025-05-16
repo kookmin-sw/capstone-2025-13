@@ -36,18 +36,18 @@ export default function Record() {
     const formattedDate = `${year}-${month}-${day}`;
 
     useEffect(() => {
-        const fetchRecord = async () => {
-            try {
-                const response = await getRecordMe(formattedDate);
-                setRecordText(response.data || "");
-                setIsSaved(response.status === "COMPLETED");
-                setRecordId(response.id || "");
-                setRating(response.rate || 0);
-                setRecordEtcText(response.comment || "");
-                setLuckyVicky(response.luckyVicky || "");
-            } catch (error) {}
-        };
-        fetchRecord();
+        // const fetchRecord = async () => {
+        //     try {
+        //         const response = await getRecordMe(formattedDate);
+        //         setRecordText(response.data || "");
+        //         setIsSaved(response.status === "COMPLETED");
+        //         setRecordId(response.id || "");
+        //         setRating(response.rate || 0);
+        //         setRecordEtcText(response.comment || "");
+        //         setLuckyVicky(response.luckyVicky || "");
+        //     } catch (error) { }
+        // };
+        // fetchRecord();
     }, [formattedDate]);
 
     const handleRecordIdUpdate = (id: string) => {
@@ -121,10 +121,12 @@ export default function Record() {
                     luckyVicky={luckyVicky}
                     isLoading={isLuckyLoading}
                 />
-                <RecordEtc
-                    onRecordEtcUpdate={setRecordEtcText}
-                    initialEtcText={recordEtcText}
-                />
+                {!isLuckyLoading && recordEtcText !== "이거 완전 럭키비키 잖아~" && (
+                    <RecordEtc
+                        onRecordEtcUpdate={setRecordEtcText}
+                        initialEtcText={recordEtcText}
+                    />
+                )}
                 <TouchableOpacity
                     style={styles.submitButton}
                     onPress={handleSave}
@@ -182,4 +184,3 @@ export default function Record() {
     );
 }
 
-// 한번만 일기 제출하게 수정, css 수정, 최종 테스트트
