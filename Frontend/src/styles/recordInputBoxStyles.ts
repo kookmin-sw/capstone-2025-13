@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         paddingVertical: 0.005,
         marginLeft: width * 0.07,
         letterSpacing: 0.7,
-        color: "#d9d9d9",
+        color: "#000",
         fontFamily: fonts.medium,
         width: "100%",
     },

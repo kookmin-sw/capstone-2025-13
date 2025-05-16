@@ -80,6 +80,25 @@ export default function CalendarScreen() {
         // }
     };
 
+    const handlePressBehavior = (behavior: Behavior) => {
+        switch (behavior.type.toUpperCase()) {
+            case "DIAGNOSIS":
+                // navigation.navigate("DiagnosisResultScreen", { date: selectedDate });
+                break;
+            case "TOPIC":
+                // navigation.navigate("TopicScreen", { date: selectedDate });
+                break;
+            case "QUEST":
+                // navigation.navigate("QuestScreen", { date: selectedDate });
+                break;
+            case "DIARY":
+                navigation.navigate("Record", { date: selectedDate });
+                break;
+            default:
+                console.warn("Unknown behavior type:", behavior.type);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -155,16 +174,18 @@ export default function CalendarScreen() {
                     {behaviors.length > 0 ? (
                         behaviors.map((item, index) => (
                             <View key={index}>
-                                <View style={calendarStyles.taskItem}>
-                                    <Image
-                                        source={selectIcon(item.type)}
-                                        style={calendarStyles.icon}
-                                    />
-                                    <View>
-                                        <Text style={calendarStyles.taskTitle}>{item.title}</Text>
-                                        <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                                <TouchableOpacity onPress={() => handlePressBehavior(item)}>
+                                    <View style={calendarStyles.taskItem}>
+                                        <Image
+                                            source={selectIcon(item.type)}
+                                            style={calendarStyles.icon}
+                                        />
+                                        <View>
+                                            <Text style={calendarStyles.taskTitle}>{item.title}</Text>
+                                            <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                                        </View>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                                 {index !== behaviors.length - 1 && <View style={calendarStyles.divider} />}
                             </View>
                         ))
