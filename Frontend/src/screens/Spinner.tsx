@@ -21,7 +21,7 @@ const Spinner = () => {
                     toValue: 1,
                     duration: 3000 + index * 300, // stagger durations
                     easing: Easing.linear,
-                    useNativeDriver: false,
+                    useNativeDriver: true,
                 })
             ).start();
         });
