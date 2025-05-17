@@ -58,7 +58,7 @@ export type RootStackParamList = {
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
-    Record: undefined;
+    Record: { date?: string };
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Calendar: undefined;

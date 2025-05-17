@@ -52,7 +52,7 @@ export default function DailyTopic() {
     const closeModal = () => setIsModalVisible(false);
     const goToDiary = () => {
         setIsModalVisible(false);
-        navigation.replace("Record");
+        navigation.replace("Record", {});
     };
 
     useEffect(() => {
