@@ -34,7 +34,7 @@ import { LoadingProvider, useLoading } from "./API/contextAPI";
 import Splash from "./screens/Splash";
 
 export type RootStackParamList = {
-    Home: undefined;
+    Home: { simpleScale?: string };
     SignIn: { score?: number; last?: boolean };
     SignUpStep1: undefined;
     Quest: undefined;
