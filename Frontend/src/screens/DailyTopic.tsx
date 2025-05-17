@@ -314,7 +314,7 @@ export default function DailyTopic() {
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
                 <TouchableOpacity
                     style={dailyTopicstyles.backButtonWrapper}
-                    onPress={() => navigation.navigate("Home")}
+                    onPress={() => navigation.navigate("Home", {})}
                 >
                     <Ionicons
                         name="arrow-back-circle"

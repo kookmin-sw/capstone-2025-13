@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
 import { TouchableOpacity } from "react-native";
 import fonts from "../constants/fonts";
 
@@ -68,6 +68,13 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingRight: wp(6),
     },
+     simpleResultWrapper: {
+            position: "absolute",
+            top: "40%",
+            alignItems: "center",
+            width:"100%",
+            zIndex: 10,
+        },
 });
 
 export default styles;
