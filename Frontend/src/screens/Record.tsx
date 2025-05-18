@@ -42,18 +42,18 @@ export default function Record() {
     const defaultLuckyText = "이거 완전 럭키비키잖아~";
 
     useEffect(() => {
-        // const fetchRecord = async () => {
-        //     try {
-        //         const response = await getRecordMe(formattedDate);
-        //         setRecordText(response.data || "");
-        //         setIsSaved(response.status === "COMPLETED");
-        //         setRecordId(response.id || "");
-        //         setRating(response.rate || 0);
-        //         setRecordEtcText(response.comment || "");
-        //         setLuckyVicky(response.luckyVicky || "");
-        //     } catch (error) { }
-        // };
-        // fetchRecord();
+        const fetchRecord = async () => {
+            try {
+            const response = await getRecordMe(formattedDate);
+            setRecordText(response.data || "");
+            setIsSaved(response.status === "COMPLETED");
+            setRecordId(response.id || "");
+            setRating(response.rate || 0);
+            setRecordEtcText(response.comment || "");
+            setLuckyVicky(response.luckyVicky || "");
+        } catch (error) { }
+        };
+        fetchRecord();
     }, [formattedDate]);
 
     const handleRecordIdUpdate = (id: string) => {
@@ -133,13 +133,12 @@ export default function Record() {
                             luckyVicky={luckyVicky}
                             isLoading={isLuckyLoading}
                         />
-                        {!isLuckyLoading &&
-                            recordEtcText !== defaultLuckyText && (
-                                <RecordEtc
-                                    onRecordEtcUpdate={setRecordEtcText}
-                                    initialEtcText={recordEtcText}
-                                />
-                            )}
+                        {!isLuckyLoading && luckyVicky !== defaultLuckyText && (
+                            <RecordEtc
+                                onRecordEtcUpdate={setRecordEtcText}
+                                initialEtcText={recordEtcText}
+                            />
+                        )}
                         <TouchableOpacity
                             style={[styles.submitButton, styles.saveButton]}
                             onPress={handleSave}
