@@ -39,12 +39,12 @@ const DepressionResultScreen = () => {
 
   const sectionText = () => {
     if (scaleName === "가벼운 우울증") {
-      return "우울감이 조금 있지만 걱정할 정도는 아니에요 가벼운 퀘스트를 통해 극복해 볼까요?"
+      return "우울감이 조금 있지만 걱정할 정도는 아니에요. 가벼운 퀘스트를 통해 극복해 볼까요?"
     } else if (scaleName === "중간정도 우울증") {
       return "우울감이 다소 있는 편이에요! 다른 검사를 통해 한번 다시 우울감을 테스트 해볼까요?"
     }
     else if (scaleName === "심한 우울증")
-      return "우울감이 많은 편리에요! 주변에 상담센터에서 상담을 한번 받아보시는 건 어떨까요?"
+      return "우울감이 많은 편이에요! 주변에 상담센터에서 상담을 한번 받아보시는 건 어떨까요?"
     else if (scaleName === "불안 시사됨") {
       return "불안 증상이 나타나고 있어요! 주변에 상담센터에서 상담을 한번 받아보시는 건 어떨까요?"
     }
@@ -110,7 +110,7 @@ const DepressionResultScreen = () => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>너무 잘하고 있어요!</Text>
                 <Text style={styles.sectionText}>
-                  오늘의 기분 좋은 일을 기록 해보는선 어때요
+                  오늘의 기분 좋은 일을 기록 해보는건 어때요?
                 </Text>
               </View>
               :

@@ -142,7 +142,7 @@ export default function CalendarScreen() {
         <View style={calendarStyles.container}>
             <View style={calendarStyles.header}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Home")}
+                    onPress={() => navigation.navigate("Home", {})}
                     style={calendarStyles.backButtonWrapper}
                 >
                     <Ionicons name="arrow-back-circle" size={40} color="#fff" />

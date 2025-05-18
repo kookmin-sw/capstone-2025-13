@@ -144,13 +144,12 @@ export default function Record() {
                             luckyVicky={luckyVicky}
                             isLoading={isLuckyLoading}
                         />
-                        {!isLuckyLoading &&
-                            recordEtcText !== defaultLuckyText && (
-                                <RecordEtc
-                                    onRecordEtcUpdate={setRecordEtcText}
-                                    initialEtcText={recordEtcText}
-                                />
-                            )}
+                        {!isLuckyLoading && luckyVicky !== defaultLuckyText && (
+                            <RecordEtc
+                                onRecordEtcUpdate={setRecordEtcText}
+                                initialEtcText={recordEtcText}
+                            />
+                        )}
                         <TouchableOpacity
                             style={[styles.submitButton, styles.saveButton]}
                             onPress={handleSave}

@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
         padding: 20,
         zIndex: 1,
     },
-    // recordStyles.ts에 추가
 
     modalOverlay: {
         flex: 1,
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
         color: "white",
         textAlign: "center",
         fontSize: 16,
-        fontfamily: fonts.laundry,
+        fontFamily: fonts.laundry,
     },
     saveButton: {
         width: width * 0.25,

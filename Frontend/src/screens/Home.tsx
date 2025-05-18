@@ -1,19 +1,31 @@
-import React from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import {
+    View,
+    ScrollView,
+    SafeAreaView,
+    Pressable,
+    TouchableWithoutFeedback,
+    StyleSheet,
+} from "react-native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
-import { View, ScrollView } from "react-native";
 import HomeCircle from "../components/Home_circle";
 import HeaderForest from "../components/Header_forest";
 import StatusBox from "../components/StatusBox";
 import HomeButton from "../components/HomeButton";
 import FloatingButton from "../components/FloatingButton";
 import CalendarBadge from "../components/CalendarBadge";
+import SimpleResult from "../components/SimpleResult";
 import styles from "../styles/homeStyles";
 
 export default function Home() {
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, "Home">>();
+    const [simpleScale, setSimpleScale] = useState(route.params?.simpleScale ?? '');
+    useEffect(() => {
+        console.log(simpleScale);
+    }, [simpleScale]);
     return (
         <View style={styles.container}>
             { }
@@ -40,11 +52,13 @@ export default function Home() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scroll}
+                contentContainerStyle={[
+                    styles.scroll,
+                    { paddingBottom: 120 },
+                ]}
                 showsVerticalScrollIndicator={false}
             >
                 <StatusBox />
-
                 <View style={styles.buttonGroup}>
                     <HomeButton
                         icon="heart-pulse"
@@ -69,6 +83,25 @@ export default function Home() {
                     <FloatingButton />
                 </View>
             </ScrollView>
-        </View>
+
+            {simpleScale !== '' && (
+                <View
+                    style={{
+                        ...StyleSheet.absoluteFillObject,
+                        zIndex: 10,
+                        backgroundColor: 'rgba(0,0,0,0.3)',
+                    }}
+                >
+                    <Pressable
+                        style={{ flex: 1 }}
+                        onPress={() => setSimpleScale('')}
+                    />
+
+                    <View style={[styles.simpleResultWrapper, { zIndex: 20 }]}>
+                        <SimpleResult simpleScale={simpleScale} />
+                    </View>
+                </View>
+            )}
+        </SafeAreaView>
     );
 }
