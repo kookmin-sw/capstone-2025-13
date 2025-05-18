@@ -27,7 +27,8 @@ export default function Home() {
         console.log(simpleScale);
     }, [simpleScale]);
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
+            { }
             <View style={styles.headerWrapper}>
                 <View
                     style={{
@@ -69,7 +70,7 @@ export default function Home() {
                         icon="book-open-variant"
                         title="일기"
                         subtitle="오늘 하루, 나의 마음 기록하기"
-                        onPress={() => navigation.navigate("Record")}
+                        onPress={() => navigation.navigate("Record", {})}
                     />
                     <HomeButton
                         icon="target"
