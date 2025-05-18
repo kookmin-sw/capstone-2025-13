@@ -1,15 +1,15 @@
 import { StyleSheet, Dimensions } from "react-native";
-import fonts from "../constants/fonts.ts";
+import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     wrapper: {
         width: "100%",
-        marginTop: height * 0,
+        marginTop: 0,
         marginHorizontal: width * 0.06,
         justifyContent: "center",
-        alignItems: "center", // 중앙 정렬 추가
+        alignItems: "center",
     },
     imageBackground: {
         justifyContent: "center",
@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
         minHeight: height * 0.17,
         fontSize: width * 0.035,
         textAlignVertical: "top",
-        paddingVertical: 0.005,
+        paddingVertical: height * 0.01, 
         marginLeft: width * 0.07,
         letterSpacing: 0.7,
-        color: "#d9d9d9",
+        color: "#000",
         fontFamily: fonts.medium,
         width: "100%",
     },
@@ -36,15 +36,15 @@ const styles = StyleSheet.create({
         width: width * 0.3,
         borderRadius: 20,
         paddingVertical: height * 0.015,
-        position: "absolute", // 절대 위치 지정
-        bottom: height * 0.03, // 화면 하단에서의 간격 조정
-        right: width * 0.1, // 화면 오른쪽에서의 간격 조정
-        justifyContent: "center", // 버튼 텍스트 중앙 정렬
+        position: "absolute",
+        bottom: height * 0.03,
+        right: width * 0.1,
+        justifyContent: "center",
         alignItems: "center",
         shadowColor: "#C26E35",
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 10,
-        shadowRadius: 0,
+        shadowOpacity: 0.4, // 10 → 0.4로 수정
+        shadowRadius: 4,
         elevation: 4,
     },
     buttontext: {
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.laundryBold,
     },
     cloverIcon: {
-        marginRight: 12,
+        marginRight: 8,
         marginBottom: 2,
     },
 });

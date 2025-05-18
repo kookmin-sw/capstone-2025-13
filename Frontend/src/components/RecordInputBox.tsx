@@ -9,7 +9,8 @@ import {
 import styles from "../styles/recordInputBoxStyles";
 import { createRecord, getRecord } from "../API/recordAPI";
 import Toast from "react-native-toast-message";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 type RecordInputBoxProps = {
     onRecordIdUpdate: (id: string) => void;
@@ -30,7 +31,6 @@ export default function RecordInputBox({
 }: RecordInputBoxProps) {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [submitRequested, setSubmitRequested] = useState<boolean>(false);
-
     const [record, setRecord] = useState<string>(initialRecord);
 
     useEffect(() => {
@@ -96,7 +96,7 @@ export default function RecordInputBox({
                 Toast.show({
                     type: "error",
                     text1: "저장 실패",
-                    text2: "일기 제출 중 오류가 발생했습니다.  다시 시도해주세요.",
+                    text2: "일기 제출 중 오류가 발생했습니다. 다시 시도해주세요.",
                     position: "bottom",
                 });
                 setIsSubmitted(false);
@@ -118,8 +118,8 @@ export default function RecordInputBox({
                 <TextInput
                     multiline
                     placeholder={`오늘 하루는 어땠어?\n오늘 있었던 일과 그때 느꼈던\n감정들에 대해 자유롭게 적어봐!`}
-                    placeholderTextColor="#555"
-                    style={styles.input}
+                    placeholderTextColor="#666" // 진한 회색으로 수정
+                    style={[styles.input, { color: "#000" }]} // 텍스트 색상 명시
                     value={record}
                     onChangeText={setRecord}
                     editable={!isSubmitted}
@@ -129,7 +129,7 @@ export default function RecordInputBox({
                     onPress={submitRecord}
                     disabled={isSubmitted}
                 >
-                    <Text style={styles.buttontext}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <MaterialCommunityIcons
                             name="clover"
                             size={18}
@@ -138,20 +138,20 @@ export default function RecordInputBox({
                         />
                         <Text
                             style={[
-                                styles.submitButtonText,
+                                styles.buttontext,
                                 { marginHorizontal: 6 },
                                 isSubmitted && { opacity: 0.5 },
                             ]}
                         >
-                            {" 럭키비키 "}
+                            럭키비키
                         </Text>
                         <MaterialCommunityIcons
                             name="clover"
                             size={18}
-                            color="#fff"
+                            color="white"
                             style={styles.cloverIcon}
                         />
-                    </Text>
+                    </View>
                 </TouchableOpacity>
             </ImageBackground>
         </View>
