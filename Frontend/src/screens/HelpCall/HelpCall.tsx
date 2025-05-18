@@ -142,9 +142,7 @@ export default function HelpCall() {
                         <View style={helpCallStyles.headerBox}>
                             <TouchableOpacity
                                 style={helpCallStyles.backButtonWrapper}
-                                onPress={() => {
-                                    navigation.navigate("Home");
-                                }}
+                                onPress={() => navigation.navigate("Home", {})}
                             >
                                 <Ionicons
                                     name="arrow-back-circle"
