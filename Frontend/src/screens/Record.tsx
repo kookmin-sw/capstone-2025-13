@@ -20,8 +20,21 @@ import RecordEtc from "../components/Record_etc";
 import styles from "../styles/recordStyles";
 import { getRecordMe, postRecord } from "../API/recordAPI";
 import { getCoupon } from "../API/potAPI";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../App";
+
+
 
 export default function Record() {
+    const route = useRoute<RouteProp<RootStackParamList, 'Record'>>();
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+    const date = route.params?.date ?? '';
+
     const [recordId, setRecordId] = useState<string>("");
     const [luckyVicky, setLuckyVicky] =
         useState<string>("이거 완전 럭키비키잖아~");
@@ -33,25 +46,23 @@ export default function Record() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSubmmitAgreed, setIsSubmitAgreed] = useState<boolean>(false);
     const [isSaved, setIsSaved] = useState<boolean>(false);
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
+
 
     const defaultLuckyText = "이거 완전 럭키비키잖아~";
 
     useEffect(() => {
         const fetchRecord = async () => {
             try {
-            const response = await getRecordMe(formattedDate);
-            setRecordText(response.data || "");
-            setIsSaved(response.status === "COMPLETED");
-            setRecordId(response.id || "");
-            setRating(response.rate || 0);
-            setRecordEtcText(response.comment || "");
-            setLuckyVicky(response.luckyVicky || "");
-        } catch (error) { }
+                const targetDate = date || formattedDate
+                const response = await getRecordMe(targetDate);
+                console.log(response)
+                setRecordText(response.data || "");
+                setIsSaved(response.status === "COMPLETED");
+                setRecordId(response.id || "");
+                setRating(response.rate || 0);
+                setRecordEtcText(response.comment || "");
+                setLuckyVicky(response.luckyVicky || "");
+            } catch (error) { }
         };
         fetchRecord();
     }, [formattedDate]);
