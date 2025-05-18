@@ -252,7 +252,7 @@ export default function UserInfo() {
 
     <View style={[userInfoStyles.container, { position: "relative" }]}>
       <TouchableOpacity
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => navigation.navigate("Home", {})}
         style={userInfoStyles.backButton}
       >
 
