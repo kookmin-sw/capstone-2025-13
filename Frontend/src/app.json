@@ -38,7 +38,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "kr.ac.kookmin.wooong",
+      "bundleIdentifier": "space.mori.wooong",
       "config": {
         "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
       },
@@ -61,7 +61,7 @@
         "foregroundImage": "./assets/Images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "kr.ac.kookmin.wooong",
+      "package": "space.mori.wooong",
       "config": {
         "googleMaps": {
           "apiKey": "process.env.GOOGLE_MAPS_API_KEY"

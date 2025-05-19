@@ -369,6 +369,7 @@
 				CODE_SIGN_ENTITLEMENTS = wooong/wooong.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 127;
+				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -390,8 +391,8 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_BUNDLE_IDENTIFIER = "space.mori.wooong";
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong develop profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -416,6 +417,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 127;
+				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y56G5PTS2K;
 				INFOPLIST_FILE = wooong/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "우웅";
@@ -432,8 +434,8 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_BUNDLE_IDENTIFIER = "space.mori.wooong";
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong appstore";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -481,7 +483,7 @@
 				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -547,7 +549,7 @@
 				DEVELOPMENT_TEAM = Y56G5PTS2K;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
