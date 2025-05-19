@@ -228,7 +228,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
     index: 26,
     type: "story",
-    backgroundImage: require("../../assets/Images/simple-6.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-6.png"),
     name: nickname || "나",
     text: "(끼이익..)",
     },

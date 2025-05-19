@@ -13,8 +13,6 @@ import Question from "../components/Question";
 import Answer from "../components/Answer";
 import LoadingAnswer from "../components/LoadingAnswer";
 import dailyTopicstyles from "../styles/dailyTopicStyles";
-import { Text } from "react-native";
-import { useState, useRef, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
@@ -332,7 +330,6 @@ export default function DailyTopic() {
                 >
                     {renderChat()}
                 </ScrollView>
-                </View>
                 <View style={dailyTopicstyles.inputContainer}>
                     <TextInput
                         placeholder={placeholderText}

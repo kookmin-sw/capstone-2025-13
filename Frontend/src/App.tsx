@@ -12,7 +12,6 @@ import Quest from "./screens/Quest/Quest";
 import Quest_stage from "./screens/Quest/Quest_stage";
 import Quest_meditation from "./screens/Quest/Quest_meditation";
 import Quest_exercise from "./screens/Quest/Quest_exercise";
-import Quest_emotion from "./screens/Quest/Quest_emotion";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -22,16 +21,18 @@ import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
 import Toast from "react-native-toast-message";
 import Interest from "./screens/SimpleDiagnosis/Interest";
 import { useCustomFonts } from "./hooks/useCustomFonts";
-import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 import { LoadingProvider, useLoading } from "./API/contextAPI";
 import Splash from "./screens/Splash";
+import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import {refreshAccessToken} from "./API/common";
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -84,10 +85,7 @@ const GlobalSpinner = () => {
 export default function App() {
     // 하드코딩된 로그인 상태
 
-    const { isLoading, setLoading } = useLoading();
-
-    // @ts-ignore
-    const routeNameRef = useRef();
+    const [loading, setLoading] = useState(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
@@ -308,40 +306,6 @@ export default function App() {
             </NavigationContainer>
         );
     };
-
-    if (!fontsLoaded) return <Spinner />;
-
-    if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen error={integrityError} />;
-    }
-
-    console.log("🧪 스크린 등록 확인:");
-    [
-        Home,
-        SignIn,
-        SignUpStep1,
-        SignUpStep2,
-        SignUpStep3,
-        SimpleDiagnosis,
-        Game,
-        Quest,
-        Quest_stage,
-        Quest_meditation,
-        Quest_exercise,
-        Quest_emotion,
-        FormalDiagnosis,
-        FormalDiagnosisSurvey,
-        GameScreen,
-        DailyTopic,
-        Spinner,
-        HelpCall,
-        HelpCall2,
-        UserInfo,
-        Record,
-        Calendar,
-    ].forEach((comp, i) => {
-        if (!comp) console.warn(`❌ [component ${i}] is undefined`);
-    });
     
     return (
         <LoadingProvider>
@@ -350,10 +314,3 @@ export default function App() {
     );
 }
 
-export default function App() {
-    return (
-        <LoadingProvider>
-            <AppInner />
-        </LoadingProvider>
-    );
-}

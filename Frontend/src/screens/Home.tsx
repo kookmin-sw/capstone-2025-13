@@ -27,8 +27,7 @@ export default function Home() {
         console.log(simpleScale);
     }, [simpleScale]);
     return (
-        <View style={styles.container}>
-            { }
+        <SafeAreaView style={styles.container}>
             <View style={styles.headerWrapper}>
                 <View
                     style={{
@@ -41,8 +40,8 @@ export default function Home() {
                     <CalendarBadge
                         day={
                             ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][
-                            new Date().getDay()
-                            ]
+                                new Date().getDay()
+                                ]
                         }
                         date={new Date().getDate()}
                     />
@@ -70,7 +69,7 @@ export default function Home() {
                         icon="book-open-variant"
                         title="일기"
                         subtitle="오늘 하루, 나의 마음 기록하기"
-                        onPress={() => navigation.navigate("Record", {})}
+                        onPress={() => navigation.navigate("Record")}
                     />
                     <HomeButton
                         icon="target"

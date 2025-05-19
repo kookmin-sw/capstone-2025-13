@@ -58,9 +58,11 @@
     "react-native-simple-line-chart": "^0.36.1",
     "react-native-toast-message": "^2.3.0",
     "react-native-vector-icons": "^10.2.0",
+    "react-native-vision-camera": "^4.6.4",
+    "react-native-vision-camera-face-detector": "^1.8.3",
     "react-native-webview": "^13.13.5",
     "react-native-worklets-core": "^1.5.0",
-    "react-native-youtube-iframe": "^2.3.0",
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
