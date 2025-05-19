@@ -22,23 +22,8 @@ const GameScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'GameScreen'>>();
   const score = route.params?.score ?? 0;
 
-  useEffect(() => {
-    const loadSound = async () => {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/success.mp3')
-      );
-      matchSound.current = sound;
-      await matchSound.current.setVolumeAsync(0.3);
-    };
-
-    loadSound();
-
-    return () => {
-      if (matchSound.current) {
-        matchSound.current.unloadAsync();
-      }
-    };
-  }, []);
+  const matchSoundPlayer = useAudioPlayer(matchSound)
+  matchSoundPlayer.volume = 0.3;
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -54,10 +39,7 @@ const GameScreen = () => {
         const [first, second] = newFlipped;
         if (cards[first].symbol === cards[second].symbol) {
           setMatched([...matched, first, second]);
-
-          if (matchSound.current) {
-            matchSound.current.replayAsync();
-          }
+          matchSoundPlayer.play()
         }
         setTimeout(() => setFlipped([]), 800);
       }

@@ -1,0 +1,42 @@
+name: 기능 요청 (Feature Request)
+description: 새로운 기능이나 개선 아이디어를 제안해주세요.
+title: "[FEATURE] "
+labels: [enhancement]
+assignees: []
+
+body:
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 🌟 기능 설명 (Describe the feature)
+      description: 원하는 기능이 무엇인지 명확하게 설명해주세요.
+      placeholder: 예) 특정 유저만 접근 가능한 관리자 페이지가 필요합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why-needed
+    attributes:
+      label: 📌 필요 이유 (Why is it needed?)
+      description: 이 기능이 왜 필요한지, 어떤 문제를 해결하는지 작성해주세요.
+      placeholder: 예) 관리자 전용 기능을 일반 유저가 사용하는 문제가 있습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 💡 대안 (Alternatives)
+      description: 생각해본 다른 방법이나 접근 방식이 있다면 적어주세요.
+      placeholder: 예) 관리자 여부를 프론트에서 필터링하는 방식도 고려했습니다.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 💬 추가 내용 (Additional context)
+      description: 참고 자료, 스크린샷, 관련 이슈 등 더 공유하고 싶은 내용이 있다면 작성해주세요.
+      placeholder: 예) 비슷한 기능이 있는 앱 링크, 관련 문서 등
+    validations:
+      required: false

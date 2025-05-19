@@ -242,7 +242,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
     index: 28,
     type: "options",
-    backgroundImage: require("../../assets/Images/simple-6.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-6.png"),
     options: [
         { text: "웅, 알겠어. 고마워", nextType: "story",score: 0, nextIndex: 29 },
         { text: "헐.. 감동이야 😭", nextType: "story",score: 0, nextIndex: 29 },
@@ -258,7 +258,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
     index: 30,
     type: "options",
-    backgroundImage: require("../../assets/Images/simple-7.jpeg"),
+    backgroundImage: require("../../assets/Images/simple-7.png"),
     options: [
         { text: "나도 비오면 좀 센치해져", nextType: "story",score: 0, nextIndex: 31 },
         { text: "나는 비 오는 날 좋아!", nextType: "story",score: 0, nextIndex: 31 },
@@ -294,7 +294,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index: 35,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-8.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-8.png"),
         options: [
             { text: "아무생각이 없다", nextType: "story",score: 0, nextIndex: 36 },
             { text: "아니, 나 오늘 정말 알찬 하루였어! 재밌다,,", nextType: "story",score: 0, nextIndex: 36 },
@@ -311,7 +311,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index:37,
         type: "story",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         name: " ",
         text: "(아침이 밝았다)",
     },
@@ -325,7 +325,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index: 39,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
             { text: "완전 푹 잤어!",nextType: "story", score: 0, nextIndex: 40 },
             { text: "아니, 요즘 잠을 잘 못 자",nextType: "story", score: 1, nextIndex: 40 },
@@ -342,7 +342,7 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     {
         index: 41,
         type: "options",
-        backgroundImage: require("../../assets/Images/simple-10.jpeg"),
+        backgroundImage: require("../../assets/Images/simple-10.png"),
         options: [
             { text: "나도 완전 기대돼 ~", nextType: "story",score: 0, nextIndex: 42 },
             { text: "그게 그거지 뭐...", nextType: "story",score: 1, nextIndex: 42 },

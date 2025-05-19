@@ -6,11 +6,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
 import { GenderEnum, getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
 import userInfoStyles from "../styles/userInfoStyles";
-import { CommonActions, useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../App";
+import {CommonActions, useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../App";
+import {Ionicons} from "@expo/vector-icons";
+
 const cloverProfile = require("../assets/Images/cloverProfile.png");
-import { Ionicons } from "@expo/vector-icons";
 
 
 // 화면 너비와 높이 가져오기
@@ -19,7 +20,7 @@ const { width, height } = Dimensions.get("window");
 type UserData = {
   nickname: string;
   email: string;
-  password: string;
+  password: string | null;
   birthDate: string;
   gender: string;
   secondPassword: string;
@@ -57,9 +58,11 @@ export default function UserInfo() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getGenderLabel = (gender: GenderEnum | string | null | undefined): string => {
     switch (gender) {
+      case GenderEnum.MALE:
       case "MALE":
       case GenderEnum.MALE:
         return "남성";
+      case GenderEnum.FEMALE:
       case "FEMALE":
       case GenderEnum.FEMALE:
         return "여성";
@@ -67,7 +70,7 @@ export default function UserInfo() {
       case GenderEnum.THIRD_GENDER:
         return "제 3의 성"
       default:
-        return "비밀";
+        return "밝히지 않음"
     }
   };
 
@@ -270,7 +273,7 @@ export default function UserInfo() {
 
         <InfoRow
           label="비밀번호"
-          value={userData.password}
+          value={userData.password ?? ""}
           onChangeText={(text) => setUserData({ ...userData, password: text })}
           secureTextEntry={!editMode}
           editable={editMode}
@@ -420,5 +423,6 @@ function InfoRow({
         <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
+          
   );
 }

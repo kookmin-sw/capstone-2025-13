@@ -14,7 +14,6 @@ import { StatusBar } from "expo-status-bar";
 import { Image } from "react-native";
 import helpCallStyles from "../../styles/helpCallStyles";
 import { getCenters } from "../../API/helpcallAPI";
-import Spinner from "../Spinner";
 import MarkerDetailCard from "../../components/MarkerDetailCard";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -71,7 +70,6 @@ export default function HelpCall() {
                 await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
-                setIsLoading(false);
                 return;
             }
 
@@ -117,8 +115,6 @@ export default function HelpCall() {
                 setMarkers(parsedMarkers);
             } catch (error) {
                 console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
-            } finally {
-                setIsLoading(false);
             }
         })();
     }, []);
@@ -228,9 +224,10 @@ export default function HelpCall() {
                                 navigation.navigate("HelpCall2");
                             }}
                         >
-                            <Image
-                                source={require("../../assets/Images/call.png")}
-                                style={{ width: 60, height: 60 }}
+                            <Ionicons
+                                name="arrow-back-circle"
+                                size={40}
+                                color="#1AA85C"
                             />
                         </TouchableOpacity>
                     </>

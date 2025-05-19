@@ -6,9 +6,10 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import java.time.Instant
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -17,13 +18,19 @@ data class RefreshToken(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: String? = null,
 
-    @Column(nullable = false, unique = true)
-    var token: String? = null,
+    @Column(nullable = false, unique = true, length = 2048)
+    var token: String,
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    val user: User? = null,
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    val user: User,
 
     @Column(nullable = false)
-    val expiryDate: Instant = Instant.now(),
-)
+    val expiryDate: LocalDateTime = LocalDateTime.now(),
+) {
+    constructor(): this(
+        token = "",
+        user = User(),
+        expiryDate = LocalDateTime.now(),
+    )
+}

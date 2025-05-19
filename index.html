@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우웅 (Wooong) 프로젝트 소개</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0 20px; background: #F9FAEC; color: #333; }
+    h1, h2, h3 { color: #2e7d32; }
+    .section { margin: 40px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 10px; vertical-align: top; text-align: center; }
+    img { border-radius: 10px; }
+    code, pre { background: #eee; padding: 10px; border-radius: 5px; display: block; overflow-x: auto; }
+    hr { margin: 40px 0; border: none; border-top: 1px solid #ccc; }
+    .badge-container img { margin: 5px; }
+    a { color: #ff6f00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .section {
+    padding: 20px;
+    font-family: sans-serif;
+    overflow-x: auto;
+  }
+  blockquote {
+      background: #f9f9f9;
+      border-left: 6px solid #ccc;
+      margin: 20px 0;
+      padding: 15px 20px;
+    }
+    ul {
+      margin-top: 10px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #2b7a78;
+    }
+
+  .identity-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .identity-card {
+    flex: 0 0 300px;
+    background-color: #B7DF9D;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .identity-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: contain; 
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background-color: white;
+}
+
+.identity-card p {
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 120px; 
+}
+  h2 {
+    margin-bottom: 24px;
+  }
+  .card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  height: auto; 
+  text-align: center;
+  transition: transform 0.2s;
+  margin-top: 10px; 
+  margin-bottom: 10px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+}
+
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-images img {
+  width: 32%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+
+.card p.description {
+    font-size: 1.1em; 
+    margin-bottom: 8px;
+  }
+  .card p.hashtags {  
+  color: #4a9449;
+  font-size: 0.95em;
+  font-weight: bold;
+}
+
+
+.card-images {
+  display: flex;
+  justify-content: flex-start; 
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-images img {
+  flex: 1;
+  max-width: 250px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.project-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  height: auto; 
+  text-align: left;
+  transition: transform 0.2s;
+  margin-top: 10px; 
+  margin-bottom: 10px; 
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center; 
+}
+
+
+
+  </style>
+</head>
+<body>
+  <br/>
+  <img src="./Images/main.png" width="100%">
+  <div class="section">
+    <h1>📝 프로젝트 소개</h1>
+    <h2>여러분은 지금 <span class="highlight">행복</span>하신가요?</h2>
+  <h3>“내가 우울한 건지, 그냥 힘든 건지”</h3>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <div class="project-card" style="flex: 1; min-width: 300px;">
+      <h3>코로나19 팬데믹 이후, 우울증을 겪는 사람들의 비율이 크게 증가</h3>
+      <img src="./Images/bg.png" alt="" width="100%">
+    </div>
+    <div class="project-card" style="flex: 1; min-width: 300px;">
+      <h3>한국 사회의 구조적 문제와 정신건강 악화</h3>
+      <img src="./Images/bg2.png" alt="" width="100%">
+    </div>
+  </div>
+  <blockquote>
+    코로나19 이후 비대면 중심의 일상이 정착되면서 대화는 줄고 정서적 고립은 더욱 깊어졌습니다.<br >
+    특히 20·30대의 우울 증세는 급증했고, 한국은 아직도 OECD 국가 중 자살률 1위를 기록하고 있습니다. <br> 
+    하지만 많은 사람들이 사회적 인식과 번거로움, 거부감 등으로 병원 방문에 큰 용기를 필요로 합니다.
+  </blockquote>
+
+  <p>
+    이에 정신건강 모바일 앱 시장은 빠르게 성장하고 있지만, 사용자 관점에서 실제 도움을 주기엔 한계가 존재했습니다.
+  </p>
+
+  <p><strong>저희는 다양한 정신건강 앱을 직접 사용해보고 다음과 같은 공통 문제를 발견했습니다:</strong></p>
+  <ul>
+    <li><strong>1. 진단·치료 기능의 단절</strong> – 흐름이 끊기고, 별도 앱을 요구</li>
+    <li><strong>2. 낮은 지속 사용 유도력</strong> – 관심을 유지할 장치 부족</li>
+    <li><strong>3. 과도한 유료화·광고</strong> – 진입 장벽 상승</li>
+    <li><strong>4. 커뮤니티 부작용</strong> – 부정적 경험의 확산</li>
+  </ul>
+  </div>
+  
+  </div>
+  <hr>
+  <div class="section">
+    <h2>🌱 브랜드 아이덴티티</h2>
+    <div class="identity-grid">
+      <div class="identity-card">
+        <img src="./Images/wooong.jpeg" alt="우웅 로고">
+        <p><strong>앱 이름</strong><br> ‘우웅~’이라는 인터넷 밈에서 착안하여, 무겁지 않고 <strong>가볍고 따뜻한 느낌</strong>으로 다가갑니다.</p>
+      </div>
+  
+      <div class="identity-card">
+        <img src="./Images/clover.png" alt="세잎이와 네잎이">
+        <p><strong>마스코트</strong><br> 세잎이와 네잎이라는 클로버 캐릭터. 사용자에게 <strong>소소한 위로와 행운</strong>을 전해주는 존재입니다.</p>
+      </div>
+  
+      <div class="identity-card">
+        <img src="./Images/colorchart.png" alt="컬러 팔레트">
+        <p><strong>메인 컬러</strong><br> 초록색 – 심리적 안정과 편안함을 상징. <br >보조색 – 갈색, 포인트 색 – 주황색으로 따뜻한 활기를 더했습니다.</p>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="section">
+    <h2>👨‍👩‍👧‍👦 팀 해피니스 소개</h2>
+    <table>
+      <tr>
+        <td>
+          <img src="https://avatars.githubusercontent.com/cherror" width="100">
+          <br>
+          <strong>한초희</strong><br>
+          PM&Frontend<br>
+          <a href="https://github.com/cherror">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/Kim-JiYun" width="100">
+          <br>
+          <strong>김지윤</strong><br>
+          Frontend<br>
+          <a href="https://github.com/Kim-JiYun">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/janeny117" width="100">
+          <br>
+          <strong>김재인</strong><br>
+          Frontend<br>
+          <a href="https://github.com/janeny117">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/20203153" width="100">
+        <br>
+          <strong>최진우</strong><br>
+          Backend<br>
+          <a href="https://github.com/20203153">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/toad-memntomori" width="100">
+          <br>
+          <strong>이충호</strong><br>
+          Backend<br>
+          <a href="https://github.com/toad-memntomori">GitHub</a>
+        </td>
+        <td>
+          <img src="https://avatars.githubusercontent.com/suyeone" width="100">
+<br>
+          <strong>이수연</strong><br>
+          AI<br>
+          <a href="https://github.com/suyeone">GitHub</a>
+        </td>
+      </tr>
+    </table>
+  </div> 
+   <hr>
+  <div class="section">
+    <h2>⚙️ 사용법</h2>
+    <pre>앱은 현재 [TestFlight / APK 링크]를 통해 설치할 수 있습니다. </pre>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h2>🎬 시연 영상</h2>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/jIa5xfGGVd0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
+
+
+  
+  <hr>
+
+  <div class="container">
+    <h2>🖼 기능소개</h2>
+    <div class="section">
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/simple.png" alt="simple">
+          <img src="./Images/signup.png" alt="signup">
+          <img src="./Images/login.png" alt="login">
+        </div>
+        <p class="description">📱 스토리로 시작되는 마음 여행, 로그인부터 감정 연결의 첫걸음.</p>
+        <p class="hashtags">#마음여행시작 #스토리기반 #심리케어첫단계 #게임 #재미 #약식검사 #로그인 #회원가입</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/loading.png" alt="loading">
+          <img src="./Images/home.png" alt="home">
+          <img src="./Images/userinfo.png" alt="userinfo">
+        </div>
+        <p class="description">🏠 로딩 후 펼쳐지는 내 마음의 홈, 개인정보는 안전하게.</p>
+        <p class="hashtags">#홈화면 #관리 #내정보수정</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/calendar.png" alt="calendar">
+          <img src="./Images/helpcall.png" alt="helpcall">
+        </div>
+        <p class="description">📅 활동을 되돌아보며 기록하고, 필요할 땐 즉시 도움받기.</p>
+        <p class="hashtags">#캘린더 #하루_요약 #활동 #출석 #통계 #기록습관 #상담도움 #심리센터연결 #위치기반</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/secondpw.png" alt="secondpw">
+          <img src="./Images/diag.png" alt="diag">
+          <img src="./Images/diag2.png" alt="diag2">
+        </div>
+        <p class="description">🔐 2차 비밀번호로 안전하게, 정식 진단으로 깊이 있게.</p>
+        <p class="hashtags">#개인정보보호 #민감한정보보호 #우울증검사 #정식검사 #진단 #전문성</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/daily.png" alt="daily">
+          <img src="./Images/diary.png" alt="diary">
+        </div>
+        <p class="description">📝 감정을 쓰고, 따뜻한 시선으로 다시 바라보기.</p>
+        <p class="hashtags">#매일1주제 #채팅 #세잎이 #소통 #챗봇질문 #일기 #럭키비키 #기록 #긍정적사고</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/quest.png" alt="quest">
+          <img src="./Images/quest2.png" alt="quest2">
+          <img src="./Images/quest3.png" alt="quest3">
+        </div>
+        <p class="description">🎯 하루 하나씩 나를 위한 퀘스트, 표정 속 진심을 마주하다.</p>
+        <p class="hashtags">#퀘스트 #챌린지 #명상 #운동 #숲 #게임</p>
+      </div>
+    
+      <div class="card">
+        <div class="card-images">
+          <img src="./Images/face.png" alt="face">
+        </div>
+        <p class="description">📸 카메라 속 나의 표정, 내가 몰랐던 감정을 알려줘요.</p>
+        <p class="hashtags">#감정인식 #나돌아보기 #표정분석 #얼굴감지 #셀카</p>
+      </div>
+    </div>
+    <hr>
+  
+    <div class="section">
+      <h2>🛠 기술 스택</h2>
+      <div class="badge-container">
+        <h3>🖥️ Frontend</h3>
+        <img src="https://img.shields.io/badge/React_Native-20232A?style=flat&logo=react&logoColor=61DAFB"/>
+        <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Expo-000020?style=flat&logo=expo&logoColor=white"/>
+  
+        <h3>⚙️ Backend</h3>
+        <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Hibernate-59666C?style=flat&logo=hibernate&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Jakarta_EE-EE3D23?style=flat&logo=jakartaee&logoColor=white"/>
+  
+        <h3>🧠 AI</h3>
+        <img src="https://img.shields.io/badge/Keras-D00000?style=flat&logo=keras&logoColor=white"/>
+        <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat&logo=tensorflow&logoColor=white"/>
+        <img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat&logo=opencv&logoColor=white"/>
+        <img src="https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white"/>
+        <img src="https://img.shields.io/badge/SciPy-8CAAE6?style=flat&logo=scipy&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Pillow-DB7093?style=flat"/>
+        <img src="https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Matplotlib-11557C?style=flat"/>
+        <img src="https://img.shields.io/badge/h5py-3776AB?style=flat"/>
+  
+        <h3>🤝 Co-Work</h3>
+        <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white"/>
+        <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/>
+      </div>
+    </div>
+    <hr>
+    <div class="section">
+      <h2>🖥 개발 환경</h2>
+      <ul>
+        <li><strong>OS</strong>: Windows 11 / macOS Sequoia 15.2</li>
+        <li><strong>Node.js</strong>: v18.20.8</li>
+        <li><strong>프레임워크</strong>: React Native</li>
+        <li><strong>언어</strong>: TypeScript</li>
+        <li><strong>Expo SDK</strong>: 50.0.3</li>
+        <li><strong>패키지 매니저</strong>: npm</li>
+        <li><strong>운영체제</strong>: Android / iOS 모두 지원</li>
+        <li><strong>백엔드</strong>: Spring Boot (Kotlin)</li>
+        <li><strong>데이터베이스</strong>: MySQL (RDS)</li>
+        <li><strong>API 통신</strong>: RESTful API (Axios 기반)</li>
+      </ul>
+    </div>
+    <hr>
+    <div class="section">
+      <h2>시스템 구조도</h2>
+      <img src="./Images/system.png" alt="서비스 구조" width=700>
+      <h2>표정분석 플로우</h2>
+      <img src="./Images/aiflow.png" alt="서비스 구조" width=700>
+    </div>
+  <hr>
+  <div class="section">
+    <h2>🤝 협업 방식</h2>
+    <blockquote>
+      독립적 개발 + 전체 구조의 일관성 유지 = <strong>효율적 협업 달성!</strong>
+    </blockquote>
+    <img src="./Images/cowork.png" alt="깃플로우" width=700>
+    <ul>
+      <li>
+        <strong>브랜치 전략</strong><br>
+        <blockquote>
+        master<br>
+        ├── 프론트엔드: front-develop<br>
+        └── 백엔드: develop<br>
+        </blockquote>
+        → 명확한 분리로 충돌 없는 병렬 개발
+      </li>
+      <li>
+        <strong>커밋 컨벤션</strong><br>
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 30%; text-align: center;">
+          <thead style="background-color: #0E6027; color: white;">
+            <tr>
+              <th>Prefix</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>[Init]</td><td>개발 환경 초기 설정</td></tr>
+            <tr><td>[Feat]</td><td>새로운 기능 추가</td></tr>
+            <tr><td>[Fix]</td><td>버그 수정</td></tr>
+            <tr><td>[Update]</td><td>기존 기능 보완</td></tr>
+            <tr><td>[Remove]</td><td>파일 삭제</td></tr>
+            <tr><td>[Move]</td><td>코드 또는 파일 이동</td></tr>
+            <tr><td>[Rename]</td><td>파일 또는 폴더 이름 변경</td></tr>
+            <tr><td>[Docs]</td><td>문서 수정</td></tr>
+            <tr><td>[Comment]</td><td>주석 추가 또는 변경</td></tr>
+            <tr><td>[Refactor]</td><td>코드 리팩토링</td></tr>
+            <tr><td>[Upload]</td><td>필요한 이미지나 파일 단순 업로드</td></tr>
+            <tr><td>[Test]</td><td>테스트 코드 작성</td></tr>
+            <tr><td>[Chore]</td><td>기타 자잘한 수정</td></tr>
+          </tbody>
+        </table>
+
+      </li>
+      <li>
+        <strong>이슈 관리</strong><br>
+        GitHub의 <strong>Issue / Milestone / Label</strong> 적극 활용<br>
+        <strong>Issue 템플릿 5종</strong> 사용 → 작업 명확화 및 문서화
+      </li>
+      <li>
+        <strong>PR 규칙</strong><br>
+        <strong>PR 템플릿</strong> 적용<br>
+        <strong>리뷰 필수</strong>: 팀원 1인의 리뷰 or GitHub Copilot 확인 후 머지 가능<br>
+        → 코드 품질 및 일관성 확보
+      </li>
+    </ul>
+  
+  </div>
+</body>
+</html>

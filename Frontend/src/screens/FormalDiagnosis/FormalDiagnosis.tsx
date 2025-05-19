@@ -135,6 +135,7 @@ export default function FormalDiagnosis() {
                             console.log(
                                 `🟢 ${item.title} 버튼 클릭됨 (id: ${item.id})`
                             );
+                            // @ts-ignore
                             navigation.navigate("FormalDiagnosisSurvey", {
                                 diagnosisId: item.id,
                             });

@@ -6,6 +6,7 @@ import SurveyHeader from "../../components/SurveyHeader";
 import SurveyQuestion from "../../components/SurveyQuestion";
 import ConfirmButton from "../../components/ConfirmButton";
 import styles from "../../styles/formalSurveyStyles";
+import {DiagnosisQuestion} from "../../API/diagnosisAPI";
 
 import {
     fetchDiagnosisDetail,

@@ -1,0 +1,60 @@
+import React, { useEffect } from 'react';
+import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import ProgressBar from './ProgressBar';
+import styles from '../styles/questEmotionChartStyles';
+
+// 1) Props 타입 정의: result 배열을 전달받습니다
+interface EmotionMissionCardProps {
+  result: number[];
+  success: boolean;
+}
+
+// 2) 감정 라벨 및 컬러 매핑
+const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+const colors: Record<string, string> = {
+  angry: '#ff4444',
+  disgust: '#ff4444',
+  fear: '#ff4444',
+  happy: '#00C851',
+  sad: '#ff4444',
+  surprise: '#00C851',
+  neutral: '#00C851',
+};
+
+export default function EmotionMissionCard({ result, success }: EmotionMissionCardProps) {
+  
+  useEffect(()=>{
+console.log(success)
+  },[success])
+  return (
+        <View style={styles.dialogueBox}>
+            <View style={styles.nametag}>
+                <Text style={styles.nametagText}>구슬이</Text>
+            </View>
+            <View style={styles.dialogueTextBox}>
+                <View style={styles.list}>
+                {result.map((progress, index) => {
+                  const label = labels[index] || 'unknown';
+                  const color = colors[label] || '#00C851';
+
+                  return (
+                    <View key={label} style={styles.row}>
+                      <Text style={[styles.label, { color }]}>{label}</Text>
+                      <View style={styles.barWrapper}>
+                        <ProgressBar progress={progress} />
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>  
+             {success && (
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>오늘 미션 완료!</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+       
+            
+        </View> 
+  );
+}
