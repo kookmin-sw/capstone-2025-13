@@ -10,6 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
+import space.mori.dalbodeule.snapadmin.external.annotations.HiddenEditForm
 import java.time.LocalDateTime
 
 enum class UserQuestStatus(val value : String) {
@@ -47,9 +48,11 @@ data class UserQuests(
     @Column(nullable = true)
     var photo: String? = null,
 
+    @HiddenEditForm
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @HiddenEditForm
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

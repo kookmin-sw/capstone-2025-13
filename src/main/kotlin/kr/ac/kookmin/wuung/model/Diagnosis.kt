@@ -1,6 +1,7 @@
 package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.*
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 // 약식 검사와 정식 검사 종류를 표현한 클래스
@@ -34,9 +35,11 @@ data class Diagnosis(
     var diagnosisScale: List<DiagnosisScale> = listOf(),
 
     @Column(nullable = false)
+    @DisableEditField
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(nullable = false)
+    @DisableEditField
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor(): this(

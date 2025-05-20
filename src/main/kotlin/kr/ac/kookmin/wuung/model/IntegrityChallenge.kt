@@ -8,6 +8,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableCreate
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableDelete
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 enum class IntegrityChallengeStatus(val value: Int) {
@@ -18,6 +21,8 @@ enum class IntegrityChallengeStatus(val value: Int) {
 
 @Entity
 @Table(name = "integrity_challenges")
+@DisableCreate
+@DisableDelete
 data class IntegrityChallenge(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,9 +34,11 @@ data class IntegrityChallenge(
     @Column(nullable = false)
     val deviceId: String,
 
+    @DisableEditField
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @DisableEditField
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 

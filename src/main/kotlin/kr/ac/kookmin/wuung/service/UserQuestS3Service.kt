@@ -4,16 +4,16 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
 import io.jsonwebtoken.io.IOException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
-import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.model.UserQuests
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserQuestS3Service (
-    @Autowired private val userQuestS3Client: AmazonS3,
+    @Autowired @Qualifier("amazonS3Client") private val s3Client: AmazonS3,
     @Value("\${s3.quest-bucket}") private val bucketName: String,
 ) {
     fun uploadPhoto(quest: UserQuests, file: MultipartFile): String {
@@ -27,7 +27,7 @@ class UserQuestS3Service (
                 metadata.contentLength = file.size
                 metadata.contentType = file.contentType
 
-                userQuestS3Client.putObject(bucketName, s3Path, file.inputStream, metadata)
+                s3Client.putObject(bucketName, s3Path, file.inputStream, metadata)
 
                 return s3Path
             } catch(e: IOException) {
@@ -37,6 +37,6 @@ class UserQuestS3Service (
 
         fun removePhoto(quest: UserQuests) {
             val s3Path = quest.photo ?: return
-            userQuestS3Client.deleteObject(bucketName, s3Path)
+            s3Client.deleteObject(bucketName, s3Path)
         }
 }

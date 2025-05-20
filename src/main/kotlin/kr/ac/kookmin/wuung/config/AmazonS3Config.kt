@@ -15,8 +15,16 @@ class AmazonS3Config(
     @Value("\${s3.secret-key}") private val s3SecretKey: String,
 ) {
     @Bean
-    fun profileS3Client(): AmazonS3 {
-        val credentials = BasicAWSCredentials(s3AccessKey, s3SecretKey)
+    fun amazonS3Client(): AmazonS3 {
+        require(s3AccessKey.isNotBlank() && s3SecretKey.isNotBlank()) { "AWS credentials cannot be blank" }
+        require(s3Url.isNotBlank()) { "S3 URL cannot be blank" }
+
+        val credentials = try {
+            BasicAWSCredentials(s3AccessKey, s3SecretKey)
+        } catch (e: Exception) {
+            throw IllegalStateException("Failed to create AWS credentials", e)
+        }
+
         val endpoint = com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration(
             s3Url,
             "us-east-1"
@@ -27,6 +35,8 @@ class AmazonS3Config(
             .withCredentials(AWSStaticCredentialsProvider(credentials))
             .withEndpointConfiguration(endpoint)
             .withPathStyleAccessEnabled(true)
+            .disableChunkedEncoding()
+            .withForceGlobalBucketAccessEnabled(true)
             .build()
     }
 }

@@ -6,14 +6,14 @@ import io.jsonwebtoken.io.IOException
 import kr.ac.kookmin.wuung.exceptions.ServerErrorException
 import kr.ac.kookmin.wuung.model.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
 class ProfileS3Service(
-    @Autowired private val profileS3Client: AmazonS3,
+    @Autowired @Qualifier("amazonS3Client") private val s3Client: AmazonS3,
     @Value("\${s3.profile-bucket}") private val bucketName: String,
 ) {
     fun uploadProfile(user: User, file: MultipartFile): String {
@@ -27,7 +27,7 @@ class ProfileS3Service(
             metadata.contentLength = file.size
             metadata.contentType = file.contentType
 
-            profileS3Client.putObject(bucketName, s3Path, file.inputStream, metadata)
+            s3Client.putObject(bucketName, s3Path, file.inputStream, metadata)
 
             return s3Path
         } catch(e: IOException) {
@@ -37,6 +37,6 @@ class ProfileS3Service(
 
     fun removeProfile(user: User) {
         val s3Path = user.profile ?: return
-        profileS3Client.deleteObject(bucketName, s3Path)
+        s3Client.deleteObject(bucketName, s3Path)
     }
 }

@@ -57,3 +57,4 @@ snapadmin:
   enabled: true
   baseUrl: admin
   models-package: kr.ac.kookmin.wuung.model
+  brand-name: WOOONG

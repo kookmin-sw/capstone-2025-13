@@ -85,7 +85,7 @@ dependencies {
 	// HTTP 클라이언트
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-	implementation("space.mori.dalbodeule:snap-admin:0.5.1")
+	implementation("space.mori.dalbodeule:snap-admin:0.5.20")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
