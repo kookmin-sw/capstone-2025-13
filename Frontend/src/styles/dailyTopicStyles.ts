@@ -42,13 +42,15 @@ const dailyTopicstyles = StyleSheet.create({
         width: width * 0.1,
         height: width * 0.1,
         marginLeft: width * 0.03,
-        marginTop: height * 0.015,
+        borderRadius: (width * 0.1) / 2,
+        marginTop: height * 0.005,
     },
     cloverProfileImage: {
         width: width * 0.1,
         height: width * 0.1,
         marginRight: width * 0.03,
         marginTop: height * 0.015,
+        borderRadius: (width * 0.1) / 2,
     },
     contentContainer: {
         flexDirection: "column",

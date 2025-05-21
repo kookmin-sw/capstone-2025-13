@@ -11,10 +11,9 @@ type TreeType = "apple" | "peach" | "forest";
 interface TreeProps {
   type: TreeType;
   title: string;
-  subtitle: string;
 }
 
-export default function Tree({ type, title, subtitle }: TreeProps) {
+export default function Tree({ type, title }: TreeProps) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const treeImages = {
@@ -30,7 +29,7 @@ export default function Tree({ type, title, subtitle }: TreeProps) {
   };
 
   const handlePress = () => {
-    navigation.navigate("Quest_stage", { title, subtitle });
+    navigation.navigate("Quest_stage", { title });
   };
 
   return (

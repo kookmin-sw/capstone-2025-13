@@ -20,13 +20,21 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 2,
     },
-    iconBox: {
+iconBox: {
         width: 25,
         height: 25,
-        backgroundColor: "#E1E1E1",
         borderRadius: 6,
         marginRight: 16,
         marginLeft: 10,
+        justifyContent: "center",  // 추가
+        alignItems: "center",      // 추가
+    },
+    iconText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 15,
+        fontFamily: fonts.semiBold,
+        textAlign:"center"
     },
     text: {
         fontSize: 16,

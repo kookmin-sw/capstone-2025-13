@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import fonts from '../constants/fonts';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
     container: {
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
     marginLeft: width * 0.04,
     color: '#fff',
     fontWeight: 'bold',
-    marginVertical: width * 0.02,
+
     fontFamily: fonts.laundryBold,
     },
     progressChart: {
@@ -41,6 +41,7 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.laundryBold,
     },
     uploadBox: {
+    marginTop: width * 0.03,
     backgroundColor: '#333',
     height: width * 0.4,
     justifyContent: 'center',
@@ -61,16 +62,29 @@ export const styles = StyleSheet.create({
     bottom: 20,
     left: width * 0.05,
     right: width * 0.05,
+    alignItems: 'center',
     },
     sectionTitle: {
     fontFamily: fonts.laundryBold,
     color: "#fff94f",
     alignSelf: "flex-start",
     },
+    warningTitle: {
+        color: "#fff",
+        fontFamily: fonts.laundry,
+        fontSize: width * 0.04,
+      },
+      description: {
+        color: "#ccc",
+        fontFamily: fonts.laundry,
+        fontSize: width * 0.03,
+        marginVertical: height * 0.004,
+      },
     completeButton: {
     fontFamily: fonts.laundryBold,
     backgroundColor: '#FF3D89',
-    borderRadius: 50,
+    borderRadius: 20,
+    width: width* 0.4,
     paddingVertical: width * 0.04,
     alignItems: 'center',
     },
@@ -78,11 +92,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    marginTop: width * 0.05,
+    marginTop: width * 0.01,
     },
     centerTextContainer: {
     position: 'absolute',
     alignItems: 'center',
+    marginTop: width * 0.05,
     fontFamily: fonts.laundryBold,
     },
 });

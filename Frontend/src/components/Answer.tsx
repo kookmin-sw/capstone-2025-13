@@ -12,7 +12,5 @@ export default function Answer({ answer }: AnswerProps) {
                 <Text style={answerStyle.answerText}>{answer}</Text>
             </View>
         </View>
-
     );
-};
-
+}

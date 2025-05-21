@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { SetStateAction, useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
@@ -7,18 +7,53 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
+import { useSecondPasswordGuard } from "../hooks/useSecondPasswordGuard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getBehaviors, getBehaviorsSummary } from "../API/calendarAPI";
+
+type BehaviorType = "diagnosis" | "topic" | "quest" | "diary";
+
+interface Behavior {
+    title: string;
+    content: string;
+    type: BehaviorType;
+}
 
 export default function CalendarScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [attendance, setAttendance] = useState(5);
+    const [attendance, setAttendance] = useState(0);
     const [attendanceRate, setAttendanceRate] = useState(0);
-    const attendanceDates = ['2025-05-01', '2025-05-03', '2025-05-06', '2025-05-24'];
+    const [behaviors, setBehaviors] = useState<Behavior[]>([
+        { title: "PHQ-9", content: "우울 검사 시행", type: "diagnosis" },
+        { title: "매일 1주제", content: "소소한 대화 기록 보러 가기", type: "topic" },
+        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
+        { title: "일기", content: "일기 작성", type: "diary" },
+        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
+        { title: "일기", content: "일기 작성", type: "diary" },
+    ]);
+
+    const [currentYearMonth, setCurrentYearMonth] = useState(() => {
+        const now = new Date();
+        const m = now.getMonth() + 1;
+        return `${now.getFullYear()}-${m < 10 ? '0' + m : m}`;
+    });
+
+    const [attendanceDates, setAttendanceDates] = useState([]);
     const navigation =
-            useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    useEffect(() => {
+        const fetchData = async () => {
+            console.log("현재 보여지는 달:", currentYearMonth);
+            const response = await getBehaviorsSummary(currentYearMonth);
+            setAttendanceDates(response);
+            setAttendance(response.length);
+        };
+
+        fetchData();
+    }, [currentYearMonth]);
 
     const generateMarkedDates = (selectedDate: string) => {
         const marked: { [date: string]: any } = {};
-
         attendanceDates.forEach(date => {
             marked[date] = {
                 selected: date === selectedDate,
@@ -42,6 +77,54 @@ export default function CalendarScreen() {
         return marked;
     };
 
+    const selectIcon = (type: string) => {
+        if (type === "QUEST") {
+            return require("../assets/Images/quest_icon.png");
+        } else if (type === "TOPIC") {
+            return require("../assets/Images/topic_icon.png");
+        }
+        else if (type === "DIARY") {
+            return require("../assets/Images/diary_icon.png");
+        }
+        else if (type === "DIAGNOSIS") {
+            return require("../assets/Images/diagnosis_icon.png");
+        }
+        // else {
+        //     return require("../assets/Images/default_icon.png"); 
+        // }
+    };
+
+    const handlePressBehavior = (behavior: Behavior) => {
+        switch (behavior.type.toUpperCase()) {
+            case "DIAGNOSIS":
+                // navigation.navigate("DiagnosisResultScreen", { date: selectedDate });
+                break;
+            case "TOPIC":
+                // navigation.navigate("TopicScreen", { date: selectedDate });
+                break;
+            case "QUEST":
+                // navigation.navigate("QuestScreen", { date: selectedDate });
+                break;
+            case "DIARY":
+                navigation.navigate("Record", { date: selectedDate });
+                break;
+            default:
+                console.warn("Unknown behavior type:", behavior.type);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getBehaviors(selectedDate);
+                setBehaviors(response);
+            } catch (error) {
+                console.error("데이터 불러오기 실패:", error);
+            }
+        };
+
+        fetchData();
+    }, [selectedDate]);
     useEffect(() => {
         const date = new Date(selectedDate);
         const year = date.getFullYear();
@@ -50,20 +133,29 @@ export default function CalendarScreen() {
         setAttendanceRate(attendance / daysInMonth);
     }, [attendance, selectedDate]);
 
+    useSecondPasswordGuard("Calendar");
+    useEffect(() => {
+        AsyncStorage.setItem("contentPasswordPassed", "false");
+    }, []);
+
     return (
         <View style={calendarStyles.container}>
             <View style={calendarStyles.header}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("Home")}
-                style={calendarStyles.backButtonWrapper}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Home", {})}
+                    style={calendarStyles.backButtonWrapper}
                 >
-                <Ionicons name="arrow-back-circle" size={40} color="#fff" />
-            </TouchableOpacity>
-                <Text style={calendarStyles.title}>달력</Text>  
+                    <Ionicons name="arrow-back-circle" size={40} color="#fff" />
+                </TouchableOpacity>
+                <Text style={calendarStyles.title}>달력</Text>
             </View>
             <Calendar
                 current={selectedDate}
                 onDayPress={(day: { dateString: SetStateAction<string>; }) => setSelectedDate(day.dateString)}
+                onMonthChange={(month) => {
+                    const m = month.month < 10 ? '0' + month.month : month.month;
+                    setCurrentYearMonth(`${month.year}-${m}`);
+                }}
                 markedDates={generateMarkedDates(selectedDate)}
                 markingType="multi-dot"
                 theme={{
@@ -91,18 +183,36 @@ export default function CalendarScreen() {
 
             <View style={calendarStyles.taskList}>
                 <Text style={calendarStyles.dateTitle}>{formatDate(selectedDate)}</Text>
-                {[1, 2, 3].map((_, index, array) => (
-                    <View key={index}>
-                        <View style={calendarStyles.taskItem}>
-                            <View style={calendarStyles.dot} />
-                            <View>
-                                <Text style={calendarStyles.taskTitle}>마음 건강 검사 진행</Text>
-                                <Text style={calendarStyles.taskSubtitle}>BDI 기반 검사</Text>
+                <ScrollView
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    style={{ flexGrow: 1, maxHeight: 400 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {behaviors.length > 0 ? (
+                        behaviors.map((item, index) => (
+                            <View key={index}>
+                                <TouchableOpacity onPress={() => handlePressBehavior(item)}>
+                                    <View style={calendarStyles.taskItem}>
+                                        <Image
+                                            source={selectIcon(item.type)}
+                                            style={calendarStyles.icon}
+                                        />
+                                        <View>
+                                            <Text style={calendarStyles.taskTitle}>{item.title}</Text>
+                                            <Text style={calendarStyles.taskSubtitle}>{item.content}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                                {index !== behaviors.length - 1 && <View style={calendarStyles.divider} />}
                             </View>
+                        ))
+                    ) : (
+                        <View style={calendarStyles.emptyContainer}>
+                            <Text style={calendarStyles.emptyText}>이 날에는 기록된 활동이 없어요.</Text>
                         </View>
-                        {index !== array.length - 1 && <View style={calendarStyles.divider} />}
-                    </View>
-                ))}
+                    )}
+
+                </ScrollView>
 
             </View>
         </View>

@@ -64,7 +64,7 @@
       "package": "space.mori.wooong",
       "config": {
         "googleMaps": {
-          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+          "apiKey": "process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
         }
       },
       "versionCode": 90,

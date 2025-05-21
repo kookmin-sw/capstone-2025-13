@@ -20,7 +20,6 @@ const calendarStyles = StyleSheet.create({
     },
     title: {
         fontSize: width * 0.075, // 약 30
-        fontWeight: "bold",
         color: "#fff",
         fontFamily: fonts.laundryBold,
     },
@@ -31,17 +30,20 @@ const calendarStyles = StyleSheet.create({
     attendanceBar: {
         marginTop: height * 0.02,
         alignItems: 'center',
+        gap: 10
     },
     attendanceText: {
         fontSize: width * 0.035,
+        fontFamily: fonts.laundry,
         color: colors.white,
     },
     count: {
-        fontWeight: 'bold',
+        fontFamily: fonts.laundryBold,
         fontSize: width * 0.05,
         color: colors.white,
     },
     taskList: {
+        flex: 1,
         marginTop: height * 0.02,
         backgroundColor: '#F2F3E5',
         borderRadius: width * 0.1,
@@ -49,7 +51,7 @@ const calendarStyles = StyleSheet.create({
     },
     dateTitle: {
         fontSize: width * 0.045,
-        fontWeight: 'bold',
+        fontFamily: fonts.laundryBold,
         marginBottom: height * 0.012,
         color: "#714E25"
     },
@@ -69,11 +71,13 @@ const calendarStyles = StyleSheet.create({
     taskTitle: {
         fontSize: width * 0.04,
         fontWeight: '500',
-        color: "#89673F"
+        color: "#89673F",
+        fontFamily: fonts.laundry,
     },
     taskSubtitle: {
         fontSize: width * 0.033,
         color: '#89673F',
+        fontFamily: fonts.laundry,
     },
     divider: {
         height: 1,
@@ -81,6 +85,23 @@ const calendarStyles = StyleSheet.create({
         width: '100%',
         marginVertical: height * 0.005,
     },
+    emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    },
+
+    emptyText: {
+        fontSize: 16,
+        color: '#89673F',
+        fontFamily: fonts.laundryBold
+    },
+    icon: {
+        width: 24,
+        height: 24,
+        marginRight: 10,
+    },
+
 });
 
 export default calendarStyles;
