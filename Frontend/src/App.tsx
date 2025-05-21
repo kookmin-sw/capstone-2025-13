@@ -12,6 +12,7 @@ import Quest from "./screens/Quest/Quest";
 import Quest_stage from "./screens/Quest/Quest_stage";
 import Quest_meditation from "./screens/Quest/Quest_meditation";
 import Quest_exercise from "./screens/Quest/Quest_exercise";
+import Quest_emotion from "./screens/Quest/Quest_emotion";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
@@ -63,7 +64,6 @@ export type RootStackParamList = {
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Quest_emotion: undefined;
-    Quest_emotion_sy: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
     FormalDiagnosisResult: {
@@ -239,6 +239,11 @@ export default function App() {
                     <Stack.Screen
                         name="Quest_exercise"
                         component={Quest_exercise}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_emotion"
+                        component={Quest_emotion}
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen

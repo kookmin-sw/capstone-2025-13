@@ -69,7 +69,7 @@ export default function Home() {
                         icon="book-open-variant"
                         title="일기"
                         subtitle="오늘 하루, 나의 마음 기록하기"
-                        onPress={() => navigation.navigate("Record")}
+                        onPress={() => navigation.navigate("Record", {})}
                     />
                     <HomeButton
                         icon="target"
@@ -101,7 +101,6 @@ export default function Home() {
                     </View>
                 </View>
             )}
-            
-        </View>
+        </SafeAreaView>
     );
 }

@@ -42,7 +42,6 @@ export default function HelpCall() {
             details: any;
         }[]
     >([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
     const filteredMarkers =
@@ -65,7 +64,6 @@ export default function HelpCall() {
 
     useEffect(() => {
         (async () => {
-            setIsLoading(true);
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
@@ -132,96 +130,12 @@ export default function HelpCall() {
         <TouchableWithoutFeedback onPress={() => setSelectedMarker(null)}>
             <View style={helpCallStyles.container}>
                 <StatusBar style="auto" />
-                {isLoading && <Spinner />}
-                {!isLoading && (
-                    <>
-                        <View style={helpCallStyles.headerBox}>
-                            <TouchableOpacity
-                                style={helpCallStyles.backButtonWrapper}
-                                onPress={() => navigation.navigate("Home", {})}
-                            >
-                                <Ionicons
-                                    name="arrow-back-circle"
-                                    size={40}
-                                    color="#1AA85C"
-                                />
-                            </TouchableOpacity>
-
-                            <Text style={helpCallStyles.headerText}>
-                                마음 케어 정보 지도
-                            </Text>
-                            <ScrollView
-                                style={{ marginTop: 10 }}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={
-                                    helpCallStyles.scrollContainer
-                                }
-                            >
-                                {buttons.map((btn) => (
-                                    <TouchableOpacity
-                                        key={btn.id}
-                                        style={[
-                                            helpCallStyles.button,
-                                            selected === btn.id
-                                                ? helpCallStyles.selectedButton
-                                                : helpCallStyles.unselectedButton,
-                                        ]}
-                                        onPress={() => setSelected(btn.id)}
-                                    >
-                                        <Text
-                                            style={[
-                                                helpCallStyles.buttonText,
-                                                selected === btn.id
-                                                    ? helpCallStyles.selectedText
-                                                    : helpCallStyles.unselectedText,
-                                            ]}
-                                        >
-                                            {btn.title}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                        </View>
-                        <MapView
-                            provider={PROVIDER_GOOGLE}
-                            style={helpCallStyles.map}
-                            region={location}
-                            showsUserLocation={true}
-                        >
-                            <Marker coordinate={location} title="내 위치" />
-                            {filteredMarkers.map((marker) => (
-                                <Marker
-                                    key={marker.id}
-                                    coordinate={{
-                                        latitude: marker.latitude,
-                                        longitude: marker.longitude,
-                                    }}
-                                    title={marker.title}
-                                    onCalloutPress={() =>
-                                        setSelectedMarker(marker.details)
-                                    }
-                                >
-                                    <Image
-                                        source={getMarkerImageByType(
-                                            marker.type
-                                        )}
-                                        style={helpCallStyles.markerIcon}
-                                    />
-                                </Marker>
-                            ))}
-                        </MapView>
-
-                        {selectedMarker && (
-                            <MarkerDetailCard
-                                details={selectedMarker}
-                                onClose={() => setSelectedMarker(null)}
-                            />
-                        )}
+                <>
+                    <View style={helpCallStyles.headerBox}>
                         <TouchableOpacity
-                            style={helpCallStyles.callButton}
+                            style={helpCallStyles.backButtonWrapper}
                             onPress={() => {
-                                navigation.navigate("HelpCall2");
+                                navigation.navigate("Home", {});
                             }}
                         >
                             <Ionicons
@@ -230,8 +144,84 @@ export default function HelpCall() {
                                 color="#1AA85C"
                             />
                         </TouchableOpacity>
-                    </>
-                )}
+
+                        <Text style={helpCallStyles.headerText}>
+                            마음 케어 정보 지도
+                        </Text>
+                        <ScrollView
+                            style={{ marginTop: 10 }}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={
+                                helpCallStyles.scrollContainer
+                            }
+                        >
+                            {buttons.map((btn) => (
+                                <TouchableOpacity
+                                    key={btn.id}
+                                    style={[
+                                        helpCallStyles.button,
+                                        selected === btn.id
+                                            ? helpCallStyles.selectedButton
+                                            : helpCallStyles.unselectedButton,
+                                    ]}
+                                    onPress={() => setSelected(btn.id)}
+                                >
+                                    <Text
+                                        style={[
+                                            helpCallStyles.buttonText,
+                                            selected === btn.id
+                                                ? helpCallStyles.selectedText
+                                                : helpCallStyles.unselectedText,
+                                        ]}
+                                    >
+                                        {btn.title}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </View>
+                    <MapView
+                        provider={PROVIDER_GOOGLE}
+                        style={helpCallStyles.map}
+                        region={location}
+                        showsUserLocation={true}
+                    >
+                        <Marker coordinate={location} title="내 위치" />
+                        {filteredMarkers.map((marker) => (
+                            <Marker
+                                key={marker.id}
+                                coordinate={{
+                                    latitude: marker.latitude,
+                                    longitude: marker.longitude,
+                                }}
+                                title={marker.title}
+                                image={getMarkerImageByType(marker.type)}
+                                onCalloutPress={() =>
+                                    setSelectedMarker(marker.details)
+                                }
+                            />
+                        ))}
+                    </MapView>
+
+                    {selectedMarker && (
+                        <MarkerDetailCard
+                            details={selectedMarker}
+                            onClose={() => setSelectedMarker(null)}
+                        />
+                    )}
+                    <TouchableOpacity
+                        style={helpCallStyles.callButton}
+                        onPress={() => {
+                            navigation.navigate("HelpCall2");
+                        }}
+                    >
+                        <Image
+                            source={require("../../assets/Images/call.png")}
+                            style={{ width: 60, height: 60 }}
+                        />
+                    </TouchableOpacity>
+                </>
             </View>
         </TouchableWithoutFeedback>
     );

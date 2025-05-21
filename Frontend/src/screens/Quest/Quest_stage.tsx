@@ -17,8 +17,8 @@ type RootStackParamList = {
 };
 
 type QuestNavigationProp =
-  | StackNavigationProp<RootStackParamList, "Quest_meditation">
-  | StackNavigationProp<RootStackParamList, "Quest_exercise">;
+    | StackNavigationProp<RootStackParamList, "Quest_meditation">
+    | StackNavigationProp<RootStackParamList, "Quest_exercise">;
 
 const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
   switch (title) {
@@ -45,7 +45,7 @@ export default function Quest_stage() {
   const navigation = useNavigation<QuestNavigationProp>();
   const { title } = route.params as { title: string };
 
-  const [questTitle, setQuestTitle] = useState(""); 
+  const [questTitle, setQuestTitle] = useState("");
   const [displayQuestTitle, setDisplayQuestTitle] = useState("");
   const [questDescription, setQuestDescription] = useState("");
   const [questTarget, setQuestTarget] = useState(0);
@@ -57,9 +57,9 @@ export default function Quest_stage() {
     const type = getQuestTypeFromTitle(title);
 
     const setQuestData = async (
-      questData: any,
-      type: "MEDITATE" | "ACTIVITY" | "EMOTION",
-      overwriteDisplayTitle?: string
+        questData: any,
+        type: "MEDITATE" | "ACTIVITY" | "EMOTION",
+        overwriteDisplayTitle?: string
     ) => {
       setQuestTitle(questData.name);
       setDisplayQuestTitle(overwriteDisplayTitle ?? questData.name);
@@ -180,20 +180,22 @@ export default function Quest_stage() {
       navigation.navigate("Quest_meditation", params);
     } else if (title === "산책") {
       navigation.navigate("Quest_exercise", params);
+    } else {
+      navigation.navigate("Quest_emotion", params);
     }
   };
 
   const navigateToQuestWithCheck = () => {
     if (displayQuestTitle === "끝! 내일 다시 만나!") {
       Alert.alert(
-        "오늘의 퀘스트 완료!",
-        title === "명상"
-          ? "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?"
-          : "이미 오늘 미션을 완료했어요.",
-        [
-          { text: "닫기", style: "cancel" },
-          { text: title === "명상" ? "한 번 더!" : "다시 볼래", onPress: navigateToQuest },
-        ]
+          "오늘의 퀘스트 완료!",
+          title === "명상"
+              ? "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?"
+              : "이미 오늘 미션을 완료했어요.",
+          [
+            { text: "닫기", style: "cancel" },
+            { text: title === "명상" ? "한 번 더!" : "다시 볼래", onPress: navigateToQuest },
+          ]
       );
     } else {
       navigateToQuest();
@@ -201,82 +203,82 @@ export default function Quest_stage() {
   };
 
   return (
-    <View style={questStageStyles.container}>
-      <ScrollView contentContainerStyle={questStyles.scrollContainer} bounces={false} overScrollMode="never">
-        <Image source={require("../../assets/Images/stage_street.png")} style={questStageStyles.street} resizeMode="contain" />
-        <View style={questStyles.headerWrapper}>
-          <Header_sky title="" subtitle="" screenName="Quest_stage" />
-          <Quest_circle style={questStyles.circle} />
-        </View>
-        <Image source={require("../../assets/Images/goal.png")} style={questStageStyles.goalImage} />
-        {["one", "two", "three", "four"].map((type, index) => {
-          const isLeft = index % 2 === 0;
-          const isFirst = index === 0;
-          return (
-            <View
-              key={index}
-              style={[
-                questStageStyles.elementWrapper,
-                {
-                  alignSelf: isLeft ? "flex-end" : "flex-start",
-                  marginTop: isFirst ? height * 0.12 : height * 0.01,
-                },
-              ]}
-            >
-              <Grass type={type as "one" | "two" | "three" | "four"} />
-            </View>
-          );
-        })}
-        <Quest_title
-          text={displayQuestTitle || "퀘스트 불러오는 중..."}
-          style={questStageStyles.questTitle}
-          onPress={navigateToQuestWithCheck}
-        />
-        <View style={questStageStyles.textWrapper}>
-          <View style={questStageStyles.lineSmallWrapper}>
-            <Text style={questStageStyles.shadowTextSmall}>{title}</Text>
-            <Text style={questStageStyles.mainTextSmall}>{title}</Text>
+      <View style={questStageStyles.container}>
+        <ScrollView contentContainerStyle={questStyles.scrollContainer} bounces={false} overScrollMode="never">
+          <Image source={require("../../assets/Images/stage_street.png")} style={questStageStyles.street} resizeMode="contain" />
+          <View style={questStyles.headerWrapper}>
+            <Header_sky title="" subtitle="" screenName="Quest_stage" />
+            <Quest_circle style={questStyles.circle} />
           </View>
-          <View style={questStageStyles.lineLargeWrapper}>
-            <Text style={questStageStyles.shadowTextLarge}>{questStage}-{questStep}</Text>
-            <Text style={questStageStyles.mainTextLarge}>{questStage}-{questStep}</Text>
-          </View>
-        </View>
-        {lockPositions.map((pos, index) => {
-          const isCurrent = index === currentStageIndex;
-          const source = isCurrent
-            ? require("../../assets/Images/stage_current.png")
-            : index < currentStageIndex
-              ? require("../../assets/Images/stage_lock.png")
-              : require("../../assets/Images/stage_unlock.png");
-
-          const imageStyle = [questStageStyles.stage, { top: pos.top, left: pos.left }];
-
-          return isCurrent ? (
-            <TouchableOpacity
-              key={index}
-              style={imageStyle}
+          <Image source={require("../../assets/Images/goal.png")} style={questStageStyles.goalImage} />
+          {["one", "two", "three", "four"].map((type, index) => {
+            const isLeft = index % 2 === 0;
+            const isFirst = index === 0;
+            return (
+                <View
+                    key={index}
+                    style={[
+                      questStageStyles.elementWrapper,
+                      {
+                        alignSelf: isLeft ? "flex-end" : "flex-start",
+                        marginTop: isFirst ? height * 0.12 : height * 0.01,
+                      },
+                    ]}
+                >
+                  <Grass type={type as "one" | "two" | "three" | "four"} />
+                </View>
+            );
+          })}
+          <Quest_title
+              text={displayQuestTitle || "퀘스트 불러오는 중..."}
+              style={questStageStyles.questTitle}
               onPress={navigateToQuestWithCheck}
-              activeOpacity={0.8}
-            >
-              <View style={questStageStyles.iconWrapper}>
-                <Image
-                  source={
-                    title === "명상"
-                      ? require("../../assets/Images/clover_meditation.png")
-                      : require("../../assets/Images/clover_exercise.png")
-                  }
-                  style={questStageStyles.cloverIcon}
-                  resizeMode="contain"
-                />
-              </View>
-              <Image source={source} style={questStageStyles.fullSizeImage} resizeMode="contain" />
-            </TouchableOpacity>
-          ) : (
-            <Image key={index} source={source} style={imageStyle} resizeMode="contain" />
-          );
-        })}
-      </ScrollView>
-    </View>
+          />
+          <View style={questStageStyles.textWrapper}>
+            <View style={questStageStyles.lineSmallWrapper}>
+              <Text style={questStageStyles.shadowTextSmall}>{title}</Text>
+              <Text style={questStageStyles.mainTextSmall}>{title}</Text>
+            </View>
+            <View style={questStageStyles.lineLargeWrapper}>
+              <Text style={questStageStyles.shadowTextLarge}>{questStage}-{questStep}</Text>
+              <Text style={questStageStyles.mainTextLarge}>{questStage}-{questStep}</Text>
+            </View>
+          </View>
+          {lockPositions.map((pos, index) => {
+            const isCurrent = index === currentStageIndex;
+            const source = isCurrent
+                ? require("../../assets/Images/stage_current.png")
+                : index < currentStageIndex
+                    ? require("../../assets/Images/stage_lock.png")
+                    : require("../../assets/Images/stage_unlock.png");
+
+            const imageStyle = [questStageStyles.stage, { top: pos.top, left: pos.left }];
+
+            return isCurrent ? (
+                <TouchableOpacity
+                    key={index}
+                    style={imageStyle}
+                    onPress={navigateToQuestWithCheck}
+                    activeOpacity={0.8}
+                >
+                  <View style={questStageStyles.iconWrapper}>
+                    <Image
+                        source={
+                          title === "명상"
+                              ? require("../../assets/Images/clover_meditation.png")
+                              : require("../../assets/Images/clover_exercise.png")
+                        }
+                        style={questStageStyles.cloverIcon}
+                        resizeMode="contain"
+                    />
+                  </View>
+                  <Image source={source} style={questStageStyles.fullSizeImage} resizeMode="contain" />
+                </TouchableOpacity>
+            ) : (
+                <Image key={index} source={source} style={imageStyle} resizeMode="contain" />
+            );
+          })}
+        </ScrollView>
+      </View>
   );
 }

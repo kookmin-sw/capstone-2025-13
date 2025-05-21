@@ -179,14 +179,14 @@ export default function Quest_meditation() {
     const buttonText = isMeditationDone
         ? "완 - 료 !"
         : isRunning
-        ? "명상중 🧘🏻‍♀️"
-        : "시 - 작 !";
+            ? "명상중 🧘🏻‍♀️"
+            : "시 - 작 !";
 
     const buttonColor = isMeditationDone
         ? "#E68E48"
         : isRunning
-        ? "#aaa"
-        : "#6c63ff";
+            ? "#aaa"
+            : "#6c63ff";
 
     return (
         <View style={styles.page}>
