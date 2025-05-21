@@ -2,6 +2,9 @@ package kr.ac.kookmin.wuung
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.cdimascio.dotenv.dotenv
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -25,9 +28,11 @@ val dotenv = dotenv {
 class WuungApplication {
 	@Bean
 	@Primary
-	fun objectMapper(): ObjectMapper {
-		val mapper = ObjectMapper()
+	open fun objectMapper(): ObjectMapper {
+		val mapper = jacksonObjectMapper()
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		mapper.registerModule(JavaTimeModule())
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 		return mapper
 	}
 }

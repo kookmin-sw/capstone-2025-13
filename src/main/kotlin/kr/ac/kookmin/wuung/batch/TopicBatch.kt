@@ -33,7 +33,11 @@ class TopicBatch(
     }
 
     @Bean("topicJob")
-    fun topicJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
+    fun topicJob(
+        jobRepository: JobRepository,
+        transactionManager: PlatformTransactionManager,
+        processTopicStep: Step,
+    ): Job {
         return JobBuilder("topicJob", jobRepository)
             .start(processTopicStep(
                 jobRepository, transactionManager

@@ -32,7 +32,7 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
-import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -83,7 +83,7 @@ class RecordController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val recordRepository: RecordRepository,
     @Autowired private val jobLauncher: JobLauncher,
-    @Qualifier("luckyVickyJob") private val job: Job
+    @Autowired private val context: ApplicationContext,
 ) {
     @GetMapping("/me")
     @Operation(
@@ -282,6 +282,7 @@ class RecordController(
 
     @Scheduled(fixedRate = 10000L)
     private fun runJob() {
+        val job = context.getBean("luckyVickyJob", Job::class.java)
         val jobParameters = JobParametersBuilder()
             .addLong("time", System.currentTimeMillis())
             .toJobParameters()

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kr.ac.kookmin.wuung.batch.TopicBatch
 import kr.ac.kookmin.wuung.model.Topic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,7 +35,7 @@ import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
 import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
-import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -135,8 +136,8 @@ class TopicController(
     @Autowired private val topicRepository: TopicRepository,
     @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
     @Autowired private val jobLauncher: JobLauncher,
-    private val configurationsRepository: ConfigurationsRepository,
-    @Qualifier("topicJob") private val job: Job,
+    @Autowired private val configurationsRepository: ConfigurationsRepository,
+    @Autowired private val context: ApplicationContext
 ) {
     @GetMapping("/me")
     @Operation(
@@ -636,6 +637,7 @@ class TopicController(
 
     @Scheduled(fixedRate = 10000L)
     private fun runJob() {
+        val job = context.getBean("topicJob", Job::class.java)
         val jobParameters = JobParametersBuilder()
             .addLong("time", System.currentTimeMillis())
             .toJobParameters()

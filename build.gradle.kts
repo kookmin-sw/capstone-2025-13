@@ -49,6 +49,9 @@ dependencies {
 	implementation("io.swagger.core.v3:swagger-core:2.2.30")
 	implementation("io.swagger.core.v3:swagger-annotations:2.2.30")
 
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
+
 	// https://mvnrepository.com/artifact/jakarta.websocket/jakarta.websocket-api
 	implementation("jakarta.websocket:jakarta.websocket-api:2.2.0")
 
@@ -86,7 +89,7 @@ dependencies {
 	// HTTP 클라이언트
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-	implementation("space.mori.dalbodeule:snap-admin:0.6.0")
+	implementation("space.mori.dalbodeule:snap-admin:0.6.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

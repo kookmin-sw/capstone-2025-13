@@ -25,6 +25,9 @@ spring:
     aws:
       s3:
         enabled: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
 springdoc:
   api-docs:
     enabled: true

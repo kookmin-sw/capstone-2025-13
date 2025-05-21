@@ -33,7 +33,11 @@ class LuckyVickyBatch(
     }
 
     @Bean("luckyVickyJob")
-    open fun luckyVickyJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
+    open fun luckyVickyJob(
+        jobRepository: JobRepository,
+        transactionManager: PlatformTransactionManager,
+        processLuckyVickyStep: Step,
+    ) : Job {
         return JobBuilder("luckyVickyJob", jobRepository)
             .start(processLuckyVickyStep(
                 jobRepository, transactionManager
