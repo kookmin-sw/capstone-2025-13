@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
 import space.mori.dalbodeule.snapadmin.external.annotations.SnapAdminEnabled
@@ -23,6 +24,7 @@ val dotenv = dotenv {
 @EntityScan(basePackages = ["kr.ac.kookmin.wuung.model"])
 class WuungApplication {
 	@Bean
+	@Primary
 	fun objectMapper(): ObjectMapper {
 		val mapper = ObjectMapper()
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
