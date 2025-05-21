@@ -8,4 +8,4 @@ spring:
     show-sql: true
 logging:
   level:
-    root: DEBUG
+    root: INFO

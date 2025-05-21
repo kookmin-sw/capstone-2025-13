@@ -85,7 +85,7 @@ dependencies {
 	// HTTP 클라이언트
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-	implementation("space.mori.dalbodeule:snap-admin:0.5.20")
+	implementation("space.mori.dalbodeule:snap-admin:0.6.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -110,7 +110,7 @@ tasks.withType<Test> {
 
 tasks.withType<BootBuildImage> {
 	val dockerId =
-		System.getenv("DOCKER_USERNAME") ?: "git.mori.space"
+		System.getenv("DOCKER_USERNAME") ?: "docker.mori.space"
 	val buildNumber =
 		System.getenv("BUILD_TAG") ?: "test"
 
