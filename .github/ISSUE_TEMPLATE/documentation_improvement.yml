@@ -1,0 +1,48 @@
+name: 문서 개선 (Documentation Improvement)
+description: 문서 관련 문제나 개선 사항을 제안해주세요.
+title: "[DOCS] "
+labels: [documentation]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        📄 **문서 개선 제안 폼입니다.**
+        문서의 위치, 문제점, 개선 제안을 입력해주세요.
+
+  - type: input
+    id: document-title
+    attributes:
+      label: 📄 어떤 문서인가요? (Which document?)
+      description: 개선이 필요한 문서의 위치나 제목을 명확히 작성해주세요.
+      placeholder: 예) README.md, docs/setup-guide.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: ✏️ 어떤 점이 문제인가요? (What’s wrong?)
+      description: 개선이 필요한 이유나 문제점을 구체적으로 설명해주세요.
+      placeholder: 예) 문법 오류가 있으며 내용이 최신 정보와 일치하지 않습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: ✅ 제안 사항 (Suggested Fix)
+      description: 어떻게 수정하거나 보완하면 좋을지 제안해주세요.
+      placeholder: 예) 설치 가이드를 최신 버전 기준으로 업데이트해주세요.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 💬 추가 내용 (Additional context)
+      description: 문서 관련 더 공유할 내용이 있다면 여기에 작성해주세요.
+      placeholder: 예) 관련 링크, 참고 자료 등
+    validations:
+      required: false

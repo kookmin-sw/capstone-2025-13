@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Pressable, View } from 'react-native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -8,6 +8,9 @@ import Animated, {
     interpolate,
 } from 'react-native-reanimated';
 import { cardStyles } from '../styles/FlipCardStyles';
+
+// @ts-ignore
+import flipSound from '../assets/sounds/flip-card.mp3';
 
 interface Props {
     symbol: string;
@@ -18,37 +21,13 @@ interface Props {
 
 const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
     const rotation = useSharedValue(0);
-    const flipSound = useRef<Audio.Sound | null>(null);
+    const flipSoundPlayer = useAudioPlayer(flipSound);
+    flipSoundPlayer.volume = 0.3;
 
     useEffect(() => {
-        // 컴포넌트가 처음 마운트 될 때만 사운드 로드
-        const loadSound = async () => {
-            const { sound } = await Audio.Sound.createAsync(
-                require('../assets/sounds/flip-card.mp3')
-            );
-            flipSound.current = sound;
-            await flipSound.current.setVolumeAsync(0.3);
-        };
-
-        loadSound();
-
-        // 컴포넌트가 사라질 때 사운드 정리
-        return () => {
-            if (flipSound.current) {
-                flipSound.current.unloadAsync();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-
-        const playSound = async () => {
-            if (isFlipped && !isMatched && flipSound.current) {
-                await flipSound.current.replayAsync();
-            }
-        };
-
-        playSound();
+        if (isFlipped && !isMatched && flipSound.current) {
+            flipSoundPlayer.play()
+        }
 
         rotation.value = withTiming(isFlipped || isMatched ? 180 : 0, { duration: 300 });
     }, [isFlipped, isMatched]);

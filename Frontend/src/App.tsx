@@ -20,18 +20,19 @@ import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
+import HelpCall2 from "./screens/HelpCall/HelpCall2";
 import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
-import { refreshAccessToken } from "./API/common";
 import Record from "./screens/Record";
 import SecondPassword from "./screens/SecondPassword";
 import Toast from "react-native-toast-message";
 import Interest from "./screens/SimpleDiagnosis/Interest";
 import { useCustomFonts } from "./hooks/useCustomFonts";
-import HelpCall2 from "./screens/HelpCall/HelpCall2";
 
 import { LoadingProvider, useLoading } from "./API/contextAPI";
 import Splash from "./screens/Splash";
+import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
+import {refreshAccessToken} from "./API/common";
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -61,6 +62,8 @@ export type RootStackParamList = {
     Record: { date?: string };
     Quest_meditation: undefined;
     Quest_exercise: undefined;
+    Quest_emotion: undefined;
+    Quest_emotion_sy: undefined;
     Calendar: undefined;
     SecondPassword: undefined;
     FormalDiagnosisResult: {
@@ -82,22 +85,57 @@ const GlobalSpinner = () => {
 export default function App() {
     // 하드코딩된 로그인 상태
 
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [loading, setLoading] = useState(true);
 
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
+    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
+    const [integrityError, setIntegrityError] = useState<string | null>(null);
+
     useEffect(() => {
+        const checkIntegrity = async () => {
+            try {
+                if (__DEV__) {
+                    console.log('Development build - skipping integrity check');
+                    setIsIntegrityVerified(true);
+                    return;
+                }
+
+                await requestChallenge();
+                console.log('Device integrity challenge sent');
+
+                const result = await verifyDeviceIntegrity();
+                console.log('Device integrity verification result:', result);
+
+                if(result.isValid) {
+                    console.log('Device integrity verified');
+                    setIsIntegrityVerified(true);
+                } else {
+                    console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
+                    setIntegrityError(`${result.message} / ${result.details ?? 'No details provided'}`)
+                    setIsIntegrityVerified(false)
+                }
+            } catch (error: any) {
+                console.error('Integrity check error: ', error);
+                console.debug(error)
+                setIsIntegrityVerified(false)
+                setIntegrityError(`${error}`)
+            }
+        };
+
         const checkToken = async () => {
             const token = await AsyncStorage.getItem("accessToken");
+            console.log("🔍 accessToken:", token);
             if (token) {
                 setIsLoggedIn(true);
             } else {
+                console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
                 setIsLoggedIn(false);
             }
             setTimeout(() => {
                 setLoading(false);
             }, 5500); // Delay splash screen for 1.5 seconds
         };
-        checkToken();
+        checkIntegrity().then(() => checkToken());
     }, []);
 
     // App 로딩 중에 폰트 로딩 및 토큰 체크
@@ -268,10 +306,11 @@ export default function App() {
             </NavigationContainer>
         );
     };
-
+    
     return (
         <LoadingProvider>
             {loading ? <Splash /> : <AppContent />}
         </LoadingProvider>
     );
 }
+
