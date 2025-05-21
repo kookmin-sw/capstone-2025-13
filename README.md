@@ -2,7 +2,7 @@
 
 # 📝 프로젝트 소개
 
-## 여러분은 지금 행복하신가요?
+### 여러분은 지금 행복하신가요?
 
 ### “내가 우울한 건지, 그냥 힘든 건지”
 
@@ -107,7 +107,7 @@
 
 ## 🎬 시연 영상
 
-[![시연 영상](https://img.youtube.com/vi/jIa5xfGGVd0/0.jpg)](https://www.youtube.com/watch?v=jIa5xfGGVd0)
+[![시연 영상](https://img.youtube.com/vi/QS5AMwF31C0/0.jpg)](https://www.youtube.com/watch?v=QS5AMwF31C0)
 
 ## 🖼 기능소개
 
