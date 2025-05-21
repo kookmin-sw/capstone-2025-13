@@ -102,6 +102,7 @@ export default function Home() {
                     </View>
                 </View>
             )}
-        </SafeAreaView>
+            
+        </View>
     );
 }
