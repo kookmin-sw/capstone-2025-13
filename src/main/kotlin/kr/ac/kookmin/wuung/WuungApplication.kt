@@ -1,11 +1,12 @@
 package kr.ac.kookmin.wuung
 
 import io.github.cdimascio.dotenv.dotenv
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
-import space.mori.dalbodeule.snapadmin.external.SnapAdminAutoConfiguration
+import space.mori.dalbodeule.snapadmin.external.annotations.SnapAdminEnabled
 
 val dotenv = dotenv {
 	ignoreIfMissing = true
@@ -13,7 +14,6 @@ val dotenv = dotenv {
 
 @SpringBootApplication
 @EnableScheduling
-@ImportAutoConfiguration(classes = [SnapAdminAutoConfiguration::class])
 class WuungApplication
 
 fun main(args: Array<String>) {
