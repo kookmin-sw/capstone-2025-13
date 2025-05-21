@@ -1,12 +1,16 @@
 package kr.ac.kookmin.wuung
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.cdimascio.dotenv.dotenv
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
 import space.mori.dalbodeule.snapadmin.external.annotations.SnapAdminEnabled
+
 
 val dotenv = dotenv {
 	ignoreIfMissing = true
@@ -17,7 +21,14 @@ val dotenv = dotenv {
 @SnapAdminEnabled
 @EnableJpaRepositories(basePackages = ["kr.ac.kookmin.wuung.repository"])
 @EntityScan(basePackages = ["kr.ac.kookmin.wuung.model"])
-class WuungApplication
+class WuungApplication {
+	@Bean
+	fun objectMapper(): ObjectMapper {
+		val mapper = ObjectMapper()
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		return mapper
+	}
+}
 
 fun main(args: Array<String>) {
 	val envVars = mapOf(
