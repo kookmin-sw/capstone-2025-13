@@ -34,6 +34,7 @@ import kr.ac.kookmin.wuung.repository.ConfigurationsRepository
 import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -134,8 +135,8 @@ class TopicController(
     @Autowired private val topicRepository: TopicRepository,
     @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
     @Autowired private val jobLauncher: JobLauncher,
-    @Autowired private val topicJob: Job,
     private val configurationsRepository: ConfigurationsRepository,
+    @Qualifier("topicJob") private val job: Job,
 ) {
     @GetMapping("/me")
     @Operation(
@@ -640,11 +641,11 @@ class TopicController(
             .toJobParameters()
 
         try {
-            jobLauncher.run(topicJob, jobParameters)
+            jobLauncher.run(job, jobParameters)
         } catch (e: JobInstanceAlreadyCompleteException) {
             // Job already running, wait and retry
             Thread.sleep(1000L)
-            jobLauncher.run(topicJob, jobParameters)
+            jobLauncher.run(job, jobParameters)
         }
     }
 }

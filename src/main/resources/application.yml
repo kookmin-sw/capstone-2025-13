@@ -18,7 +18,7 @@ spring:
           model: gpt-4o
   batch:
     jdbc:
-      initialize-schema: embedded
+      initialize-schema: never
     job:
       enabled: false
 springdoc:

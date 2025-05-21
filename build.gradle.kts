@@ -6,6 +6,7 @@ plugins {
 	kotlin("plugin.spring") version "2.1.10"
 	id("org.hibernate.orm") version "6.5.2.Final"
 	id("org.springframework.boot") version "3.4.5"
+	id("org.springframework.boot.aot") version "3.4.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
 }
@@ -32,7 +33,7 @@ repositories {
 	google()
 }
 
-extra["springAiVersion"] = "1.0.0-M4"
+extra["springAiVersion"] = "1.0.0-M6"
 extra["springCloudVersion"] = "2023.0.0"
 
 dependencies {
@@ -62,10 +63,10 @@ dependencies {
 
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-	runtimeOnly("org.postgresql:postgresql:42.7.4")
+	implementation("org.postgresql:postgresql:42.7.4")
 
-	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
-	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+	// https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter-s3
+	implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.0")
 
 	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 	implementation("javax.xml.bind:jaxb-api:2.3.1")
@@ -133,6 +134,7 @@ tasks.withType<BootBuildImage> {
 	environment = mapOf(
 		"BP_NATIVE_IMAGE" to "true",
 		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
+		"BPE_APPEND_JAVA_TOOL_OPTIONS" to "-Dspring.aot.enabled=true",
 		"BP_JVM_TYPE" to "JDK",
 		"BP_JVM_VERSION" to "21",
         "SPRING_PROFILES_ACTIVE" to "dev"

@@ -32,8 +32,8 @@ class LuckyVickyBatch(
         private const val CHUNK_SIZE = 10
     }
 
-    @Bean
-    fun luckyVickyJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
+    @Bean("luckyVickyJob")
+    open fun luckyVickyJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
         return JobBuilder("luckyVickyJob", jobRepository)
             .start(processLuckyVickyStep(
                 jobRepository, transactionManager
@@ -42,7 +42,7 @@ class LuckyVickyBatch(
     }
 
     @Bean
-    fun processLuckyVickyStep(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Step {
+    open fun processLuckyVickyStep(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Step {
         return StepBuilder("processLuckyVickyStep", jobRepository)
             .chunk<Record, Record>(CHUNK_SIZE, transactionManager)
             .reader(luckyVickyFeedbackReader())
@@ -52,7 +52,7 @@ class LuckyVickyBatch(
     }
 
     @Bean
-    fun luckyVickyFeedbackReader(): RepositoryItemReader<Record> {
+    open fun luckyVickyFeedbackReader(): RepositoryItemReader<Record> {
         val sortKeys = hashMapOf("createdAt" to Sort.Direction.ASC)
 
         return RepositoryItemReaderBuilder<Record>()
@@ -66,7 +66,7 @@ class LuckyVickyBatch(
     }
 
     @Bean
-    fun luckyVickyFeedbackProcessor(): ItemProcessor<Record, Record> {
+    open fun luckyVickyFeedbackProcessor(): ItemProcessor<Record, Record> {
         return ItemProcessor { record ->
             val prompt = luckyVickyPrompt.trimIndent()
 
@@ -95,7 +95,7 @@ class LuckyVickyBatch(
     }
 
     @Bean
-    fun luckyVickyFeedbackWriter(): ItemWriter<Record> {
+    open fun luckyVickyFeedbackWriter(): ItemWriter<Record> {
         return ItemWriter { items ->
             // 처리 완료 후 DB 업데이트, 로그 기록 등 필요한 로직 구현
             // 예시로 단순 로그 출력
