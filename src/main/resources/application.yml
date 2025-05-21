@@ -21,6 +21,10 @@ spring:
       initialize-schema: never
     job:
       enabled: false
+  cloud:
+    aws:
+      s3:
+        enabled: false
 springdoc:
   api-docs:
     enabled: true
