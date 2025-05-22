@@ -102,12 +102,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            storeFile = file('wooong.release.jks')
-            storePassword = MYKEY_KEYSTORE_PASSWORD
-            keyAlias = 'wooong-deploy'
-            keyPassword = MYKEY_KEYSTORE_PASSWORD
-        }
     }
     buildTypes {
         debug {
