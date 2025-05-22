@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 type RootStackParamList = {
   Quest_meditation: { questTitle: string; questDescription: string; questTarget: number };
   Quest_exercise: { questTitle: string; questDescription: string; questTarget: number };
-  Quest_emotion: { questTitle: string; questDescription: string; questTarget: number; nickname?: string};
+  Quest_emotion: { questTitle: string; questDescription: string; questTarget: number; nickname: string;};
 };
 
 type QuestNavigationProp =
@@ -60,7 +60,7 @@ const lockPositions = [
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation<QuestNavigationProp>();
-  const { title } = route.params as { title: string };
+  const { title, nickname } = route.params as { title: string, nickname :string };
 
   const [questTitle, setQuestTitle] = useState("");
   const [displayQuestTitle, setDisplayQuestTitle] = useState("");
@@ -198,7 +198,7 @@ export default function Quest_stage() {
     } else if (title === "산책") {
       navigation.navigate("Quest_exercise", params);
     } else {
-      navigation.navigate("Quest_emotion", params);
+      navigation.navigate("Quest_emotion", {...params, nickname});
     }
   };
 

@@ -31,7 +31,7 @@ export default function Tree({ type, title, nickname }: TreeProps) {
   };
 
   const handlePress = () => {
-    navigation.navigate("Quest_stage", { title, nickname,});
+    navigation.navigate("Quest_stage", { title, nickname});
   };
 
   return (
