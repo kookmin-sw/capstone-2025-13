@@ -1,16 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Pressable, View } from 'react-native';
-import { useAudioPlayer } from 'expo-audio';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
     interpolate,
 } from 'react-native-reanimated';
+import { Audio } from 'expo-av';
 import { cardStyles } from '../styles/FlipCardStyles';
-
-// @ts-ignore
-import flipSound from '../assets/sounds/flip-card.mp3';
 
 interface Props {
     symbol: string;
@@ -20,16 +17,48 @@ interface Props {
 }
 
 const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
+    const flipSoundFile = require('../assets/sounds/flip-card.mp3');
+
     const rotation = useSharedValue(0);
-    const flipSoundPlayer = useAudioPlayer(flipSound);
-    flipSoundPlayer.volume = 0.3;
+
+    // 사운드 참조용 ref
+    const flipSound = useRef<Audio.Sound | null>(null);
+
+    // 사운드 로드 및 언로드 관리
+    useEffect(() => {
+        let isMounted = true;
+        const loadSound = async () => {
+            try {
+                const { sound } = await Audio.Sound.createAsync(flipSoundFile);
+                if (isMounted) {
+                    flipSound.current = sound;
+                    await flipSound.current.setVolumeAsync(0.3);
+                }
+            } catch (error) {
+                console.error('Failed to load flip sound', error);
+            }
+        };
+        loadSound();
+
+        return () => {
+            isMounted = false;
+            if (flipSound.current) {
+                flipSound.current.unloadAsync();
+            }
+        };
+    }, []);
 
     useEffect(() => {
-        if (isFlipped && !isMatched && flipSound.current) {
-            flipSoundPlayer.play()
-        }
-
         rotation.value = withTiming(isFlipped || isMatched ? 180 : 0, { duration: 300 });
+
+        // 카드가 뒤집힐 때 소리 재생 (isFlipped가 true로 변할 때만)
+        if (isFlipped && !isMatched) {
+            if (flipSound.current) {
+                flipSound.current.replayAsync().catch((e) => {
+                    console.error('Failed to play flip sound', e);
+                });
+            }
+        }
     }, [isFlipped, isMatched]);
 
     const frontAnimatedStyle = useAnimatedStyle(() => ({
