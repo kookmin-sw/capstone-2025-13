@@ -333,6 +333,19 @@ class QuestsController(
         quest.status = request.status
         userQuestsRepository.save(quest)
 
+        val questStage = userQuestStageRepository.findByUserAndType(userDetails, quest.quest.type) ?: let {
+            val quest = UserQuestStages(
+                user = userDetails,
+                stage = 0,
+                type = quest.quest.type
+            )
+            userQuestStageRepository.save(quest)
+
+            return@let quest
+        }
+
+        questStage.stage += 1
+
         val dto = quest.toDTO()
         dto.photoEndpoint = s3PublicEndpoint
         dto.photoBucketName = s3BucketName
