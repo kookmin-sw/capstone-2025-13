@@ -81,6 +81,7 @@ const questMeditationStyles = StyleSheet.create({
     textAlign: "center",
     fontSize: width * 0.03,
     marginVertical: height * 0.005,
+    lineHeight: width * 0.045,
   },
   sectionTitle: {
     fontFamily: fonts.laundryBold,

@@ -67,6 +67,7 @@ export default function QuestExercise() {
     const [isCompleted, setIsCompleted] = useState(false);
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
+    const [isGoalReached, setIsGoalReached] = useState(false);
     const { questTitle, questDescription, questTarget } =
         route.params as RouteParams;
     const descriptionLines = questDescription.split("\n");
@@ -163,49 +164,54 @@ export default function QuestExercise() {
     };
 
     useEffect(() => {
-        const init = async () => {
-            const type = "ACTIVITY";
-            try {
-                const response = await customAxios.get(`/quests/last/${type}`);
-                const lastData = response.data.data;
-                const lastDataStatus = lastData.status;
-
-                if (lastDataStatus === "COMPLETED") {
-                    setIsCompleted(true);
-                    if (lastData.photo) {
-                        setImage(lastData.photo);
-                    }
-                }
-            } catch (error) {
-                console.error("퀘스트 상태 확인 중 오류:", error);
-            }
-
-            const isAvailable = await Pedometer.isAvailableAsync();
-            if (!isAvailable) {
-                Alert.alert(
-                    "걸음 수 추적 불가",
-                    "이 기기는 걸음 수 추적을 지원하지 않습니다."
-                );
-                return;
-            }
-
-            const end = new Date();
-            const start = new Date();
-            start.setHours(0, 0, 0, 0);
-
-            const result = await Pedometer.getStepCountAsync(start, end);
-            setSteps(result.steps);
-
-            const subscription = Pedometer.watchStepCount((result) => {
-                setSteps((prevSteps) => prevSteps + result.steps);
-            });
-
-            return () => subscription.remove();
-        };
-
-        requestPermissions();
-        init();
-    }, []);
+      let interval: NodeJS.Timeout;
+      const init = async () => {
+          const type = "ACTIVITY";
+          try {
+              const response = await customAxios.get(`/quests/last/${type}`);
+              const lastData = response.data.data;
+              const lastDataStatus = lastData.status;
+  
+              if (lastDataStatus === "COMPLETED") {
+                  setIsCompleted(true);
+                  setIsGoalReached(true);
+                  if (lastData.photo) setImage(lastData.photo);
+              }
+          } catch (error) {
+              console.error("퀘스트 상태 확인 중 오류:", error);
+          }
+  
+          const isAvailable = await Pedometer.isAvailableAsync();
+          if (!isAvailable) {
+              Alert.alert(
+                  "걸음 수 추적 불가",
+                  "이 기기는 걸음 수 추적을 지원하지 않습니다."
+              );
+              return;
+          }
+  
+          const updateSteps = async () => {
+              const end = new Date();
+              const start = new Date();
+              start.setHours(0, 0, 0, 0);
+              const result = await Pedometer.getStepCountAsync(start, end);
+              setSteps(result.steps);
+              if (result.steps >= questTarget) {
+                  setIsGoalReached(true);
+                  clearInterval(interval);
+              }
+          };
+  
+          await updateSteps();
+          interval = setInterval(updateSteps, 3000);
+  
+          return () => clearInterval(interval);
+      };
+  
+      requestPermissions();
+      init();
+  }, []);
+  
 
     return (
         <View style={styles.container}>
@@ -256,16 +262,29 @@ export default function QuestExercise() {
                             backgroundGradientFrom: "#000",
                             backgroundGradientTo: "#000",
                             decimalPlaces: 0,
-                            color: (opacity = 1) =>
-                                `rgba(255, 61, 137, ${opacity})`,
+                            color: (opacity = 1) => `rgba(255, 61, 137, ${opacity})`,
                             labelColor: () => "#fff",
                         }}
                         hideLegend={true}
                         style={styles.progressChart}
                     />
+
                     <View style={styles.centerTextContainer}>
-                        <Text style={dynamic.stepCount}>{steps}</Text>
-                        <Text style={dynamic.stepGoal}>/{questTarget}</Text>
+                        {isGoalReached ? (
+                            <Text
+                                style={[
+                                    dynamic.stepCount,
+                                    { color: "#FF6188", fontSize: 28, textAlign: "center" },
+                                ]}
+                            >
+                                완료!
+                            </Text>
+                        ) : (
+                            <>
+                                <Text style={dynamic.stepCount}>{steps}</Text>
+                                <Text style={dynamic.stepGoal}>/{questTarget}</Text>
+                            </>
+                        )}
                     </View>
                 </View>
 

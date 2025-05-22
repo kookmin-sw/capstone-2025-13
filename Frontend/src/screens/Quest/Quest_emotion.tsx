@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { Text, View } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -22,9 +22,8 @@ type RouteParams = {
 export default function QuestEmotion() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
-    const { questTitle, questDescription, questTarget } =
+    const { questTitle } =
         route.params as RouteParams;
-
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
     const cameraRef = useRef<any>(null);
@@ -36,7 +35,6 @@ export default function QuestEmotion() {
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
-    // 타이밍 제어
     const lastPhotoTimeRef = useRef(0);
     const isPhotoTaken = useRef(false);
 
@@ -80,15 +78,12 @@ export default function QuestEmotion() {
     };
 
     const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-        // faces 배열이 들어오긴 했지만 길이가 0이면 경고 켜고 리턴
         if (faces && faces.length === 0) {
             setNoFaceWarning(true);
             return;
         }
-        // 얼굴이 하나라도 잡히면 경고 끄기
         setNoFaceWarning(false);
 
-        // 모델 로드 여부 체크
         if (!faces?.length || !isLoaded || !model) return;
 
         const face = faces[0];
