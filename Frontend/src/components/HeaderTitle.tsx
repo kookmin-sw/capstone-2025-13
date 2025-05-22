@@ -14,7 +14,7 @@ export default function HeaderTitle({ title }: { title: string }) {
     return (
         <View style={styles.headerContainer}>
             <TouchableOpacity
-                onPress={() => navigation.navigate("Home")}
+                onPress={() => navigation.navigate("Home", {})}
                 style={styles.backButtonWrapper}
             >
                 <Ionicons name="arrow-back-circle" size={40} color="#fff" />

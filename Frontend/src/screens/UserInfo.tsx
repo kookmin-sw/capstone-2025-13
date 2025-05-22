@@ -6,10 +6,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
 import { GenderEnum, getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
 import userInfoStyles from "../styles/userInfoStyles";
-import {CommonActions, useNavigation} from "@react-navigation/native";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../App";
-import {Ionicons} from "@expo/vector-icons";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
+import { Ionicons } from "@expo/vector-icons";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -66,9 +66,9 @@ export default function UserInfo() {
       case "FEMALE":
       case GenderEnum.FEMALE:
         return "여성";
-      case "THIRD_GENDER":
-      case GenderEnum.THIRD_GENDER:
-        return "제 3의 성"
+      case "UNKNOWN":
+      case GenderEnum.UNKNOWN:
+        return "비밀"
       default:
         return "밝히지 않음"
     }
@@ -84,7 +84,7 @@ export default function UserInfo() {
       const initialData: UserData = {
         nickname: user.username,
         email: user.email,
-        password: "",
+        password: null,
         birthDate: user.birthDate,
         gender: getGenderLabel(user.gender),
         secondPassword: (await AsyncStorage.getItem("@secondPassword")) || '1111',
@@ -268,7 +268,7 @@ export default function UserInfo() {
         </TouchableOpacity>
 
         <Text style={userInfoStyles.nickname}>{userData.nickname}</Text>
-
+        <InfoRow label="닉네임" value={userData.nickname} editable={editMode} onChangeText={(text) => setUserData({ ...userData, nickname: text })} />
         <InfoRow label="이메일" value={userData.email} editable={false} />
 
         <InfoRow
@@ -285,19 +285,24 @@ export default function UserInfo() {
           <Text style={userInfoStyles.label}>성별</Text>
           {editMode ? (
             <View style={userInfoStyles.genderOptions}>
-              {["여성", "남성", "비밀"].map((g) => (
+              {[
+                { label: "여성", value: "FEMALE" },
+                { label: "남성", value: "MALE" },
+                { label: "비밀", value: "UNKNOWN" },
+              ].map((g) => (
                 <TouchableOpacity
-                  key={g}
-                  onPress={() => setUserData({ ...userData, gender: g })}
+                  key={g.value}
+                  onPress={() => setUserData({ ...userData, gender: g.value })}
                   style={[
                     userInfoStyles.genderButton,
-                    userData.gender === g && userInfoStyles.genderSelected,
+                    userData.gender === g.value && userInfoStyles.genderSelected,
                   ]}
                 >
-                  <Text style={userInfoStyles.buttonText}>{g}</Text>
+                  <Text style={userInfoStyles.buttonText}>{g.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
+
           ) : (
             <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
           )}
@@ -423,6 +428,6 @@ function InfoRow({
         <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
       )}
     </View>
-          
+
   );
 }

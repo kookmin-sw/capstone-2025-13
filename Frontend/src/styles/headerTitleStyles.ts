@@ -7,8 +7,8 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection:'row',
         paddingHorizontal: width * 0.07,
-        paddingTop: 80,
-        paddingBottom: 20,
+        paddingTop: 60,
+        paddingBottom: 10,
         backgroundColor: "#3CB46E",
         alignItems:'center'
     },

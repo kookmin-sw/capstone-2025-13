@@ -33,6 +33,10 @@ export default function FormalDiagnosis() {
     const [diagnosisList, setDiagnosisList] = useState<DiagnosisList[]>([]);
     const [diagnosisResults, setDiagnosisResults] = useState<DiagnosisResult[]>([]);
 
+    useSecondPasswordGuard("FormalDiagnosis");
+    useEffect(() => {
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
 
     useEffect(() => {
         const today = new Date();
@@ -54,7 +58,8 @@ export default function FormalDiagnosis() {
                     const result = await getDiagnosisResult(startDate);
                     if (result) {
                         console.log("✅ 진단 결과:", result);
-                        setDiagnosisResults(result);
+                        setDiagnosisResults(Array.isArray(result) ? result : []);
+
                     } else {
                         console.warn("⚠️ 진단 결과가 없습니다.");
                     }
@@ -67,10 +72,6 @@ export default function FormalDiagnosis() {
     }, [startDate]);
 
 
-    useSecondPasswordGuard("FormalDiagnosis");
-    useEffect(() => {
-        AsyncStorage.setItem("secondPasswordPassed", "false");
-    }, []);
 
     useEffect(() => {
         const loadDiagnosis = async () => {
@@ -123,7 +124,6 @@ export default function FormalDiagnosis() {
         <View style={styles.container}>
             <HeaderTitle title="마음 건강 진단" />
             <EmotionChartBox subtitle="지난 2주 간 나의 마음 변화 흐름" data={groupAndSortResults()} />
-            <SectionLabel text="📈 나의 진단 결과" />
             <ScrollView contentContainerStyle={styles.scroll}>
                 <SectionLabel text="이런 방법들이 있어요" />
                 {diagnosisList.map((item) => (

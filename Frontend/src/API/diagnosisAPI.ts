@@ -119,11 +119,22 @@ export const putDiagnosisResult = async (id: number, scale: number, result: numb
 
 
 export const getDiagnosisResult = async (start: string): Promise<DiagnosisResult[] | null> => {
-  console.log(start);
-  return handleAuthRequest(async () => {
+ return handleAuthRequest(async () => {
     const headers = await getAuthHeaders();
     const { data } = await axios.get<ApiResponseDTO<DiagnosisResult[]>>(
       `/diagnosis/results?start=${start}`,
+      { headers }
+    );
+    return data.data;
+  });
+};
+
+export const getDiagnosisSpecificResult = async (resultId: string|number): Promise<DiagnosisResult[] | null> => {
+  console.log("resultId", resultId);
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisResult[]>>(
+      `/diagnosis/results/${resultId}`,
       { headers }
     );
     return data.data;

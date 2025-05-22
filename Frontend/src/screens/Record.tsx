@@ -46,6 +46,8 @@ export default function Record() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSubmmitAgreed, setIsSubmitAgreed] = useState<boolean>(false);
     const [isSaved, setIsSaved] = useState<boolean>(false);
+    const finalDate = date || formattedDate;
+    const title = finalDate === formattedDate ? "오늘의 하루" : "그날의 하루";
 
 
     const defaultLuckyText = "이거 완전 럭키비키잖아~";
@@ -121,7 +123,7 @@ export default function Record() {
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.container}>
-                    <RecordHeader />
+                    <RecordHeader title={title} date={finalDate} />
                     <ScrollView
                         contentContainerStyle={[
                             styles.scroll,

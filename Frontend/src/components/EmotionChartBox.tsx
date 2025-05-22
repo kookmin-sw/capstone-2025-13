@@ -4,6 +4,7 @@ import { LineChart } from "react-native-chart-kit";
 import styles from "../styles/emotionChartBoxStyles";
 import dialogueStyles from "../styles/formalDialogueStyles";
 import { useDiagnosisColor } from "../hooks/useDiagnosisColor";
+import SectionLabel from "./SectionLabel";
 
 interface EmotionChartData {
     diagnosisId: number;
@@ -45,6 +46,9 @@ export default function EmotionChartBox({ subtitle, data }: EmotionChartBoxProps
     }
     return (
         <View style={styles.wrapper}>
+            <View style={{ width: "85%", alignItems: "flex-start" }}>
+                <SectionLabel text="📈 나의 진단 결과" />
+            </View>
             <View style={styles.box}>
                 <LineChart
                     data={{
