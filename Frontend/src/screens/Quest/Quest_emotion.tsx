@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Text, View, Alert } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -12,17 +12,20 @@ import { QUESTS } from '../../utils/QuestEmotion/quests';
 import EmotionChartBox from '../../components/Quest_emotionBox';
 import styles from '../../styles/questEmotionStyles';
 import {NavigationProp, useNavigation, useRoute} from "@react-navigation/native";
+import customAxios from "../../API/axios";
+import { getCoupon } from "../../API/potAPI";
 
 type RouteParams = {
     questTitle: string;
     questDescription: string;
     questTarget: number;
+    nickname: string,
 };
 
 export default function QuestEmotion() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
-    const { questTitle } =
+    const { questTitle, nickname } =
         route.params as RouteParams;
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
@@ -37,6 +40,38 @@ export default function QuestEmotion() {
     const [success, setSuccess] = useState<boolean>(false);
     const lastPhotoTimeRef = useRef(0);
     const isPhotoTaken = useRef(false);
+
+    const handleComplete = async () => {
+        try {
+            const type = "EMOTION";
+            const response = await customAxios.get(`/quests/last/${type}`);
+            const lastDataID = response.data.data.id;
+    
+            const postRes = await customAxios.post("/quests", {
+                id: lastDataID,
+                current: 0,
+                status: "COMPLETED",
+            });
+    
+            if (postRes.status === 200 || postRes.status === 201) {
+                await getCoupon();
+                Alert.alert("완료!", "감정 퀘스트가 성공적으로 완료되었어요! 🎉", [
+                    {
+                        text: "확인",
+                        onPress: () =>
+                            navigation.navigate("Quest_stage", {
+                                title: `${nickname}의 숲`,
+                            }),
+                    },
+                ]);
+            } else {
+                Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
+            }
+        } catch (error) {
+            console.error("감정 퀘스트 완료 처리 중 오류 발생:", error);
+            Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+        }
+    };    
 
     const quest = QUESTS.find(q => q.id === questTitle);
     if (!quest) {
@@ -106,6 +141,7 @@ export default function QuestEmotion() {
             if (quest.check(updated)) {
                 setSuccess(true);
                 console.log('🎯 퀘스트 완료');
+                handleComplete
             }
         }
     });
