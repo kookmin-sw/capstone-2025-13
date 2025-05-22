@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -45,6 +46,8 @@ data class DiagnosisDTO(
     val description: String,
     val questions: List<DiagnosisQuestionDTO> = listOf(),
     val scale: List<DiagnosisScaleDTO> = listOf(),
+    @JsonProperty("max_score")
+    val maxScore: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
@@ -65,18 +68,19 @@ data class DiagnosisScaleDTO(
 
 fun Diagnosis.toDTO() = DiagnosisDTO(
     id = this.id ?: 0,
-    type = this.type ?: DiagnosisType.Simple,
-    title = this.title ?: "",
-    description = this.description ?: "",
+    type = this.type,
+    title = this.title,
+    description = this.description,
+    maxScore = this.diagnosisQuestions.sumOf { question -> question.diagnosisText.maxBy { it.score }.score},
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     questions = this.diagnosisQuestions.map { question ->
         DiagnosisQuestionDTO(
-            seq = question.seq ?: 0,
-            text = question.text ?: "",
+            seq = question.seq,
+            text = question.text,
             answers = question.diagnosisText.map { text ->
                 DiagnosisTextDTO(
-                    text = text.text ?: "",
+                    text = text.text,
                     score = text.score,
                 )
             }.sortedBy { it.score }
@@ -98,6 +102,7 @@ fun Diagnosis.toDTOSelf() = DiagnosisDTO(
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     questions = listOf(),
+    maxScore = this.diagnosisQuestions.sumOf { question -> question.diagnosisText.maxBy { it.score }.score},
     scale = this.diagnosisScale.map { scale ->
         DiagnosisScaleDTO(
             start = scale.start,
@@ -339,6 +344,57 @@ class DiagnosisController(
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = diagnosis.map { it.toDTO() }.sortedByDescending { it.createdAt } )
+        )
+    }
+
+    @GetMapping("/result/{resultId}")
+    @Operation(
+        summary = "Get diagnosis result by ID / ID로 진단 결과 조회",
+        description = """
+        [EN] Retrieve specific diagnosis result for the authenticated user.
+        AccessToken is required for this part of endpoints on Authorization header.
+        
+        [KR] 인증된 사용자의 특정 진단 결과를 조회합니다.
+        이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis result",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Diagnosis result not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getDiagnosisResult(
+        @AuthenticationPrincipal userDetails: User?,
+        @Schema(description = "Diagnosis Result ID", type = "UUID")
+        @RequestParam resultId: String,
+    ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val diagnosis = diagnosisResultsRepository.findById(resultId).getOrNull()
+        if (diagnosis == null) throw NotFoundException()
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosis.toDTO())
         )
     }
 }

@@ -37,6 +37,7 @@ data class DailyBehaviorDTO(
     val title : String,
     val content : String,
     val type : BehaviorType,
+    val id: String,
 )
 
 @RestController
@@ -108,10 +109,10 @@ class EtcController(
 
         var behaviors: List<DailyBehaviorDTO> = diagnosis.mapNotNull { result ->
             when (result.diagnosis?.type) {
-                DiagnosisType.`GAD-7` -> DailyBehaviorDTO("검사", "GAD-7 검사 시행 완료", BehaviorType.DIAGNOSIS)
-                DiagnosisType.`PHQ-9` -> DailyBehaviorDTO("검사", "PHQ-9 검사 시행 완료", BehaviorType.DIAGNOSIS)
-                DiagnosisType.Simple -> DailyBehaviorDTO("검사", "약식 검사 시행 완료", BehaviorType.DIAGNOSIS)
-                DiagnosisType.BDI -> DailyBehaviorDTO("검사", "BDI 검사 시행 완료", BehaviorType.DIAGNOSIS)
+                DiagnosisType.`GAD-7` -> DailyBehaviorDTO("검사", "GAD-7 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
+                DiagnosisType.`PHQ-9` -> DailyBehaviorDTO("검사", "PHQ-9 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
+                DiagnosisType.Simple -> DailyBehaviorDTO("검사", "약식 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
+                DiagnosisType.BDI -> DailyBehaviorDTO("검사", "BDI 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
                 else -> null
             }
         }
@@ -126,7 +127,8 @@ class EtcController(
             val recordBehavior = DailyBehaviorDTO(
                 "일기",
                 "${startDate.monthValue}월 ${startDate.dayOfMonth}일 일기 작성 완료",
-                BehaviorType.DIARY
+                BehaviorType.DIARY,
+                records.first().id!!
             )
             behaviors = behaviors + recordBehavior
         }
@@ -136,7 +138,7 @@ class EtcController(
             userDetails,
             startDate,
             endDate
-        )
+        ).sortedBy { it.createdAt }
 
         val userMainStages = userQuestStageRepository.findByUser(userDetails)
 
@@ -157,7 +159,8 @@ class EtcController(
             DailyBehaviorDTO(
                 "퀘스트",
                 "${stage}-${quest.quest?.step} $questType $status",
-                BehaviorType.QUEST
+                BehaviorType.QUEST,
+                quest.id!!
             )
         }
 
