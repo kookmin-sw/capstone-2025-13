@@ -25,7 +25,7 @@ type RouteParams = {
 export default function QuestEmotion() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
-    const { questTitle, nickname } =
+    const { questTitle, questDescription, nickname } =
         route.params as RouteParams;
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
@@ -188,7 +188,7 @@ export default function QuestEmotion() {
 
             {latestResult !== null ? (
                 <View style={styles.overlay}>
-                    <EmotionChartBox result={latestResult} success={success} nickname={nickname}/>
+                    <EmotionChartBox result={latestResult} success={success} nickname={nickname} questDescription={questDescription}/>
                 </View>
             ) : (
                 <View style={styles.overlay}>

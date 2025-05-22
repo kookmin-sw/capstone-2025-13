@@ -8,6 +8,7 @@ interface EmotionMissionCardProps {
   result: number[];
   success: boolean;
   nickname: string;
+  questDescription: string;
 }
 
 // 2) 감정 라벨 및 컬러 매핑
@@ -22,7 +23,7 @@ const colors: Record<string, string> = {
   neutral: '#00C851',
 };
 
-export default function EmotionMissionCard({ result, success,nickname }: EmotionMissionCardProps) {
+export default function EmotionMissionCard({ result, success, nickname, questDescription }: EmotionMissionCardProps) {
   
   useEffect(()=>{
 console.log(success)
@@ -48,11 +49,17 @@ console.log(success)
                   );
                 })}
               </View>  
-             {success && (
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>오늘 미션 완료!</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  !success && { backgroundColor: '#ccc' },
+                ]}
+                disabled={!success} 
+              >
+                <Text style={styles.buttonText}>
+                  {success ? '오늘 미션 완료!' : questDescription}
+                </Text>
+              </TouchableOpacity>
             </View>
        
             
