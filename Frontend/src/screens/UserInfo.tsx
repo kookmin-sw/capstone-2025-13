@@ -84,7 +84,7 @@ export default function UserInfo() {
       const initialData: UserData = {
         nickname: user.username,
         email: user.email,
-        password: "",
+        password: null,
         birthDate: user.birthDate,
         gender: getGenderLabel(user.gender),
         secondPassword: (await AsyncStorage.getItem("@secondPassword")) || '1111',
