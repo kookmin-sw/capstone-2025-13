@@ -71,7 +71,7 @@ fun Diagnosis.toDTO() = DiagnosisDTO(
     type = this.type,
     title = this.title,
     description = this.description,
-    maxScore = this.diagnosisQuestions.sumOf { question -> question.diagnosisText.maxBy { it.score }.score},
+    maxScore = this.totalScore,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     questions = this.diagnosisQuestions.map { question ->
@@ -102,7 +102,7 @@ fun Diagnosis.toDTOSelf() = DiagnosisDTO(
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     questions = listOf(),
-    maxScore = this.diagnosisQuestions.sumOf { question -> question.diagnosisText.maxBy { it.score }.score},
+    maxScore = this.totalScore,
     scale = this.diagnosisScale.map { scale ->
         DiagnosisScaleDTO(
             start = scale.start,
@@ -125,6 +125,8 @@ data class DiagnosisResultDTO(
     val scale: Int,
     @JsonProperty("scale_description")
     val scaleDescription: List<DiagnosisScaleDTO> = listOf(),
+    @JsonProperty("max_score")
+    val maxScore: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
@@ -140,6 +142,7 @@ fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
             description = scale.description,
         )
     },
+    maxScore = this.diagnosis.totalScore,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )

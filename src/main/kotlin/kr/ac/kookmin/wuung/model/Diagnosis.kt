@@ -28,6 +28,9 @@ data class Diagnosis(
     @Column(nullable = false, length = 1024)
     var description: String,
 
+    @Column
+    var totalScore: Int = 0,
+
     @OneToMany
     var diagnosisQuestions: List<DiagnosisQuestions> = listOf(),
 
@@ -52,5 +55,10 @@ data class Diagnosis(
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
+        totalScore = diagnosisQuestions.sumOf { question ->
+            question.diagnosisText.maxBy {
+                answer -> answer.score
+            }.score
+        }
     }
 }
