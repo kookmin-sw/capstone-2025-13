@@ -394,7 +394,7 @@ class DiagnosisController(
     )
     fun getDiagnosisResult(
         @AuthenticationPrincipal userDetails: User?,
-        @Schema(description = "Diagnosis Result ID", type = "UUID")
+        @Schema(description = "Diagnosis Result ID")
         @PathVariable resultId: String,
     ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
         if (userDetails == null) throw UnauthorizedException()
