@@ -76,7 +76,7 @@ export default function Quest() {
                       <Tree
                           type={treeTypes[index % treeTypes.length]}
                           title={isFirst ? `${nickname}의 숲` : quest.title}
-                          questTitle={quest.title}
+                          nickname={nickname}
                         />
                     </View>
 

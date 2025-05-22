@@ -7,6 +7,8 @@ import styles from '../styles/questEmotionChartStyles';
 interface EmotionMissionCardProps {
   result: number[];
   success: boolean;
+  nickname: string;
+  questDescription: string;
 }
 
 // 2) 감정 라벨 및 컬러 매핑
@@ -21,7 +23,7 @@ const colors: Record<string, string> = {
   neutral: '#00C851',
 };
 
-export default function EmotionMissionCard({ result, success }: EmotionMissionCardProps) {
+export default function EmotionMissionCard({ result, success, nickname, questDescription }: EmotionMissionCardProps) {
   
   useEffect(()=>{
 console.log(success)
@@ -29,7 +31,7 @@ console.log(success)
   return (
         <View style={styles.dialogueBox}>
             <View style={styles.nametag}>
-                <Text style={styles.nametagText}>구슬이</Text>
+                <Text style={styles.nametagText}>{nickname}</Text>
             </View>
             <View style={styles.dialogueTextBox}>
                 <View style={styles.list}>
@@ -47,11 +49,17 @@ console.log(success)
                   );
                 })}
               </View>  
-             {success && (
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>오늘 미션 완료!</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  !success && { backgroundColor: '#ccc' },
+                ]}
+                disabled={!success} 
+              >
+                <Text style={styles.buttonText}>
+                  {success ? '오늘 미션 완료!' : questDescription}
+                </Text>
+              </TouchableOpacity>
             </View>
        
             

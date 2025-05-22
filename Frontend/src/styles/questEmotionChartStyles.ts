@@ -32,20 +32,20 @@ export default StyleSheet.create({
     backgroundColor: '#FF9B4B',
     borderRadius: 8,
     paddingVertical: 10,
+    paddingHorizontal: 16,
     alignItems: 'center',
     zIndex: 999,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
+    textAlign: 'center',
   },
   dialogueBox: {
         position: "absolute",
         bottom: 0,
         width: "100%",
-        // height: "25%"
-     
     },
     nametag: {
         position: "absolute",
