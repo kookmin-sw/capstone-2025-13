@@ -10,10 +10,12 @@ type TreeType = "apple" | "peach" | "forest";
 
 interface TreeProps {
   type: TreeType;
-  title: string;
+  title: string;       // 보여줄 제목
+  questTitle: string; // 실제 퀘스트 이름
 }
 
-export default function Tree({ type, title }: TreeProps) {
+
+export default function Tree({ type, title, questTitle }: TreeProps) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const treeImages = {
@@ -29,7 +31,7 @@ export default function Tree({ type, title }: TreeProps) {
   };
 
   const handlePress = () => {
-    navigation.navigate("Quest_stage", { title });
+    navigation.navigate("Quest_stage", { title: questTitle ?? title });
   };
 
   return (
@@ -49,7 +51,6 @@ export default function Tree({ type, title }: TreeProps) {
             },
           ]}
         />
-
         <View style={treeElementStyles.nameContainer}>
           <Image
             source={require("../assets/Images/title.png")}
