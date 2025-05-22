@@ -89,16 +89,16 @@ fun Diagnosis.toDTO() = DiagnosisDTO(
     scale = this.diagnosisScale.map { scale ->
         DiagnosisScaleDTO(
             start = scale.start,
-            scaleName = scale.scaleName ?: "",
-            description = scale.description ?: "",
+            scaleName = scale.scaleName,
+            description = scale.description,
         )
     }.sortedBy { it.start },
 )
 fun Diagnosis.toDTOSelf() = DiagnosisDTO(
     id = this.id ?: 0,
-    type = this.type ?: DiagnosisType.Simple,
-    title = this.title ?: "",
-    description = this.description ?: "",
+    type = this.type,
+    title = this.title,
+    description = this.description,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     questions = listOf(),
@@ -106,8 +106,8 @@ fun Diagnosis.toDTOSelf() = DiagnosisDTO(
     scale = this.diagnosisScale.map { scale ->
         DiagnosisScaleDTO(
             start = scale.start,
-            scaleName = scale.scaleName ?: "",
-            description = scale.description ?: "",
+            scaleName = scale.scaleName,
+            description = scale.description,
         )
     }.sortedBy { it.start },
 )
@@ -123,14 +123,23 @@ data class DiagnosisResultDTO(
     val diagnosisId: Long,
     val result: Int,
     val scale: Int,
+    @JsonProperty("scale_description")
+    val scaleDescription: List<DiagnosisScaleDTO> = listOf(),
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
 fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
     id = this.id ?: "",
-    diagnosisId = this.diagnosis?.id ?: 0,
-    result = this.result ?: 0,
-    scale = this.scale ?: 0,
+    diagnosisId = this.diagnosis.id ?: 0,
+    result = this.result,
+    scale = this.scale,
+    scaleDescription = this.diagnosis.diagnosisScale.map { scale ->
+        DiagnosisScaleDTO(
+            start = scale.start,
+            scaleName = scale.scaleName,
+            description = scale.description,
+        )
+    },
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )
