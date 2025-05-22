@@ -42,6 +42,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
         totalScore: number;
         scaleName: string;
         description: string;
+        createdAt: string;
     } | null>(null);
 
     // 우울 점수에 따른 scaleName과 설명 추출
@@ -60,7 +61,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
                 console.log("진단 결과 데이터:", response);
 
                 if (response) {
-                    const { result, scale, scale_description } = response;  // 바로 사용
+                    const { result, scale, scale_description, createdAt } = response;  // 바로 사용
                     const matchedScale = findScaleInfo(result, scale_description);
 
                     setData(response);
@@ -69,6 +70,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
                         totalScore: scale,
                         scaleName: matchedScale.scaleName,
                         description: matchedScale.description,
+                        createdAt: createdAt
                     });
                 }
             } catch (error) {
@@ -80,6 +82,18 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
 
         fetchDiagnosisResult();
     }, [id, visible]);
+
+    let formattedDate = "현재";
+    if (computedResult?.createdAt) {
+        const date = new Date(computedResult.createdAt);
+        if (!isNaN(date.getTime())) {
+            formattedDate = new Intl.DateTimeFormat('ko-KR', {
+                month: 'long',
+                day: 'numeric'
+            }).format(date);
+        }
+    }
+
 
     if (!visible) return null;
 
@@ -101,6 +115,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
     const { result, scale } = data;
     const { scaleName, description } = computedResult;
     const depressionLevel = scale === 0 ? 0 : result / scale;
+    // 고쳐야 함
 
 
     const actionSuggestion = () => {
@@ -144,7 +159,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
 
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={styles.chartWrapper}>
-                            <Text style={styles.chartTitle}>나의 현재 감정 지수는?</Text>
+                            <Text style={styles.chartTitle}>나의 {formattedDate} 감정 지수는?</Text>
                             <View style={{
                                 width: width * 0.6,
                                 height: width * 0.6,
