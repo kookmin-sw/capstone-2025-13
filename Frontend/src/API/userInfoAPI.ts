@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "./axios";
 import { AxiosResponse } from "axios";
 import ApiResponseDTO from "./common";
+import Toast from "react-native-toast-message";
 
 export enum GenderEnum {
     MALE = "MALE",
@@ -86,8 +87,18 @@ export const getUserInfo = async () => {
 };
 
 // 프로필 이미지 업로드
-export const putProfileImg = async (profileImage: { uri: string; name: string; type: string }) => {
+export const putProfileImg = async (profileImage: { uri: string; name: string; type: string, size?: number }) => {
     console.log("putProfileImg called with:", profileImage);
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+        if (profileImage.size && profileImage.size > MAX_SIZE) {
+            Toast.show({
+                    type: "error",
+                    text1: "저장 실패",
+                    text2: "이미지 크기는 5MB를 초과할 수 없습니다.",
+                    position: "bottom",
+                });
+                 return; 
+        }
 
     const accessToken = await AsyncStorage.getItem("accessToken");
 
