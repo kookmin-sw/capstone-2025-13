@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 type RootStackParamList = {
   Quest_meditation: { questTitle: string; questDescription: string; questTarget: number };
   Quest_exercise: { questTitle: string; questDescription: string; questTarget: number };
-  Quest_emotion: { questTitle: string; questDescription: string; questTarget: number };
+  Quest_emotion: { questTitle: string; questDescription: string; questTarget: number; nickname: string;};
 };
 
 type QuestNavigationProp =
@@ -22,14 +22,15 @@ type QuestNavigationProp =
     | StackNavigationProp<RootStackParamList, "Quest_exercise">
     | StackNavigationProp<RootStackParamList, "Quest_emotion">;
 
-const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
-  switch (title) {
-    case "명상": return "MEDITATE";
-    case "산책": return "ACTIVITY";
-    case "감정": return "EMOTION";
-    default: return "EMOTION";
-  }
-};
+  const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
+    if (title.includes("의 숲")) return "EMOTION"; 
+    switch (title) {
+      case "명상": return "MEDITATE";
+      case "산책": return "ACTIVITY";
+      default: return "EMOTION";
+    }
+  };
+    
 
 const getImageSource = (title: string) => {
   switch (title) {
@@ -59,7 +60,7 @@ const lockPositions = [
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation<QuestNavigationProp>();
-  const { title } = route.params as { title: string };
+  const { title, nickname } = route.params as { title: string, nickname :string };
 
   const [questTitle, setQuestTitle] = useState("");
   const [displayQuestTitle, setDisplayQuestTitle] = useState("");
@@ -196,8 +197,8 @@ export default function Quest_stage() {
       navigation.navigate("Quest_meditation", params);
     } else if (title === "산책") {
       navigation.navigate("Quest_exercise", params);
-    } else if (title === "감정") {
-      navigation.navigate("Quest_emotion", params);
+    } else {
+      navigation.navigate("Quest_emotion", {...params, nickname});
     }
   };
 
