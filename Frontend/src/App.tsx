@@ -34,6 +34,7 @@ import { LoadingProvider, useLoading } from "./API/contextAPI";
 import Splash from "./screens/Splash";
 import { requestChallenge, verifyDeviceIntegrity } from "./API/IntegrityAPI";
 import { refreshAccessToken } from "./API/common";
+import { StatusBar } from "expo-status-bar";
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -177,6 +178,7 @@ export default function App() {
 
         return (
             <NavigationContainer>
+                <StatusBar style="auto" />
                 <Stack.Navigator
                     initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
                 >
