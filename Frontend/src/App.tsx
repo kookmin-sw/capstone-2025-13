@@ -32,8 +32,8 @@ import { useCustomFonts } from "./hooks/useCustomFonts";
 
 import { LoadingProvider, useLoading } from "./API/contextAPI";
 import Splash from "./screens/Splash";
-import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
-import {refreshAccessToken} from "./API/common";
+import { requestChallenge, verifyDeviceIntegrity } from "./API/IntegrityAPI";
+import { refreshAccessToken } from "./API/common";
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -106,7 +106,7 @@ export default function App() {
                 const result = await verifyDeviceIntegrity();
                 console.log('Device integrity verification result:', result);
 
-                if(result.isValid) {
+                if (result.isValid) {
                     console.log('Device integrity verified');
                     setIsIntegrityVerified(true);
                 } else {
@@ -311,7 +311,7 @@ export default function App() {
             </NavigationContainer>
         );
     };
-    
+
     return (
         <LoadingProvider>
             {loading ? <Splash /> : <AppContent />}
