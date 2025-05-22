@@ -11,11 +11,11 @@ export default {
     slug: "wooong",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/Images/icon.png",
+    icon: "./assets/Images/wooong-logo.png",
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
-      image: "./assets/Images/splash-icon.png",
+      image: "./assets/Images/wooong-logo.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -69,7 +69,7 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/Images/adaptive-icon.png",
+        foregroundImage: "./assets/Images/wooong-logo.png",
         backgroundColor: "#ffffff"
       },
       package: "space.mori.wooong",
@@ -81,7 +81,7 @@ export default {
       ]
     },
     web: {
-      favicon: "./assets/Images/favicon.png"
+      favicon: "./assets/Images/wooong-logo.png"
     },
     extra: {
       eas: {
