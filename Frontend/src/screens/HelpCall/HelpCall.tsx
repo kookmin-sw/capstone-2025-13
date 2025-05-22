@@ -186,6 +186,9 @@ export default function HelpCall() {
                         style={helpCallStyles.map}
                         region={location}
                         showsUserLocation={true}
+                        onMapReady={(event) => {
+                            console.log("Google Map Ready!")
+                        }}
                     >
                         <Marker coordinate={location} title="내 위치" />
                         {filteredMarkers.map((marker) => (
