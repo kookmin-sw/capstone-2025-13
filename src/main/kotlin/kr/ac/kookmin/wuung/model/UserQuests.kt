@@ -2,6 +2,8 @@ package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -25,13 +27,13 @@ data class UserQuests(
     var id: String? = null,
 
     @ManyToOne
-    var user: User? = null,
+    var user: User,
 
     @ManyToOne
-    var quest: Quests? = null,
+    var quest: Quests,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var description: String? = null,
+    var description: String,
 
     @Column(nullable = false)
     var progress: Int = 0,
@@ -39,8 +41,11 @@ data class UserQuests(
     @Column(nullable = false)
     var target: Int = 0,
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     var status : UserQuestStatus = UserQuestStatus.INCOMPLETE,
+
+    @Column(nullable = true)
+    var photo: String? = null,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -48,6 +53,17 @@ data class UserQuests(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        id = null,
+        user = User(),
+        quest = Quests(),
+        description = "",
+        progress = 0,
+        target = 0,
+        status = UserQuestStatus.INCOMPLETE,
+        photo = null,
+        createdAt = LocalDateTime.now(),
+    )
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

@@ -4,26 +4,31 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "userTest")
+@Table(name = "user_test")
 data class Test(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id : Long? = null,
+
     @Column(nullable = false)
-    var type : Long? = null,
+    var type : Long,
     // 0 : Simple test
     // 1 : Normal test (PHQ-9)
     // 2 : Normal test (BDI) ...
     // 3 ...
     @Column(nullable = false)
-    var result : Long? = null,
+    var result : Long,
 
     @Column(nullable = false)
-    var dateAt : LocalDateTime? = null,
+    var dateAt : LocalDateTime = LocalDateTime.now(),
 
     @OneToOne
     @JoinColumn(nullable = false)
-    val user: User? = null,
+    val user: User,
 ) {
-
+    constructor(): this(
+        type = 0,
+        result = 0,
+        user = User(),
+    )
 }

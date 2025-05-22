@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
     },
     choiceItem: {
         alignItems: "center",
+        justifyContent:"center",
         flex: 1,
     },
     circle: {
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
     choiceLabel: {
         fontSize: 12,
         color: "#333",
+        textAlign: 'center'
     },
     choiceLabelSelected: {
         color: "#3CB46E",

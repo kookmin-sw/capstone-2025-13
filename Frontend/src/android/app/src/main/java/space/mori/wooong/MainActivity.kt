@@ -1,4 +1,4 @@
-package kr.ac.kookmin.wooong
+package space.mori.wooong
 
 import android.os.Build
 import android.os.Bundle

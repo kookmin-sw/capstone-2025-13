@@ -1,10 +1,11 @@
 package kr.ac.kookmin.wuung
 
 import io.github.cdimascio.dotenv.dotenv
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
+import space.mori.dalbodeule.snapadmin.external.SnapAdminAutoConfiguration
 
 val dotenv = dotenv {
 	ignoreIfMissing = true
@@ -12,6 +13,7 @@ val dotenv = dotenv {
 
 @SpringBootApplication
 @EnableScheduling
+@ImportAutoConfiguration(classes = [SnapAdminAutoConfiguration::class])
 class WuungApplication
 
 fun main(args: Array<String>) {
@@ -28,6 +30,7 @@ fun main(args: Array<String>) {
 		"S3_ACCESS_KEY" to dotenv["S3_ACCESS_KEY"],
 		"S3_SECRET_KEY" to dotenv["S3_SECRET_KEY"],
 		"S3_PROFILE_BUCKET" to dotenv["S3_PROFILE_BUCKET"],
+		"S3_QUEST_BUCKET" to dotenv["S3_QUEST_BUCKET"],
 		"S3_PUBLIC_ENDPOINT" to dotenv["S3_PUBLIC_ENDPOINT"],
 		"GPT_API_KEY" to dotenv["GPT_API_KEY"],
 		"GPT_BASE_URL" to (dotenv["GPT_BASE_URL"]?.let {

@@ -27,16 +27,18 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>kr.ac.kookmin.wooong</string>
+          <string>space.mori.wooong</string>
         </array>
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>102</string>
+    <string>109</string>
     <key>GMSApiKey</key>
     <string>process.env.GOOGLE_MAPS_API_KEY</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
     <key>LSMinimumSystemVersion</key>
-    <string>12.0</string>
+    <string>15.1</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
@@ -50,10 +52,12 @@
     <string>$(PRODUCT_NAME) needs access to your Camera.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
+    <key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
+    <string>걸음수 추적을 위해 앱에 대한 권한 요청을 합니다.</string>
     <key>NSHealthShareUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights.</string>
+    <string>걸음수 추적을 위해 앱에 대한 권한 요청을 합니다.</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights.</string>
+    <string>$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationAlwaysUsageDescription</key>
@@ -90,5 +94,7 @@
     </array>
     <key>UIUserInterfaceStyle</key>
     <string>Light</string>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
   </dict>
 </plist>

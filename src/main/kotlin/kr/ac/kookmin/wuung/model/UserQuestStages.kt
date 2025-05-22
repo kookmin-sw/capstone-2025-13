@@ -19,20 +19,26 @@ data class UserQuestStages(
         var id: Long? = null,
 
         @ManyToOne
-        var user: User? = null,
+        var user: User,
 
         @Column(nullable = false)
         var stage: Int = 1,
 
         @Enumerated
-        var type: QuestType? = null,
+        var type: QuestType,
 
         @Column(nullable = false)
         val createdAt: LocalDateTime = LocalDateTime.now(),
 
         @Column(nullable = false)
         var updatedAt: LocalDateTime = LocalDateTime.now()
-    ) {
+) {
+    constructor(): this(
+            id = null,
+            user = User(),
+            stage = 1,
+            type = QuestType.MEDITATE,
+    )
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

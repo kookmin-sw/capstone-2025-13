@@ -1,10 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useLoading, LoadingProvider } from "./hooks/LoadingContext";
-import { useFonts } from "expo-font";
-import {
-    NavigationContainer,
-    createNavigationContainerRef,
-} from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
 import SignIn from "./screens/SignIn";
@@ -21,29 +16,31 @@ import Quest_emotion from "./screens/Quest/Quest_emotion";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FormalDiagnosis from "./screens/FormalDiagnosis/FormalDiagnosis";
 import FormalDiagnosisSurvey from "./screens/FormalDiagnosis/FormalDiagnosis_survey";
+import FormalDiagnosisResult from "./screens/FormalDiagnosis/FormalDiagnsis_result";
 import GameScreen from "./screens/Game/GameScreen";
 import DailyTopic from "./screens/DailyTopic";
 import Spinner from "./screens/Spinner";
 import HelpCall from "./screens/HelpCall/HelpCall";
 import HelpCall2 from "./screens/HelpCall/HelpCall2";
+import Calendar from "./screens/Calendar";
 import UserInfo from "./screens/UserInfo";
 import Record from "./screens/Record";
-import Calendar from "./screens/Calendar";
+import SecondPassword from "./screens/SecondPassword";
+import Toast from "react-native-toast-message";
+import Interest from "./screens/SimpleDiagnosis/Interest";
+import { useCustomFonts } from "./hooks/useCustomFonts";
 
-import customAxios from './API/axios';
-import { refreshAccessToken } from "./API/common";
-
+import { LoadingProvider, useLoading } from "./API/contextAPI";
+import Splash from "./screens/Splash";
 import {requestChallenge, verifyDeviceIntegrity} from "./API/IntegrityAPI";
-import RestrictedAccessScreen from "./screens/RestrictedAccessScreen";
-
-const navigationRef = createNavigationContainerRef();
+import {refreshAccessToken} from "./API/common";
 
 export type RootStackParamList = {
-    Home: undefined;
-    SignIn: undefined;
+    Home: { simpleScale?: string };
+    SignIn: { score?: number; last?: boolean };
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title: string; subtitle?: string };
+    Quest_stage: { title: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -51,35 +48,44 @@ export type RootStackParamList = {
         birthDate?: string;
         gender?: string;
     };
+    Interest: { score?: number };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number };
     FormalDiagnosis: undefined;
-    FormalDiagnosisSurvey: undefined;
-    GameScreen: undefined;
+    FormalDiagnosisSurvey: { diagnosisId: number };
+    GameScreen: { score?: number };
     DailyTopic: undefined;
     Spinner: undefined;
     HelpCall: undefined;
     HelpCall2: undefined;
     UserInfo: undefined;
-    Record: undefined;
+    Record: { date?: string };
     Quest_meditation: undefined;
     Quest_exercise: undefined;
     Quest_emotion: undefined;
-    Quest_emotion_sy: undefined;
     Calendar: undefined;
-
+    SecondPassword: undefined;
+    FormalDiagnosisResult: {
+        diagnosisId: number;
+        score: number;
+        totalScore: number;
+        scaleName: string;
+        description: string;
+    };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function AppInner() {
+const GlobalSpinner = () => {
+    const { isLoading } = useLoading();
+    return isLoading ? <Spinner /> : null;
+};
+
+export default function App() {
     // 하드코딩된 로그인 상태
 
-    const { isLoading, setLoading } = useLoading();
-
-    // @ts-ignore
-    const routeNameRef = useRef();
+    const [loading, setLoading] = useState(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
     const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
@@ -121,13 +127,13 @@ function AppInner() {
             console.log("🔍 accessToken:", token);
             if (token) {
                 setIsLoggedIn(true);
-                console.log("✅ Token exists. setLoading(false) 호출됨");
-                setLoading(false);
             } else {
                 console.log("❌ Token 없음. 로그인 상태 false, 로딩 해제");
                 setIsLoggedIn(false);
-                setLoading(false);
             }
+            setTimeout(() => {
+                setLoading(false);
+            }, 5500); // Delay splash screen for 1.5 seconds
         };
         checkIntegrity().then(() => checkToken());
     }, []);
@@ -136,7 +142,7 @@ function AppInner() {
     useEffect(() => {
         const interval = setInterval(async () => {
             const accessToken = await AsyncStorage.getItem("accessToken");
-            const tokenExpiry = await AsyncStorage.getItem("accessTokenExpiry");
+            const tokenExpiry = 15 * 60 * 1000; // 15분 (900000ms) 후 만료된다고 가정
 
             if (accessToken && tokenExpiry) {
                 const expiryTime = new Date(tokenExpiry).getTime();
@@ -144,94 +150,35 @@ function AppInner() {
 
                 // 5분 전까지 만료되면 갱신
                 if (expiryTime - currentTime <= 5 * 60 * 1000) {
+                    console.log("토큰 갱신 시도 중...");
                     try {
                         await refreshAccessToken(); // 토큰 갱신
+                        console.log("토큰 갱신 성공");
                     } catch (error) {
-                        console.error("Token refresh failed", error);
+                        console.error("토큰 갱신 실패:", error);
                     }
+                } else {
+                    console.log("토큰 유효함, 갱신 불필요");
                 }
+            } else {
+                console.log("토큰 없음, 갱신 불필요");
             }
-        }, 4 * 60 * 1000);
+        }, 4 * 60 * 1000); // 4분마다 실행
 
         return () => clearInterval(interval); // cleanup
     }, []);
 
-    const [fontsLoaded] = useFonts({
-        "Pretendard-Regular": require("./assets/fonts/Pretendard-Regular.otf"),
-        "Pretendard-Bold": require("./assets/fonts/Pretendard-Bold.otf"),
-        "Pretendard-SemiBold": require("./assets/fonts/Pretendard-SemiBold.otf"),
-        "Pretendard-Medium": require("./assets/fonts/Pretendard-Medium.otf"),
-        "Pretendard-Light": require("./assets/fonts/Pretendard-Light.otf"),
-        "Pretendard-ExtraLight": require("./assets/fonts/Pretendard-ExtraLight.otf"),
-        "Pretendard-ExtraBold": require("./assets/fonts/Pretendard-ExtraBold.otf"),
-        "Pretendard-Black": require("./assets/fonts/Pretendard-Black.otf"),
-        "Pretendard-Thin": require("./assets/fonts/Pretendard-Thin.otf"),
-        "DungGeunMo": require("./assets/fonts/DungGeunMo.ttf"),
-        "LaundryGothic-Regular": require("./assets/fonts/LaundryGothic-Regular.ttf"),
-        "LaundryGothic-Bold": require("./assets/fonts/LaundryGothic-Bold.ttf"),
-    });
+    // Now define AppContent here with isLoggedIn passed as prop
+    const AppContent = () => {
+        const fontsLoaded = useCustomFonts();
 
-    console.log("📦 fontsLoaded:", fontsLoaded, "| isLoading:", isLoading);
+        // Show Splash while fonts are loading
+        if (!fontsLoaded) return <Splash />;
 
-    if (!fontsLoaded) return <Spinner />;
-
-    if(!isIntegrityVerified) {
-        return <RestrictedAccessScreen error={integrityError} />;
-    }
-
-    console.log("🧪 스크린 등록 확인:");
-    [
-        Home,
-        SignIn,
-        SignUpStep1,
-        SignUpStep2,
-        SignUpStep3,
-        SimpleDiagnosis,
-        Game,
-        Quest,
-        Quest_stage,
-        Quest_meditation,
-        Quest_exercise,
-        Quest_emotion,
-        FormalDiagnosis,
-        FormalDiagnosisSurvey,
-        GameScreen,
-        DailyTopic,
-        Spinner,
-        HelpCall,
-        HelpCall2,
-        UserInfo,
-        Record,
-        Calendar,
-    ].forEach((comp, i) => {
-        if (!comp) console.warn(`❌ [component ${i}] is undefined`);
-    });
-    
-    return (
-        <NavigationContainer
-            ref={navigationRef}
-            onReady={() => {
-                // @ts-ignore
-                routeNameRef.current = navigationRef.getCurrentRoute().name;
-            }}
-            onStateChange={() => {
-                const previous = routeNameRef.current;
-                const current = navigationRef.getCurrentRoute()?.name;
-
-                if (!previous || previous === current) return;
-
-                console.log("🌀 Navigation changed:", previous, "→", current);
-                setLoading(true);
-                setTimeout(() => setLoading(false), 500);
-
-                routeNameRef.current = current;
-            }}
-        >
-            {isLoading ? (
-                <Spinner />
-            ) : (
+        return (
+            <NavigationContainer>
                 <Stack.Navigator
-                    initialRouteName={isLoggedIn ? "Home" : "Quest"}
+                    initialRouteName={isLoggedIn ? "Home" : "SimpleDiagnosis"}
                 >
                     <Stack.Screen
                         name="Home"
@@ -262,94 +209,113 @@ function AppInner() {
                         {() => <SignUpStep3 />}
                     </Stack.Screen>
                     <Stack.Screen
-                    name="SimpleDiagnosis"
-                    options={{ headerShown: false }}
-                    component={SimpleDiagnosis}
-                />
-                <Stack.Screen name="Game" options={{ headerShown: false }}>
-                    {() => <Game />}
-                </Stack.Screen>
-                <Stack.Screen
-                    name="Quest"
-                    component={Quest}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_stage"
-                    component={Quest_stage}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_meditation"
-                    component={Quest_meditation}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_exercise"
-                    component={Quest_exercise}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Quest_emotion"
-                    component={Quest_emotion}
-                    options={{ headerShown: false}}
-                />
-                <Stack.Screen
-                    name="FormalDiagnosis" // FormalDiagnosis 화면 추가
-                    component={FormalDiagnosis}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
-                    component={FormalDiagnosisSurvey}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="GameScreen" // GameScreen 화면 추가
-                    component={GameScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="DailyTopic" // DailyTopic 화면 추가
-                    component={DailyTopic}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Spinner" // Spinner 화면 추가
-                    component={Spinner}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="UserInfo"
-                    component={UserInfo}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Record"
-                    component={Record}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="HelpCall"
-                    component={HelpCall}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="HelpCall2" 
-                    component={HelpCall2}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="Calendar" 
-                    component={Calendar}
-                    options={{ headerShown: false }} />
-              </Stack.Navigator>)}
-        </NavigationContainer>
-    );
-}
-
-export default function App() {
+                        name="SimpleDiagnosis"
+                        options={{ headerShown: false }}
+                        component={SimpleDiagnosis}
+                    />
+                    <Stack.Screen
+                        name="Interest"
+                        component={Interest}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="Game" options={{ headerShown: false }}>
+                        {() => <Game />}
+                    </Stack.Screen>
+                    <Stack.Screen
+                        name="Quest"
+                        component={Quest}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_stage"
+                        component={Quest_stage}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_meditation"
+                        component={Quest_meditation}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_exercise"
+                        component={Quest_exercise}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Quest_emotion"
+                        component={Quest_emotion}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormalDiagnosis" // FormalDiagnosis 화면 추가
+                        component={FormalDiagnosis}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormalDiagnosisSurvey" // FormalDiagnosisSurvey 화면 추가
+                        component={FormalDiagnosisSurvey}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormalDiagnosisResult"
+                        component={FormalDiagnosisResult}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="GameScreen" // GameScreen 화면 추가
+                        component={GameScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="DailyTopic" // DailyTopic 화면 추가
+                        component={DailyTopic}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Spinner" // Spinner 화면 추가
+                        component={Spinner}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="UserInfo"
+                        component={UserInfo}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="HelpCall"
+                        component={HelpCall}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="HelpCall2"
+                        component={HelpCall2}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Calendar"
+                        component={Calendar}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Record"
+                        component={Record}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="SecondPassword"
+                        component={SecondPassword}
+                        options={{ headerShown: false }}
+                    />
+                </Stack.Navigator>
+                <Toast />
+            </NavigationContainer>
+        );
+    };
+    
     return (
         <LoadingProvider>
-            <AppInner />
+            {loading ? <Splash /> : <AppContent />}
         </LoadingProvider>
     );
 }
+

@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import kr.ac.kookmin.wuung.jwt.JwtProvider
 import kr.ac.kookmin.wuung.model.RefreshToken
+import kr.ac.kookmin.wuung.model.RevokedToken
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.RefreshTokenRepository
+import kr.ac.kookmin.wuung.repository.RevokedTokenRepository
 import org.springframework.data.jpa.repository.Modifying
 import java.time.LocalDateTime
 import java.util.Optional
@@ -16,12 +18,15 @@ import java.util.Optional
 class TokenService(
     @Autowired private val jwtProvider: JwtProvider,
     @Autowired private val refreshTokenRepository: RefreshTokenRepository,
-    @Value("\${jwt.refresh-token-validity}") private val refreshTokenValidity: Long
+    @Autowired private val revokedTokenRepository: RevokedTokenRepository,
+    @Value("\${jwt.refresh-token-validity}") private val refreshTokenValidity: Long,
 ) {
     fun generateAccessToken(user: User): String {
         return jwtProvider.generateAccessToken(user)
     }
 
+    @Transactional
+    @Modifying
     fun generateRefreshToken(user: User): String {
         val refreshToken = jwtProvider.generateRefreshToken(user)
         val newRefreshToken = RefreshToken(
@@ -31,9 +36,11 @@ class TokenService(
         )
 
         refreshTokenRepository.findByUser(user).ifPresent {
+            revokedTokenRepository.save(RevokedToken(it.token))
             refreshTokenRepository.delete(it)
         }
         refreshTokenRepository.save(newRefreshToken)
+
         return refreshToken
     }
 

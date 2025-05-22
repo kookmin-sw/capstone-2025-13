@@ -15,11 +15,17 @@ data class DiagnosisScale(
     var id : String? = null,
 
     @Column(nullable = false)
-    var start: Int = 0,
-
-    @Column(nullable = false, length = 32)
-    var scaleName: String? = null,
-
+    var start: Int,
+  
     @Column(nullable = false, length = 128)
-    var description: String? = null
-)
+    var scaleName: String,
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    var description: String
+) {
+    constructor(): this(
+        start = 0,
+        scaleName = "",
+        description = "",
+    )
+}

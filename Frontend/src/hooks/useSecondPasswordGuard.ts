@@ -1,4 +1,3 @@
-// hooks/useSecondPasswordGuard.ts
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
@@ -7,8 +6,7 @@ import { RootStackParamList } from "../App";
 
 export const useSecondPasswordGuard = (currentScreen: keyof RootStackParamList) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const [checking, setChecking] = useState(true); // 로딩 상태
-
+    const [checking, setChecking] = useState(true); 
     useEffect(() => {
         const checkSecondPassword = async () => {
             const passed = await AsyncStorage.getItem("secondPasswordPassed");
@@ -18,16 +16,13 @@ export const useSecondPasswordGuard = (currentScreen: keyof RootStackParamList) 
                     routes: [{ name: "SecondPassword", params: { nextScreen: currentScreen } }],
                 });
             } else {
-                setChecking(false); // 통과되면 렌더 허용
+                setChecking(false);
             }
         };
-
         checkSecondPassword();
-
         return () => {
             AsyncStorage.setItem("secondPasswordPassed", "false");
         };
     }, []);
-
     return checking;
 };

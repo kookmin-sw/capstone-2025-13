@@ -19,9 +19,16 @@ java {
 	}
 }
 
+hibernate {
+	enhancement {
+		enableAssociationManagement.set(false)
+	}
+}
+
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/milestone") }
+	maven { url = uri("https://git.mori.space/api/packages/dalbodeule/maven") }
 	google()
 }
 
@@ -77,6 +84,8 @@ dependencies {
 
 	// HTTP 클라이언트
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	implementation("space.mori.dalbodeule:snap-admin:0.5.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -26,7 +26,6 @@ export const dynamic = StyleSheet.create({
     },
     mainText: {
         fontSize: width * 0.06,
-        marginVertical: width * 0.02,
     },
     warningTitle: {
         fontSize: width * 0.045,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Text,
     View,
@@ -12,11 +12,12 @@ import {
     ImageBackground,
 } from "react-native";
 import signInStyles from "../styles/signInStyles";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { signIn } from "../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { putDiagnosisResult } from "../API/diagnosisAPI";
 
 const SignIn = () => {
     const navigation =
@@ -30,6 +31,23 @@ const SignIn = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    type SignInRouteProp = RouteProp<RootStackParamList, "SignIn">;
+    const route = useRoute<SignInRouteProp>();
+    const score = route.params?.score ?? 0;
+    const last = route.params?.last ?? false;
+
+    const getDepressionScale = (result: number): number => {
+        if (result >= 8) return 8; // 심한 우울증
+        if (result >= 6) return 6; // 중증도 우울증
+        if (result >= 3) return 3; // 경미한 우울증
+        return 0;                  // 없음 (정상)
+    };
+    const getScaleName = (result: number): string => {
+        if (result >= 8) return '심한 우울증';
+        if (result >= 6) return '중증도 우울증';
+        if (result >= 3) return '경미한 우울증';
+        return '정상';
+    };
 
     const handleSignIn = async () => {
         if (!email || !password) {
@@ -43,16 +61,34 @@ const SignIn = () => {
             console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
             console.log("로그인 성공:", response.accessToken);
-            await AsyncStorage.setItem("accessToken", response.accessToken);
-            await AsyncStorage.setItem("refreshToken", response.refreshToken);
-            navigation.navigate("Home");
+            await AsyncStorage.setItem('accessToken', response.accessToken);
+            await AsyncStorage.setItem('refreshToken', response.refreshToken);
+
+            if (last) {
+                const id = 2; // 약식검사 아이디
+                const result = score;
+                const scale = getDepressionScale(result);
+                const scaleName = getScaleName(result);
+                console.log(id, result, scale, scaleName);
+                try {
+                    await putDiagnosisResult(id, scale, result);
+                    console.log("✅ 진단 결과 저장 성공");
+                } catch (err) {
+                    console.error("❌ 진단 결과 저장 실패:", err);
+                }
+                navigation.navigate('Home', { simpleScale: scaleName });
+            } else {
+                navigation.navigate('Home', {});
+            }
         } catch (error) {
             console.error("로그인 실패:", error);
-            setError(
-                "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."
-            );
+            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+        } finally {
+            setLoading(false);
         }
     };
+
+
 
     return (
         <KeyboardAvoidingView
@@ -61,7 +97,7 @@ const SignIn = () => {
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ImageBackground
-                    source={require("../assets/Images/simple-3.png")}
+                    source={require("../assets/Images/simple-3-2.png")}
                     style={{ flex: 1 }}
                     resizeMode="cover"
                 >

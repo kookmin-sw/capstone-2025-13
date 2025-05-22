@@ -135,7 +135,7 @@ export default function HelpCall() {
                         <TouchableOpacity
                             style={helpCallStyles.backButtonWrapper}
                             onPress={() => {
-                                navigation.navigate("Home");
+                                navigation.navigate("Home", {});
                             }}
                         >
                             <Ionicons

@@ -17,14 +17,21 @@ class Configurations(
     val id: Long? = null,
 
     @Enumerated(EnumType.STRING)
-    val key: ConfigurationKey? = null,
+    val key: ConfigurationKey,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    val value: String? = null,
+    val value: String,
 
     @Column(nullable = false)
-    val innerSeq: Int = 0
-)
+    val innerSeq: Int
+) {
+    constructor(): this(
+        id = null,
+        key = ConfigurationKey.DAILY_QUESTION,
+        value = "",
+        innerSeq = 0
+    )
+}
 
 enum class ConfigurationKey(val value: String) {
     RECORD_PROMPT("RECORD_PROMPT"),

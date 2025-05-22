@@ -1,6 +1,6 @@
 import axios from "./axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ApiResponseDTO, { refreshAccessToken } from "./common";
+import ApiResponseDTO, { refreshAccessToken, } from "./common";
 
 export enum DiagnosisTypeEnum {
   "Simple" = "Simple",
@@ -8,7 +8,6 @@ export enum DiagnosisTypeEnum {
   "GAD-7" = "GAD-7",
   "BDI" = "BDI"
 }
-
 export interface DiagnosisList {
   id: number;
   type: DiagnosisTypeEnum;
@@ -18,6 +17,23 @@ export interface DiagnosisList {
   scale: DiagnosisScale[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DiagnosisQuestion {
+  seq: number;
+  text: string;
+  answers: DiagnosisAnswers[]; 
+}
+
+export interface DiagnosisAnswers {
+  text: string;
+  score: number;
+}
+
+export interface DiagnosisScale {
+  start: number;
+  scaleName: string;
+  description: string;
 }
 
 export interface DiagnosisQuestion {
@@ -35,6 +51,14 @@ export interface DiagnosisScale {
   start: number;
   scaleName: string;
   description: string;
+}
+export interface DiagnosisResult {
+    id: string;
+    diagnosisId: number;
+    result: number;
+    scale: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 const getAuthHeaders = async () => {
@@ -78,6 +102,30 @@ export const fetchDiagnosisDetail = async (id: number): Promise<DiagnosisList | 
   return handleAuthRequest(async () => {
     const headers = await getAuthHeaders();
     const { data } = await axios.get<ApiResponseDTO<DiagnosisList>>(`/diagnosis/${id}`, { headers });
+    return data.data;
+  });
+};
+
+
+export const putDiagnosisResult = async (id: number, scale: number, result: number) => {
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const body = { id, scale, result };
+    console.log(body);
+    const { data } = await axios.put<ApiResponseDTO<DiagnosisList>>("/diagnosis/submit", body, { headers });
+    return data.data;
+  });
+};
+
+
+export const getDiagnosisResult = async (start: string): Promise<DiagnosisResult[] | null> => {
+  console.log(start);
+  return handleAuthRequest(async () => {
+    const headers = await getAuthHeaders();
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisResult[]>>(
+      `/diagnosis/results?start=${start}`,
+      { headers }
+    );
     return data.data;
   });
 };

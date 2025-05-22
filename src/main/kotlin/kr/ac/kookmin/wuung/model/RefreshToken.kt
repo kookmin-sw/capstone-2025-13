@@ -19,12 +19,18 @@ data class RefreshToken(
     var id: String? = null,
 
     @Column(nullable = false, unique = true, length = 2048)
-    var token: String? = null,
+    var token: String,
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    val user: User? = null,
+    val user: User,
 
     @Column(nullable = false)
     val expiryDate: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    constructor(): this(
+        token = "",
+        user = User(),
+        expiryDate = LocalDateTime.now(),
+    )
+}

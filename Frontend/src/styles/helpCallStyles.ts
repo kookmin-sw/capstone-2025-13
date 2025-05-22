@@ -25,7 +25,7 @@ const helpCallStyles = StyleSheet.create({
         paddingTop: height * 0.07,
     },
     backButtonWrapper: {
-        position: 'absolute',
+        position: "absolute",
         left: width * 0.02,
         top: width * 0.115,
         padding: width * 0.02,
@@ -96,6 +96,11 @@ const helpCallStyles = StyleSheet.create({
         fontSize: width * 0.038,
         color: "blue",
         textDecorationLine: "underline",
+    },
+    markerIcon: {
+        width: 30,
+        height: 30,
+        resizeMode: "contain",
     },
 });
 

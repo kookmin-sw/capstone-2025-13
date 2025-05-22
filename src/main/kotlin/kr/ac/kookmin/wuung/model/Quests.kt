@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 
-@Entity
+@Entity(name="Quests")
 @Table(name = "quests")
 data class Quests(
     @Id
@@ -20,16 +20,16 @@ data class Quests(
     var id: Long? = null,
 
     @Enumerated(EnumType.STRING)
-    var type: QuestType? = null,
+    var type: QuestType,
 
     @Column(nullable = false)
     var step: Int = 0,
 
     @Column(nullable = false)
-    var name: String? = null,
+    var name: String,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var description: String? = null,
+    var description: String,
 
     @Column(nullable = false)
     var target: Int = 0,
@@ -40,6 +40,15 @@ data class Quests(
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
+    constructor(): this(
+        type = QuestType.MEDITATE,
+        step = 0,
+        name = "",
+        description = "",
+        target = 0,
+        createdAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()

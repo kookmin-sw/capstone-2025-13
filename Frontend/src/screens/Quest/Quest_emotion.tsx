@@ -12,8 +12,15 @@ import { QUESTS } from '../../utils/QuestEmotion/quests';
 
 import EmotionChartBox from '../../components/Quest_emotionBox';
 import styles from '../../styles/questEmotionStyles';
-
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+import {NavigationProp, useNavigation, useRoute} from "@react-navigation/native";
+
+type RouteParams = {
+    questTitle: string;
+    questDescription: string;
+    questTarget: number;
+};
+
 
 export default function QuestEmotion() {
   const [emotionLog, setEmotionLog] = useState<string[]>([]);
@@ -22,10 +29,11 @@ export default function QuestEmotion() {
   const [hasPermission, setHasPermission] = useState(false);
   const { isLoaded, model } = useLoadEmotionModel();
   const [noFaceWarning, setNoFaceWarning] = useState(false);
+
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [latestResult, setLatestResult] = useState<number[] | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
-
+const [success, setSuccess] = useState<boolean>(false);
+  // 타이밍 제어
   const lastPhotoTimeRef = useRef(0);
   const isPhotoTaken = useRef(false);
   
@@ -36,7 +44,6 @@ export default function QuestEmotion() {
     windowHeight: cameraHeight,
     performanceMode: 'accurate',
   });
-
   const quest_name = '5초 간 웃어보기';
   const quest = QUESTS.find(q => q.id === quest_name);
   if (!quest) {
@@ -47,19 +54,19 @@ export default function QuestEmotion() {
     );
   }
 
-  const quest_capture_interval = quest.interval ?? 1000;
-  const quest_save_pre_log = quest.logLength ?? 20;
+    const quest_capture_interval = quest.interval ?? 1000;
+    const quest_save_pre_log = quest.logLength ?? 20;
 
-  const capturePhoto = async (face: Face | undefined) => {
-    if (isPhotoTaken.current) return null;
-    isPhotoTaken.current = true;
+    const capturePhoto = async (face: Face | undefined) => {
+        if (isPhotoTaken.current) return null;
+        isPhotoTaken.current = true;
 
-    const now = Date.now();
-    const { isLargeEnough, now: checkedTime } = shouldCaptureFace(face, lastPhotoTimeRef.current);
-    if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
-      isPhotoTaken.current = false;
-      return null;
-    }
+        const now = Date.now();
+        const {isLargeEnough, now: checkedTime} = shouldCaptureFace(face, lastPhotoTimeRef.current);
+        if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
+            isPhotoTaken.current = false;
+            return null;
+        }
 
     try {
       const photo = await cameraRef.current.takePhoto();
@@ -155,23 +162,23 @@ export default function QuestEmotion() {
     if (now - last < quest_capture_interval) return;
     (globalThis as any).lastProcessTime = now;
 
-    const faces = detectFaces(frame);
-    handleDetectedFaces(faces);
-  }, [handleDetectedFaces]);
+        const faces = detectFaces(frame);
+        handleDetectedFaces(faces);
+    }, [handleDetectedFaces]);
 
-  useEffect(() => {
-    (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    useEffect(() => {
+        (async () => {
+            const status = await Camera.requestCameraPermission();
+            setHasPermission(status === 'granted');
+        })();
+    }, []);
 
-  if (!device || !hasPermission) {
-    return (
-        <View style={styles.centered}>
-          <Text>📷 카메라 준비 중...</Text>
-        </View>
-      );
+    if (!device || !hasPermission) {
+        return (
+            <View style={styles.centered}>
+                <Text>📷 카메라 준비 중...</Text>
+            </View>
+        );
     }
 
   return (

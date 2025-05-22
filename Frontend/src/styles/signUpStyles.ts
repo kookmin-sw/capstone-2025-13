@@ -7,7 +7,6 @@ const signUpStyles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        // backgroundColor: "rgba(0,0,0,0.5)",
     },
     container: {
         backgroundColor: colors.background,
@@ -134,6 +133,31 @@ const signUpStyles = StyleSheet.create({
         marginTop: 5,
         textAlign: "center",
     },
+    termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 1,
+    borderColor: '#89673F',
+    backgroundColor: '#fff',
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#89673F',
+  },
+  checkmark: {
+    color: '#fff',
+  },
+  termsText: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
 });
 
 export default signUpStyles;
