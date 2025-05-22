@@ -65,3 +65,6 @@ snapadmin:
   baseUrl: admin
   models-package: kr.ac.kookmin.wuung.model
   brand-name: WOOONG
+server:
+  tomcat:
+    max-http-form-post-size: 15MB
