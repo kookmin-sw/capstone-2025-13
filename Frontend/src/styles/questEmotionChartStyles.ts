@@ -37,15 +37,13 @@ export default StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   },
   dialogueBox: {
         position: "absolute",
         bottom: 0,
         width: "100%",
-        // height: "25%"
-     
     },
     nametag: {
         position: "absolute",
