@@ -53,9 +53,9 @@
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
     <key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
-    <string>걸음수 추적을 위해 앱에 대한 권한 요청을 합니다.</string>
+    <string>$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.</string>
     <key>NSHealthShareUsageDescription</key>
-    <string>걸음수 추적을 위해 앱에 대한 권한 요청을 합니다.</string>
+    <string>$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

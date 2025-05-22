@@ -15,4 +15,4 @@ local.properties
 # Bundle artifacts
 *.jsbundle
 
-src/main/AndroidManifest.xml
+AndroidManifest.xml
