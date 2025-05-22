@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
 import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
 import styles from "../../styles/formalDiagnsisResultStyles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -53,8 +54,12 @@ const DepressionResultScreen = () => {
     <View style={{ flex: 1, backgroundColor: "#1BA663" }}>
       <TouchableOpacity
         style={styles.backButtonWrapper}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          navigation.navigate("FormalDiagnosis");
+          AsyncStorage.setItem("secondPasswordPassed", "true");
+        }}
       >
+
         <Ionicons name="arrow-back-circle" size={40} color="white" />
       </TouchableOpacity>
 
@@ -128,7 +133,7 @@ const DepressionResultScreen = () => {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </View >
   );
 };
 
