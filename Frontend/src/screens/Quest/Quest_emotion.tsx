@@ -188,7 +188,7 @@ export default function QuestEmotion() {
 
             {latestResult !== null ? (
                 <View style={styles.overlay}>
-                    <EmotionChartBox result={latestResult} success={success}/>
+                    <EmotionChartBox result={latestResult} success={success} nickname={nickname}/>
                 </View>
             ) : (
                 <View style={styles.overlay}>
