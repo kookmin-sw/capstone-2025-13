@@ -32,6 +32,7 @@ export default StyleSheet.create({
     backgroundColor: '#FF9B4B',
     borderRadius: 8,
     paddingVertical: 10,
+    paddingHorizontal: 16,
     alignItems: 'center',
     zIndex: 999,
   },
@@ -39,6 +40,7 @@ export default StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+    textAlign: 'center',
   },
   dialogueBox: {
         position: "absolute",
