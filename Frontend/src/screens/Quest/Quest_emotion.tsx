@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { Text, View, Alert } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -12,19 +12,21 @@ import { QUESTS } from '../../utils/QuestEmotion/quests';
 import EmotionChartBox from '../../components/Quest_emotionBox';
 import styles from '../../styles/questEmotionStyles';
 import {NavigationProp, useNavigation, useRoute} from "@react-navigation/native";
+import customAxios from "../../API/axios";
+import { getCoupon } from "../../API/potAPI";
 
 type RouteParams = {
     questTitle: string;
     questDescription: string;
     questTarget: number;
+    nickname: string,
 };
 
 export default function QuestEmotion() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
-    const { questTitle, questDescription, questTarget } =
+    const { questTitle, questDescription, nickname } =
         route.params as RouteParams;
-
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
     const cameraRef = useRef<any>(null);
@@ -36,9 +38,40 @@ export default function QuestEmotion() {
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
-    // 타이밍 제어
     const lastPhotoTimeRef = useRef(0);
     const isPhotoTaken = useRef(false);
+
+    const handleComplete = async () => {
+        try {
+            const type = "EMOTION";
+            const response = await customAxios.get(`/quests/last/${type}`);
+            const lastDataID = response.data.data.id;
+    
+            const postRes = await customAxios.post("/quests", {
+                id: lastDataID,
+                current: 0,
+                status: "COMPLETED",
+            });
+    
+            if (postRes.status === 200 || postRes.status === 201) {
+                await getCoupon();
+                Alert.alert("완료!", "감정 퀘스트가 성공적으로 완료되었어요! 🎉", [
+                    {
+                        text: "확인",
+                        onPress: () =>
+                            navigation.navigate("Quest_stage", {
+                                title: `${nickname}의 숲`,
+                            }),
+                    },
+                ]);
+            } else {
+                Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
+            }
+        } catch (error) {
+            console.error("감정 퀘스트 완료 처리 중 오류 발생:", error);
+            Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+        }
+    };    
 
     const quest = QUESTS.find(q => q.id === questTitle);
     if (!quest) {
@@ -80,15 +113,12 @@ export default function QuestEmotion() {
     };
 
     const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-        // faces 배열이 들어오긴 했지만 길이가 0이면 경고 켜고 리턴
         if (faces && faces.length === 0) {
             setNoFaceWarning(true);
             return;
         }
-        // 얼굴이 하나라도 잡히면 경고 끄기
         setNoFaceWarning(false);
 
-        // 모델 로드 여부 체크
         if (!faces?.length || !isLoaded || !model) return;
 
         const face = faces[0];
@@ -111,6 +141,7 @@ export default function QuestEmotion() {
             if (quest.check(updated)) {
                 setSuccess(true);
                 console.log('🎯 퀘스트 완료');
+                handleComplete
             }
         }
     });
@@ -157,7 +188,7 @@ export default function QuestEmotion() {
 
             {latestResult !== null ? (
                 <View style={styles.overlay}>
-                    <EmotionChartBox result={latestResult} success={success}/>
+                    <EmotionChartBox result={latestResult} success={success} nickname={nickname} questDescription={questDescription}/>
                 </View>
             ) : (
                 <View style={styles.overlay}>

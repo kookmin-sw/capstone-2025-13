@@ -14,17 +14,34 @@ import { StackNavigationProp } from "@react-navigation/stack";
 type RootStackParamList = {
   Quest_meditation: { questTitle: string; questDescription: string; questTarget: number };
   Quest_exercise: { questTitle: string; questDescription: string; questTarget: number };
+  Quest_emotion: { questTitle: string; questDescription: string; questTarget: number; nickname: string;};
 };
 
 type QuestNavigationProp =
     | StackNavigationProp<RootStackParamList, "Quest_meditation">
-    | StackNavigationProp<RootStackParamList, "Quest_exercise">;
+    | StackNavigationProp<RootStackParamList, "Quest_exercise">
+    | StackNavigationProp<RootStackParamList, "Quest_emotion">;
 
-const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
+  const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTION" => {
+    if (title.includes("의 숲")) return "EMOTION"; 
+    switch (title) {
+      case "명상": return "MEDITATE";
+      case "산책": return "ACTIVITY";
+      default: return "EMOTION";
+    }
+  };
+    
+
+const getImageSource = (title: string) => {
   switch (title) {
-    case "명상": return "MEDITATE";
-    case "산책": return "ACTIVITY";
-    default: return "EMOTION";
+    case "명상":
+      return require("../../assets/Images/clover_meditation.png");
+    case "산책":
+      return require("../../assets/Images/clover_exercise.png");
+    case "감정":
+      return require("../../assets/Images/clover_cv.png");
+    default:
+      return require("../../assets/Images/clover_cv.png");
   }
 };
 
@@ -43,7 +60,7 @@ const lockPositions = [
 export default function Quest_stage() {
   const route = useRoute();
   const navigation = useNavigation<QuestNavigationProp>();
-  const { title } = route.params as { title: string };
+  const { title, nickname } = route.params as { title: string, nickname :string };
 
   const [questTitle, setQuestTitle] = useState("");
   const [displayQuestTitle, setDisplayQuestTitle] = useState("");
@@ -181,7 +198,7 @@ export default function Quest_stage() {
     } else if (title === "산책") {
       navigation.navigate("Quest_exercise", params);
     } else {
-      navigation.navigate("Quest_emotion", params);
+      navigation.navigate("Quest_emotion", {...params, nickname});
     }
   };
 
@@ -262,14 +279,10 @@ export default function Quest_stage() {
                     activeOpacity={0.8}
                 >
                   <View style={questStageStyles.iconWrapper}>
-                    <Image
-                        source={
-                          title === "명상"
-                              ? require("../../assets/Images/clover_meditation.png")
-                              : require("../../assets/Images/clover_exercise.png")
-                        }
-                        style={questStageStyles.cloverIcon}
-                        resizeMode="contain"
+                  <Image
+                      source={getImageSource(title)}
+                      style={questStageStyles.cloverIcon}
+                      resizeMode="contain"
                     />
                   </View>
                   <Image source={source} style={questStageStyles.fullSizeImage} resizeMode="contain" />

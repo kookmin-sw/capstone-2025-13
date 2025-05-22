@@ -79,6 +79,7 @@ export const styles = StyleSheet.create({
         fontFamily: fonts.laundry,
         fontSize: width * 0.03,
         marginVertical: height * 0.004,
+        lineHeight: width * 0.045,
       },
     completeButton: {
     fontFamily: fonts.laundryBold,
