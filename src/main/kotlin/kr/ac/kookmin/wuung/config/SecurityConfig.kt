@@ -40,7 +40,7 @@ class SecurityConfig(
     @Order(1)
     fun jwtSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .securityMatcher("/api/**", "/admin/**") // JWT 인증을 적용할 경로 지정
+            .securityMatcher("/api/**") // JWT 인증을 적용할 경로 지정
             .csrf { it.disable() }
             .cors {
                 val configuration = CorsConfiguration().apply {
@@ -57,8 +57,18 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/**", "/api/integrity/**", "/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**", "/v2/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                    .anyRequest().authenticated()
+                    .requestMatchers(
+                        "/auth/**",
+                        "/api/integrity/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/api-docs/**",
+                        "/v3/api-docs/**",
+                        "/v2/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                    ).permitAll()
+                auth.anyRequest().authenticated()
             }
             .addFilterBefore(exceptionHandlerFilter, LogoutFilter::class.java)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
