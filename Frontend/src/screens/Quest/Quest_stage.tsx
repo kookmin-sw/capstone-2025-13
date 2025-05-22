@@ -31,6 +31,19 @@ const getQuestTypeFromTitle = (title: string): "MEDITATE" | "ACTIVITY" | "EMOTIO
   }
 };
 
+const getImageSource = (title: string) => {
+  switch (title) {
+    case "명상":
+      return require("../../assets/Images/clover_meditation.png");
+    case "산책":
+      return require("../../assets/Images/clover_exercise.png");
+    case "감정":
+      return require("../../assets/Images/clover_cv.png");
+    default:
+      return require("../../assets/Images/clover_cv.png");
+  }
+};
+
 const { height, width } = Dimensions.get("window");
 
 const lockPositions = [
@@ -265,14 +278,10 @@ export default function Quest_stage() {
                     activeOpacity={0.8}
                 >
                   <View style={questStageStyles.iconWrapper}>
-                    <Image
-                        source={
-                          title === "명상"
-                              ? require("../../assets/Images/clover_meditation.png")
-                              : require("../../assets/Images/clover_exercise.png")
-                        }
-                        style={questStageStyles.cloverIcon}
-                        resizeMode="contain"
+                  <Image
+                      source={getImageSource(title)}
+                      style={questStageStyles.cloverIcon}
+                      resizeMode="contain"
                     />
                   </View>
                   <Image source={source} style={questStageStyles.fullSizeImage} resizeMode="contain" />
