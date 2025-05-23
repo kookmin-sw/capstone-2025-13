@@ -74,19 +74,19 @@ export default function DailyTopic() {
     const initializeChat = async () => {
         try {
             const topicData = date
-                ? await getTopicByDate(date)
-                : await getTodayTopic();
-
+                ? await getTopicDetails(date)  // 날짜가 있는 경우 해당 날짜의 데이터
+                : await getTodayTopic();       // 없는 경우 오늘 주제
+    
             const history: ChatItem[] = [
                 { type: "question", text: topicData.data },
             ];
-
+    
             const allFeedbacks = topicData.feedbacks.sort(
                 (a: any, b: any) =>
                     new Date(a.createdAt).getTime() -
                     new Date(b.createdAt).getTime()
             );
-
+    
             allFeedbacks.forEach((feedback: any) => {
                 history.push({ type: "answer", text: feedback.data });
                 if (feedback.status !== TopicFeedbackStatus.NOFEEDBACK) {
@@ -95,18 +95,25 @@ export default function DailyTopic() {
                         text: feedback.aiFeedback,
                     });
                 }
-
-                if (feedback.status === TopicFeedbackStatus.NOFEEDBACK) {
-                    setInputDisabled(true);
-                    setPlaceholderText(
-                        "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
-                    );
-                    setIsModalVisible(true);
-                }
             });
-
+    
             setTopicId(topicData.id);
             setChatHistory(history);
+
+            if (date) {
+                setInputDisabled(true);
+                setPlaceholderText(`${date}의 기록이야`);
+                return;
+            }
+    
+            const lastFeedback = allFeedbacks[allFeedbacks.length - 1];
+            if (lastFeedback?.status === TopicFeedbackStatus.NOFEEDBACK) {
+                setInputDisabled(true);
+                setPlaceholderText(
+                    "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
+                );
+                setIsModalVisible(true);
+            }
         } catch (error: any) {
             if (
                 error.response?.status === 404 ||
@@ -121,6 +128,7 @@ export default function DailyTopic() {
             }
         }
     };
+    
 
     const handleCreateTopic = async () => {
         try {
@@ -140,17 +148,6 @@ export default function DailyTopic() {
                     error.response?.data || error.message
                 );
             }
-        }
-    };
-
-    const handleFetchFeedback = async (topicId: string) => {
-        try {
-            await getTopicDetails(topicId);
-        } catch (error: any) {
-            console.error(
-                "❌ Failed to fetch feedback:",
-                error.response?.data || error.message
-            );
         }
     };
 
@@ -322,7 +319,13 @@ export default function DailyTopic() {
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
                 <TouchableOpacity
                     style={dailyTopicstyles.backButtonWrapper}
-                    onPress={() => navigation.navigate("Home", {})}
+                    onPress={() => {
+                        if (date) {
+                            navigation.navigate("Calendar");
+                        } else {
+                            navigation.navigate("Home", {}); 
+                        }
+                    }}
                 >
                     <Ionicons
                         name="arrow-back-circle"
