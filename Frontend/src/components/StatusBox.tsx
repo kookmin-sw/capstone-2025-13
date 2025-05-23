@@ -43,7 +43,7 @@ export default function StatusBox() {
     const progressRatio = Math.min(potData.exp / potData.need, 1);
 
     let potImageSource = potImage;
-    if (progressRatio > 0.9) {
+    if (progressRatio > 0.7) {
         potImageSource = potFlower;
     } else if (progressRatio > 0.2) {
         potImageSource = potClover;
