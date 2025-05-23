@@ -53,6 +53,8 @@ export default function DailyTopic() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [hasShownModal, setHasShownModal] = useState(false);
+
 
     const showModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
@@ -114,6 +116,7 @@ export default function DailyTopic() {
                     "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
                 );
                 setIsModalVisible(true);
+                setHasShownModal(true);
             }
         } catch (error: any) {
             if (
