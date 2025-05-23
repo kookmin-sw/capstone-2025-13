@@ -66,6 +66,7 @@ export interface DiagnosisSpecificResult {
     diagnosisId: number;
     result: number;
     scale: number;
+    max_score: number;
     scale_description: ScaleDescription[];
     createdAt: string;
     updatedAt: string;

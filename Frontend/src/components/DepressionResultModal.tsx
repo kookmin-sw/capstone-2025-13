@@ -31,6 +31,7 @@ interface DiagnosisResult {
     result: number;
     scale: number;
     createdAt: string;
+    max_score: number;
     scale_description: ScaleDescription[];
 }
 
@@ -43,6 +44,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
         scaleName: string;
         description: string;
         createdAt: string;
+        max_score: number;
     } | null>(null);
 
     // 우울 점수에 따른 scaleName과 설명 추출
@@ -69,6 +71,7 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
                         score: result,
                         totalScore: scale,
                         scaleName: matchedScale.scaleName,
+                        max_score: response.max_score,
                         description: matchedScale.description,
                         createdAt: createdAt
                     });
@@ -112,9 +115,9 @@ const DepressionResultModal: React.FC<Props> = ({ visible, onClose, id }) => {
         );
     }
 
-    const { result, scale } = data;
+    const { result, scale, max_score } = data;
     const { scaleName, description } = computedResult;
-    const depressionLevel = scale === 0 ? 0 : result / scale;
+    const depressionLevel = scale === 0 ? 0 : result / max_score;
     // 고쳐야 함
 
 
