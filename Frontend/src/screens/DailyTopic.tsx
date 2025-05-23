@@ -101,8 +101,9 @@ export default function DailyTopic() {
             setChatHistory(history);
 
             if (date) {
+                const [year, month, day] = date.split("-"); // "2025", "05", "04"로 분리
                 setInputDisabled(true);
-                setPlaceholderText(`${date}의 기록이야`);
+                setPlaceholderText(`${year}년 ${month}월 ${day}일의 매일 1주제야-!`);
                 return;
             }
     
