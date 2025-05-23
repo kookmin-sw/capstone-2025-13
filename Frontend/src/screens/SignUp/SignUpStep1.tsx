@@ -39,6 +39,7 @@ const SignUpStep1 = () => {
                                 <Text style={signUpStyles.inputTitle}>닉네임</Text>
                                 <TextInput
                                     placeholder="닉네임"
+                                    placeholderTextColor="#989898"
                                     style={signUpStyles.input}
                                     value={nickname}
                                     onChangeText={setNickname}

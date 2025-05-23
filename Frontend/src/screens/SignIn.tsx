@@ -111,6 +111,7 @@ const SignIn = () => {
                                 </Text>
                                 <TextInput
                                     placeholder="이메일"
+                                    placeholderTextColor="#989898"
                                     style={signInStyles.input}
                                     value={email}
                                     onChangeText={setEmail}
@@ -123,8 +124,9 @@ const SignIn = () => {
                                 </Text>
                                 <TextInput
                                     placeholder="비밀번호"
+                                    placeholderTextColor="#989898"
+                                    style={[signInStyles.input, { color: '#000' }]}
                                     secureTextEntry
-                                    style={signInStyles.input}
                                     value={password}
                                     onChangeText={setPassword}
                                 />
