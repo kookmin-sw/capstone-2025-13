@@ -29,7 +29,9 @@ export default function SecondPassword({ route }: any) {
         fetchPassword();
     }, []);
 
-
+    useEffect(() => {
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
     useEffect(() => {
         if (password.length === 4) {
             const validatePassword = async () => {

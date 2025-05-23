@@ -34,9 +34,6 @@ export default function FormalDiagnosis() {
     const [diagnosisResults, setDiagnosisResults] = useState<DiagnosisResult[]>([]);
 
     useSecondPasswordGuard("FormalDiagnosis");
-    useEffect(() => {
-        AsyncStorage.setItem("secondPasswordPassed", "false");
-    }, []);
 
     useEffect(() => {
         const today = new Date();

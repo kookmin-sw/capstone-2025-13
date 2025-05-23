@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, use, useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 import calendarStyles from "../styles/calendarStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -36,9 +36,12 @@ export default function CalendarScreen() {
     const [attendanceDates, setAttendanceDates] = useState([]);
     const [isQuestModalVisible, setIsQuestModalVisible] = useState(false);
     const [selectedQuestId, setSelectedQuestId] = useState<string | number>();
-
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+
+    useSecondPasswordGuard("Calendar");
+
     useEffect(() => {
         const fetchData = async () => {
             console.log("현재 보여지는 달:", currentYearMonth);
@@ -137,10 +140,6 @@ export default function CalendarScreen() {
         setAttendanceRate(attendance / daysInMonth);
     }, [attendance, selectedDate]);
 
-    useSecondPasswordGuard("Calendar");
-    useEffect(() => {
-        AsyncStorage.setItem("contentPasswordPassed", "false");
-    }, []);
 
     return (
         <View style={calendarStyles.container}>
