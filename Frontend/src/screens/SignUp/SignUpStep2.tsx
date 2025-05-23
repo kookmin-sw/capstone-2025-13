@@ -83,6 +83,7 @@ const SignUpStep2 = () => {
                                     <TextInput
                                         style={signUpStyles.input}
                                         placeholder="YYYY-MM-DD"
+                                        placeholderTextColor="#989898"
                                         value={date ? date.toISOString().slice(0, 10) : ""}
                                         editable={false}
                                         pointerEvents="none"

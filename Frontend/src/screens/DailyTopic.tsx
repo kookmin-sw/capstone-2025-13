@@ -348,6 +348,7 @@ export default function DailyTopic() {
                 <View style={dailyTopicstyles.inputContainer}>
                     <TextInput
                         placeholder={placeholderText}
+                        placeholderTextColor="#A3B8A0"
                         style={dailyTopicstyles.textInput}
                         value={answer}
                         onChangeText={setAnswer}
