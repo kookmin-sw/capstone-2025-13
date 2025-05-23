@@ -137,10 +137,10 @@ export default function CalendarScreen() {
         setAttendanceRate(attendance / daysInMonth);
     }, [attendance, selectedDate]);
 
-    // useSecondPasswordGuard("Calendar");
-    // useEffect(() => {
-    //     AsyncStorage.setItem("contentPasswordPassed", "false");
-    // }, []);
+    useSecondPasswordGuard("Calendar");
+    useEffect(() => {
+        AsyncStorage.setItem("contentPasswordPassed", "false");
+    }, []);
 
     return (
         <View style={calendarStyles.container}>
