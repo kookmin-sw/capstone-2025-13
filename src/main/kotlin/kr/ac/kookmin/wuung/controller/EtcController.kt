@@ -11,10 +11,13 @@ import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.lib.datetimeParser
 import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.QuestType
+import kr.ac.kookmin.wuung.model.TopicFeedbackStatus
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.model.UserQuestStatus
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
 import kr.ac.kookmin.wuung.repository.RecordRepository
+import kr.ac.kookmin.wuung.repository.TopicFeedbackRepository
+import kr.ac.kookmin.wuung.repository.TopicRepository
 import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
 import kr.ac.kookmin.wuung.repository.UserQuestsRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,12 +28,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.format.DateTimeFormatter
 
 enum class BehaviorType(val value : String){
     DIARY("DIARY"),
     QUEST("QUEST"),
-    DIAGNOSIS("DIAGNOSIS")
+    DIAGNOSIS("DIAGNOSIS"),
+    TOPIC("TOPIC")
 }
 
 data class DailyBehaviorDTO(
@@ -55,6 +60,8 @@ class EtcController(
     @Autowired private val recordRepository: RecordRepository,
     @Autowired private val userQuestRepository: UserQuestsRepository,
     @Autowired private val userQuestStageRepository: UserQuestStageRepository,
+    @Autowired private val topicRepository: TopicRepository,
+    @Autowired private val topicFeedbackRepository: TopicFeedbackRepository,
 ) {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -166,6 +173,28 @@ class EtcController(
 
         behaviors = behaviors + questBehaviors
 
+        val todayTopics = topicRepository.findByUserAndCreatedAtBetween(userDetails, startDate, endDate)
+
+        // 한 번이라도 대화를 했다면
+        if (todayTopics.size >= 1) {
+            
+            // 각 주제에서 피드백 뽑아서
+            todayTopics.forEach { topic ->
+                val hasPendingFeedback = topic.topicFeedback.any { feedback -> feedback.status == TopicFeedbackStatus.NOFEEDBACK } // NOFEEDBACK이 있는지 확인
+
+                // 하나라도 대화가 완료된 내역이 있다면 행동에 추가
+                if (hasPendingFeedback) {
+                    behaviors += DailyBehaviorDTO(
+                        title = "1일 1주제",
+                        content = "1일 1주제 대화 완료",
+                        type = BehaviorType.TOPIC,
+                        id = topic.id!!
+                    )
+                    return@forEach
+                }
+            }
+        }
+
         return ResponseEntity.ok(
             ApiResponseDTO(
                 data = behaviors
@@ -243,6 +272,20 @@ class EtcController(
         }
         behaviors.forEach { behavior ->
             date.add(behavior.createdAt.format(dateFormatter))
+        }
+
+        // 토픽들 찾아서
+        val topics = topicRepository.findByUserAndCreatedAtBetween(
+            userDetails,
+            startDate,
+            endDate
+        )
+
+        // NOFEEDBACK 있는 애만 date에 싹 다 추가
+        topics.forEach { topic ->
+            if (topic.topicFeedback.any { feedback -> feedback.status == TopicFeedbackStatus.NOFEEDBACK }) {
+                date.add(topic.createdAt.format(dateFormatter))
+            }
         }
 
         return ResponseEntity.ok(ApiResponseDTO(data = date.distinct()))
