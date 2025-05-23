@@ -61,6 +61,23 @@ export interface DiagnosisResult {
     updatedAt: string;
 }
 
+export interface DiagnosisSpecificResult {
+    id: string;
+    diagnosisId: number;
+    result: number;
+    scale: number;
+    max_score: number;
+    scale_description: ScaleDescription[];
+    createdAt: string;
+    updatedAt: string;
+}
+interface ScaleDescription {
+    start: number;
+    scaleName: string;
+    description: string;
+}
+
+
 const getAuthHeaders = async () => {
   const token = await AsyncStorage.getItem("accessToken");
   if (!token) throw new Error("❌ 로그인되지 않았습니다.");
@@ -129,12 +146,14 @@ export const getDiagnosisResult = async (start: string): Promise<DiagnosisResult
   });
 };
 
-export const getDiagnosisSpecificResult = async (resultId: string|number): Promise<DiagnosisResult[] | null> => {
+export const getDiagnosisSpecificResult = async (
+  resultId: string | number
+): Promise<DiagnosisSpecificResult | null> => {
   console.log("resultId", resultId);
   return handleAuthRequest(async () => {
     const headers = await getAuthHeaders();
-    const { data } = await axios.get<ApiResponseDTO<DiagnosisResult[]>>(
-      `/diagnosis/results/${resultId}`,
+    const { data } = await axios.get<ApiResponseDTO<DiagnosisSpecificResult>>(
+      `/diagnosis/result/${resultId}`,
       { headers }
     );
     return data.data;
