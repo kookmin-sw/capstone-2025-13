@@ -185,8 +185,8 @@ class EtcController(
                 // 하나라도 대화가 완료된 내역이 있다면 행동에 추가
                 if (hasPendingFeedback) {
                     behaviors += DailyBehaviorDTO(
-                        title = "1일 1주제",
-                        content = "1일 1주제 대화 완료",
+                        title = "매일 1주제",
+                        content = "매일 1주제 대화 완료",
                         type = BehaviorType.TOPIC,
                         id = topic.id!!
                     )
