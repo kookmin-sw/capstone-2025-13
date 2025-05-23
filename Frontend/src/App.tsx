@@ -56,7 +56,7 @@ export type RootStackParamList = {
     FormalDiagnosis: undefined;
     FormalDiagnosisSurvey: { diagnosisId: number };
     GameScreen: { score?: number };
-    DailyTopic: undefined;
+    DailyTopic: { date?: string };
     Spinner: undefined;
     HelpCall: undefined;
     HelpCall2: undefined;

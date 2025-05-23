@@ -27,9 +27,15 @@ import {
     getTopicDetails,
     submitFeedback,
     getFeedbackById,
+    getTopicByDate,
     TopicFeedbackResponse,
     TopicFeedbackStatus,
 } from "../API/topicAPI";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
+const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
+const date = route.params?.date ?? '';
+
 
 type ChatItem =
     | { type: "question"; text: string }
@@ -67,7 +73,9 @@ export default function DailyTopic() {
 
     const initializeChat = async () => {
         try {
-            const topicData = await getTodayTopic();
+            const topicData = date
+                ? await getTopicByDate(date)
+                : await getTodayTopic();
 
             const history: ChatItem[] = [
                 { type: "question", text: topicData.data },
