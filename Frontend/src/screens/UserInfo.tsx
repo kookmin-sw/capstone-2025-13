@@ -10,6 +10,7 @@ import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -54,20 +55,19 @@ export default function UserInfo() {
   const [originalData, setOriginalData] = useState<UserData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getGenderLabel = (gender: GenderEnum | string | null | undefined): string => {
     switch (gender) {
-      case GenderEnum.MALE:
       case "MALE":
-      case GenderEnum.MALE:
         return "남성";
-      case GenderEnum.FEMALE:
       case "FEMALE":
       case GenderEnum.FEMALE:
         return "여성";
       case "UNKNOWN":
-      case GenderEnum.UNKNOWN:
         return "비밀"
       default:
         return "밝히지 않음"
@@ -86,7 +86,7 @@ export default function UserInfo() {
         email: user.email,
         password: null,
         birthDate: user.birthDate,
-        gender: getGenderLabel(user.gender),
+        gender: user.gender,
         secondPassword: (await AsyncStorage.getItem("@secondPassword")) || '1111',
         profilePic: user.profile ?? null,
       };
@@ -160,7 +160,17 @@ export default function UserInfo() {
         gender = GenderEnum.THIRD_GENDER;
         break;
     }
-
+    if (userData.password && !passwordRegex.test(userData.password)) {
+      setPasswordError("비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.");
+      Toast.show({
+        type: "error",
+        text1: "저장 실패",
+        text2: "비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.",
+        position: "bottom",
+      });
+      return;
+    }
+    setPasswordError(null);
     try {
       const transformedUserData = {
         ...userData,
@@ -270,14 +280,24 @@ export default function UserInfo() {
         <Text style={userInfoStyles.nickname}>{userData.nickname}</Text>
         <InfoRow label="닉네임" value={userData.nickname} editable={editMode} onChangeText={(text) => setUserData({ ...userData, nickname: text })} />
         <InfoRow label="이메일" value={userData.email} editable={false} />
-
         <InfoRow
           label="비밀번호"
           value={userData.password ?? ""}
-          onChangeText={(text) => setUserData({ ...userData, password: text })}
+          onChangeText={(text) => {
+            setUserData({ ...userData, password: text });
+            if (!passwordRegex.test(text)) {
+              setPasswordError("비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.");
+            } else {
+              setPasswordError(null);
+            }
+          }}
           secureTextEntry={!editMode}
           editable={editMode}
         />
+        {passwordError && (
+          <Text style={{ color: "red", marginLeft: 10 }}>{passwordError}</Text>
+        )}
+
 
         <InfoRow label="생년월일" value={userData.birthDate} editable={false} />
 
@@ -304,7 +324,9 @@ export default function UserInfo() {
             </View>
 
           ) : (
-            <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
+            <Text style={userInfoStyles.buttonText}>
+              {getGenderLabel(userData.gender)}
+            </Text>
           )}
         </View>
         <InfoRow
@@ -405,29 +427,28 @@ function InfoRow({
   maxLength = 20,
 }: InfoRowProps) {
   const handleChange = (text: string) => {
-    if (onChangeText) onChangeText(text);
-    if (keyboardType === "number-pad" && text.length === maxLength) {
-      Keyboard.dismiss();
+    if (onChangeText) {
+      onChangeText(text);
     }
   };
 
   return (
     <View style={userInfoStyles.row}>
       <Text style={userInfoStyles.label}>{label}</Text>
-      {editable ? (
-        <TextInput
-          value={value}
-          onChangeText={handleChange}
-          style={userInfoStyles.input}
-          secureTextEntry={secureTextEntry}
-          editable={editable}
-          keyboardType={keyboardType}
-          maxLength={maxLength}
-        />
-      ) : (
-        <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
-      )}
+      <TextInput
+        style={[
+          userInfoStyles.input,
+          !editable && userInfoStyles.inputDisabled
+        ]}
+        value={value}
+        editable={editable}
+        onChangeText={handleChange}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        maxLength={maxLength}
+        placeholder={editable ? label : undefined}
+        placeholderTextColor={editable ? "#999" : "#ccc"}
+      />
     </View>
-
   );
 }

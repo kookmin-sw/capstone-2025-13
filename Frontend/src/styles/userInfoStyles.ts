@@ -47,10 +47,13 @@ const userInfoStyles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    backgroundColor: '#f0f0f0',
+    color: '#000000',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
     width: width * 0.5,
-    padding: 5,
     fontFamily: fonts.primary,
     fontSize: width * 0.04,
   },
@@ -130,6 +133,14 @@ const userInfoStyles = StyleSheet.create({
     left: width * 0.05,   // 전체 너비의 5% 위치
     zIndex: 10,
   },
+  inputDisabled: {
+  backgroundColor: '#f0f0f0',
+  color: '#999',
+  borderColor: '#ddd',
+  borderWidth: 1,
+  borderRadius: 8,
+  padding: 10,
+}
 });
 
 export default userInfoStyles;
