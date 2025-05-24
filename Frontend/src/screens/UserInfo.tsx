@@ -11,6 +11,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import InfoRow from "../components/UserInfo/InfoRow";
+import ProfileImageModal from "../components/UserInfo/ProfileImageModal";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -373,81 +375,13 @@ export default function UserInfo() {
         </View>
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <ProfileImageModal
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={userInfoStyles.modalContainer}>
-          <View style={userInfoStyles.modalContent}>
-            {editMode ? (
-              <>
-                <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>갤러리에서 선택</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>카메라로 찍기</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>기본 이미지로 설정</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <Text style={userInfoStyles.buttonText}>수정 모드에서만 변경 가능합니다.</Text>
-            )}
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
-              <Text style={userInfoStyles.buttonText}>닫기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
-}
-
-type InfoRowProps = {
-  label: string;
-  value: string;
-  onChangeText?: (text: string) => void;
-  editable?: boolean;
-  secureTextEntry?: boolean;
-  keyboardType?: "default" | "number-pad" | "numeric" | "email-address" | "phone-pad";
-  maxLength?: number;
-};
-
-
-function InfoRow({
-  label,
-  value,
-  onChangeText,
-  editable = true,
-  secureTextEntry = false,
-  keyboardType = "default",
-  maxLength = 20,
-}: InfoRowProps) {
-  const handleChange = (text: string) => {
-    if (onChangeText) {
-      onChangeText(text);
-    }
-  };
-
-  return (
-    <View style={userInfoStyles.row}>
-      <Text style={userInfoStyles.label}>{label}</Text>
-      <TextInput
-        style={[
-          userInfoStyles.input,
-          !editable && userInfoStyles.inputDisabled
-        ]}
-        value={value}
-        editable={editable}
-        onChangeText={handleChange}
-        secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        maxLength={maxLength}
-        placeholder={editable ? label : undefined}
-        placeholderTextColor={editable ? "#999" : "#ccc"}
+        onClose={() => setModalVisible(false)}
+        onPickImage={handlePickImage}
+        onTakePhoto={handleTakePhoto}
+        onReset={handleResetProfilePic}
+        editMode={editMode}
       />
     </View>
   );
