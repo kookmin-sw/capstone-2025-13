@@ -6,8 +6,8 @@ import {
     ImageBackground,
     TouchableOpacity,
 } from "react-native";
-import styles from "../styles/recordInputBoxStyles";
-import { createRecord, getRecord } from "../API/recordAPI";
+import styles from "../../styles/Record/recordInputBoxStyles";
+import { createRecord, getRecord } from "../../API/recordAPI";
 import Toast from "react-native-toast-message";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -111,7 +111,7 @@ export default function RecordInputBox({
     return (
         <View style={styles.wrapper}>
             <ImageBackground
-                source={require("../assets/Images/record_input.png")}
+                source={require("../../assets/Images/record_input.png")}
                 resizeMode="stretch"
                 style={styles.imageBackground}
             >

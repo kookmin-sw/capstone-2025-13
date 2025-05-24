@@ -1,6 +1,6 @@
 // styles/methodCardStyles.ts
 import { StyleSheet, Dimensions } from "react-native";
-import fonts from "../constants/fonts";
+import fonts from "../../constants/fonts";
 
 const { width } = Dimensions.get("window");
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, TextInput } from "react-native";
-import styles from "../styles/recordEtcStyles";
+import styles from "../../styles/Record/recordEtcStyles";
 
 type RecordEtcProps = {
     onRecordEtcUpdate: (text: string) => void;

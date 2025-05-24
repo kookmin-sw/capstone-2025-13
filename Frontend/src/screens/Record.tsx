@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
     View,
     ScrollView,
-    Image,
     Text,
     TouchableOpacity,
     Modal,
@@ -12,12 +11,12 @@ import {
     TouchableWithoutFeedback,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import RecordHeader from "../components/RecordHeader";
-import RecordInputBox from "../components/RecordInputBox";
-import StarRating from "../components/StarRating";
-import RecordChat from "../components/Record_chat";
-import RecordEtc from "../components/Record_etc";
-import styles from "../styles/recordStyles";
+import RecordHeader from "../components/Record/RecordHeader";
+import RecordInputBox from "../components/Record/RecordInputBox";
+import StarRating from "../components/Record/StarRating";
+import RecordChat from "../components/Record/Record_chat";
+import RecordEtc from "../components/Record/Record_etc";
+import styles from "../styles/Record/recordStyles";
 import { getRecordMe, postRecord } from "../API/recordAPI";
 import { getCoupon } from "../API/potAPI";
 import { RouteProp, useRoute } from "@react-navigation/native";

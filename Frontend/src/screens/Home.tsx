@@ -18,14 +18,15 @@ import FloatingButton from "../components/FloatingButton";
 import CalendarBadge from "../components/CalendarBadge";
 import SimpleResult from "../components/SimpleResult";
 import styles from "../styles/homeStyles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, "Home">>();
     const [simpleScale, setSimpleScale] = useState(route.params?.simpleScale ?? '');
     useEffect(() => {
-        console.log(simpleScale);
-    }, [simpleScale]);
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>

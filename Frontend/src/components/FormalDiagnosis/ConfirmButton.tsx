@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
-import styles from "../styles/confirmButtonStyles";
+import styles from "../../styles/FormalDiagnosis/confirmButtonStyles"
 
 export default function ConfirmButton({
     label,

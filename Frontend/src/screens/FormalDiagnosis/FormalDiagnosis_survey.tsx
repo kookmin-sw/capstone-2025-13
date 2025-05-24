@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, ScrollView, Text } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import SurveyHeader from "../../components/SurveyHeader";
-import SurveyQuestion from "../../components/SurveyQuestion";
-import ConfirmButton from "../../components/ConfirmButton";
-import styles from "../../styles/formalSurveyStyles";
-import {DiagnosisQuestion} from "../../API/diagnosisAPI";
+import SurveyHeader from "../../components/FormalDiagnosis/SurveyHeader";
+import SurveyQuestion from "../../components/FormalDiagnosis/SurveyQuestion";
+import ConfirmButton from "../../components/FormalDiagnosis/ConfirmButton";
+import styles from "../../styles/FormalDiagnosis/formalSurveyStyles";
+
 
 import {
     fetchDiagnosisDetail,
@@ -54,10 +54,10 @@ export default function FormalDiagnosisSurvey() {
         const matched = sorted.find((s) => totalScore >= s.start);
         return matched
             ? {
-                  scaleName: matched.scaleName,
-                  description: matched.description,
-                  start: matched.start,
-              }
+                scaleName: matched.scaleName,
+                description: matched.description,
+                start: matched.start,
+            }
             : null;
     };
 

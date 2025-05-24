@@ -334,6 +334,7 @@ export default function DailyTopic() {
                     <TextInput
                         placeholder={placeholderText}
                         style={dailyTopicstyles.textInput}
+                        placeholderTextColor="#A3B8A0"
                         value={answer}
                         onChangeText={setAnswer}
                         editable={!inputDisabled}
