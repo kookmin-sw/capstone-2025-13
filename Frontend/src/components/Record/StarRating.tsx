@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import styles from "../styles/starRatingStyles";
+import styles from "../../styles/Record/starRatingStyles";
 
 type StarRatingProps = {
     onRecordEtcUpdate: (rating: number) => void;

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import fonts from "../constants/fonts";
-import colors from "../constants/colors";
+import fonts from "../../constants/fonts";
+import colors from "../../constants/colors";
 
 export const gameScreenstyles = StyleSheet.create({
   container: { 

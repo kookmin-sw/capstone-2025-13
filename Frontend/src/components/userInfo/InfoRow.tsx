@@ -1,7 +1,7 @@
 // components/InfoRow.tsx
 import React from "react";
 import { View, Text, TextInput } from "react-native";
-import userInfoStyles from "../../styles/userInfoStyles";
+import userInfoStyles from "../../styles/UserInfo/userInfoStyles";
 
 type InfoRowProps = {
     label: string;

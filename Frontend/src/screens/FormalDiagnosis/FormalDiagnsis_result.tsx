@@ -10,7 +10,7 @@ import { ProgressChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
 import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
-import styles from "../../styles/formalDiagnsisResultStyles";
+import styles from "../../styles/FormalDiagnosis/formalDiagnsisResultStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");

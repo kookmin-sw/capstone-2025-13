@@ -1,8 +1,7 @@
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
-import styles from "../styles/methodCardStyles";
-import { useDiagnosisColor } from "../hooks/useDiagnosisColor";
-
+import styles from "../../styles/FormalDiagnosis/methodCardStyles";
+import { useDiagnosisColor } from "../../hooks/useDiagnosisColor";
 interface MethodCardProps {
     label: string;
     id: number

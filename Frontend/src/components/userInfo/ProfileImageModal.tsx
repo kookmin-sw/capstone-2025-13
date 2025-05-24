@@ -1,7 +1,7 @@
 // components/ProfileImageModal.tsx
 import React from "react";
 import { Modal, View, TouchableOpacity, Text } from "react-native";
-import userInfoStyles from "../../styles/userInfoStyles";
+import userInfoStyles from "../../styles/UserInfo/userInfoStyles";
 
 type ProfileImageModalProps = {
     visible: boolean;

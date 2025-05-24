@@ -5,7 +5,7 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
 import { GenderEnum, getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
-import userInfoStyles from "../styles/userInfoStyles";
+import userInfoStyles from "../styles/UserInfo/userInfoStyles";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
