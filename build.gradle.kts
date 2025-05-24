@@ -40,8 +40,13 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-batch")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis") // redis
+
+	implementation("org.hibernate.orm:hibernate-spatial") // spatial
+	implementation("org.locationtech.jts:jts-core") // spatial
+
+
+			implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
@@ -66,7 +71,7 @@ dependencies {
 
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-	implementation("org.postgresql:postgresql:42.7.4")
+	implementation("org.postgresql:postgresql:42.7.4") // postgresql
 
 	// https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter-s3
 	implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.0")

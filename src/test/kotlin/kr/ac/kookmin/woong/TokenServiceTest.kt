@@ -43,4 +43,5 @@ class TokenServiceTest {
         val isStillExists = revokedTokenRepository.findByToken(token).isPresent
         assertThat(isStillExists).isFalse
     }
+
 }

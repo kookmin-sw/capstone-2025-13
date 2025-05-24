@@ -5,11 +5,13 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 import java.time.LocalTime
+import org.locationtech.jts.geom.*;
 
 @Table(name = "help")
 @Entity
@@ -31,10 +33,13 @@ data class Help (
     var lnmadr : String? = null, // 소재지지번주소
 
     @Column
-    var latitude : Double?= null, // 위도
+    var latitude : Double= 0.0, // 위도
 
     @Column
-    var longitude : Double?= null, // 경도
+    var longitude : Double= 0.0, // 경도
+
+    @Column(columnDefinition = "geomtery(Point, 4326)") // WGIS의 기준점
+    private var location: Point? = null,
 
     @Column
     var hpCnterJob : String?= null, // 건강증진업무내용
@@ -102,4 +107,14 @@ data class Help (
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
     }
+
+    @PrePersist
+    @PreUpdate
+    private fun updateLocation() {
+            val geometryFactory = GeometryFactory()
+            location = geometryFactory.createPoint(
+                Coordinate(longitude!!, latitude!!)
+            )
+    }
+
 }

@@ -1,6 +1,6 @@
 services:
   pgvector:
-    image: 'pgvector/pgvector:pg16'
+    image: 'timescale/timescaledb-ha:pg16.9-ts2.20.0-oss'
     environment:
       - 'POSTGRES_DB=mydatabase'
       - 'POSTGRES_PASSWORD=secret'
@@ -9,10 +9,18 @@ services:
       - "org.springframework.boot.service-connection=postgres"
     ports:
       - target: 5432
-        published: 55432
+        published: 45432
         protocol: tcp
     volumes:
       - postgresql:/var/lib/postgresql/data
+    # PostGIS 설치를 위한 초기화 스크립트 추가
+    #command:  >
+    #  bash -c '
+    #  docker-entrypoint.sh postgres &
+    #  until pg_isready -U myuser -d mydatabase; do sleep 1; done;
+    #  psql -U myuser -d mydatabase -c "CREATE EXTENSION IF NOT EXISTS vector;" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+    #  wait
+    #  '
   redis:
     image: 'redis:latest'
     ports:
