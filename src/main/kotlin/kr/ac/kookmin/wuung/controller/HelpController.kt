@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.persistence.PreUpdate
+import kr.ac.kookmin.wuung.controller.HelpDTO
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.model.Help
@@ -16,6 +17,7 @@ import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.model.UserQuestStatus
 import kr.ac.kookmin.wuung.model.UserQuests
 import kr.ac.kookmin.wuung.repository.HelpRepository
+import kr.ac.kookmin.wuung.service.RedisService
 import org.locationtech.jts.geom.Point
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -63,29 +65,29 @@ data class HelpDTO(
 
 fun HelpDTO.toDTO() = HelpDTO(
     this.hpCnterNm,  // 건강증진센터명
-this.hpCnterSe, // 건강증진센터구분
-this.rdnmadr, // 소재지도로명주소
-this.lnmadr, // 소재지지번주소
-this.latitude, // 위도
-this.longitude, // 경도
-this.hpCnterJob, // 건강증진업무내용
-this.operOpenHhmm, // 운영시작시간
-this.operCloseHhmm, // 운영종료시각
-this.rstdeInfo, // 휴무일정보
-this.hpCnterAr, // 건물면적
-this.doctrCo, // 의사수
-this.nurseCo, // 간호사수
-this.scrcsCo, // 사회복지사수
-this.ntrstCo, // 영양사수
-this.etcHnfSttus, // 기타입력현황
-this.etcUseIfno, // 기타이용안내
-this.operPhoneNumber, // 운영기관전화번호
-this.operInstitutionNm, // 운영기관명
-this.phoneNumber, // 관리기관전화번호
-this.institutionNm, // 관리기관명
-this.referenceDate, // 데이터기준일자
-this.instt_code, // 제공기관코드
-this.instt_nm, // 제공기관기관명
+    this.hpCnterSe, // 건강증진센터구분
+    this.rdnmadr, // 소재지도로명주소
+    this.lnmadr, // 소재지지번주소
+    this.latitude, // 위도
+    this.longitude, // 경도
+    this.hpCnterJob, // 건강증진업무내용
+    this.operOpenHhmm, // 운영시작시간
+    this.operCloseHhmm, // 운영종료시각
+    this.rstdeInfo, // 휴무일정보
+    this.hpCnterAr, // 건물면적
+    this.doctrCo, // 의사수
+    this.nurseCo, // 간호사수
+    this.scrcsCo, // 사회복지사수
+    this.ntrstCo, // 영양사수
+    this.etcHnfSttus, // 기타입력현황
+    this.etcUseIfno, // 기타이용안내
+    this.operPhoneNumber, // 운영기관전화번호
+    this.operInstitutionNm, // 운영기관명
+    this.phoneNumber, // 관리기관전화번호
+    this.institutionNm, // 관리기관명
+    this.referenceDate, // 데이터기준일자
+    this.instt_code, // 제공기관코드
+    this.instt_nm, // 제공기관기관명
 )
 
 @RestController
@@ -99,7 +101,8 @@ this.instt_nm, // 제공기관기관명
 """
 )
 class HelpController(
-    @Autowired private val helpRepository: HelpRepository
+    @Autowired private val helpRepository: HelpRepository,
+    @Autowired private val redisService: RedisService
 ) {
     @GetMapping("/hospital")
     @Operation(
@@ -139,42 +142,80 @@ class HelpController(
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val helps: MutableList<Help> = mutableListOf()
-        
-        val databaseHelps = helpRepository.findNearbyHelp(request.latitude, request.longitude, 1000.0)
+        // 캐시에서 뒤져보고
+        val cachedResult = redisService.getCachedHospitals(request.latitude, request.longitude)
 
+        // 있으면 반환
+        if (cachedResult != null) return ResponseEntity.ok(ApiResponseDTO(data = cachedResult.map {
+            HelpDTO(
+                it.hpCnterNm,
+                it.hpCnterSe,
+                it.rdnmadr,
+                it.lnmadr,
+                it.latitude,
+                it.longitude,
+                it.hpCnterJob,
+                it.operOpenHhmm,
+                it.operCloseHhmm,
+                it.rstdeInfo,
+                it.hpCnterAr,
+                it.doctrCo,
+                it.nurseCo,
+                it.scrcsCo,
+                it.ntrstCo,
+                it.etcHnfSttus,
+                it.etcUseIfno,
+                it.operPhoneNumber,
+                it.operInstitutionNm,
+                it.phoneNumber,
+                it.institutionNm,
+                it.referenceDate,
+                it.instt_code,
+                it.instt_nm
+            )
+        }))
+
+        val helps: MutableList<Help> = mutableListOf()
+
+        // 없으면 데이터베이스 한 번 뒤져보고  
+        val databaseHelps = helpRepository.findNearbyHelp(request.latitude, request.longitude, 1000.0)
         helps.addAll(databaseHelps)
-        
+
+        // 데이터베이스에 있는 내용을 캐시에 갱신
+        redisService.cacheHospitals(request.latitude, request.longitude, databaseHelps)
+
+        // 반환
         return ResponseEntity.ok(
             ApiResponseDTO(
-                data = helps.map { help ->
+                data = helps.map {
                     HelpDTO(
-                        hpCnterNm = help.hpCnterNm,
-                        hpCnterSe = help.hpCnterSe,
-                        rdnmadr = help.rdnmadr,
-                        lnmadr = help.lnmadr,
-                        latitude = help.latitude,
-                        longitude = help.longitude,
-                        hpCnterJob = help.hpCnterJob,
-                        operOpenHhmm = help.operOpenHhmm,
-                        operCloseHhmm = help.operCloseHhmm,
-                        rstdeInfo = help.rstdeInfo,
-                        hpCnterAr = help.hpCnterAr,
-                        doctrCo = help.doctrCo,
-                        nurseCo = help.nurseCo,
-                        scrcsCo = help.scrcsCo,
-                        ntrstCo = help.ntrstCo,
-                        etcHnfSttus = help.etcHnfSttus,
-                        etcUseIfno = help.etcUseIfno,
-                        operPhoneNumber = help.operPhoneNumber,
-                        operInstitutionNm = help.operInstitutionNm,
-                        phoneNumber = help.phoneNumber,
-                        institutionNm = help.institutionNm,
-                        referenceDate = help.referenceDate,
-                        instt_code = help.instt_code,
-                        instt_nm = help.instt_nm
+                        it.hpCnterNm,
+                        it.hpCnterSe,
+                        it.rdnmadr,
+                        it.lnmadr,
+                        it.latitude,
+                        it.longitude,
+                        it.hpCnterJob,
+                        it.operOpenHhmm,
+                        it.operCloseHhmm,
+                        it.rstdeInfo,
+                        it.hpCnterAr,
+                        it.doctrCo,
+                        it.nurseCo,
+                        it.scrcsCo,
+                        it.ntrstCo,
+                        it.etcHnfSttus,
+                        it.etcUseIfno,
+                        it.operPhoneNumber,
+                        it.operInstitutionNm,
+                        it.phoneNumber,
+                        it.institutionNm,
+                        it.referenceDate,
+                        it.instt_code,
+                        it.instt_nm
                     )
                 }
+            )
             )
         )
     }
