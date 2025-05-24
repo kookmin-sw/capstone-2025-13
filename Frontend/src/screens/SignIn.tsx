@@ -18,6 +18,7 @@ import { RootStackParamList } from "../App";
 import { signIn } from "../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { putDiagnosisResult } from "../API/diagnosisAPI";
+import Toast from "react-native-toast-message";
 
 const SignIn = () => {
     const navigation =
@@ -51,14 +52,17 @@ const SignIn = () => {
 
     const handleSignIn = async () => {
         if (!email || !password) {
-            alert("이메일과 비밀번호를 입력해주세요.");
+            Toast.show({
+                type: "error",
+                text1: "이메일과 비밀번호를 입력해주세요.",
+                position: "bottom",
+            });
             return;
         }
         setLoading(true);
         setError(null);
 
         try {
-            console.log("로그인 시도:", { email, password });
             const response = await signIn(email, password);
             console.log("로그인 성공:", response.accessToken);
             await AsyncStorage.setItem('accessToken', response.accessToken);
@@ -82,7 +86,12 @@ const SignIn = () => {
             }
         } catch (error) {
             console.error("로그인 실패:", error);
-            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+            Toast.show({
+                type: "error",
+                text1: "로그인에 실패했습니다.",
+                text2: "이메일과 비밀번호를 확인해주세요.",
+                position: "bottom",
+            });
         } finally {
             setLoading(false);
         }
@@ -129,11 +138,6 @@ const SignIn = () => {
                                     onChangeText={setPassword}
                                 />
                             </View>
-                            {!email || !password ? (
-                                <Text style={signInStyles.errorText}>
-                                    이메일과 비밀번호를 입력해주세요.
-                                </Text>
-                            ) : null}
                             <View style={signInStyles.row}>
                                 <TouchableOpacity
                                     style={signInStyles.backButton}
