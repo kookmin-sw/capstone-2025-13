@@ -1,9 +1,6 @@
 import dotenv from "dotenv"
 
 const config = dotenv.config()
-if (config.error) {
-  throw config.error
-}
 
 export default {
   expo: {
@@ -27,7 +24,7 @@ export default {
         "react-native-maps",
         {
           iosGoogleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
-          androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
+          androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY
         }
       ],
       [
