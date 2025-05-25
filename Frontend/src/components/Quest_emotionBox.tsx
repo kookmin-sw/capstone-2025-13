@@ -12,15 +12,15 @@ interface EmotionMissionCardProps {
 }
 
 // 2) 감정 라벨 및 컬러 매핑
-const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
+const labels = ["Happy", "Surprise", "Angry", "Sad", "Disgust", "Fear", "Neutral"]
 const colors: Record<string, string> = {
-  angry: '#ff4444',
-  disgust: '#ff4444',
-  fear: '#ff4444',
-  happy: '#00C851',
-  sad: '#ff4444',
-  surprise: '#00C851',
-  neutral: '#00C851',
+  Angry: '#ff4444',
+  Disgust: '#ff4444',
+  Fear: '#ff4444',
+  Happy: '#00C851',
+  Sad: '#ff4444',
+  Surprise: '#00C851',
+  Neutral: '#00C851',
 };
 
 export default function EmotionMissionCard({ result, success, nickname, questDescription }: EmotionMissionCardProps) {

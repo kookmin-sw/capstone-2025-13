@@ -112,6 +112,13 @@ export default function QuestEmotion() {
         }
     };
 
+    function softmax(logits: number[]): number[] {
+        const maxLogit = Math.max(...logits);
+        const exps = logits.map(x => Math.exp(x - maxLogit));
+        const sumExps = exps.reduce((a, b) => a + b, 0);
+        return exps.map(e => e / sumExps);
+    }
+
     const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
         if (faces && faces.length === 0) {
             setNoFaceWarning(true);
@@ -126,24 +133,27 @@ export default function QuestEmotion() {
         if (!uri) return;
 
         const result = await EmotionModelRunner(uri, model);
-        if (result) {
-            const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-            const topIndex = result.indexOf(Math.max(...result));
-            const predictedLabel = labels[topIndex];
-            const updated = [...emotionLog, predictedLabel];
+if (result) {
+    const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
 
-            setLatestResult(Array.from(result));
-            console.log('Predicted Label:', predictedLabel);
+    const probs = softmax(Array.from(result)); // 👈 소프트맥스 적용
+    const topIndex = probs.indexOf(Math.max(...probs));
+    const predictedLabel = labels[topIndex];
 
-            if (updated.length > quest_save_pre_log) updated.shift();
-            setEmotionLog(updated);
+    const updated = [...emotionLog, predictedLabel];
 
-            if (quest.check(updated)) {
-                setSuccess(true);
-                console.log('🎯 퀘스트 완료');
-                handleComplete
-            }
-        }
+    setLatestResult(probs); // 👈 정규화된 값 저장 (시각화에도 적합)
+    console.log('Predicted Label:', predictedLabel);
+
+    if (updated.length > quest_save_pre_log) updated.shift();
+    setEmotionLog(updated);
+
+    if (quest.check(updated)) {
+        setSuccess(true);
+        console.log('🎯 퀘스트 완료');
+        handleComplete();
+    }
+}
     });
 
 
