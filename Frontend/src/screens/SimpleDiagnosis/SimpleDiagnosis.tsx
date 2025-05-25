@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import DialogueQuestionBox from "../../components/DialogueQuestionBox";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SimpleDiagnosisRouteProp = RouteProp<
     RootStackParamList,
@@ -27,6 +28,8 @@ const SimpleDiagnosis = () => {
     const [score, setScore] = useState(route.params?.score ?? 0);
 
     const script = SimpleDiagnosisScript({ nickname });
+
+    useBlockBackHandler();
 
     useEffect(() => {
         console.log(score)

@@ -19,6 +19,7 @@ import CalendarBadge from "../components/CalendarBadge";
 import SimpleResult from "../components/SimpleResult";
 import styles from "../styles/homeStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useBlockBackHandler from "../hooks/useBlockBackHandler";
 
 export default function Home() {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -27,6 +28,9 @@ export default function Home() {
     useEffect(() => {
         AsyncStorage.setItem("secondPasswordPassed", "false");
     }, []);
+
+    useBlockBackHandler();
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>

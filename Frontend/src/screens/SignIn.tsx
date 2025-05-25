@@ -19,6 +19,7 @@ import { signIn } from "../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { putDiagnosisResult } from "../API/diagnosisAPI";
 import Toast from "react-native-toast-message";
+import useBlockBackHandler from "../hooks/useBlockBackHandler";
 
 const SignIn = () => {
     const navigation =
@@ -97,7 +98,7 @@ const SignIn = () => {
         }
     };
 
-
+    useBlockBackHandler();
 
     return (
         <KeyboardAvoidingView
