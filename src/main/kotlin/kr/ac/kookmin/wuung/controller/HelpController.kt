@@ -1,24 +1,17 @@
 package kr.ac.kookmin.wuung.controller
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.persistence.PreUpdate
-import kr.ac.kookmin.wuung.controller.HelpDTO
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
 import kr.ac.kookmin.wuung.model.Help
-import kr.ac.kookmin.wuung.model.QuestType
 import kr.ac.kookmin.wuung.model.User
-import kr.ac.kookmin.wuung.model.UserQuestStatus
-import kr.ac.kookmin.wuung.model.UserQuests
 import kr.ac.kookmin.wuung.repository.HelpRepository
 import kr.ac.kookmin.wuung.service.RedisService
-import org.locationtech.jts.geom.Point
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlin.String
@@ -215,7 +207,6 @@ class HelpController(
                         it.instt_nm
                     )
                 }
-            )
             )
         )
     }

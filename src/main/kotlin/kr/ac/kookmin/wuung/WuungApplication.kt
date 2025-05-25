@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.cdimascio.dotenv.dotenv
+import kr.ac.kookmin.wuung.cron.UpdateHelpCenter
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
@@ -64,6 +65,7 @@ fun main(args: Array<String>) {
 		"GOOGLE_ACCOUNT_JSON" to dotenv["GOOGLE_ACCOUNT_JSON"],
 		"APPLE_TEAM_ID" to dotenv["APPLE_TEAM_ID"],
 		"APPLE_KEY_ID" to dotenv["APPLE_KEY_ID"],
+		"OPENAPI_KEY" to dotenv["OPENAPI_KEY"],
 	)
 
 	runApplication<WuungApplication>(*args) {

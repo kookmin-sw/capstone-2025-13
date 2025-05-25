@@ -24,16 +24,16 @@ data class Help (
     var id: Long? = null,
 
     @Column
-    var hpCnterNm : String? = null, // 건강증진센터명
+    var hpCnterNm : String, // 건강증진센터명
 
     @Column
-    var hpCnterSe : String? = null, // 건강증진센터구분
+    var hpCnterSe : String, // 건강증진센터구분
 
     @Column
-    var rdnmadr : String? = null, // 소재지도로명주소
+    var rdnmadr : String, // 소재지도로명주소
 
     @Column
-    var lnmadr : String? = null, // 소재지지번주소
+    var lnmadr : String, // 소재지지번주소
 
     @Column
     var latitude : Double= 0.0, // 위도
@@ -42,62 +42,62 @@ data class Help (
     var longitude : Double= 0.0, // 경도
 
     @JsonIgnore
-    @Column(columnDefinition = "geomtery(Point, 4326)") // WGIS의 기준점
-    private var location: Point? = null,
+    @Column(columnDefinition = "geometry(Point, 4326)") // WGIS의 기준점
+    private var location: Point,
 
     @Column
-    var hpCnterJob : String?= null, // 건강증진업무내용
+    var hpCnterJob : String, // 건강증진업무내용
 
     @Column
-    var operOpenHhmm: LocalTime? = null, // 운영시작시간
+    var operOpenHhmm: LocalTime, // 운영시작시간
 
     @Column
-    var operCloseHhmm: LocalTime? = null, // 운영종료시각
+    var operCloseHhmm: LocalTime, // 운영종료시각
 
     @Column
-    var rstdeInfo : String? = null, // 휴무일정보
+    var rstdeInfo : String, // 휴무일정보
 
     @Column
-    var hpCnterAr : Int? = null, // 건물면적
+    var hpCnterAr : Int, // 건물면적
 
     @Column
-    var doctrCo : Int? = null, // 의사수
+    var doctrCo : Int, // 의사수
 
     @Column
-    var nurseCo : Int? = null, // 간호사수
+    var nurseCo : Int, // 간호사수
 
     @Column
-    var scrcsCo : Int? = null, // 사회복지사수
+    var scrcsCo : Int, // 사회복지사수
 
     @Column
-    var ntrstCo : Int? = null, // 영양사수
+    var ntrstCo : Int, // 영양사수
 
     @Column
-    var etcHnfSttus : String? = null, // 기타입력현황
+    var etcHnfSttus : String, // 기타입력현황
 
     @Column
-    var etcUseIfno : String? = null, // 기타이용안내
+    var etcUseIfno : String, // 기타이용안내
 
     @Column
-    var operPhoneNumber : String? = null, // 운영기관전화번호
+    var operPhoneNumber : String, // 운영기관전화번호
 
     @Column
-    var operInstitutionNm: String? = null, // 운영기관명
+    var operInstitutionNm: String, // 운영기관명
 
     @Column
-    var phoneNumber : String? = null, // 관리기관전화번호
+    var phoneNumber : String, // 관리기관전화번호
 
     @Column
-    var institutionNm : String? = null, // 관리기관명
+    var institutionNm : String, // 관리기관명
 
     @Column
-    var referenceDate : LocalDateTime? = null, // 데이터기준일자
+    var referenceDate : LocalDateTime, // 데이터기준일자
 
     @Column
-    var instt_code : String? = null, // 제공기관코드
+    var instt_code : String, // 제공기관코드
 
     @Column
-    var instt_nm : String? = null, // 제공기관기관명
+    var instt_nm : String, // 제공기관기관명
 
     @Column(nullable = false)
     @DisableEditField
@@ -107,17 +107,44 @@ data class Help (
     @DisableEditField
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) : Serializable {
+    constructor() : this(
+        id = null,
+        hpCnterNm = "",
+        hpCnterSe = "",
+        rdnmadr = "",
+        lnmadr = "",
+        latitude = 0.0,
+        longitude = 0.0,
+        location = GeometryFactory().createPoint(Coordinate(0.0, 0.0)),
+        hpCnterJob = "",
+        operOpenHhmm = LocalTime.now(),
+        operCloseHhmm = LocalTime.now(),
+        rstdeInfo = "",
+        hpCnterAr = 0,
+        doctrCo = 0,
+        nurseCo = 0,
+        scrcsCo = 0,
+        ntrstCo = 0,
+        etcHnfSttus = "",
+        etcUseIfno = "",
+        operPhoneNumber = "",
+        operInstitutionNm = "",
+        phoneNumber = "",
+        institutionNm = "",
+        referenceDate = LocalDateTime.now(),
+        instt_code = "",
+        instt_nm = "",
+        createdAt = LocalDateTime.now(),
+        updatedAt = LocalDateTime.now(),
+    )
+
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
-    }
 
-    @PrePersist
-    @PreUpdate
-    private fun updateLocation() {
-            val geometryFactory = GeometryFactory()
-            location = geometryFactory.createPoint(
-                Coordinate(longitude!!, latitude!!)
-            )
+        val geometryFactory = GeometryFactory()
+        location = geometryFactory.createPoint(
+            Coordinate(longitude, latitude)
+        )
     }
 }
