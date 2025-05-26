@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         width: width * 0.5, // 버튼 너비를 더 넓게 설정
-        height: height * 0.1, // 버튼 높이를 더 크게 설정
+        // height: height * 0.1, // 버튼 높이를 더 크게 설정
         paddingVertical: 20,
         alignItems: "center",
         justifyContent: "center",
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         width: width * 0.25,
-        height: height * 0.06,
+        // height: height * 0.06,
         backgroundColor: "#1AA85C",
         paddingVertical: 12,
         paddingHorizontal: 12,

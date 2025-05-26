@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.laundryBold,
     },
     cloverIcon: {
-        marginRight: 8,
+        // marginRight: 8,
         marginBottom: 2,
     },
 });

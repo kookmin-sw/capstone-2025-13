@@ -129,7 +129,7 @@ export default function RecordInputBox({
                     onPress={submitRecord}
                     disabled={isSubmitted}
                 >
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <MaterialCommunityIcons
                             name="clover"
                             size={18}
@@ -142,8 +142,7 @@ export default function RecordInputBox({
                                 { marginHorizontal: 7 },
                                 isSubmitted && { opacity: 0.5 },
                             ]}
-                        >
-                            럭키비키
+                        >럭키비키
                         </Text>
                         <MaterialCommunityIcons
                             name="clover"
