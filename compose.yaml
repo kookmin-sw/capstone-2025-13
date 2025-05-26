@@ -1,6 +1,6 @@
 services:
   pgvector:
-    image: 'pgvector/pgvector:pg16'
+    image: 'kartoza/postgis:16-3.4--v2024.03.17'
     environment:
       - 'POSTGRES_DB=mydatabase'
       - 'POSTGRES_PASSWORD=secret'
@@ -13,12 +13,6 @@ services:
         protocol: tcp
     volumes:
       - postgresql:/var/lib/postgresql/data
-    # PostGIS 설치를 위한 초기화 스크립트 추가
-    command:  >
-      bash -c "apt-get update &&
-                     apt-get install -y postgis postgresql-16-postgis-3 &&
-                     rm -rf /var/lib/apt/lists/* &&
-                     docker-entrypoint.sh postgres"
   redis:
     image: 'redis:latest'
     ports:

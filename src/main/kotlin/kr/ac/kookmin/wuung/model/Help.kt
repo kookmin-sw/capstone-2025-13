@@ -6,18 +6,16 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import kr.ac.kookmin.wuung.controller.HelpDTO
 import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 import java.time.LocalTime
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.*
 import java.io.Serializable
 
-@Table(name = "help")
 @Entity
+@Table(name = "help_center")
 data class Help (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
