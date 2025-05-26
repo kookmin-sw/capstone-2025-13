@@ -1,6 +1,6 @@
 services:
   pgvector:
-    image: 'pgvector/pgvector:pg16'
+    image: 'kartoza/postgis:16-3.4--v2024.03.17'
     environment:
       - 'POSTGRES_DB=mydatabase'
       - 'POSTGRES_PASSWORD=secret'

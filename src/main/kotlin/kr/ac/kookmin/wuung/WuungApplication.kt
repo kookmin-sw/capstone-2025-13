@@ -28,7 +28,7 @@ val dotenv = dotenv {
 class WuungApplication {
 	@Bean
 	@Primary
-	open fun objectMapper(): ObjectMapper {
+	fun objectMapper(): ObjectMapper {
 		val mapper = jacksonObjectMapper()
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 		mapper.registerModule(JavaTimeModule())
@@ -64,6 +64,7 @@ fun main(args: Array<String>) {
 		"GOOGLE_ACCOUNT_JSON" to dotenv["GOOGLE_ACCOUNT_JSON"],
 		"APPLE_TEAM_ID" to dotenv["APPLE_TEAM_ID"],
 		"APPLE_KEY_ID" to dotenv["APPLE_KEY_ID"],
+		"OPENAPI_KEY" to dotenv["OPENAPI_KEY"],
 	)
 
 	runApplication<WuungApplication>(*args) {
