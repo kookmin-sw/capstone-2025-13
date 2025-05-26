@@ -21,7 +21,7 @@ export default function RecordHeader({ title, date }: RecordHeaderProps) {
             <TouchableOpacity
                 style={styles.backButtonWrapper}
                 onPress={() => {
-                    navigation.navigate("Home", {})
+                    navigation.goBack();
                 }}
             >
                 <Ionicons name="arrow-back-circle" size={40} color="#349C64" />
