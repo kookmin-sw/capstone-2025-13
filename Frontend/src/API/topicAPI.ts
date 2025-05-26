@@ -28,6 +28,13 @@ export const createTopic = async () => {
     return response.data.data;
 };
 
+export const getTopicByDate = async (date: string) => {
+    const response = await customAxios.get("/topic/me", {
+        params: { date },
+    });
+    return response.data.data;
+};
+
 export const submitFeedback = async (topicId: string, answer: string) => {
     const response = await customAxios.put(`/topic/feedback/${topicId}`, {
         data: answer,

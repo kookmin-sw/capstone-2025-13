@@ -27,9 +27,15 @@ import {
     getTopicDetails,
     submitFeedback,
     getFeedbackById,
+    getTopicByDate,
     TopicFeedbackResponse,
     TopicFeedbackStatus,
 } from "../API/topicAPI";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
+const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
+const date = route.params?.date ?? '';
+
 
 type ChatItem =
     | { type: "question"; text: string }
@@ -47,6 +53,8 @@ export default function DailyTopic() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [hasShownModal, setHasShownModal] = useState(false);
+
 
     const showModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
@@ -67,18 +75,20 @@ export default function DailyTopic() {
 
     const initializeChat = async () => {
         try {
-            const topicData = await getTodayTopic();
-
+            const topicData = date
+                ? await getTopicByDate(date)
+                : await getTodayTopic();
+    
             const history: ChatItem[] = [
                 { type: "question", text: topicData.data },
             ];
-
+    
             const allFeedbacks = topicData.feedbacks.sort(
                 (a: any, b: any) =>
                     new Date(a.createdAt).getTime() -
                     new Date(b.createdAt).getTime()
             );
-
+    
             allFeedbacks.forEach((feedback: any) => {
                 history.push({ type: "answer", text: feedback.data });
                 if (feedback.status !== TopicFeedbackStatus.NOFEEDBACK) {
@@ -87,18 +97,27 @@ export default function DailyTopic() {
                         text: feedback.aiFeedback,
                     });
                 }
-
-                if (feedback.status === TopicFeedbackStatus.NOFEEDBACK) {
-                    setInputDisabled(true);
-                    setPlaceholderText(
-                        "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
-                    );
-                    setIsModalVisible(true);
-                }
             });
-
+    
             setTopicId(topicData.id);
             setChatHistory(history);
+
+            if (date) {
+                const [year, month, day] = date.split("-"); // "2025", "05", "04"로 분리
+                setInputDisabled(true);
+                setPlaceholderText(`${year}년 ${month}월 ${day}일의 매일 1주제야-!`);
+                return;
+            }
+    
+            const lastFeedback = allFeedbacks[allFeedbacks.length - 1];
+            if (lastFeedback?.status === TopicFeedbackStatus.NOFEEDBACK) {
+                setInputDisabled(true);
+                setPlaceholderText(
+                    "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
+                );
+                setIsModalVisible(true);
+                setHasShownModal(true);
+            }
         } catch (error: any) {
             if (
                 error.response?.status === 404 ||
@@ -113,6 +132,7 @@ export default function DailyTopic() {
             }
         }
     };
+    
 
     const handleCreateTopic = async () => {
         try {
@@ -132,17 +152,6 @@ export default function DailyTopic() {
                     error.response?.data || error.message
                 );
             }
-        }
-    };
-
-    const handleFetchFeedback = async (topicId: string) => {
-        try {
-            await getTopicDetails(topicId);
-        } catch (error: any) {
-            console.error(
-                "❌ Failed to fetch feedback:",
-                error.response?.data || error.message
-            );
         }
     };
 
@@ -314,7 +323,13 @@ export default function DailyTopic() {
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
                 <TouchableOpacity
                     style={dailyTopicstyles.backButtonWrapper}
-                    onPress={() => navigation.navigate("Home", {})}
+                    onPress={() => {
+                        if (date) {
+                            navigation.navigate("Calendar");
+                        } else {
+                            navigation.navigate("Home", {}); 
+                        }
+                    }}
                 >
                     <Ionicons
                         name="arrow-back-circle"
@@ -334,7 +349,6 @@ export default function DailyTopic() {
                     <TextInput
                         placeholder={placeholderText}
                         style={dailyTopicstyles.textInput}
-                        placeholderTextColor="#A3B8A0"
                         value={answer}
                         onChangeText={setAnswer}
                         editable={!inputDisabled}
