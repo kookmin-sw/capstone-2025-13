@@ -17,6 +17,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp } from "@react-navigation/native";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep2NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep2">;
 type SignUpStep2RouteProp = RouteProp<RootStackParamList, "SignUpStep2">;
@@ -64,6 +65,8 @@ const SignUpStep2 = () => {
             gender,
         });
     };
+
+    useBlockBackHandler();
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>

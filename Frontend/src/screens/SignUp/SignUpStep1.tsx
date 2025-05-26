@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep1NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep1">;
 
@@ -22,6 +23,8 @@ const SignUpStep1 = () => {
     const navigation = useNavigation<SignUpStep1NavigationProp>();
     const [nickname, setNickname] = useState("");
     const [showError, setShowError] = useState(false);
+
+    useBlockBackHandler();
 
     return (
 

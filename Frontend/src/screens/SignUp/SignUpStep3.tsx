@@ -7,6 +7,7 @@ import type { RootStackParamList } from "../../App";
 import { signUp } from "../../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TermsModal from "../../components/TermsModal";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;
 type SignUpStep3RouteProp = RouteProp<RootStackParamList, "SignUpStep3">;
@@ -75,6 +76,7 @@ const SignUpStep3 = () => {
         }
     };
 
+    useBlockBackHandler();
 
     return (
         <ImageBackground
