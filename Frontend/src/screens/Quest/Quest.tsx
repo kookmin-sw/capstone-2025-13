@@ -1,5 +1,5 @@
 import React ,  {useState, useEffect} from "react";
-import { View, ScrollView, Dimensions,  Image} from "react-native";
+import { View, ScrollView, Dimensions,  Image, TouchableOpacity, Alert} from "react-native";
 import Header_sky from "../../components/Header_sky";
 import Quest_circle from "../../components/Darkgreen_circle";
 import Street from "../../components/Street";
@@ -7,6 +7,7 @@ import Street_basic from "../../components/Street_basic";
 import questStyles from "../../styles/questStyles";
 import Tree from "../../components/Tree";
 import { getUserInfo, UserInfoResponse } from "../../API/userInfoAPI";
+import { Ionicons } from "@expo/vector-icons";
 
 const treeTypes: ("apple" | "peach" | "forest")[] = ["apple", "peach", "forest"];
 
@@ -73,11 +74,34 @@ export default function Quest() {
                           },
                         ]}
                     >
-                      <Tree
-                          type={treeTypes[index % treeTypes.length]}
-                          title={isFirst ? `${nickname}의 숲` : quest.title}
-                          nickname={nickname}
-                        />
+                  <Tree
+                    type={treeTypes[index % treeTypes.length]}
+                    title={isFirst ? `${nickname}의 숲` : quest.title}
+                    nickname={nickname}
+                  />
+
+                  {isFirst && (
+                    <TouchableOpacity
+                      onPress={() =>
+                        Alert.alert(
+                          `${nickname}의 숲이란?`,
+                          "이 숲에서는 나를 돌아보고\n감정을 다시 느껴보는 시간이에요.\n나의 표정을 살펴보고\n다양한 표정을 지어볼까요?",
+                          [{ text: "확인" }]
+                        )
+                      }
+                      style={{
+                        position: "absolute",
+                        left: 130,   // Tree 내에서 아이콘의 좌측 위치 (px 단위)
+                        top: 10,     // Tree 내에서 아이콘의 상단 위치
+                      }}
+                    >
+                      <Ionicons
+                        name="information-circle-outline"
+                        size={22}
+                        color="#fff"
+                      />
+                    </TouchableOpacity>
+                  )}
                     </View>
 
                     {isLast && (
