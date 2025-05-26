@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, use, useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 import calendarStyles from "../styles/calendarStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSecondPasswordGuard } from "../hooks/useSecondPasswordGuard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getBehaviors, getBehaviorsSummary } from "../API/calendarAPI";
+import DepressionResultModal from "../components/DepressionResultModal";
 
 type BehaviorType = "diagnosis" | "topic" | "quest" | "diary";
 
@@ -17,20 +18,14 @@ interface Behavior {
     title: string;
     content: string;
     type: BehaviorType;
+    id: string | number;
 }
 
 export default function CalendarScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [attendance, setAttendance] = useState(0);
     const [attendanceRate, setAttendanceRate] = useState(0);
-    const [behaviors, setBehaviors] = useState<Behavior[]>([
-        { title: "PHQ-9", content: "우울 검사 시행", type: "diagnosis" },
-        { title: "매일 1주제", content: "소소한 대화 기록 보러 가기", type: "topic" },
-        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
-        { title: "일기", content: "일기 작성", type: "diary" },
-        { title: "퀘스트", content: "명상 2-7 클리어", type: "quest" },
-        { title: "일기", content: "일기 작성", type: "diary" },
-    ]);
+    const [behaviors, setBehaviors] = useState<Behavior[]>([]);
 
     const [currentYearMonth, setCurrentYearMonth] = useState(() => {
         const now = new Date();
@@ -39,8 +34,14 @@ export default function CalendarScreen() {
     });
 
     const [attendanceDates, setAttendanceDates] = useState([]);
+    const [isQuestModalVisible, setIsQuestModalVisible] = useState(false);
+    const [selectedQuestId, setSelectedQuestId] = useState<string | number>();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+
+    useSecondPasswordGuard("Calendar");
+
     useEffect(() => {
         const fetchData = async () => {
             console.log("현재 보여지는 달:", currentYearMonth);
@@ -95,16 +96,21 @@ export default function CalendarScreen() {
     };
 
     const handlePressBehavior = (behavior: Behavior) => {
+        console.log("Behavior clicked:", behavior);
         switch (behavior.type.toUpperCase()) {
             case "DIAGNOSIS":
-                // navigation.navigate("DiagnosisResultScreen", { date: selectedDate });
+                console.log("퀘스트 모달 열림");
+                setSelectedQuestId(behavior.id)
+                setIsQuestModalVisible(true); // 모달 열기
                 break;
             case "TOPIC":
                 // navigation.navigate("TopicScreen", { date: selectedDate });
                 break;
             case "QUEST":
-                // navigation.navigate("QuestScreen", { date: selectedDate });
+
+                // 
                 break;
+                setSelectedQuestId(behavior.id);
             case "DIARY":
                 navigation.navigate("Record", { date: selectedDate });
                 break;
@@ -117,6 +123,7 @@ export default function CalendarScreen() {
         const fetchData = async () => {
             try {
                 const response = await getBehaviors(selectedDate);
+                console.log("fetchData", response);
                 setBehaviors(response);
             } catch (error) {
                 console.error("데이터 불러오기 실패:", error);
@@ -133,10 +140,6 @@ export default function CalendarScreen() {
         setAttendanceRate(attendance / daysInMonth);
     }, [attendance, selectedDate]);
 
-    useSecondPasswordGuard("Calendar");
-    useEffect(() => {
-        AsyncStorage.setItem("contentPasswordPassed", "false");
-    }, []);
 
     return (
         <View style={calendarStyles.container}>
@@ -215,6 +218,11 @@ export default function CalendarScreen() {
                 </ScrollView>
 
             </View>
+            <DepressionResultModal
+                visible={isQuestModalVisible}
+                onClose={() => setIsQuestModalVisible(false)}
+                id={selectedQuestId ?? ""}
+            />
         </View>
     );
 }

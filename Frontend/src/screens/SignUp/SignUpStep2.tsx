@@ -17,6 +17,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp } from "@react-navigation/native";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep2NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep2">;
 type SignUpStep2RouteProp = RouteProp<RootStackParamList, "SignUpStep2">;
@@ -65,6 +66,8 @@ const SignUpStep2 = () => {
         });
     };
 
+    useBlockBackHandler();
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -83,6 +86,7 @@ const SignUpStep2 = () => {
                                     <TextInput
                                         style={signUpStyles.input}
                                         placeholder="YYYY-MM-DD"
+                                        placeholderTextColor="#989898"
                                         value={date ? date.toISOString().slice(0, 10) : ""}
                                         editable={false}
                                         pointerEvents="none"

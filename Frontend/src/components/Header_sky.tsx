@@ -22,7 +22,7 @@ export default function Header_sky({
     if (screenName === "Quest_stage") {
       navigation.navigate("Quest"); // QuestStage -> Quest
     } else if (screenName === "Quest") {
-      navigation.navigate("Home"); // Quest -> Home
+      navigation.navigate("Home", {}); // Quest -> Home
     } else {
       navigation.goBack(); // 기본적으로 뒤로 가기
     }
@@ -42,7 +42,7 @@ export default function Header_sky({
           >
             <Ionicons name="arrow-back-circle" size={40} color="#fff" />
           </TouchableOpacity>
-          
+
           <View style={headerSkyStyles.textWrapper}>
             <Text style={headerSkyStyles.title}>{title}</Text>
             <Text style={headerSkyStyles.subtitle}>{subtitle}</Text>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
-import FlipCard from '../../components/FlipCard';
+import { View, Text, TouchableOpacity } from 'react-native';
+import FlipCard from '../../components/Game/FlipCard';
 import { generateShuffledCards } from '../../utils/cardUtils';
-import { gameScreenstyles } from "../../styles/GameScreenStyles";
+import { gameScreenstyles } from "../../styles/Game/GameScreenStyles";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -12,23 +12,53 @@ type GameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "G
 
 const GameScreen = () => {
   const navigation = useNavigation<GameScreenNavigationProp>();
+  const route = useRoute<RouteProp<RootStackParamList, 'GameScreen'>>();
+  const score = route.params?.score ?? 0;
+
   const [cards, setCards] = useState(generateShuffledCards());
   const [showModal, setShowModal] = useState(false);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
-  const matchSound = useRef<Audio.Sound | null>(null);
-  const route = useRoute<RouteProp<RootStackParamList, 'GameScreen'>>();
-  const score = route.params?.score ?? 0;
 
-  const matchSoundPlayer = useAudioPlayer(matchSound)
-  matchSoundPlayer.volume = 0.3;
+  const matchSound = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
+    // 게임 시작할 때 사운드 로드
+    loadMatchSound();
     setStartTime(Date.now());
     setEndTime(null);
+
+    return () => {
+      // 컴포넌트 언마운트 시 사운드 해제
+      if (matchSound.current) {
+        matchSound.current.unloadAsync();
+      }
+    };
   }, [cards]);
+
+  const loadMatchSound = async () => {
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/sounds/success.mp3')
+      );
+      matchSound.current = sound;
+      matchSound.current.setVolumeAsync(0.3);
+    } catch (error) {
+      console.error('Failed to load sound', error);
+    }
+  };
+
+  const playMatchSound = async () => {
+    try {
+      if (matchSound.current) {
+        await matchSound.current.replayAsync();
+      }
+    } catch (error) {
+      console.error('Failed to play sound', error);
+    }
+  };
 
   const handleFlip = (index: number) => {
     if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) {
@@ -39,7 +69,7 @@ const GameScreen = () => {
         const [first, second] = newFlipped;
         if (cards[first].symbol === cards[second].symbol) {
           setMatched([...matched, first, second]);
-          matchSoundPlayer.play()
+          playMatchSound();
         }
         setTimeout(() => setFlipped([]), 800);
       }
@@ -80,6 +110,7 @@ const GameScreen = () => {
           ))}
         </View>
       </View>
+
       {isGameFinished && showModal && (
         <View style={[gameScreenstyles.modalOverlay, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]}>
           <View style={gameScreenstyles.modalContent}>
@@ -95,7 +126,7 @@ const GameScreen = () => {
                   setShowModal(false);
                   navigation.navigate('SimpleDiagnosis', {
                     initialIndex: 33,
-                    score: score
+                    score: score,
                   });
                 }}
               >
@@ -105,7 +136,6 @@ const GameScreen = () => {
           </View>
         </View>
       )}
-
     </View>
   );
 };

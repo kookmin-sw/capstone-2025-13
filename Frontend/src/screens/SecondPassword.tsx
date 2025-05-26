@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { secondPasswordStyles } from '../styles/secondPasswordStyles';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function SecondPassword({ route }: any) {
     const [password, setPassword] = useState('');
@@ -28,7 +29,9 @@ export default function SecondPassword({ route }: any) {
         fetchPassword();
     }, []);
 
-
+    useEffect(() => {
+        AsyncStorage.setItem("secondPasswordPassed", "false");
+    }, []);
     useEffect(() => {
         if (password.length === 4) {
             const validatePassword = async () => {
@@ -75,6 +78,14 @@ export default function SecondPassword({ route }: any) {
 
     return (
         <View style={secondPasswordStyles.container}>
+            <View style={secondPasswordStyles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Home", {})}
+                    style={secondPasswordStyles.backButtonWrapper}
+                >
+                    <Ionicons name="arrow-back-circle" size={40} color="#349C64" />
+                </TouchableOpacity>
+            </View>
             <View style={secondPasswordStyles.centerContent}>
                 <Text style={secondPasswordStyles.title}>비밀번호를 입력해라!</Text>
 

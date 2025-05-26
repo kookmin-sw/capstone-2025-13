@@ -5,11 +5,14 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "../API/signAPI";
 import { GenderEnum, getUserInfo, putProfileImg, userInfoUpdate } from "../API/userInfoAPI";
-import userInfoStyles from "../styles/userInfoStyles";
-import {CommonActions, useNavigation} from "@react-navigation/native";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../App";
-import {Ionicons} from "@expo/vector-icons";
+import userInfoStyles from "../styles/UserInfo/userInfoStyles";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
+import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import InfoRow from "../components/UserInfo/InfoRow";
+import ProfileImageModal from "../components/UserInfo/ProfileImageModal";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
@@ -54,21 +57,20 @@ export default function UserInfo() {
   const [originalData, setOriginalData] = useState<UserData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const getGenderLabel = (gender: GenderEnum | string | null | undefined): string => {
     switch (gender) {
-      case GenderEnum.MALE:
       case "MALE":
-      case GenderEnum.MALE:
         return "남성";
-      case GenderEnum.FEMALE:
       case "FEMALE":
       case GenderEnum.FEMALE:
         return "여성";
-      case "THIRD_GENDER":
-      case GenderEnum.THIRD_GENDER:
-        return "제 3의 성"
+      case "UNKNOWN":
+        return "비밀"
       default:
         return "밝히지 않음"
     }
@@ -84,9 +86,9 @@ export default function UserInfo() {
       const initialData: UserData = {
         nickname: user.username,
         email: user.email,
-        password: "",
+        password: null,
         birthDate: user.birthDate,
-        gender: getGenderLabel(user.gender),
+        gender: user.gender,
         secondPassword: (await AsyncStorage.getItem("@secondPassword")) || '1111',
         profilePic: user.profile ?? null,
       };
@@ -160,7 +162,17 @@ export default function UserInfo() {
         gender = GenderEnum.THIRD_GENDER;
         break;
     }
-
+    if (userData.password && !passwordRegex.test(userData.password)) {
+      setPasswordError("비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.");
+      Toast.show({
+        type: "error",
+        text1: "저장 실패",
+        text2: "비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.",
+        position: "bottom",
+      });
+      return;
+    }
+    setPasswordError(null);
     try {
       const transformedUserData = {
         ...userData,
@@ -268,16 +280,26 @@ export default function UserInfo() {
         </TouchableOpacity>
 
         <Text style={userInfoStyles.nickname}>{userData.nickname}</Text>
-
+        <InfoRow label="닉네임" value={userData.nickname} editable={editMode} onChangeText={(text) => setUserData({ ...userData, nickname: text })} />
         <InfoRow label="이메일" value={userData.email} editable={false} />
-
         <InfoRow
           label="비밀번호"
           value={userData.password ?? ""}
-          onChangeText={(text) => setUserData({ ...userData, password: text })}
+          onChangeText={(text) => {
+            setUserData({ ...userData, password: text });
+            if (!passwordRegex.test(text)) {
+              setPasswordError("비밀번호는 8자 이상, 영문과 숫자를 모두 포함해야 합니다.");
+            } else {
+              setPasswordError(null);
+            }
+          }}
           secureTextEntry={!editMode}
           editable={editMode}
         />
+        {passwordError && (
+          <Text style={{ color: "red", marginLeft: 10 }}>{passwordError}</Text>
+        )}
+
 
         <InfoRow label="생년월일" value={userData.birthDate} editable={false} />
 
@@ -285,21 +307,28 @@ export default function UserInfo() {
           <Text style={userInfoStyles.label}>성별</Text>
           {editMode ? (
             <View style={userInfoStyles.genderOptions}>
-              {["여성", "남성", "비밀"].map((g) => (
+              {[
+                { label: "여성", value: "FEMALE" },
+                { label: "남성", value: "MALE" },
+                { label: "비밀", value: "UNKNOWN" },
+              ].map((g) => (
                 <TouchableOpacity
-                  key={g}
-                  onPress={() => setUserData({ ...userData, gender: g })}
+                  key={g.value}
+                  onPress={() => setUserData({ ...userData, gender: g.value })}
                   style={[
                     userInfoStyles.genderButton,
-                    userData.gender === g && userInfoStyles.genderSelected,
+                    userData.gender === g.value && userInfoStyles.genderSelected,
                   ]}
                 >
-                  <Text style={userInfoStyles.buttonText}>{g}</Text>
+                  <Text style={userInfoStyles.buttonText}>{g.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
+
           ) : (
-            <Text style={userInfoStyles.buttonText}>{userData.gender}</Text>
+            <Text style={userInfoStyles.buttonText}>
+              {getGenderLabel(userData.gender)}
+            </Text>
           )}
         </View>
         <InfoRow
@@ -346,83 +375,14 @@ export default function UserInfo() {
         </View>
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <ProfileImageModal
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={userInfoStyles.modalContainer}>
-          <View style={userInfoStyles.modalContent}>
-            {editMode ? (
-              <>
-                <TouchableOpacity onPress={handlePickImage} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>갤러리에서 선택</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleTakePhoto} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>카메라로 찍기</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleResetProfilePic} style={userInfoStyles.button}>
-                  <Text style={userInfoStyles.buttonText}>기본 이미지로 설정</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <Text style={userInfoStyles.buttonText}>수정 모드에서만 변경 가능합니다.</Text>
-            )}
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={userInfoStyles.button}>
-              <Text style={userInfoStyles.buttonText}>닫기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setModalVisible(false)}
+        onPickImage={handlePickImage}
+        onTakePhoto={handleTakePhoto}
+        onReset={handleResetProfilePic}
+        editMode={editMode}
+      />
     </View>
-  );
-}
-
-type InfoRowProps = {
-  label: string;
-  value: string;
-  onChangeText?: (text: string) => void;
-  editable?: boolean;
-  secureTextEntry?: boolean;
-  keyboardType?: "default" | "number-pad" | "numeric" | "email-address" | "phone-pad";
-  maxLength?: number;
-};
-
-
-function InfoRow({
-  label,
-  value,
-  onChangeText,
-  editable = true,
-  secureTextEntry = false,
-  keyboardType = "default",
-  maxLength = 20,
-}: InfoRowProps) {
-  const handleChange = (text: string) => {
-    if (onChangeText) onChangeText(text);
-    if (keyboardType === "number-pad" && text.length === maxLength) {
-      Keyboard.dismiss();
-    }
-  };
-
-  return (
-    <View style={userInfoStyles.row}>
-      <Text style={userInfoStyles.label}>{label}</Text>
-      {editable ? (
-        <TextInput
-          value={value}
-          onChangeText={handleChange}
-          style={userInfoStyles.input}
-          secureTextEntry={secureTextEntry}
-          editable={editable}
-          keyboardType={keyboardType}
-          maxLength={maxLength}
-        />
-      ) : (
-        <Text style={userInfoStyles.Text}>{secureTextEntry ? "●●●●" : value}</Text>
-      )}
-    </View>
-          
   );
 }
