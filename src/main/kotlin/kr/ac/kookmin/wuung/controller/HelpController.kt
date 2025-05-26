@@ -135,7 +135,7 @@ class HelpController(
         @RequestParam latitude : Double,
         @RequestParam longitude : Double
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
-        if (userDetails == null) throw UnauthorizedException()
+        //if (userDetails == null) throw UnauthorizedException()
 
         // 캐시에서 뒤져보고
         val cachedResult = redisService.getCachedHospitals(latitude, longitude)
