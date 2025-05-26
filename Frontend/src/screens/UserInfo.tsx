@@ -11,8 +11,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import InfoRow from "../components/UserInfo/InfoRow";
-import ProfileImageModal from "../components/UserInfo/ProfileImageModal";
+import InfoRow from "../components/userInfo/InfoRow";
+import ProfileImageModal from "../components/userInfo/ProfileImageModal";
 
 const cloverProfile = require("../assets/Images/cloverProfile.png");
 
