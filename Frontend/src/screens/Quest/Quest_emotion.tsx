@@ -1,4 +1,4 @@
-import { Text, View, Alert } from 'react-native';
+import { Text, View, Alert, Image } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -30,11 +30,10 @@ export default function QuestEmotion() {
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
     const cameraRef = useRef<any>(null);
-    const {detectFaces} = useFaceDetector();
+    const { detectFaces } = useFaceDetector();
     const [hasPermission, setHasPermission] = useState(false);
-    const {isLoaded, model} = useLoadEmotionModel();
+    const { isLoaded, model } = useLoadEmotionModel();
     const [noFaceWarning, setNoFaceWarning] = useState(false);
-
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
@@ -71,90 +70,90 @@ export default function QuestEmotion() {
             console.error("감정 퀘스트 완료 처리 중 오류 발생:", error);
             Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
         }
-    };    
+    };  
 
     const quest = QUESTS.find(q => q.id === questTitle);
-    if (!quest) {
-        return (
-            <View style={styles.centered}>
-                <Text>❌ 퀘스트 정보를 찾을 수 없습니다</Text>
-            </View>
-        );
+    const quest_capture_interval = quest?.interval ?? 1000;
+    const quest_save_pre_log = quest?.logLength ?? 20;
+
+const capturePhoto = async (face: Face | undefined): Promise<string | null> => {
+    if (isPhotoTaken.current) {
+        console.log("📷 캡처 건너뜀: 이전 캡처 중");
+        return null;
+    }
+    isPhotoTaken.current = true;
+
+    const now = Date.now();
+    const { isLargeEnough, now: checkedTime } = shouldCaptureFace(face, lastPhotoTimeRef.current);
+    if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
+        isPhotoTaken.current = false;
+        console.log("📏 얼굴이 작거나 캡처 간격 미달");
+        return null;
     }
 
-    const quest_capture_interval = quest.interval ?? 1000;
-    const quest_save_pre_log = quest.logLength ?? 20;
+    try {
+        const photo = await cameraRef.current.takePhoto();
+        const path = `file://${photo.path}?ts=${Date.now()}`; // 고유 URI 처리
+        console.log("📸 캡처 성공:", path);
+        setPhotoPath(path);
+        lastPhotoTimeRef.current = checkedTime;
 
-    const capturePhoto = async (face: Face | undefined) => {
-        if (isPhotoTaken.current) return null;
-        isPhotoTaken.current = true;
-
-        const now = Date.now();
-        const {isLargeEnough, now: checkedTime} = shouldCaptureFace(face, lastPhotoTimeRef.current);
-        if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
+        // 최소 캡처 간격 보장 (예: 1초)
+        setTimeout(() => {
             isPhotoTaken.current = false;
-            return null;
-        }
-
-        try {
-            const photo = await cameraRef.current.takePhoto();
-            const path = `file://${photo.path}`;
-            setPhotoPath(path);
-            console.log('📸 사진 저장됨:', path);
-            lastPhotoTimeRef.current = checkedTime;
-            return path;
-        } catch (err) {
-            console.error('❌ 사진 캡처 실패:', err);
-            return null;
-        } finally {
-            isPhotoTaken.current = false;
-            console.log('🔄 isPhotoTaken reset');
-        }
-    };
-
-    function softmax(logits: number[]): number[] {
-        const maxLogit = Math.max(...logits);
-        const exps = logits.map(x => Math.exp(x - maxLogit));
-        const sumExps = exps.reduce((a, b) => a + b, 0);
-        return exps.map(e => e / sumExps);
+        }, 1000);
+        return path;
+    } catch (err) {
+        console.error("❌ 사진 캡처 실패:", err);
+        isPhotoTaken.current = false;
+        return null;
     }
+};
 
     const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-        if (faces && faces.length === 0) {
-            setNoFaceWarning(true);
-            return;
-        }
-        setNoFaceWarning(false);
-
-        if (!faces?.length || !isLoaded || !model) return;
-
-        const face = faces[0];
-        const uri = await capturePhoto(face);
-        if (!uri) return;
-
-        const result = await EmotionModelRunner(uri, model);
-if (result) {
-    const labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
-
-    const probs = softmax(Array.from(result)); // 👈 소프트맥스 적용
-    const topIndex = probs.indexOf(Math.max(...probs));
-    const predictedLabel = labels[topIndex];
-
-    const updated = [...emotionLog, predictedLabel];
-
-    setLatestResult(probs); // 👈 정규화된 값 저장 (시각화에도 적합)
-    console.log('Predicted Label:', predictedLabel);
-
-    if (updated.length > quest_save_pre_log) updated.shift();
-    setEmotionLog(updated);
-
-    if (quest.check(updated)) {
-        setSuccess(true);
-        console.log('🎯 퀘스트 완료');
-        handleComplete();
+    if (!faces?.length) {
+        setNoFaceWarning(true);
+        return;
     }
-}
-    });
+    setNoFaceWarning(false);
+
+    if (!isLoaded || !model) {
+        console.log("❌ 모델 로드 안됨");
+        return;
+    }
+
+    const face = faces[0];
+    const uri = await capturePhoto(face);
+    if (!uri) {
+        console.log("📛 사진 캡처 실패 or 생략됨");
+        return;
+    }
+
+    const result = await EmotionModelRunner(uri, model);
+
+    if (result) {
+        const labels = ["Happy", "Surprise", "Angry", "Sad", "Disgust", "Fear", "Neutral"];
+        const topIndex = result.indexOf(Math.max(...result));
+        const predictedLabel = labels[topIndex];
+
+        console.log("🎯 예측 감정:", predictedLabel);
+        console.log(result);
+
+        const updated = [...emotionLog, predictedLabel];
+        if (updated.length > quest_save_pre_log) updated.shift();
+
+        setEmotionLog(updated);
+        setLatestResult(Array.from(result)); // ✅ 그대로 사용
+
+        if (quest && quest.check(updated)) {
+            setSuccess(true);
+            console.log("✅ 퀘스트 조건 충족!");
+            handleComplete();
+        }
+    } else {
+        console.warn("⚠️ 모델 결과 없음");
+    }
+});
 
 
     const frameProcessor = useFrameProcessor((frame) => {
@@ -183,9 +182,17 @@ if (result) {
         );
     }
 
+    if (!quest) {
+        return (
+            <View style={styles.centered}>
+                <Text>❌ 퀘스트 정보를 찾을 수 없습니다</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
-            <View style={[styles.half, {flex: 7}]}>
+            <View style={[styles.half, { flex: 7 }]}>
                 <Camera
                     ref={cameraRef}
                     style={styles.camera}
@@ -198,13 +205,20 @@ if (result) {
 
             {latestResult !== null ? (
                 <View style={styles.overlay}>
-                    <EmotionChartBox result={latestResult} success={success} nickname={nickname} questDescription={questDescription}/>
+                    <EmotionChartBox
+                        result={latestResult}
+                        success={success}
+                        nickname={nickname}
+                        questDescription={questDescription}
+                    />
                 </View>
             ) : (
                 <View style={styles.overlay}>
-                    <View style={styles.centered}>
-                        <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
-                    </View>
+                    {noFaceWarning && (
+                        <View style={styles.centered}>
+                            <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
+                        </View>
+                    )}
                 </View>
             )}
         </View>
