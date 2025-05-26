@@ -15,20 +15,21 @@ class RedisService(
     private val HOSPITAL_CACHE_PREFIX = "hospital:"
     private val CACHE_DURATION = 43200L // 캐시 유효 시간 (분) 1달로 정의해둠.
 
-    fun getCachedHospitals(latitude: Double, longitude: Double): List<Help>? {
+    fun getCachedHospitals(latitude: Double, longitude: Double): List<HelpDTO>? {
         val key = generateKey(latitude, longitude)
         val cachedData = redisTemplate.opsForValue().get(key) ?: return null
         return objectMapper.readValue(cachedData,
-            objectMapper.typeFactory.constructCollectionType(List::class.java, Help::class.java))
+            objectMapper.typeFactory.constructCollectionType(List::class.java, HelpDTO::class.java))
     }
 
-    fun cacheHospitals(latitude: Double, longitude: Double, hospitals: List<Help>) {
+    fun cacheHospitals(latitude: Double, longitude: Double, hospitals: List<HelpDTO>) {
         val key = generateKey(latitude, longitude)
         val value = objectMapper.writeValueAsString(hospitals)
         redisTemplate.opsForValue().set(key, value, CACHE_DURATION, TimeUnit.MINUTES)
     }
 
-    private fun generateKey(latitude: Double, longitude: Double): String {
-        return "${HOSPITAL_CACHE_PREFIX}${String.format("%.3f", latitude)}:${String.format("%.3f", longitude)}"
-    }
+private fun generateKey(latitude: Double, longitude: Double): String {
+    // 소수점 2자리까지만 사용 (약 1.11km 반경)
+    return "${HOSPITAL_CACHE_PREFIX}${String.format("%.2f", latitude)}:${String.format("%.2f", longitude)}"
+}
 }

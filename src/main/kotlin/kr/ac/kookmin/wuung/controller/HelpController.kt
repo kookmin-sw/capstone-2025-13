@@ -177,7 +177,34 @@ class HelpController(
         helps.addAll(databaseHelps)
 
         // 데이터베이스에 있는 내용을 캐시에 갱신
-        redisService.cacheHospitals(latitude, longitude, databaseHelps)
+        redisService.cacheHospitals(latitude, longitude, databaseHelps.map { it ->
+            HelpDTO(
+                hpCnterNm = it.hpCnterNm,
+                hpCnterSe = it.hpCnterSe,
+                rdnmadr = it.rdnmadr,
+                lnmadr = it.lnmadr,
+                latitude = it.latitude,
+                longitude = it.longitude,
+                hpCnterJob = it.hpCnterJob,
+                operOpenHhmm = it.operOpenHhmm,
+                operCloseHhmm = it.operCloseHhmm,
+                rstdeInfo = it.rstdeInfo,
+                hpCnterAr = it.hpCnterAr,
+                doctrCo = it.doctrCo,
+                nurseCo = it.nurseCo,
+                scrcsCo = it.scrcsCo,
+                ntrstCo = it.ntrstCo,
+                etcHnfSttus = it.etcHnfSttus,
+                etcUseIfno = it.etcUseIfno,
+                operPhoneNumber = it.operPhoneNumber,
+                operInstitutionNm = it.operInstitutionNm,
+                phoneNumber = it.phoneNumber,
+                institutionNm = it.institutionNm,
+                referenceDate = it.referenceDate,
+                instt_code = it.instt_code,
+                instt_nm = it.instt_nm
+            )
+        })
 
         // 반환
         return ResponseEntity.ok(
