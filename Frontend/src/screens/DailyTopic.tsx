@@ -33,15 +33,14 @@ import {
 } from "../API/topicAPI";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
-const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
-const date = route.params?.date ?? '';
-
 
 type ChatItem =
     | { type: "question"; text: string }
     | { type: "answer"; text: string; isLoading?: boolean };
 
 export default function DailyTopic() {
+    const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
+    const date = route.params?.date ?? '';
     const [topicId, setTopicId] = useState<string | null>(null);
     const [answer, setAnswer] = useState<string>("");
     const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
