@@ -18,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -128,14 +129,16 @@ class HelpController(
                 )]
             )
         ]
-    )fun getBehaviorByDate(
+    )fun getHosiptialInformationByPoint(
         @AuthenticationPrincipal userDetails: User?,
-        @RequestBody request: HospitalRequest,
+        //@RequestBody request: HospitalRequest,
+        @RequestParam latitude : Double,
+        @RequestParam longitude : Double
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
         // 캐시에서 뒤져보고
-        val cachedResult = redisService.getCachedHospitals(request.latitude, request.longitude)
+        val cachedResult = redisService.getCachedHospitals(latitude, longitude)
 
         // 있으면 반환
         if (cachedResult != null) return ResponseEntity.ok(ApiResponseDTO(data = cachedResult.map {
@@ -170,11 +173,11 @@ class HelpController(
         val helps: MutableList<Help> = mutableListOf()
 
         // 없으면 데이터베이스 한 번 뒤져보고  
-        val databaseHelps = helpRepository.findNearbyHelp(request.latitude, request.longitude, 1000.0)
+        val databaseHelps = helpRepository.findNearbyHelp(latitude, longitude, 1000.0)
         helps.addAll(databaseHelps)
 
         // 데이터베이스에 있는 내용을 캐시에 갱신
-        redisService.cacheHospitals(request.latitude, request.longitude, databaseHelps)
+        redisService.cacheHospitals(latitude, longitude, databaseHelps)
 
         // 반환
         return ResponseEntity.ok(
