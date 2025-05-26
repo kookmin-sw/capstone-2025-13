@@ -74,7 +74,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                 <View style={styles.headerWrapper}>
                     <CopilotStep
                         text="나의 이력을 볼 수 있어요!"
-                        order={7}
+                        order={8}
                         name="calendarBadge"
                     >
                         <WalkthroughableView
@@ -101,7 +101,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                 >
                     <CopilotStep
                         text="나만의 마음정원을 키워봐요!"
-                        order={6}
+                        order={7}
                         name="statusBox"
                     >
                         <WalkthroughableView>
@@ -155,15 +155,15 @@ function HomeContent({ navigation }: { navigation: any }) {
                         </CopilotStep>
                     </View>
                     <View>
-                        <CopilotStep
+                        {/* <CopilotStep
                             text="도움이 필요하면 불러주세요!"
                             order={4}
                             name="floatingButton"
-                        >
-                            <WalkthroughableView style={styles.floatingButtonWrapper}>
-                                <FloatingButton />
-                            </WalkthroughableView>
-                        </CopilotStep>
+                        > */}
+                        <WalkthroughableView style={styles.floatingButtonWrapper}>
+                            <FloatingButton />
+                        </WalkthroughableView>
+                        {/* </CopilotStep> */}
                     </View>
                 </ScrollView>
 

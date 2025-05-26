@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import styles from "../styles/floatingButtonStyles";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -7,9 +7,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { getTodayTopic } from "../API/topicAPI";
 
+// Copilot 관련 import
+import { CopilotStep, walkthroughable } from "react-native-copilot";
+
+const WalkthroughableView = walkthroughable(View);
+
 export default function FloatingButton() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [showBadge, setShowBadge] = useState(true); // 기본은 뱃지 보여주기
+  const [showBadge, setShowBadge] = useState(true);
 
   useEffect(() => {
     const checkTopicStatus = async () => {
@@ -29,41 +34,63 @@ export default function FloatingButton() {
     };
 
     checkTopicStatus();
-
   }, []);
 
   return (
     <>
       <View style={[styles.container, { left: 24, right: "auto" }]}>
-        <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => {
-            navigation.navigate("DailyTopic", {});
-            setShowBadge(false);
-          }}
+        <CopilotStep
+          text="매일의 주제를 확인하고 피드백을 남겨보세요!"
+          order={4}
+          name="dailyTopic"
         >
-          <MaterialCommunityIcons name="message-text" size={24} color="#fff" />
-          {showBadge && <View style={styles.badge} />}
-        </TouchableOpacity>
+          <WalkthroughableView>
+            <TouchableOpacity
+              style={styles.bubble}
+              onPress={() => {
+                navigation.navigate("DailyTopic", {});
+                setShowBadge(false);
+              }}
+            >
+              <MaterialCommunityIcons name="message-text" size={24} color="#fff" />
+              {showBadge && <View style={styles.badge} />}
+            </TouchableOpacity>
+          </WalkthroughableView>
+        </CopilotStep>
 
-        <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => {
-            navigation.navigate("HelpCall");
-          }}
+        <CopilotStep
+          text="긴급하거나 도움이 필요할 땐 이곳을 눌러보세요."
+          order={5}
+          name="helpCall"
         >
-          <MaterialCommunityIcons name="phone" size={24} color="#fff" />
-        </TouchableOpacity>
+          <WalkthroughableView>
+            <TouchableOpacity
+              style={styles.bubble}
+              onPress={() => {
+                navigation.navigate("HelpCall");
+              }}
+            >
+              <MaterialCommunityIcons name="phone" size={24} color="#fff" />
+            </TouchableOpacity>
+          </WalkthroughableView>
+        </CopilotStep>
       </View>
 
-      {/* 오른쪽 하단 계정 버튼 */}
       <View style={[styles.container, { left: "auto", right: 24 }]}>
-        <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => navigation.navigate("UserInfo")}
+        <CopilotStep
+          text="내 계정 정보를 확인할 수 있어요!"
+          order={6}
+          name="userInfo"
         >
-          <MaterialCommunityIcons name="account" size={24} color="#fff" />
-        </TouchableOpacity>
+          <WalkthroughableView>
+            <TouchableOpacity
+              style={styles.bubble}
+              onPress={() => navigation.navigate("UserInfo")}
+            >
+              <MaterialCommunityIcons name="account" size={24} color="#fff" />
+            </TouchableOpacity>
+          </WalkthroughableView>
+        </CopilotStep>
       </View>
     </>
   );
