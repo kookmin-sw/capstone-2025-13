@@ -200,36 +200,33 @@ export default function DailyTopic() {
                 );
             }
         } catch (error: any) {
-            const status = error.response?.status ?? null;
-            if (status === 404) {
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
-            } else if (status === null) {
-                // error.response가 null인 경우 (네트워크 오류 등)
+            const response = error.response;
+        
+            if (!response) {
+                // 네트워크 오류나 서버 응답 없음
                 console.error(
                     "❌ Feedback fetch failed: No response received",
                     error.message
                 );
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
             } else {
-                console.error(
-                    "❌ Feedback fetch failed:",
-                    error.response?.data || error.message
-                );
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
+                const status = response.status;
+                if (status === 404) {
+                    // 피드백이 아직 생성되지 않았을 경우 재시도
+                    console.warn("⚠️ Feedback not ready (404), retrying...");
+                } else {
+                    console.error(
+                        "❌ Feedback fetch failed:",
+                        response.data || error.message
+                    );
+                }
             }
-        }
+        
+            // 재시도
+            setTimeout(
+                () => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
+                3000
+            );
+        }        
     };
 
     const handleSendFeedback = async (answer: string) => {
