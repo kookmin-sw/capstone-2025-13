@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kr.ac.kookmin.wuung.batch.LuckyVickyBatch
 import kr.ac.kookmin.wuung.exceptions.AiFeedbackNotCompleteException
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.http.ResponseEntity
@@ -55,7 +54,7 @@ data class RecordDTO(
 fun Record.toDTO() = RecordDTO(
     this.id ?: "",
     this.rate,
-    this.data ?: "",
+    this.data,
     this.luckyVicky ?: "",
     this.comment ?: "",
     this.status,

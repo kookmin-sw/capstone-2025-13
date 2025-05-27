@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kr.ac.kookmin.wuung.batch.TopicBatch
 import kr.ac.kookmin.wuung.model.Topic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping

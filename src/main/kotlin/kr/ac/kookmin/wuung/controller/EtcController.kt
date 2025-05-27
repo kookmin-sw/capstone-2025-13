@@ -115,7 +115,7 @@ class EtcController(
         )
 
         var behaviors: List<DailyBehaviorDTO> = diagnosis.mapNotNull { result ->
-            when (result.diagnosis?.type) {
+            when (result.diagnosis.type) {
                 DiagnosisType.`GAD-7` -> DailyBehaviorDTO("검사", "GAD-7 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
                 DiagnosisType.`PHQ-9` -> DailyBehaviorDTO("검사", "PHQ-9 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)
                 DiagnosisType.Simple -> DailyBehaviorDTO("검사", "약식 검사 시행 완료", BehaviorType.DIAGNOSIS, result.id!!)

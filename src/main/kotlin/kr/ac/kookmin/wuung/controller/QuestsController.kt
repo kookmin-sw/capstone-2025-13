@@ -28,6 +28,7 @@ import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
 import kr.ac.kookmin.wuung.service.UserQuestS3Service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -391,6 +392,7 @@ class QuestsController(
             )
         ]
     )
+    @Cacheable(cacheNames = ["quests"])
     fun listQuests(
         @AuthenticationPrincipal userDetails: User?,
     ): ResponseEntity<ApiResponseDTO<List<QuestsDTO>>> {
@@ -439,6 +441,7 @@ class QuestsController(
             )
         ]
     )
+    @Cacheable(cacheNames = ["quests_{type}"])
     fun listQuestsWithTypes(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Type of quest", example = "ACTIVITY")
@@ -489,6 +492,7 @@ class QuestsController(
             )
         ]
     )
+    @Cacheable(cacheNames = ["quests_{type}_{step}"])
     fun listQuestsWithTypes(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Type of quest", example = "ACTIVITY")

@@ -13,6 +13,7 @@ import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.HelpRepository
 import kr.ac.kookmin.wuung.service.RedisService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -129,82 +130,16 @@ class HelpController(
                 )]
             )
         ]
-    )fun getHosiptialInformationByPoint(
+    )
+    @Cacheable(key = "#latitude+'_'+#longitude", value = ["helps"])
+    fun getHospitalInformationByPoint(
         @AuthenticationPrincipal userDetails: User?,
-        //@RequestBody request: HospitalRequest,
         @RequestParam latitude : Double,
         @RequestParam longitude : Double
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
-        //if (userDetails == null) throw UnauthorizedException()
+        if (userDetails == null) throw UnauthorizedException()
 
-        // 캐시에서 뒤져보고
-        val cachedResult = redisService.getCachedHospitals(latitude, longitude)
-
-        // 있으면 반환
-        if (cachedResult != null) return ResponseEntity.ok(ApiResponseDTO(data = cachedResult.map {
-            HelpDTO(
-                it.hpCnterNm,
-                it.hpCnterSe,
-                it.rdnmadr,
-                it.lnmadr,
-                it.latitude,
-                it.longitude,
-                it.hpCnterJob,
-                it.operOpenHhmm,
-                it.operCloseHhmm,
-                it.rstdeInfo,
-                it.hpCnterAr,
-                it.doctrCo,
-                it.nurseCo,
-                it.scrcsCo,
-                it.ntrstCo,
-                it.etcHnfSttus,
-                it.etcUseIfno,
-                it.operPhoneNumber,
-                it.operInstitutionNm,
-                it.phoneNumber,
-                it.institutionNm,
-                it.referenceDate,
-                it.instt_code,
-                it.instt_nm
-            )
-        }))
-
-        val helps: MutableList<Help> = mutableListOf()
-
-        // 없으면 데이터베이스 한 번 뒤져보고  
-        val databaseHelps = helpRepository.findNearbyHelp(latitude, longitude, 1000.0)
-        helps.addAll(databaseHelps)
-
-        // 데이터베이스에 있는 내용을 캐시에 갱신
-        redisService.cacheHospitals(latitude, longitude, databaseHelps.map { it ->
-            HelpDTO(
-                hpCnterNm = it.hpCnterNm,
-                hpCnterSe = it.hpCnterSe,
-                rdnmadr = it.rdnmadr,
-                lnmadr = it.lnmadr,
-                latitude = it.latitude,
-                longitude = it.longitude,
-                hpCnterJob = it.hpCnterJob,
-                operOpenHhmm = it.operOpenHhmm,
-                operCloseHhmm = it.operCloseHhmm,
-                rstdeInfo = it.rstdeInfo,
-                hpCnterAr = it.hpCnterAr,
-                doctrCo = it.doctrCo,
-                nurseCo = it.nurseCo,
-                scrcsCo = it.scrcsCo,
-                ntrstCo = it.ntrstCo,
-                etcHnfSttus = it.etcHnfSttus,
-                etcUseIfno = it.etcUseIfno,
-                operPhoneNumber = it.operPhoneNumber,
-                operInstitutionNm = it.operInstitutionNm,
-                phoneNumber = it.phoneNumber,
-                institutionNm = it.institutionNm,
-                referenceDate = it.referenceDate,
-                instt_code = it.instt_code,
-                instt_nm = it.instt_nm
-            )
-        })
+        val helps = helpRepository.findNearbyHelp(latitude, longitude, 1000.0)
 
         // 반환
         return ResponseEntity.ok(

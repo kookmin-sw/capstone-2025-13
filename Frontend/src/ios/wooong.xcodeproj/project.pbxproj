@@ -376,7 +376,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong develop profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -420,7 +420,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = kr.ac.kookmin.wooong;
-				PRODUCT_NAME = wooong;
+				PRODUCT_NAME = "wooong";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wooong appstore";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

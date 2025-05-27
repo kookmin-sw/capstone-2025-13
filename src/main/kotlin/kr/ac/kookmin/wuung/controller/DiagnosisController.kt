@@ -20,6 +20,8 @@ import kr.ac.kookmin.wuung.repository.DiagnosisRepository
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
 import kr.ac.kookmin.wuung.service.DiagnosisService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -198,6 +200,7 @@ class DiagnosisController(
             )
         ]
     )
+    @Cacheable(value = ["diagnosis"], key = "#id")
     fun getDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable id: Int,
@@ -243,6 +246,7 @@ class DiagnosisController(
             )
         ]
     )
+    @Cacheable(value = ["diagnosisList"], key = "#userDetails?.username")
     fun getDiagnosisList(
         @AuthenticationPrincipal userDetails: User?,
     ): ResponseEntity<ApiResponseDTO<List<DiagnosisDTO>>> {
@@ -291,6 +295,7 @@ class DiagnosisController(
             )
         ]
     )
+    @CachePut(value=["diagnosis"], key="#request.id")
     fun putDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: DiagnosisResultSubmitRequest,

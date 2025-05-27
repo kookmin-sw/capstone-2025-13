@@ -31,6 +31,12 @@ spring:
     multipart:
       max-file-size: 15MB
       max-request-size: 15MB
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DB}
 springdoc:
   api-docs:
     enabled: true
