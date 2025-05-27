@@ -18,10 +18,10 @@ import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.DiagnosisRepository
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
+import kr.ac.kookmin.wuung.service.DiagnosisDTO
+import kr.ac.kookmin.wuung.service.DiagnosisScaleDTO
 import kr.ac.kookmin.wuung.service.DiagnosisService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cache.annotation.CachePut
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -38,80 +38,6 @@ data class CreateDiagnosisRequest(
     val result: Long,
     val type: String,
     val createAt: String
-)
-
-// message만 설정해놓긴 했음.
-data class DiagnosisDTO(
-    val id: Long,
-    val type: DiagnosisType,
-    val title: String,
-    val description: String,
-    val questions: List<DiagnosisQuestionDTO> = listOf(),
-    val scale: List<DiagnosisScaleDTO> = listOf(),
-    @JsonProperty("max_score")
-    val maxScore: Int,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
-data class DiagnosisQuestionDTO(
-    val seq: Int,
-    val text: String,
-    val answers: List<DiagnosisTextDTO> = listOf()
-)
-data class DiagnosisTextDTO(
-    val text: String,
-    val score: Int,
-)
-data class DiagnosisScaleDTO(
-    val start: Int,
-    val scaleName: String,
-    val description: String,
-)
-
-fun Diagnosis.toDTO() = DiagnosisDTO(
-    id = this.id ?: 0,
-    type = this.type,
-    title = this.title,
-    description = this.description,
-    maxScore = this.totalScore,
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt,
-    questions = this.diagnosisQuestions.map { question ->
-        DiagnosisQuestionDTO(
-            seq = question.seq,
-            text = question.text,
-            answers = question.diagnosisText.map { text ->
-                DiagnosisTextDTO(
-                    text = text.text,
-                    score = text.score,
-                )
-            }.sortedBy { it.score }
-        )
-    }.sortedBy { it.seq },
-    scale = this.diagnosisScale.map { scale ->
-        DiagnosisScaleDTO(
-            start = scale.start,
-            scaleName = scale.scaleName,
-            description = scale.description,
-        )
-    }.sortedBy { it.start },
-)
-fun Diagnosis.toDTOSelf() = DiagnosisDTO(
-    id = this.id ?: 0,
-    type = this.type,
-    title = this.title,
-    description = this.description,
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt,
-    questions = listOf(),
-    maxScore = this.totalScore,
-    scale = this.diagnosisScale.map { scale ->
-        DiagnosisScaleDTO(
-            start = scale.start,
-            scaleName = scale.scaleName,
-            description = scale.description,
-        )
-    }.sortedBy { it.start },
 )
 
 data class DiagnosisResultSubmitRequest(
@@ -160,8 +86,6 @@ fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
 """)
 class DiagnosisController(
     @Autowired private val diagnosisService: DiagnosisService,
-    @Autowired private val jwtProvider: JwtProvider,
-    private val diagnosisRepository: DiagnosisRepository,
     private val diagnosisResultsRepository: DiagnosisResultsRepository
 )  {
     @GetMapping("/{id}")
@@ -200,7 +124,6 @@ class DiagnosisController(
             )
         ]
     )
-    @Cacheable(value = ["diagnosis"], key = "#id")
     fun getDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
         @PathVariable id: Int,
@@ -209,12 +132,12 @@ class DiagnosisController(
         if (userDetails == null)
             throw UnauthorizedException()
 
-        val diagnosis = diagnosisRepository.findDiagnosisById(id.toLong()).getOrNull()
+        val diagnosis = diagnosisService.findById(id.toLong())
 
         if (diagnosis == null) throw NotFoundException()
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = diagnosis.toDTO())
+            ApiResponseDTO(data = diagnosis)
         )
     }
 
@@ -246,13 +169,12 @@ class DiagnosisController(
             )
         ]
     )
-    @Cacheable(value = ["diagnosisList"], key = "#userDetails?.username")
     fun getDiagnosisList(
         @AuthenticationPrincipal userDetails: User?,
     ): ResponseEntity<ApiResponseDTO<List<DiagnosisDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val diagnosisList = diagnosisRepository.findAll().map { it.toDTOSelf() }
+        val diagnosisList = diagnosisService.findAll()
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = diagnosisList)
@@ -295,14 +217,13 @@ class DiagnosisController(
             )
         ]
     )
-    @CachePut(value=["diagnosis"], key="#request.id")
     fun putDiagnosis(
         @AuthenticationPrincipal userDetails: User?,
         @RequestBody request: DiagnosisResultSubmitRequest,
     ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val diagnosis = diagnosisRepository.findDiagnosisById(request.id).getOrNull()
+        val diagnosis = diagnosisService.findByIdWithRaw(request.id)
         if (diagnosis == null) throw NotFoundException()
 
         val diagnosisResult = DiagnosisResults(

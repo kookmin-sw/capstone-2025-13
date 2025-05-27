@@ -25,13 +25,13 @@ import kr.ac.kookmin.wuung.model.Quests
 import kr.ac.kookmin.wuung.model.UserQuestStages
 import kr.ac.kookmin.wuung.model.UserQuestStatus
 import kr.ac.kookmin.wuung.repository.UserQuestStageRepository
+import kr.ac.kookmin.wuung.service.QuestService
+import kr.ac.kookmin.wuung.service.QuestsDTO
 import kr.ac.kookmin.wuung.service.UserQuestS3Service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -108,27 +108,6 @@ data class UpdateQuestRequest(
     val status: UserQuestStatus
 )
 
-data class QuestsDTO(
-    val id: Long,
-    val type: QuestType,
-    val name: String,
-    val description: String,
-    val target: Int,
-    val step: Int,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
-fun Quests.toDTO() = QuestsDTO(
-    id = this.id ?: 0,
-    type = this.type,
-    name = this.name,
-    description = this.description,
-    target = this.target,
-    step = this.step,
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt
-)
-
 data class UserQuestStagesDTO(
     val id: Long,
     val type: QuestType,
@@ -156,9 +135,9 @@ fun UserQuestStages.toDTO() = UserQuestStagesDTO(
 """)
 class QuestsController(
     @Autowired private val lifeQuoteRepository: LifeQuoteRepository,
-    @Autowired private val questsRepository: QuestsRepository,
+    @Autowired private val questService: QuestService,
     @Autowired private val userQuestsRepository: UserQuestsRepository,
-    @Autowired private val userQuestStageRepository : UserQuestStageRepository,
+    @Autowired private val userQuestStageRepository: UserQuestStageRepository,
     @Autowired private val userQuestS3Service: UserQuestS3Service,
     @Value("\${s3.public-endpoint}") private val s3PublicEndpoint: String,
     @Value("\${s3.quest-bucket}") private val s3BucketName: String,
@@ -256,7 +235,7 @@ class QuestsController(
     ): ResponseEntity<ApiResponseDTO<UserQuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val quest = questsRepository.findById(request.id).getOrNull() ?: throw NotFoundException()
+        val quest = questService.getByIdRaw(request.id) ?: throw NotFoundException()
 
         val data = UserQuests(
             user = userDetails,
@@ -392,16 +371,15 @@ class QuestsController(
             )
         ]
     )
-    @Cacheable(cacheNames = ["quests"])
     fun listQuests(
         @AuthenticationPrincipal userDetails: User?,
     ): ResponseEntity<ApiResponseDTO<List<QuestsDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val quests = questsRepository.findAll()
+        val quests = questService.getAll()
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = quests.map { it.toDTO() })
+            ApiResponseDTO(data = quests)
         )
     }
 
@@ -441,7 +419,6 @@ class QuestsController(
             )
         ]
     )
-    @Cacheable(cacheNames = ["quests_{type}"])
     fun listQuestsWithTypes(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Type of quest", example = "ACTIVITY")
@@ -449,10 +426,10 @@ class QuestsController(
     ): ResponseEntity<ApiResponseDTO<List<QuestsDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val quests = questsRepository.findAllByType(type)
+        val quests = questService.getAllByType(type)
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = quests.map { it.toDTO() })
+            ApiResponseDTO(data = quests)
         )
     }
 
@@ -492,7 +469,6 @@ class QuestsController(
             )
         ]
     )
-    @Cacheable(cacheNames = ["quests_{type}_{step}"])
     fun listQuestsWithTypes(
         @AuthenticationPrincipal userDetails: User?,
         @Schema(description = "Type of quest", example = "ACTIVITY")
@@ -502,10 +478,10 @@ class QuestsController(
     ): ResponseEntity<ApiResponseDTO<QuestsDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val quest = questsRepository.findByTypeAndStep(type, step).getOrNull() ?: throw NotFoundException()
+        val quest = questService.getByTypeAndStep(type, step) ?: throw NotFoundException()
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = quest.toDTO())
+            ApiResponseDTO(data = quest )
         )
     }
 

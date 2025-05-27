@@ -56,19 +56,19 @@ data class Help (
     var rstdeInfo : String, // 휴무일정보
 
     @Column
-    var hpCnterAr : Int, // 건물면적
+    var hpCnterAr : Int?, // 건물면적
 
     @Column
-    var doctrCo : Int, // 의사수
+    var doctrCo : Int?, // 의사수
 
     @Column
-    var nurseCo : Int, // 간호사수
+    var nurseCo : Int?, // 간호사수
 
     @Column
-    var scrcsCo : Int, // 사회복지사수
+    var scrcsCo : Int?, // 사회복지사수
 
     @Column
-    var ntrstCo : Int, // 영양사수
+    var ntrstCo : Int?, // 영양사수
 
     @Column
     var etcHnfSttus : String, // 기타입력현황
