@@ -8,16 +8,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.ac.kookmin.wuung.exceptions.UnauthorizedException
 import kr.ac.kookmin.wuung.lib.ApiResponseDTO
-import kr.ac.kookmin.wuung.model.Help
 import kr.ac.kookmin.wuung.model.User
-import kr.ac.kookmin.wuung.repository.HelpRepository
+import kr.ac.kookmin.wuung.repository.HelpCenterRepository
 import kr.ac.kookmin.wuung.service.RedisService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -95,8 +93,7 @@ fun HelpDTO.toDTO() = HelpDTO(
 """
 )
 class HelpController(
-    @Autowired private val helpRepository: HelpRepository,
-    @Autowired private val redisService: RedisService
+    @Autowired private val helpRepository: HelpCenterRepository,
 ) {
     @GetMapping("/hospital")
     @Operation(

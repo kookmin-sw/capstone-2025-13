@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param
 import java.util.Optional
 
 
-interface HelpRepository : JpaRepository<Help, Long>{
+interface HelpCenterRepository : JpaRepository<Help, Long>{
     @Query(
         value = """
     WITH point AS (
@@ -15,7 +15,7 @@ interface HelpRepository : JpaRepository<Help, Long>{
     )
     SELECT h.*,
            ST_Distance(h.location::geography, p.ref_point) as distance
-    FROM help h, point p
+    FROM help_center h, point p
     WHERE ST_DWithin(
         h.location::geography, 
         p.ref_point, 
