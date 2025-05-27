@@ -104,7 +104,7 @@ export default function CalendarScreen() {
                 setIsQuestModalVisible(true); // 모달 열기
                 break;
             case "TOPIC":
-                // navigation.navigate("TopicScreen", { date: selectedDate });
+                navigation.navigate("DailyTopic", { date: selectedDate });
                 break;
             case "QUEST":
 

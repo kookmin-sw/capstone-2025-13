@@ -27,15 +27,20 @@ import {
     getTopicDetails,
     submitFeedback,
     getFeedbackById,
+    getTopicByDate,
     TopicFeedbackResponse,
     TopicFeedbackStatus,
 } from "../API/topicAPI";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
 
 type ChatItem =
     | { type: "question"; text: string }
     | { type: "answer"; text: string; isLoading?: boolean };
 
 export default function DailyTopic() {
+    const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
+    const date = route.params?.date ?? '';
     const [topicId, setTopicId] = useState<string | null>(null);
     const [answer, setAnswer] = useState<string>("");
     const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
@@ -47,6 +52,8 @@ export default function DailyTopic() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [hasShownModal, setHasShownModal] = useState(false);
+
 
     const showModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
@@ -67,18 +74,20 @@ export default function DailyTopic() {
 
     const initializeChat = async () => {
         try {
-            const topicData = await getTodayTopic();
-
+            const topicData = date
+                ? await getTopicByDate(date)
+                : await getTodayTopic();
+    
             const history: ChatItem[] = [
                 { type: "question", text: topicData.data },
             ];
-
+    
             const allFeedbacks = topicData.feedbacks.sort(
                 (a: any, b: any) =>
                     new Date(a.createdAt).getTime() -
                     new Date(b.createdAt).getTime()
             );
-
+    
             allFeedbacks.forEach((feedback: any) => {
                 history.push({ type: "answer", text: feedback.data });
                 if (feedback.status !== TopicFeedbackStatus.NOFEEDBACK) {
@@ -87,18 +96,27 @@ export default function DailyTopic() {
                         text: feedback.aiFeedback,
                     });
                 }
-
-                if (feedback.status === TopicFeedbackStatus.NOFEEDBACK) {
-                    setInputDisabled(true);
-                    setPlaceholderText(
-                        "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
-                    );
-                    setIsModalVisible(true);
-                }
             });
-
+    
             setTopicId(topicData.id);
             setChatHistory(history);
+
+            if (date) {
+                const [year, month, day] = date.split("-"); // "2025", "05", "04"로 분리
+                setInputDisabled(true);
+                setPlaceholderText(`${year}년 ${month}월 ${day}일의 매일 1주제야-!`);
+                return;
+            }
+    
+            const lastFeedback = allFeedbacks[allFeedbacks.length - 1];
+            if (lastFeedback?.status === TopicFeedbackStatus.NOFEEDBACK) {
+                setInputDisabled(true);
+                setPlaceholderText(
+                    "오늘은 세잎이와 충분히 대화했어!\n일기 써보는 건 어때?"
+                );
+                setIsModalVisible(true);
+                setHasShownModal(true);
+            }
         } catch (error: any) {
             if (
                 error.response?.status === 404 ||
@@ -113,6 +131,7 @@ export default function DailyTopic() {
             }
         }
     };
+    
 
     const handleCreateTopic = async () => {
         try {
@@ -132,17 +151,6 @@ export default function DailyTopic() {
                     error.response?.data || error.message
                 );
             }
-        }
-    };
-
-    const handleFetchFeedback = async (topicId: string) => {
-        try {
-            await getTopicDetails(topicId);
-        } catch (error: any) {
-            console.error(
-                "❌ Failed to fetch feedback:",
-                error.response?.data || error.message
-            );
         }
     };
 
@@ -192,36 +200,33 @@ export default function DailyTopic() {
                 );
             }
         } catch (error: any) {
-            const status = error.response?.status ?? null;
-            if (status === 404) {
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
-            } else if (status === null) {
-                // error.response가 null인 경우 (네트워크 오류 등)
+            const response = error.response;
+        
+            if (!response) {
+                // 네트워크 오류나 서버 응답 없음
                 console.error(
                     "❌ Feedback fetch failed: No response received",
                     error.message
                 );
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
             } else {
-                console.error(
-                    "❌ Feedback fetch failed:",
-                    error.response?.data || error.message
-                );
-                setTimeout(
-                    () =>
-                        fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
-                    3000
-                );
+                const status = response.status;
+                if (status === 404) {
+                    // 피드백이 아직 생성되지 않았을 경우 재시도
+                    console.warn("⚠️ Feedback not ready (404), retrying...");
+                } else {
+                    console.error(
+                        "❌ Feedback fetch failed:",
+                        response.data || error.message
+                    );
+                }
             }
-        }
+        
+            // 재시도
+            setTimeout(
+                () => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
+                3000
+            );
+        }        
     };
 
     const handleSendFeedback = async (answer: string) => {
@@ -314,7 +319,13 @@ export default function DailyTopic() {
             <View style={[dailyTopicstyles.container, { flex: 1 }]}>
                 <TouchableOpacity
                     style={dailyTopicstyles.backButtonWrapper}
-                    onPress={() => navigation.navigate("Home", {})}
+                    onPress={() => {
+                        if (date) {
+                            navigation.navigate("Calendar");
+                        } else {
+                            navigation.navigate("Home", {}); 
+                        }
+                    }}
                 >
                     <Ionicons
                         name="arrow-back-circle"
@@ -334,7 +345,6 @@ export default function DailyTopic() {
                     <TextInput
                         placeholder={placeholderText}
                         style={dailyTopicstyles.textInput}
-                        placeholderTextColor="#A3B8A0"
                         value={answer}
                         onChangeText={setAnswer}
                         editable={!inputDisabled}
