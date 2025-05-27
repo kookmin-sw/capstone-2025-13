@@ -1,19 +1,28 @@
-import { Text, View, Alert, Image } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
-import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
-import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
-import { Worklets } from 'react-native-worklets-core';
+import {Alert, Text, View} from 'react-native';
+import {useEffect, useRef, useState} from 'react';
+import {
+    Camera,
+    useCameraDevice,
+    useCameraFormat,
+    useCameraPermission,
+    useFrameProcessor
+} from 'react-native-vision-camera';
+import {useFaceDetector} from 'react-native-vision-camera-face-detector';
+import { runOnJS } from 'react-native-reanimated';
 
-import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
-import { shouldCaptureFace } from '../../utils/faceChecker';
-import { EmotionModelRunner } from '../../utils/EmotionModelRun';
-import { QUESTS } from '../../utils/QuestEmotion/quests';
+import {useLoadEmotionModel} from '../../hooks/useLoadEmotionModel';
+import {runTFLiteModel} from '../../utils/EmotionModelRun';
+import {shouldCaptureFace} from '../../utils/faceChecker';
+import {QUESTS} from '../../utils/QuestEmotion/quests';
 
 import EmotionChartBox from '../../components/Quest_emotionBox';
 import styles from '../../styles/questEmotionStyles';
-import {NavigationProp, useNavigation, useRoute} from "@react-navigation/native";
-import customAxios from "../../API/axios";
-import { getCoupon } from "../../API/potAPI";
+import {NavigationProp, useNavigation, useRoute} from '@react-navigation/native';
+import customAxios from '../../API/axios';
+import {getCoupon} from '../../API/potAPI';
+import {crop} from "vision-camera-cropper";
+
+import "react-native-worklets-core";
 
 type RouteParams = {
     questTitle: string;
@@ -25,33 +34,40 @@ type RouteParams = {
 export default function QuestEmotion() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
-    const { questTitle, questDescription, nickname } =
-        route.params as RouteParams;
-    const [emotionLog, setEmotionLog] = useState<string[]>([]);
+    const { questTitle, questDescription, nickname } = route.params as RouteParams;
+
     const device = useCameraDevice('front');
     const cameraRef = useRef<any>(null);
-    const { detectFaces } = useFaceDetector();
-    const [hasPermission, setHasPermission] = useState(false);
-    const { isLoaded, model } = useLoadEmotionModel();
-    const [noFaceWarning, setNoFaceWarning] = useState(false);
-    const [photoPath, setPhotoPath] = useState<string | null>(null);
+    const {detectFaces} = useFaceDetector();
+    const {isLoaded, model} = useLoadEmotionModel();
+
+    const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
-    const lastPhotoTimeRef = useRef(0);
-    const isPhotoTaken = useRef(false);
+    const [noFaceWarning, setNoFaceWarning] = useState(false);
+    const { hasPermission, requestPermission } = useCameraPermission()
+
+    const quest = QUESTS.find(q => q.id === questTitle);
+    const quest_capture_interval = quest?.interval ?? 1000;
+    const quest_save_pre_log = quest?.logLength ?? 20;
+
+
+    const format = useCameraFormat(device, [
+        { videoResolution: { width: 720, height: 1280 } },
+    ]);
 
     const handleComplete = async () => {
         try {
             const type = "EMOTION";
             const response = await customAxios.get(`/quests/last/${type}`);
             const lastDataID = response.data.data.id;
-    
+
             const postRes = await customAxios.post("/quests", {
                 id: lastDataID,
                 current: 0,
                 status: "COMPLETED",
             });
-    
+
             if (postRes.status === 200 || postRes.status === 201) {
                 await getCoupon();
                 Alert.alert("완료!", "감정 퀘스트가 성공적으로 완료되었어요! 🎉", [
@@ -70,109 +86,79 @@ export default function QuestEmotion() {
             console.error("감정 퀘스트 완료 처리 중 오류 발생:", error);
             Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
         }
-    };  
+    };
 
-    const quest = QUESTS.find(q => q.id === questTitle);
-    const quest_capture_interval = quest?.interval ?? 1000;
-    const quest_save_pre_log = quest?.logLength ?? 20;
+    const handleProcessedInput = async (floatInput: string) => {
+        if (!isLoaded || !model) return;
 
-const capturePhoto = async (face: Face | undefined): Promise<string | null> => {
-    if (isPhotoTaken.current) {
-        console.log("📷 캡처 건너뜀: 이전 캡처 중");
-        return null;
-    }
-    isPhotoTaken.current = true;
+        const input = Buffer.from(floatInput, 'base64');
 
-    const now = Date.now();
-    const { isLargeEnough, now: checkedTime } = shouldCaptureFace(face, lastPhotoTimeRef.current);
-    if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
-        isPhotoTaken.current = false;
-        console.log("📏 얼굴이 작거나 캡처 간격 미달");
-        return null;
-    }
+        const result = await runTFLiteModel(new Float32Array(input), model);
+        if (!result) {
+            console.warn('⚠️ 모델 결과 없음');
+            return;
+        }
 
-    try {
-        const photo = await cameraRef.current.takePhoto();
-        const path = `file://${photo.path}?ts=${Date.now()}`; // 고유 URI 처리
-        console.log("📸 캡처 성공:", path);
-        setPhotoPath(path);
-        lastPhotoTimeRef.current = checkedTime;
-
-        // 최소 캡처 간격 보장 (예: 1초)
-        setTimeout(() => {
-            isPhotoTaken.current = false;
-        }, 1000);
-        return path;
-    } catch (err) {
-        console.error("❌ 사진 캡처 실패:", err);
-        isPhotoTaken.current = false;
-        return null;
-    }
-};
-
-    const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-    if (!faces?.length) {
-        setNoFaceWarning(true);
-        return;
-    }
-    setNoFaceWarning(false);
-
-    if (!isLoaded || !model) {
-        console.log("❌ 모델 로드 안됨");
-        return;
-    }
-
-    const face = faces[0];
-    const uri = await capturePhoto(face);
-    if (!uri) {
-        console.log("📛 사진 캡처 실패 or 생략됨");
-        return;
-    }
-
-    const result = await EmotionModelRunner(uri, model);
-
-    if (result) {
-        const labels = ["Happy", "Surprise", "Angry", "Sad", "Disgust", "Fear", "Neutral"];
+        const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
         const topIndex = result.indexOf(Math.max(...result));
         const predictedLabel = labels[topIndex];
 
-        console.log("🎯 예측 감정:", predictedLabel);
+        console.log('🎯 예측 감정:', predictedLabel);
         console.log(result);
 
         const updated = [...emotionLog, predictedLabel];
         if (updated.length > quest_save_pre_log) updated.shift();
 
         setEmotionLog(updated);
-        setLatestResult(Array.from(result)); // ✅ 그대로 사용
+        setLatestResult([...result]);
 
         if (quest && quest.check(updated)) {
             setSuccess(true);
-            console.log("✅ 퀘스트 조건 충족!");
             handleComplete();
         }
-    } else {
-        console.warn("⚠️ 모델 결과 없음");
-    }
-});
-
+    };
 
     const frameProcessor = useFrameProcessor((frame) => {
-        "worklet";
+        'worklet';
         const now = Date.now();
         const last = (globalThis as any).lastProcessTime ?? 0;
         if (now - last < quest_capture_interval) return;
         (globalThis as any).lastProcessTime = now;
 
         const faces = detectFaces(frame);
-        handleDetectedFaces(faces);
-    }, [handleDetectedFaces]);
+        if (faces?.length) {
+            const face = faces[0];
+            const {isLargeEnough} = shouldCaptureFace(face, last);
+            if (!isLargeEnough) return;
+
+            const {x, y, width, height} = face.bounds;
+
+            console.log(`${Math.max(0, x)}, ${Math.max(0, y)}, ${Math.min(height, frame.height - y)}, ${Math.min(width, frame.width - x)}`);
+
+            const cropped = crop(frame, {
+                cropRegion: {
+                    left: x / frame.width,
+                    top: y / frame.height,
+                    height: height / frame.height,
+                    width: width / frame.width
+                },
+                saveAsFile: false,
+                includeImageBase64: true
+            });
+
+            runOnJS(handleProcessedInput)(cropped.base64 ?? '');
+        } else {
+            runOnJS(() => setNoFaceWarning(true))();
+        }
+    }, [isLoaded, model, quest]);
 
     useEffect(() => {
-        (async () => {
-            const status = await Camera.requestCameraPermission();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
+        const initPermission = async() => {
+            await requestPermission();
+        }
+
+        initPermission();
+    })
 
     if (!device || !hasPermission) {
         return (
@@ -200,27 +186,26 @@ const capturePhoto = async (face: Face | undefined): Promise<string | null> => {
                     photo
                     isActive
                     frameProcessor={frameProcessor}
+                    format={format}
                 />
             </View>
 
-            {latestResult !== null ? (
-                <View style={styles.overlay}>
+            <View style={styles.overlay}>
+                {latestResult ? (
                     <EmotionChartBox
                         result={latestResult}
                         success={success}
                         nickname={nickname}
                         questDescription={questDescription}
                     />
-                </View>
-            ) : (
-                <View style={styles.overlay}>
-                    {noFaceWarning && (
+                ) : (
+                    noFaceWarning && (
                         <View style={styles.centered}>
                             <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
                         </View>
-                    )}
-                </View>
-            )}
+                    )
+                )}
+            </View>
         </View>
     );
 }

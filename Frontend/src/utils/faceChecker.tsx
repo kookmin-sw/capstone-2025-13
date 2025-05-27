@@ -1,4 +1,5 @@
 import { Face } from 'react-native-vision-camera-face-detector';
+import "react-native-worklets-core";
 
 export const shouldCaptureFace = (
   face: Face | undefined,
@@ -6,6 +7,7 @@ export const shouldCaptureFace = (
   minWidth = 150,
   minHeight = 200,
 ): { isLargeEnough: boolean, now: number } => {
+  'worklet';
   if (!face) return {isLargeEnough:false, now:lastPhotoTime};
 
   const now = Date.now();
