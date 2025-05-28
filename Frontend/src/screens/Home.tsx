@@ -3,7 +3,6 @@ import {
     View,
     ScrollView,
     SafeAreaView,
-    Pressable,
     StyleSheet,
     Dimensions,
 } from "react-native";
@@ -28,6 +27,12 @@ import {
     useCopilot,
     CopilotProvider,
 } from "react-native-copilot";
+import customAxios from "../API/axios";
+
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-notifications";
+import { Platform, Alert } from "react-native";
+import dayjs from "dayjs";
 
 const WalkthroughableView = walkthroughable(View);
 const { width, height } = Dimensions.get("window");
@@ -35,12 +40,73 @@ const wp = (percentage: number) => (width * percentage) / 100;
 const hp = (percentage: number) => (height * percentage) / 100;
 
 function HomeContent({ navigation }: { navigation: any }) {
+
+// 컴포넌트 밖
+const getQuote = async () => {
+    try {
+        const response = await customAxios.get('/quests/quote');
+        return response.data.data; // 응답 구조에 맞게 조정
+    } catch (error) {
+        console.error('명언 가져오기 실패:', error);
+        throw error;
+    }
+};
+  
+
+// 알림 권한 요청 함수
+async function requestNotificationPermission() {
+    const settings = await Notifications.getPermissionsAsync();
+    if (!settings.granted) {
+        await Notifications.requestPermissionsAsync();
+    }
+}
+
+async function sendLocalNotification(title: string, body: string) {
+    
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title,
+            body,
+        },
+        trigger: null, // 즉시 알림
+    });
+}
     const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, "Home">>();
     const [simpleScale, setSimpleScale] = useState(route.params?.simpleScale ?? "");
     const { start, copilotEvents } = useCopilot();
 
     const scrollRef = useRef<ScrollView>(null);
+
+    useEffect(() => {
+    const checkFirstVisitToday = async () => {
+        await requestNotificationPermission();
+
+        const today = dayjs().format("YYYY-MM-DD");
+        const lastVisit = await AsyncStorage.getItem("lastHomeVisit");
+
+        console.log("📆 Today:", today);
+        console.log("📆 LastVisit:", lastVisit);
+
+        if (lastVisit !== today) {
+            await AsyncStorage.setItem("lastHomeVisit", today);
+
+            console.log("🔔 Sending Notification!");
+            await sendLocalNotification("반가워요!", "오늘도 좋은 하루 되세요! 😊");
+        } else {
+            try {
+                const quoteData = await getQuote(); 
+                await sendLocalNotification("오늘의 명언", quoteData);
+                console.log("✅ 오늘 이미 방문했어요. 명언 알림 전송 완료");
+            } catch (error) {
+                console.error("❌ 명언 알림 전송 실패:", error);
+            }
+        }
+    };
+
+    checkFirstVisitToday();
+}, []);
+
 
     useEffect(() => {
         AsyncStorage.setItem("secondPasswordPassed", "false");
@@ -176,7 +242,6 @@ function HomeContent({ navigation }: { navigation: any }) {
                             backgroundColor: "rgba(0,0,0,0.3)",
                         }}
                     >
-                        <Pressable style={{ flex: 1 }} onPress={() => setSimpleScale("")} />
                         <View style={[styles.simpleResultWrapper, { zIndex: 20 }]}>
                             <SimpleResult simpleScale={simpleScale} />
                         </View>
