@@ -11,7 +11,7 @@ import {
     ImageBackground,
     ScrollView
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import signUpStyles from "../../styles/signUpStyles";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -35,10 +35,9 @@ const SignUpStep2 = () => {
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
 
-    const handleDateChange = (event: any, selectedDate?: Date) => {
-        if (Platform.OS === "android") hideDatePicker();
-        if (selectedDate) setDate(selectedDate);
-
+    const handleConfirm = (selectedDate: Date) => {
+        setDate(selectedDate);
+        hideDatePicker();
     };
 
     const handleSignUp = () => {
@@ -93,14 +92,14 @@ const SignUpStep2 = () => {
                                     />
                                 </TouchableOpacity>
 
-                                {isDatePickerVisible && (
-                                    <DateTimePicker
-                                        value={date ?? new Date()}
-                                        mode="date"
-                                        onChange={handleDateChange}
-                                        display="spinner"
-                                    />
-                                )}
+                                <DateTimePickerModal
+                                    isVisible={isDatePickerVisible}
+                                    mode="date"
+                                    onConfirm={handleConfirm}
+                                    onCancel={hideDatePicker}
+                                    date={date ?? new Date()}
+                                    display="spinner"
+                                />
                             </View>
 
                             <View style={signUpStyles.inputContainer}>

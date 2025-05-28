@@ -52,11 +52,11 @@ export type RootStackParamList = {
     Interest: { score?: number };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
-    Game: { score?: number };
+    Game: { score?: number, nickname: string };
     FormalDiagnosis: undefined;
     FormalDiagnosisSurvey: { diagnosisId: number };
-    GameScreen: { score?: number };
-    DailyTopic: {date?: string};
+    GameScreen: { score?: number, nickname: string };
+    DailyTopic: { date?: string };
     Spinner: undefined;
     HelpCall: undefined;
     HelpCall2: undefined;
