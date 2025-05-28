@@ -119,19 +119,21 @@ export default function Record() {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={0}
-        >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                contentContainerStyle={[styles.scroll, { alignItems: "center" }]}
+            >
                 <View style={styles.container}>
                     <RecordHeader title={title} date={finalDate} />
                     <ScrollView
                         contentContainerStyle={[
                             styles.scroll,
-                            { alignItems: "center" },
+                            { alignItems: "center", flexGrow: 1 },
+
                         ]}
+                        keyboardShouldPersistTaps="handled"
                     >
                         <StarRating
                             onRecordEtcUpdate={handleRatingChange}
@@ -153,6 +155,7 @@ export default function Record() {
                             <RecordEtc
                                 onRecordEtcUpdate={setRecordEtcText}
                                 initialEtcText={recordEtcText}
+                                disabled={isSaved}
                             />
                         )}
                         <TouchableOpacity
@@ -214,7 +217,8 @@ export default function Record() {
                         </Modal>
                     </ScrollView>
                 </View>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+
     );
 }
