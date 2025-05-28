@@ -46,6 +46,6 @@ class FaceDetectorFrameProcessorPlugin(
             height,
             x, y, w, h
         )
-        return floatArray
+        return floatArray.map { it.toDouble() }
     }
 }

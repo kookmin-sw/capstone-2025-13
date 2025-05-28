@@ -144,13 +144,15 @@ export default function QuestEmotion() {
     if (now - last < quest_capture_interval) return;
     (globalThis as any).lastProcessTime = now;
 
-    const pluginResult = cropFaces(frame, faces[0].bounds);
-    if (!(pluginResult instanceof Float32Array)) {
+    console.log(faces[0].bounds)
+    const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
+    if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
       console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
       return;
     }
 
-    const floatInput = new Float32Array(Array.from(pluginResult));
+    const floatInput = Float32Array.from(pluginResult);
+    console.log('📏 floatInput length:', floatInput.length);
     jsHandleDetectedResult(floatInput);
   }, [detectFaces, handleDetectedResult, quest_capture_interval]);
 
