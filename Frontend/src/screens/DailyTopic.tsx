@@ -78,19 +78,19 @@ export default function DailyTopic() {
 
       const allFeedbacks = topicData.feedbacks.sort(
         (a: any, b: any) =>
-            new Date(a.createdAt).getTime() -
-            new Date(b.createdAt).getTime()
-    );
+          new Date(a.createdAt).getTime() -
+          new Date(b.createdAt).getTime()
+      );
 
-    allFeedbacks.forEach((feedback: any) => {
+      allFeedbacks.forEach((feedback: any) => {
         history.push({ type: "answer", text: feedback.data });
         if (feedback.status !== TopicFeedbackStatus.NOFEEDBACK) {
-            history.push({
-                type: "question",
-                text: feedback.aiFeedback,
-            });
+          history.push({
+            type: "question",
+            text: feedback.aiFeedback,
+          });
         }
-    });
+      });
 
       setTopicId(topicData.id);
       setChatHistory(history);
@@ -217,7 +217,6 @@ export default function DailyTopic() {
         )}
       </View>
     ));
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -243,6 +242,10 @@ export default function DailyTopic() {
           contentContainerStyle={dailyTopicstyles.scrollContainer}
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          onContentSizeChange={() => {
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }}
         >
           {renderChat()}
         </ScrollView>

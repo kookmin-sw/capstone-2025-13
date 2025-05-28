@@ -58,10 +58,10 @@ export default function FormalDiagnosisSurvey() {
         const matched = sorted.find((s) => totalScore >= s.start);
         return matched
             ? {
-                  scaleName: matched.scaleName,
-                  description: matched.description,
-                  start: matched.start,
-              }
+                scaleName: matched.scaleName,
+                description: matched.description,
+                start: matched.start,
+            }
             : null;
     };
 
@@ -134,6 +134,7 @@ export default function FormalDiagnosisSurvey() {
                 <ConfirmButton
                     label="검사 결과 확인하기"
                     onPress={handleConfirm}
+                    disabled={answers.length !== questions.length || answers.some(a => a === undefined)}
                 />
             </ScrollView>
         </View>

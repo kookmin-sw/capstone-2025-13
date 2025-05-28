@@ -14,6 +14,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    disabledButton: {
+        backgroundColor: "#A5D6B2", 
+    },
     label: {
         color: "#fff",
         fontSize: 18,
@@ -21,6 +24,9 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         textAlign: "center",
         textAlignVertical: "center",
+    },
+    disabledLabel: {
+        color: "#f1f1f1", 
     },
 });
 
