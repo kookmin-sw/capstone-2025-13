@@ -56,14 +56,14 @@ class PotController(
     @Operation(
         summary = "[en] get pot status [ko] 화분 상태 조회",
         description = """
-        [en]
-        Retrieves the current status of user's plant pot including level, experience points, and coupon count.
-        This endpoint is protected and requires authentication.
+            [en]
+            Retrieves the current status of user's plant pot including level, experience points, and coupon count.
+            This endpoint is protected and requires authentication.
         
-        [ko]
-        사용자 화분의 현재 상태(레벨, 경험치, 쿠폰 개수 등)를 조회합니다.
-        이 엔드포인트는 보호되어 있으며 사용을 위해서 accessToken이 필요합니다.
-    """
+            [ko]
+            사용자 화분의 현재 상태(레벨, 경험치, 쿠폰 개수 등)를 조회합니다.
+            이 엔드포인트는 보호되어 있으며 사용을 위해서 accessToken이 필요합니다.
+        """
     )
     @ApiResponses(
         value = [
@@ -81,6 +81,11 @@ class PotController(
                 responseCode = "404",
                 description = "pot not found",
                 content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "445",
+                description = "Max Level Reached",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
             )
         ]
     )
@@ -93,15 +98,19 @@ class PotController(
         // 사용자가 가진 pot 정보 조회 및 pot Level 정보에 대한 요구치 조회
         var pot = potRepository.findPotByUser(user).getOrNull()
 
-        if(pot == null) {
+        if (pot == null) {
             pot = Pot(
                 user = user,
             )
             potRepository.save(pot)
         }
 
-        val potLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
-        
+        val potLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
+
         // 결과 반환
         return ResponseEntity.ok(
             ApiResponseDTO(
@@ -144,6 +153,11 @@ class PotController(
                 responseCode = "404",
                 description = "pot not found",
                 content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "445",
+                description = "Max Level Reached",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
             )
         ]
     )
@@ -156,7 +170,11 @@ class PotController(
         pot.coupon += 1
         potRepository.save(pot)
 
-        val potLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        val potLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
 
         return ResponseEntity.ok(
             ApiResponseDTO(
@@ -222,7 +240,7 @@ class PotController(
 
         // 인증 체크
         val pot = potRepository.findPotByUser(userDetails).orElseThrow { NotFoundException() }
-        
+
         // 쿠폰 개수 체크
         if (pot.coupon <= 0) throw CouponNotEnoughException()
 
@@ -230,20 +248,36 @@ class PotController(
         pot.coupon -= 1
         pot.exp += 1
 
-        // 현재 레벨 조회
-        val currentPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
-        
-        // 레벨업 조건 확인
+        // 현재 레벨 조회 및 최대 레벨 체크
+        val currentPotLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
+
+        // 레벨업 조건 확인 
         if (pot.exp >= currentPotLevel.need) {
-            pot.level += 1
-            pot.exp = 0
+            try {
+                // 미리 다음 레벨이 존재하는지 확인
+                potLevelRepository.findPotLevelByLevel(pot.level + 1).orElseThrow { PotMaxLevelReachedException() }
+                pot.level += 1
+                pot.exp = 0
+            } catch (e: PotMaxLevelReachedException) {
+                // 최대 레벨에 도달한 경우 exp를 need로 고정
+                pot.exp = currentPotLevel.need
+                throw e
+            }
         }
 
         // 저장
         potRepository.save(pot)
 
         // 새로운 레벨 정보 조회
-        val newPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
+        val newPotLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
 
         // 새 레벨 정보를 포함한 pot 정보 반환
         return ResponseEntity.ok(
@@ -311,7 +345,7 @@ class PotController(
 
         // 인증 체크
         val pot = potRepository.findPotByUser(userDetails).orElseThrow { NotFoundException() }
-        
+
         // 쿠폰 개수 체크
         if (pot.coupon < number) throw CouponNotEnoughException()
 
@@ -320,20 +354,25 @@ class PotController(
         pot.exp += number
 
         // 레벨업 처리
-        var currentPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
-        
+        var currentPotLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
+
         // 레벨업이 여러 번 발생할 수 있으므로 while 루프 사용
         while (pot.exp >= currentPotLevel.need) {
-            pot.level += 1
-            pot.exp -= currentPotLevel.need
-            
-            // 새로운 레벨에 대한 정보 조회
             try {
-                currentPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
+                // 미리 다음 레벨이 존재하는지 확인
+                potLevelRepository.findPotLevelByLevel(pot.level + 1).orElseThrow { PotMaxLevelReachedException() }
+                pot.level += 1
+                pot.exp -= currentPotLevel.need
+                currentPotLevel =
+                    potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
             } catch (e: PotMaxLevelReachedException) {
-                // 최대 레벨에 도달한 경우 경험치를 0으로 설정
-                pot.exp = 0
-                break
+                // 최대 레벨에 도달한 경우 exp를 need로 고정
+                pot.exp = currentPotLevel.need
+                throw e
             }
         }
 
@@ -341,7 +380,11 @@ class PotController(
         potRepository.save(pot)
 
         // 현재 레벨 정보 조회
-        val newPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
+        val newPotLevel = try {
+            potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        } catch (e: NotFoundException) {
+            throw PotMaxLevelReachedException()
+        }
 
         // 새 레벨 정보를 포함한 pot 정보 반환
         return ResponseEntity.ok(
