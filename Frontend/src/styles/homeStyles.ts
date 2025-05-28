@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingRight: wp(6),
     },
-     simpleResultWrapper: {
-            position: "absolute",
-            top: "40%",
-            alignItems: "center",
-            width:"100%",
-            zIndex: 10,
-        },
+    simpleResultWrapper: {
+        position: "absolute",
+        top: "40%",
+        alignItems: "center",
+        width: "100%",
+        zIndex: 10,
+    },
 });
 
 export default styles;
