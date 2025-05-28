@@ -84,8 +84,6 @@ const GlobalSpinner = () => {
 };
 
 export default function App() {
-    // 하드코딩된 로그인 상태
-
     const [loading, setLoading] = useState(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
