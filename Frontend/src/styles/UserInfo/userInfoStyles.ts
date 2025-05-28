@@ -88,9 +88,10 @@ cameraIcon: {
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     marginTop: height * 0.03,
     width: "100%",
+    gap: 10,
   },
   cancelButton: {
     backgroundColor: "#ccc",
