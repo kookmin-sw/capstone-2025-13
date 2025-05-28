@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { Image } from "react-native";
 import helpCallStyles from "../../styles/helpCallStyles";
 import { getCenters } from "../../API/helpcallAPI";
+import { useLoading } from "../../API/contextAPI";
 import MarkerDetailCard from "../../components/MarkerDetailCard";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -43,6 +44,7 @@ export default function HelpCall() {
         }[]
     >([]);
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
+    const { showLoading, hideLoading } = useLoading();
 
     const filteredMarkers =
         selected === "all"
@@ -82,6 +84,7 @@ export default function HelpCall() {
             });
 
             try {
+                showLoading();
                 const centerData = await getCenters();
                 const parsedMarkers = centerData
                     .filter((item: any) => item.hpCnterSe === "정신보건")
@@ -111,8 +114,10 @@ export default function HelpCall() {
                     }));
 
                 setMarkers(parsedMarkers);
+                hideLoading();
             } catch (error) {
                 console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
+                hideLoading();
             }
         })();
     }, []);
@@ -187,7 +192,7 @@ export default function HelpCall() {
                         region={location}
                         showsUserLocation={true}
                         onMapReady={(event) => {
-                            console.log("Google Map Ready!")
+                            console.log("Google Map Ready!");
                         }}
                     >
                         <Marker coordinate={location} title="내 위치" />
