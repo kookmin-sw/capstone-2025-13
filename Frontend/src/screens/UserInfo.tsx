@@ -19,6 +19,7 @@ import {
     getUserInfo,
     putProfileImg,
     userInfoUpdate,
+    deleteProfileImg,
 } from "../API/userInfoAPI";
 import userInfoStyles from "../styles/UserInfo/userInfoStyles";
 import { CommonActions, useNavigation } from "@react-navigation/native";
@@ -279,12 +280,23 @@ export default function UserInfo() {
         }
     };
 
-    const handleResetProfilePic = () => {
-        setUserData({
-            ...userData,
-            profilePic: null,
-        });
-        setHasChanges(true);
+    const handleResetProfilePic = async () => {
+        try {
+            await deleteProfileImg();
+            setUserData({
+                ...userData,
+                profilePic: null,
+            });
+            setHasChanges(true);
+            Toast.show({
+                type: "success",
+                text1: "프로필 이미지 삭제 완료",
+                position: "bottom",
+            });
+            setModalVisible(false); // Modal closes after deletion
+        } catch (error) {
+            Alert.alert("오류", "프로필 이미지 삭제 중 문제가 발생했습니다.");
+        }
     };
 
     const renderProfilePic = () => {

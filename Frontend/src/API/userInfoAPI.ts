@@ -1,3 +1,25 @@
+// 유저 프로필 이미지 삭제
+export const deleteProfileImg = async () => {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+
+    try {
+        const response = await axios.delete(
+            "https://wuung.mori.space/auth/profile",
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        console.log("프로필 이미지 삭제 성공:", response.data);
+        return response.data.data;
+    } catch (error) {
+        console.error("프로필 이미지 삭제 실패:", error);
+        throw error;
+    }
+};
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "./axios";
 import { AxiosResponse } from "axios";
@@ -8,7 +30,7 @@ export enum GenderEnum {
     MALE = "MALE",
     FEMALE = "FEMALE",
     THIRD_GENDER = "THIRD_GENDER",
-    UNKNOWN = "UNKNOWN"
+    UNKNOWN = "UNKNOWN",
 }
 
 export interface UserInfoResponse {
@@ -37,12 +59,17 @@ export const userInfoUpdate = async (
     birthDate: string | null,
     gender: string | null
 ) => {
-    console.log("userInfoUpdate called with:", { password, nickname, birthDate, gender });
+    console.log("userInfoUpdate called with:", {
+        password,
+        nickname,
+        birthDate,
+        gender,
+    });
 
     const accessToken = await AsyncStorage.getItem("accessToken");
 
     try {
-        const response = await axios.post(
+        const response = (await axios.post(
             "https://wuung.mori.space/auth/update",
             {
                 password,
@@ -57,7 +84,7 @@ export const userInfoUpdate = async (
                     Authorization: `Bearer ${accessToken}`,
                 },
             }
-        ) as AxiosResponse<ApiResponseDTO<UserProfileUpdateResponse>>;
+        )) as AxiosResponse<ApiResponseDTO<UserProfileUpdateResponse>>;
 
         return response.data.data;
     } catch (error) {
@@ -71,13 +98,13 @@ export const getUserInfo = async () => {
     const accessToken = await AsyncStorage.getItem("accessToken");
 
     try {
-        const response = await axios.get("/auth/me", {
+        const response = (await axios.get("/auth/me", {
             headers: {
                 "Content-Type": "application/json",
                 accept: "application/json",
                 Authorization: `Bearer ${accessToken}`,
             },
-        }) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>;
+        })) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>;
 
         return response.data.data;
     } catch (error) {
@@ -87,18 +114,23 @@ export const getUserInfo = async () => {
 };
 
 // 프로필 이미지 업로드
-export const putProfileImg = async (profileImage: { uri: string; name: string; type: string, size?: number }) => {
+export const putProfileImg = async (profileImage: {
+    uri: string;
+    name: string;
+    type: string;
+    size?: number;
+}) => {
     console.log("putProfileImg called with:", profileImage);
     const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-        if (profileImage.size && profileImage.size > MAX_SIZE) {
-            Toast.show({
-                    type: "error",
-                    text1: "저장 실패",
-                    text2: "이미지 크기는 5MB를 초과할 수 없습니다.",
-                    position: "bottom",
-                });
-                 return; 
-        }
+    if (profileImage.size && profileImage.size > MAX_SIZE) {
+        Toast.show({
+            type: "error",
+            text1: "저장 실패",
+            text2: "이미지 크기는 5MB를 초과할 수 없습니다.",
+            position: "bottom",
+        });
+        return;
+    }
 
     const accessToken = await AsyncStorage.getItem("accessToken");
 
@@ -110,7 +142,7 @@ export const putProfileImg = async (profileImage: { uri: string; name: string; t
     } as any);
 
     try {
-        const response = await axios.put(
+        const response = (await axios.put(
             "https://wuung.mori.space/auth/profile",
             formData,
             {
@@ -120,7 +152,7 @@ export const putProfileImg = async (profileImage: { uri: string; name: string; t
                     Authorization: `Bearer ${accessToken}`,
                 },
             }
-        ) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>;
+        )) as AxiosResponse<ApiResponseDTO<UserInfoResponse>>;
 
         return response.data.data;
     } catch (error) {
