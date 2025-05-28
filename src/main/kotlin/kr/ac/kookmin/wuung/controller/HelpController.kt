@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.roundToInt
 
 
 data class HospitalRequest (
@@ -75,11 +76,18 @@ class HelpController(
     fun getHospitalInformationByPoint(
         @AuthenticationPrincipal userDetails: User?,
         @RequestParam latitude: Double,
-        @RequestParam longitude: Double
+        @RequestParam longitude: Double,
+        @RequestParam distance: Double = 1000.0,
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
-        return ResponseEntity.ok(ApiResponseDTO(data =
-            helpCenterService.getCenters(latitude, longitude)
-        ))
+
+        val scaledLatitude = (latitude * 10000.0).roundToInt() / 10000.0
+        val scaledLongitude = (longitude * 10000.0).roundToInt() / 10000.0
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data =
+                    helpCenterService.getCenters(scaledLatitude, scaledLongitude, distance)
+            ))
     }
 }
