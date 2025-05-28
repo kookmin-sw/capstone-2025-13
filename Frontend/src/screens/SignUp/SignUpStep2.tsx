@@ -78,10 +78,9 @@ const SignUpStep2 = () => {
                     <ScrollView contentContainerStyle={signUpStyles.overlay}>
                         <View style={signUpStyles.container}>
                             <Text style={signUpStyles.title}>회원가입</Text>
-
                             <View style={signUpStyles.inputContainer}>
                                 <Text style={signUpStyles.inputTitle}>생년월일</Text>
-                                <TouchableOpacity onPress={showDatePicker}>
+                                <TouchableOpacity onPress={showDatePicker} activeOpacity={0.8}>
                                     <TextInput
                                         style={signUpStyles.input}
                                         placeholder="YYYY-MM-DD"
@@ -91,16 +90,17 @@ const SignUpStep2 = () => {
                                         pointerEvents="none"
                                     />
                                 </TouchableOpacity>
-
-                                <DateTimePickerModal
-                                    isVisible={isDatePickerVisible}
-                                    mode="date"
-                                    onConfirm={handleConfirm}
-                                    onCancel={hideDatePicker}
-                                    date={date ?? new Date()}
-                                    display="spinner"
-                                />
                             </View>
+
+                            <DateTimePickerModal
+                                isVisible={isDatePickerVisible}
+                                mode="date"
+                                onConfirm={handleConfirm}
+                                onCancel={hideDatePicker}
+                                date={date ?? new Date()}
+                                display={Platform.OS === "android" ? "spinner" : undefined}
+                            />
+
 
                             <View style={signUpStyles.inputContainer}>
                                 <Text style={signUpStyles.inputTitle}>성별</Text>
