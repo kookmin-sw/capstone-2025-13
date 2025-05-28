@@ -13,20 +13,20 @@ export default function FloatingButton() {
 
   useEffect(() => {
     const checkTopicStatus = async () => {
-        try {
-          const response = await getTodayTopic();
-          const feedbackArray = response.feedbacks;
-      
-          if (Array.isArray(feedbackArray)) {
-            const hasNoFeedback = feedbackArray.some(item => item.status === "NOFEEDBACK");
-            setShowBadge(!hasNoFeedback);
-          } else {
-            setShowBadge(true);
-          }
-        } catch (error) {
+      try {
+        const response = await getTodayTopic();
+        const feedbackArray = response.feedbacks;
+
+        if (Array.isArray(feedbackArray)) {
+          const hasNoFeedback = feedbackArray.some(item => item.status === "NOFEEDBACK");
+          setShowBadge(!hasNoFeedback);
+        } else {
           setShowBadge(true);
         }
-      };       
+      } catch (error) {
+        setShowBadge(true);
+      }
+    };
 
     checkTopicStatus();
 
@@ -38,7 +38,7 @@ export default function FloatingButton() {
         <TouchableOpacity
           style={styles.bubble}
           onPress={() => {
-            navigation.navigate("DailyTopic");
+            navigation.navigate("DailyTopic", {});
             setShowBadge(false);
           }}
         >

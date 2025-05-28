@@ -44,10 +44,7 @@ const dialogueBoxStyles = StyleSheet.create({
     button: {
         alignContent: "center",
         justifyContent: "center",
-        position: "absolute",
-        bottom: 40,
-        right: 20,
-        zIndex: 10,
+
     },
     triangle: {
         width: 0,
@@ -60,6 +57,10 @@ const dialogueBoxStyles = StyleSheet.create({
         borderLeftColor: "transparent",
         borderRightColor: "transparent",
         borderTopColor: colors.grey,
+        position: "absolute",
+        bottom: 40,
+        right: 20,
+        zIndex: 10,
     },
 });
 
