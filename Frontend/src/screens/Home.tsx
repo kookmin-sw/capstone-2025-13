@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     View,
     ScrollView,
     SafeAreaView,
     Pressable,
     StyleSheet,
+    Dimensions,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -29,12 +30,17 @@ import {
 } from "react-native-copilot";
 
 const WalkthroughableView = walkthroughable(View);
+const { width, height } = Dimensions.get("window");
+const wp = (percentage: number) => (width * percentage) / 100;
+const hp = (percentage: number) => (height * percentage) / 100;
 
 function HomeContent({ navigation }: { navigation: any }) {
     const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, "Home">>();
     const [simpleScale, setSimpleScale] = useState(route.params?.simpleScale ?? "");
-    const { start } = useCopilot();
+    const { start, copilotEvents } = useCopilot();
+
+    const scrollRef = useRef<ScrollView>(null);
 
     useEffect(() => {
         AsyncStorage.setItem("secondPasswordPassed", "false");
@@ -48,21 +54,28 @@ function HomeContent({ navigation }: { navigation: any }) {
         setCopilotReady(true);
     }, []);
 
+
+    // useEffect(() => {
+    //     const scale = route.params?.simpleScale;
+    //     if (scale) {
+    //         setSimpleScale(scale);
+    //         const timer = setTimeout(() => {
+    //             setSimpleScale(""); // 오버레이 닫기
+    //             console.log("🎯 Copilot 시작");
+    //             start();            // Copilot 가이드 시작
+    //         }, 3000);
+
+    //         return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
+    //     }
+    // }, [copilotReady]);
+
     useEffect(() => {
-        const scale = route.params?.simpleScale;
-        if (scale) {
-            setSimpleScale(scale);
-
-            // 5초 후 오버레이 닫고 Copilot start
-            const timer = setTimeout(() => {
-                setSimpleScale(""); // 오버레이 닫기
-                console.log("🎯 Copilot 시작");
-                start();            // Copilot 가이드 시작
-            }, 3000);
-
-            return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
+        if (copilotReady) {
+            console.log("🎯 Copilot 시작");
+            start();
         }
     }, [copilotReady]);
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -73,17 +86,17 @@ function HomeContent({ navigation }: { navigation: any }) {
             <View style={StyleSheet.absoluteFill}>
                 <View style={styles.headerWrapper}>
                     <CopilotStep
-                        text="나의 이력을 볼 수 있어요!"
+                        text={`여기는 캘린더야.\n한 달 동안 얼마나 많은 활동을 했는지\n한눈에 확인할 수 있어!`}
                         order={8}
                         name="calendarBadge"
                     >
                         <WalkthroughableView
-                            style={{
-                                position: "absolute",
-                                top: 155,
-                                right: 55,
-                                zIndex: 3,
-                            }}
+                           style={{
+                            position: "absolute",
+                            top: hp(17),
+                            right: wp(14),
+                            zIndex: 3,
+                        }}
                         >
                             <CalendarBadge
                                 day={["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][new Date().getDay()]}
@@ -96,11 +109,12 @@ function HomeContent({ navigation }: { navigation: any }) {
                 </View>
 
                 <ScrollView
+                    ref={scrollRef} 
                     contentContainerStyle={[styles.scroll, { paddingBottom: 0 }]}
                     showsVerticalScrollIndicator={false}
                 >
                     <CopilotStep
-                        text="나만의 마음정원을 키워봐요!"
+                        text={`여기는 마음 정원이야.\n앞서 소개한 기능들을 수행하면 물주기 쿠폰이 쌓여서\n너만의 클로버 정원을 키울 수 있어!`}
                         order={7}
                         name="statusBox"
                     >
@@ -110,7 +124,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                     </CopilotStep>
                     <View style={styles.buttonGroup}>
                         <CopilotStep
-                            text="지금, 내 마음 상태를 진단해보세요!"
+                            text={`실제 진단에 쓰이는 검사들을 직접 해보고,\n그 결과를 한눈에 확인할 수 있어.`}
                             order={1}
                             name="formalDiagnosis"
                         >
@@ -125,7 +139,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                         </CopilotStep>
 
                         <CopilotStep
-                            text="오늘 하루, 나의 마음 기록하기"
+                            text={`단순한 일기? 아니지!\n여기서 너가 하루를 기록하면,\n그 기록을 럭키비키하게 바꿔줄게-!`}
                             order={2}
                             name="recordDiary"
                         >
@@ -140,7 +154,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                         </CopilotStep>
 
                         <CopilotStep
-                            text="작은 실천으로 마음 건강 지키기!"
+                            text={`우울감을 날려버릴 다양한 퀘스트들이 있어.\n하루에 하나씩 도전하면서 너만의 루틴을 만들어봐!`}
                             order={3}
                             name="quest"
                         >
@@ -155,15 +169,9 @@ function HomeContent({ navigation }: { navigation: any }) {
                         </CopilotStep>
                     </View>
                     <View>
-                        {/* <CopilotStep
-                            text="도움이 필요하면 불러주세요!"
-                            order={4}
-                            name="floatingButton"
-                        > */}
                         <WalkthroughableView style={styles.floatingButtonWrapper}>
                             <FloatingButton />
                         </WalkthroughableView>
-                        {/* </CopilotStep> */}
                     </View>
                 </ScrollView>
 

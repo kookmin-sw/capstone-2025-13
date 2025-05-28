@@ -40,7 +40,7 @@ export default function FloatingButton() {
     <>
       <View style={[styles.container, { left: 24, right: "auto" }]}>
         <CopilotStep
-          text="매일의 주제를 확인하고 피드백을 남겨보세요!"
+          text={`여기는 매일 1주제!\n너의 감정을 돌아볼 주제가 준비되어 있어.\n나랑 함께 대화하며 마음을 다독여 보자!`}
           order={4}
           name="dailyTopic"
         >
@@ -59,7 +59,7 @@ export default function FloatingButton() {
         </CopilotStep>
 
         <CopilotStep
-          text="긴급하거나 도움이 필요할 땐 이곳을 눌러보세요."
+          text={`여기는 헬프콜이야!\n위치 기반 상담 센터 지도와\n관련 기관 정보를 한눈에 보여줄게.`}
           order={5}
           name="helpCall"
         >
@@ -78,7 +78,7 @@ export default function FloatingButton() {
 
       <View style={[styles.container, { left: "auto", right: 24 }]}>
         <CopilotStep
-          text="내 계정 정보를 확인할 수 있어요!"
+          text={`여기는 회원정보 공간이야.\n여기서 너의 정보를 확인하고 수정할 수 있어.`}
           order={6}
           name="userInfo"
         >

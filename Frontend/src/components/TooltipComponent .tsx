@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useCopilot } from "react-native-copilot";
+import fonts from "../constants/fonts";
 
 
 const TooltipComponent = () => {
@@ -18,7 +19,7 @@ const TooltipComponent = () => {
             <Text style={styles.tooltipText}>{currentStep?.text}</Text>
             <View style={styles.buttonRow}>
                 {!isFirstStep && (
-                    <TouchableOpacity onPress={goToPrev} style={styles.button}>
+                    <TouchableOpacity onPress={goToPrev} style={styles.prevbutton}>
                         <Text style={styles.buttonText}>이전</Text>
                     </TouchableOpacity>
                 )}
@@ -27,8 +28,8 @@ const TooltipComponent = () => {
                         <Text style={styles.buttonText}>다음</Text>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity onPress={stop} style={styles.button}>
-                        <Text style={styles.buttonText}>완료</Text>
+                    <TouchableOpacity onPress={stop} style={styles.completebutton}>
+                        <Text style={styles.buttonText}>이해했어-!</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -39,7 +40,7 @@ const TooltipComponent = () => {
 const styles = StyleSheet.create({
     tooltipContainer: {
         backgroundColor: "white",
-        padding: 15,
+        padding: 10,
         borderRadius: 8,
         maxWidth: 250,
         shadowColor: "#000",
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
     tooltipText: {
         fontSize: 13,
         marginBottom: 12,
+        fontFamily: fonts.semiBold,
         color: "#333",
     },
     buttonRow: {
@@ -61,7 +63,21 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         paddingHorizontal: 10,
         paddingVertical: 6,
-        backgroundColor: "#00aaff",
+        backgroundColor: "#1BA663",
+        borderRadius: 6,
+    },
+    prevbutton: {
+        marginLeft: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        backgroundColor: "#C8B6A1",
+        borderRadius: 6,
+    },
+    completebutton:{
+        marginLeft: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        backgroundColor: "#FF9B4B",
         borderRadius: 6,
     },
     buttonText: {
@@ -69,7 +85,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     stepNumberContainer: {
-        backgroundColor: "#00aaff",
+        backgroundColor: "#1BA663",
         borderRadius: 12,
         width: 24,
         height: 24,
