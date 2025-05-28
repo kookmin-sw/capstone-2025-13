@@ -32,16 +32,10 @@ Java_space_mori_wooong_FaceDetectorFrameProcessorPlugin_cropResizeNormalizeDirec
             int srcX = faceBox.x + (xx * faceBox.w) / 64;
             int srcY = faceBox.y + (yy * faceBox.h) / 64;
             int idx  = (srcY * imageWidth + srcX) * 4;
-
-            if (idx + 2 >= imageSize || srcX >= imageWidth || srcY >= imageHeight || srcX < 0 || srcY < 0) {
-                output.push_back(0); // R
-                output.push_back(0); // G
-                output.push_back(0); // B
-            } else {
-                output.push_back(rgba[idx]   / 255.0f); // R
-                output.push_back(rgba[idx+1] / 255.0f); // G
-                output.push_back(rgba[idx+2] / 255.0f); // B
-            }
+            if (idx + 2 >= imageSize) continue;
+            output.push_back(rgba[idx]   / 255.0f);
+            output.push_back(rgba[idx+1] / 255.0f);
+            output.push_back(rgba[idx+2] / 255.0f);
         }
     }
 

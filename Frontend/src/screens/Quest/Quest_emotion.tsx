@@ -82,7 +82,7 @@ export default function QuestEmotion() {
     }, []);
 
    const handleDetectedResult = useCallback(
-    Worklets.createRunOnJS(async (pluginResult: Float32Array) => {
+    Worklets.createRunOnJS(async (pluginResult: number[]) => {
       if (!isLoaded || !model) {
         console.log('❌ 모델 로드 안됨');
         return;
@@ -93,9 +93,10 @@ export default function QuestEmotion() {
         return;
       }
 
+      const input = new Float32Array(pluginResult);
       setIsPredicting(true);
       try {
-        const result = await runTFLiteModelRunner(pluginResult, model);
+        const result = await runTFLiteModelRunner(input, model);
         if (result) {
           const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
           const topIndex = result.indexOf(Math.max(...result));
@@ -144,16 +145,14 @@ export default function QuestEmotion() {
     if (now - last < quest_capture_interval) return;
     (globalThis as any).lastProcessTime = now;
 
-    console.log(faces[0].bounds)
     const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
     if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
       console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
       return;
     }
 
-    const floatInput = Float32Array.from(pluginResult);
-    console.log('📏 floatInput length:', floatInput.length);
-    jsHandleDetectedResult(floatInput);
+    const rawArray = Array.from(pluginResult);
+    jsHandleDetectedResult(rawArray);
   }, [detectFaces, handleDetectedResult, quest_capture_interval]);
 
   useEffect(() => {
