@@ -72,9 +72,10 @@ const DepressionResultScreen = () => {
 
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={styles.container}
+
                 bounces={false}
                 overScrollMode="never"
+                contentContainerStyle={[styles.container, { paddingBottom: 40 }]}
             >
                 <View style={styles.resultBox}>
                     <Text style={styles.title}>
@@ -152,6 +153,54 @@ const DepressionResultScreen = () => {
                             전문의와의 상담을 권장합니다.
                         </Text>
                     </View>
+                    {["심한 우울증", "불안 시사됨"].includes(scaleName) && (
+                        <TouchableOpacity
+                            style={{
+                                marginTop: 20,
+                                padding: 15,
+                                borderRadius: 10,
+                                backgroundColor: "#3CB46E",
+                                alignItems: "center",
+                            }}
+                            onPress={() => navigation.navigate("HelpCall")}
+                        >
+                            <Text style={{ color: "#ffffff", fontSize: 16, fontWeight: "bold" }}>
+                                도움 받으러 가기
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                    {scaleName === "가벼운 우울증" && (
+                        <TouchableOpacity
+                            style={{
+                                marginTop: 20,
+                                padding: 15,
+                                borderRadius: 10,
+                                backgroundColor: "#3CB46E",
+                                alignItems: "center",
+                            }}
+                            onPress={() => navigation.navigate("Quest")}
+                        >
+                            <Text style={{ color: "#ffffff", fontSize: 16, fontWeight: "bold" }}>
+                                퀘스트하러 가기
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                    {scaleName === "중간정도 우울증" && (
+                        <TouchableOpacity
+                            style={{
+                                marginTop: 20,
+                                padding: 15,
+                                borderRadius: 10,
+                                backgroundColor: "#3CB46E",
+                                alignItems: "center",
+                            }}
+                            onPress={() => navigation.navigate("FormalDiagnosis")}
+                        >
+                            <Text style={{ color: "#ffffff", fontSize: 16, fontWeight: "bold" }}>
+                                다른 검사하러 가기
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </ScrollView>
         </View>
