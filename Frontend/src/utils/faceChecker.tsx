@@ -6,6 +6,7 @@ export const shouldCaptureFace = (
   minWidth = 150,
   minHeight = 200,
 ): { isLargeEnough: boolean, now: number } => {
+  'worklet';
   if (!face) return {isLargeEnough:false, now:lastPhotoTime};
 
   const now = Date.now();

@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert } from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
-import { runOnJS } from 'react-native-reanimated';
 
 import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
+import { shouldCaptureFace } from '../../utils/faceChecker';
 import { cropFaces } from '../../plugins/cropFaces'
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
@@ -30,21 +30,21 @@ export default function QuestEmotion() {
         route.params as RouteParams;
 
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
-    const device = useCameraDevice('front');
     const [hasPermission, setHasPermission] = useState(false);
     const [noFaceWarning, setNoFaceWarning] = useState(false);
-    const { isLoaded, model } = useLoadEmotionModel();
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [isPredicting, setIsPredicting] = useState(false);
     const [success, setSuccess] = useState<boolean>(false);
 
+    const device = useCameraDevice('front');
+    const { isLoaded, model } = useLoadEmotionModel();
     const cameraRef = useRef<any>(null);
     const { detectFaces } = useFaceDetector();
 
     const quest = QUESTS.find(q => q.id === questTitle);
     const quest_capture_interval = quest?.interval ?? 1000;
     const quest_save_pre_log = quest?.logLength ?? 20;
-
+    
     const handleComplete = async () => {
         try {
             const type = "EMOTION";
@@ -77,136 +77,137 @@ export default function QuestEmotion() {
         }
     };  
 
-    const handleDetectedResult = Worklets.createRunOnJS(async (pluginResult: Float32Array) => {
-        if (!isLoaded || !model) {
-        console.log('❌ 모델 로드 안됨')
-        return
-        }
+    const handleFaceStatus = useCallback((hasFace: boolean) => {
+        setNoFaceWarning(!hasFace);
+    }, []);
 
-        if (isPredicting) {
-            console.log('⏳ 예측 중이므로 스킵');
-            return;
-        }
+   const handleDetectedResult = useCallback(
+    Worklets.createRunOnJS(async (pluginResult: Float32Array) => {
+      if (!isLoaded || !model) {
+        console.log('❌ 모델 로드 안됨');
+        return;
+      }
 
-        setIsPredicting(true); // ✅ 예측 시작
-        
-        try {
-            const result = await runTFLiteModelRunner(pluginResult, model);
-            if (result) {
-            const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
-            const topIndex = result.indexOf(Math.max(...result));
-            const predictedLabel = labels[topIndex];
+      if (isPredicting) {
+        console.log('⏳ 예측 중이므로 스킵');
+        return;
+      }
 
-            console.log('🎯 예측 감정:', predictedLabel);
-            console.log(result);
+      setIsPredicting(true);
+      try {
+        const result = await runTFLiteModelRunner(pluginResult, model);
+        if (result) {
+          const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
+          const topIndex = result.indexOf(Math.max(...result));
+          const predictedLabel = labels[topIndex];
 
-            const updated = [...emotionLog, predictedLabel];
-            if (updated.length > quest_save_pre_log) updated.shift();
+          console.log('🎯 예측 감정:', predictedLabel);
+          console.log(result);
 
-            setEmotionLog(updated);
-            setLatestResult(result);
+          const updated = [...emotionLog, predictedLabel];
+          if (updated.length > quest_save_pre_log) updated.shift();
 
-            if (quest && quest.check(updated)) {
-                setSuccess(true);
-                console.log('✅ 퀘스트 조건 충족!');
-                handleComplete();
-            }
-            } else {
-            console.warn('⚠️ 모델 결과 없음');
-            }
-        } catch (err) {
-            console.error('❌ 예측 중 오류:', err);
-        } finally {
-            setIsPredicting(false); // ✅ 예측 완료
-        }
-    });
+          setEmotionLog(updated);
+          setLatestResult(result);
 
-    const frameProcessor = useFrameProcessor((frame: Frame) => {
-        'worklet'
-        const now = Date.now()
-        const last = (globalThis as any).lastProcessTime ?? 0
-        if (now - last < quest_capture_interval) return
-        ;(globalThis as any).lastProcessTime = now
-
-        // 1) 얼굴 박스 감지
-        const faces: Face[] = detectFaces(frame)
-        if (!faces || faces.length === 0) {
-        setNoFaceWarning(true)
-        return
-        }
-        setNoFaceWarning(false)
-
-        // 2) 첫 얼굴 박스 정보로 네이티브 크롭+전처리
-        const pluginResult = cropFaces(frame, faces[0].bounds);
-
-        let result: number[] = [];
-
-        if (pluginResult instanceof Float32Array) {
-            result = Array.from(pluginResult); // result: number[]
+          if (quest && quest.check(updated)) {
+            setSuccess(true);
+            console.log('✅ 퀘스트 조건 충족!');
+            handleComplete();
+          }
         } else {
-            console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
-            return;
+          console.warn('⚠️ 모델 결과 없음');
         }
+      } catch (err) {
+        console.error('❌ 예측 중 오류:', err);
+      } finally {
+        setIsPredicting(false);
+      }
+    }),
+    [isLoaded, model, isPredicting, emotionLog, quest]
+  );
 
-        const floatInput = new Float32Array(result);
-        runOnJS(handleDetectedResult)(floatInput);
+  const jsHandleFaceStatus = Worklets.createRunOnJS(handleFaceStatus);
+  const jsHandleDetectedResult = Worklets.createRunOnJS(handleDetectedResult);
 
-    }, [detectFaces, handleDetectedResult, quest_capture_interval])
+  const frameProcessor = useFrameProcessor((frame: Frame) => {
+    'worklet';
 
-    useEffect(() => {
-        ;(async () => {
-        const status = await Camera.requestCameraPermission()
-        setHasPermission(status === 'granted')
-        })()
-    }, [])
+    const faces: Face[] = detectFaces(frame);
+    jsHandleFaceStatus(faces.length > 0);
 
-    if (!device || !hasPermission) {
-        return (
-            <View style={styles.centered}>
-                <Text>📷 카메라 준비 중...</Text>
-            </View>
-        );
+    if (!faces || faces.length === 0) return;
+
+    const last = (globalThis as any).lastProcessTime ?? 0;
+    const { isLargeEnough, now } = shouldCaptureFace(faces[0], last, 150, 200);
+    if (!isLargeEnough) return;
+    if (now - last < quest_capture_interval) return;
+    (globalThis as any).lastProcessTime = now;
+
+    const pluginResult = cropFaces(frame, faces[0].bounds);
+    if (!(pluginResult instanceof Float32Array)) {
+      console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
+      return;
     }
 
-    if (!quest) {
-        return (
-            <View style={styles.centered}>
-                <Text>❌ 퀘스트 정보를 찾을 수 없습니다</Text>
-            </View>
-        );
-    }
+    const floatInput = new Float32Array(Array.from(pluginResult));
+    jsHandleDetectedResult(floatInput);
+  }, [detectFaces, handleDetectedResult, quest_capture_interval]);
 
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  if (!device || !hasPermission) {
     return (
-        <View style={styles.container}>
-            <View style={[styles.half, { flex: 7 }]}>
-                <Camera
-                    ref={cameraRef}
-                    style={styles.camera}
-                    device={device}
-                    photo
-                    isActive
-                    frameProcessor={frameProcessor}
-                />
-            </View>
-
-            {latestResult !== null ? (
-                <View style={styles.overlay}>
-                    <EmotionChartBox
-                        result={latestResult}
-                        success={success}
-                        nickname={nickname}
-                        questDescription={questDescription}
-                    />
-                </View>
-            ) : (
-                <View style={styles.overlay}>
-                    {noFaceWarning && (
-                        <View style={styles.centered}>
-                            <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
-                        </View>
-                    )}
-                </View>
-            )}
-        </View>
+      <View style={styles.centered}>
+        <Text>📷 카메라 준비 중...</Text>
+      </View>
     );
+  }
+
+  if (!quest) {
+    return (
+      <View style={styles.centered}>
+        <Text>❌ 퀘스트 정보를 찾을 수 없습니다</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.half, { flex: 7 }]}>
+        <Camera
+          ref={cameraRef}
+          style={styles.camera}
+          device={device}
+          photo
+          isActive
+          frameProcessor={frameProcessor}
+        />
+      </View>
+
+      {latestResult !== null ? (
+        <View style={styles.overlay}>
+          <EmotionChartBox
+            result={latestResult}
+            success={success}
+            nickname={nickname}
+            questDescription={questDescription}
+          />
+        </View>
+      ) : (
+        <View style={styles.overlay}>
+          {noFaceWarning && (
+            <View style={styles.centered}>
+              <Text style={styles.warningText}>⚠️ 얼굴이 감지되지 않았습니다</Text>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
 }
