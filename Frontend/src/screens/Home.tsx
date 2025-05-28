@@ -19,8 +19,7 @@ import SimpleResult from "../components/SimpleResult";
 import styles from "../styles/homeStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useBlockBackHandler from "../hooks/useBlockBackHandler";
-import TooltipComponent
-    from "../components/TooltipComponent ";
+import TooltipComponent from "../components/TooltipComponent ";
 import {
     CopilotStep,
     walkthroughable,
@@ -33,6 +32,7 @@ import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import dayjs from "dayjs";
+import { useLoading } from "../API/contextAPI";
 
 const WalkthroughableView = walkthroughable(View);
 const { width, height } = Dimensions.get("window");
@@ -40,73 +40,77 @@ const wp = (percentage: number) => (width * percentage) / 100;
 const hp = (percentage: number) => (height * percentage) / 100;
 
 function HomeContent({ navigation }: { navigation: any }) {
+    // 컴포넌트 밖
+    const getQuote = async () => {
+        try {
+            const response = await customAxios.get("/quests/quote");
+            return response.data.data; // 응답 구조에 맞게 조정
+        } catch (error) {
+            console.error("명언 가져오기 실패:", error);
+            throw error;
+        }
+    };
 
-// 컴포넌트 밖
-const getQuote = async () => {
-    try {
-        const response = await customAxios.get('/quests/quote');
-        return response.data.data; // 응답 구조에 맞게 조정
-    } catch (error) {
-        console.error('명언 가져오기 실패:', error);
-        throw error;
+    // 알림 권한 요청 함수
+    async function requestNotificationPermission() {
+        const settings = await Notifications.getPermissionsAsync();
+        if (!settings.granted) {
+            await Notifications.requestPermissionsAsync();
+        }
     }
-};
-  
 
-// 알림 권한 요청 함수
-async function requestNotificationPermission() {
-    const settings = await Notifications.getPermissionsAsync();
-    if (!settings.granted) {
-        await Notifications.requestPermissionsAsync();
+    async function sendLocalNotification(title: string, body: string) {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title,
+                body,
+            },
+            trigger: null, // 즉시 알림
+        });
     }
-}
-
-async function sendLocalNotification(title: string, body: string) {
-    
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title,
-            body,
-        },
-        trigger: null, // 즉시 알림
-    });
-}
     const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, "Home">>();
-    const [simpleScale, setSimpleScale] = useState(route.params?.simpleScale ?? "");
+    const { showLoading, hideLoading } = useLoading();
+    const [simpleScale, setSimpleScale] = useState(
+        route.params?.simpleScale ?? ""
+    );
     const { start, copilotEvents } = useCopilot();
 
     const scrollRef = useRef<ScrollView>(null);
 
     useEffect(() => {
-    const checkFirstVisitToday = async () => {
-        await requestNotificationPermission();
+        showLoading();
+        const checkFirstVisitToday = async () => {
+            await requestNotificationPermission();
 
-        const today = dayjs().format("YYYY-MM-DD");
-        const lastVisit = await AsyncStorage.getItem("lastHomeVisit");
+            const today = dayjs().format("YYYY-MM-DD");
+            const lastVisit = await AsyncStorage.getItem("lastHomeVisit");
 
-        console.log("📆 Today:", today);
-        console.log("📆 LastVisit:", lastVisit);
+            console.log("📆 Today:", today);
+            console.log("📆 LastVisit:", lastVisit);
 
-        if (lastVisit !== today) {
-            await AsyncStorage.setItem("lastHomeVisit", today);
+            if (lastVisit !== today) {
+                await AsyncStorage.setItem("lastHomeVisit", today);
 
-            console.log("🔔 Sending Notification!");
-            await sendLocalNotification("반가워요!", "오늘도 좋은 하루 되세요! 😊");
-        } else {
-            try {
-                const quoteData = await getQuote(); 
-                await sendLocalNotification("오늘의 명언", quoteData);
-                console.log("✅ 오늘 이미 방문했어요. 명언 알림 전송 완료");
-            } catch (error) {
-                console.error("❌ 명언 알림 전송 실패:", error);
+                console.log("🔔 Sending Notification!");
+                await sendLocalNotification(
+                    "반가워요!",
+                    "오늘도 좋은 하루 되세요! 😊"
+                );
+            } else {
+                try {
+                    const quoteData = await getQuote();
+                    await sendLocalNotification("오늘의 명언", quoteData);
+                    console.log("✅ 오늘 이미 방문했어요. 명언 알림 전송 완료");
+                } catch (error) {
+                    console.error("❌ 명언 알림 전송 실패:", error);
+                }
             }
-        }
-    };
+            hideLoading();
+        };
 
-    checkFirstVisitToday();
-}, []);
-
+        checkFirstVisitToday();
+    }, []);
 
     useEffect(() => {
         AsyncStorage.setItem("secondPasswordPassed", "false");
@@ -120,21 +124,19 @@ async function sendLocalNotification(title: string, body: string) {
         setCopilotReady(true);
     }, []);
 
+    useEffect(() => {
+        const scale = route.params?.simpleScale;
+        if (scale) {
+            setSimpleScale(scale);
+            const timer = setTimeout(() => {
+                setSimpleScale(""); // 오버레이 닫기
+                console.log("🎯 Copilot 시작");
+                start(); // Copilot 가이드 시작
+            }, 3000);
 
-     useEffect(() => {
-         const scale = route.params?.simpleScale;
-         if (scale) {
-             setSimpleScale(scale);
-             const timer = setTimeout(() => {
-                 setSimpleScale(""); // 오버레이 닫기
-                 console.log("🎯 Copilot 시작");
-                 start();            // Copilot 가이드 시작
-             }, 3000);
-
-             return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
-         }
-     }, [copilotReady]);
-
+            return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
+        }
+    }, [copilotReady]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -150,15 +152,25 @@ async function sendLocalNotification(title: string, body: string) {
                         name="calendarBadge"
                     >
                         <WalkthroughableView
-                           style={{
-                            position: "absolute",
-                            top: hp(17),
-                            right: wp(14),
-                            zIndex: 3,
-                        }}
+                            style={{
+                                position: "absolute",
+                                top: hp(17),
+                                right: wp(14),
+                                zIndex: 3,
+                            }}
                         >
                             <CalendarBadge
-                                day={["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][new Date().getDay()]}
+                                day={
+                                    [
+                                        "SUN",
+                                        "MON",
+                                        "TUE",
+                                        "WED",
+                                        "THU",
+                                        "FRI",
+                                        "SAT",
+                                    ][new Date().getDay()]
+                                }
                                 date={new Date().getDate()}
                             />
                         </WalkthroughableView>
@@ -168,8 +180,11 @@ async function sendLocalNotification(title: string, body: string) {
                 </View>
 
                 <ScrollView
-                    ref={scrollRef} 
-                    contentContainerStyle={[styles.scroll, { paddingBottom: 0 }]}
+                    ref={scrollRef}
+                    contentContainerStyle={[
+                        styles.scroll,
+                        { paddingBottom: 0 },
+                    ]}
                     showsVerticalScrollIndicator={false}
                 >
                     <CopilotStep
@@ -192,7 +207,9 @@ async function sendLocalNotification(title: string, body: string) {
                                     icon="heart-pulse"
                                     title="마음 건강 진단"
                                     subtitle="지금, 내 마음 상태 알아보기"
-                                    onPress={() => nav.navigate("FormalDiagnosis")}
+                                    onPress={() =>
+                                        nav.navigate("FormalDiagnosis")
+                                    }
                                 />
                             </WalkthroughableView>
                         </CopilotStep>
@@ -228,7 +245,9 @@ async function sendLocalNotification(title: string, body: string) {
                         </CopilotStep>
                     </View>
                     <View>
-                        <WalkthroughableView style={styles.floatingButtonWrapper}>
+                        <WalkthroughableView
+                            style={styles.floatingButtonWrapper}
+                        >
                             <FloatingButton />
                         </WalkthroughableView>
                     </View>
@@ -242,7 +261,9 @@ async function sendLocalNotification(title: string, body: string) {
                             backgroundColor: "rgba(0,0,0,0.3)",
                         }}
                     >
-                        <View style={[styles.simpleResultWrapper, { zIndex: 20 }]}>
+                        <View
+                            style={[styles.simpleResultWrapper, { zIndex: 20 }]}
+                        >
                             <SimpleResult simpleScale={simpleScale} />
                         </View>
                     </View>
