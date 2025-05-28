@@ -53,10 +53,11 @@ export default function StatusBox() {
         await AsyncStorage.setItem("localCoupon", String(newLocalCoupon));
 
         const newExp = potData.exp + newLocalCoupon;
+
         if (newExp >= potData.need) {
             try {
                 console.log("레벨업! 서버에 동기화 중...");
-                await useCoupon(newLocalCoupon);
+                await useCoupon(newLocalCoupon); // Pass the entire accumulated localCoupon value
                 await fetchPotStatus();
                 setLocalCoupon(0);
                 await AsyncStorage.setItem("localCoupon", "0");
