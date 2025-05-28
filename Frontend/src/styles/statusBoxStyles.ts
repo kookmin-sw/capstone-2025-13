@@ -7,7 +7,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginHorizontal: 20,
-        marginTop: 20,
         elevation: 2,
     },
     levelWrapper: {

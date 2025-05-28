@@ -12,7 +12,7 @@ export default function HomeCircle({ style }: HomeCircleProps) {
             <Image
                 source={require("../assets/Images/home_circle.png")}
                 style={homeCircleStyles.image}
-                resizeMode="cover"
+                resizeMode="stretch"
             />
         </View>
     );
