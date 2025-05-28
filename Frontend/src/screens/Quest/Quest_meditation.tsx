@@ -20,6 +20,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import customAxios from "../../API/axios";
 import { getCoupon } from "../../API/potAPI";
+import { useLoading } from "../../API/contextAPI";
 
 type RouteParams = {
     questTitle: string;
@@ -28,6 +29,7 @@ type RouteParams = {
 };
 
 export default function Quest_meditation() {
+    const { showLoading, hideLoading } = useLoading();
     const [timeLeft, setTimeLeft] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [isMeditationDone, setIsMeditationDone] = useState(false);
@@ -103,6 +105,7 @@ export default function Quest_meditation() {
     };
 
     const handleComplete = async () => {
+        showLoading();
         try {
             const type = "MEDITATE";
             const response = await customAxios.get(`/quests/last/${type}`);
@@ -144,6 +147,8 @@ export default function Quest_meditation() {
         } catch (error) {
             console.error("명상 완료 처리 중 오류 발생:", error);
             Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+        } finally {
+            hideLoading();
         }
     };
 
@@ -179,14 +184,14 @@ export default function Quest_meditation() {
     const buttonText = isMeditationDone
         ? "완 - 료 !"
         : isRunning
-            ? "명상중 🧘🏻‍♀️"
-            : "시 - 작 !";
+        ? "명상중 🧘🏻‍♀️"
+        : "시 - 작 !";
 
     const buttonColor = isMeditationDone
         ? "#E68E48"
         : isRunning
-            ? "#aaa"
-            : "#6c63ff";
+        ? "#aaa"
+        : "#6c63ff";
 
     return (
         <View style={styles.page}>
