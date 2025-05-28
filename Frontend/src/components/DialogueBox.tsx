@@ -25,13 +25,13 @@ const DialogueBox = ({ name, text, onPress }: DialogueBoxProps) => {
             <View style={dialogueBoxStyles.nametag}>
                 <Text style={dialogueBoxStyles.nametagText}>{name}</Text>
             </View>
-            <View style={dialogueBoxStyles.dialogueTextBox}>
-                <Text style={dialogueBoxStyles.dialogueText}>{text}</Text>
-                <TouchableOpacity style={dialogueBoxStyles.button} onPress={onPress}>
+            <TouchableOpacity style={dialogueBoxStyles.button} onPress={onPress} activeOpacity={1}>
+                <View style={dialogueBoxStyles.dialogueTextBox}>
+                    <Text style={dialogueBoxStyles.dialogueText}>{text}</Text>
                     <View style={dialogueBoxStyles.triangle} />
-                </TouchableOpacity>
-            </View>
-        </View>
+                </View>
+            </TouchableOpacity>
+        </View >
 
     );
 };
