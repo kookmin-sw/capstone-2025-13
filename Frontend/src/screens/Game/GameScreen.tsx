@@ -21,7 +21,7 @@ const GameScreen = () => {
   const [matched, setMatched] = useState<number[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
-
+  const nickname = route.params?.nickname ?? '';
   const matchSound = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
@@ -127,6 +127,7 @@ const GameScreen = () => {
                   navigation.navigate('SimpleDiagnosis', {
                     initialIndex: 33,
                     score: score,
+                    nickname: nickname,
                   });
                 }}
               >

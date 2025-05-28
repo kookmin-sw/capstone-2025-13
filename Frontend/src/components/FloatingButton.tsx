@@ -43,6 +43,12 @@ export default function FloatingButton() {
           text={`여기는 매일 1주제!\n너의 감정을 돌아볼 주제가 준비되어 있어.\n나랑 함께 대화하며 마음을 다독여 보자!`}
           order={4}
           name="dailyTopic"
+        <TouchableOpacity
+          style={styles.bubble}
+          onPress={() => {
+            navigation.navigate("DailyTopic", {});
+            setShowBadge(false);
+          }}
         >
           <WalkthroughableView>
             <TouchableOpacity

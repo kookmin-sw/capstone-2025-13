@@ -41,7 +41,8 @@ interface SimpleDiagnosisScriptProp {
   nickname: string | null;
 }
 
-export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): ScriptSegment[] => [
+export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): ScriptSegment[] => 
+  [
     {
       index: 0,
       type: "story",
@@ -222,14 +223,14 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
     index: 25,
     type: "story",
     backgroundImage: require("../../assets/Images/simple-5.png"),
-    name: nickname || "나",
+    name: `${nickname}`,
     text: "잘 먹었어!\n이만 가봐야겠다",
     },
     {
     index: 26,
     type: "story",
     backgroundImage: require("../../assets/Images/simple-6.png"),
-    name: nickname || "나",
+    name: `${nickname}`,
     text: "(끼이익..)",
     },
     {
@@ -360,14 +361,14 @@ export const SimpleDiagnosisScript = ({ nickname }: SimpleDiagnosisScriptProp): 
         index: 43,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-10-4.png"),
-        name: nickname || "나",
+        name: `${nickname}`,
         text: "엉\n재워줘서 고마워 안녕!\n또 보자!",
     },
     {
         index: 44,
         type: "story",
         backgroundImage: require("../../assets/Images/simple-1.png"),
-        name: nickname || "나",
+        name: `${nickname}`,
         text: "클로버 마을...\n여기 마음에 드는 것 같아\n조금 더 돌아보고 싶어",
     },
     {
