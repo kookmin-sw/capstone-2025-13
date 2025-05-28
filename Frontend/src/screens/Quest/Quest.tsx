@@ -27,6 +27,11 @@ export default function Quest() {
     const [user, setUser] = useState<UserInfoResponse | null>(null);
     const { showLoading, hideLoading } = useLoading();
 
+          <View style={questStyles.headerWrapper}>
+            <Header_sky title= "퀘스트" subtitle="하루에 하나씩 깨면서 나만의 루틴을 만들어봐요!"  screenName="Quest" />
+            <Quest_circle style={questStyles.circle} />
+          </View>
+
     useEffect(() => {
         const fetchUserInfo = async () => {
             showLoading();

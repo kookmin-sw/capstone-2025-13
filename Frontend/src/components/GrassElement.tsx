@@ -18,7 +18,7 @@ export default function Grass({ type }: grassProps) {
   };
 
   const sizeStyles = {
-    width: 0.5, height: 0.45 
+    width: 0.5, height: 0.41
   };
 
 

@@ -14,7 +14,7 @@ export default function HomeButton({ title, subtitle, icon, onPress }: Props) {
     return (
         <TouchableOpacity style={styles.container} onPress={onPress}>
             <MaterialCommunityIcons
-                name={icon}
+                name={icon as any}
                 size={24}
                 color="#5D432C"
                 style={styles.icon}
