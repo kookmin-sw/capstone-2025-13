@@ -238,14 +238,24 @@ export default function UserInfo() {
                 }
             }
 
-            // 저장 성공 후 처리
-            Alert.alert("저장 완료", "회원 정보가 수정되었습니다.");
+
+            Toast.show({
+                type: "success",
+                text1: "저장 완료",
+                text2: "회원 정보가 수정되었습니다.",
+                position: "bottom",
+            });
             setOriginalData(userData);
             setEditMode(false);
             setHasChanges(false);
         } catch (error) {
             console.error("회원정보 업데이트 실패:", error);
-            Alert.alert("저장 실패", "정보 수정 중 문제가 발생했습니다.");
+            Toast.show({
+                type: "error",
+                text1: "저장 실패",
+                text2: "정보 수정 중 문제가 발생했습니다.",
+                position: "bottom",
+            });
         }
     };
 
@@ -300,15 +310,26 @@ export default function UserInfo() {
     };
 
     const renderProfilePic = () => {
-        return userData.profilePic ? (
-            <Image
-                source={{ uri: userData.profilePic }}
-                style={userInfoStyles.avatar}
-            />
-        ) : (
-            <Image source={cloverProfile} style={userInfoStyles.avatar} />
+        return (
+            <View style={userInfoStyles.profilePicContainer}>
+                <Image
+                    source={
+                        userData.profilePic
+                            ? { uri: userData.profilePic }
+                            : cloverProfile
+                    }
+                    style={userInfoStyles.avatar}
+                />
+                <Ionicons
+                    name="camera-outline"
+                    size={20}
+                    color="#000"
+                    style={userInfoStyles.cameraIcon}
+                />
+            </View>
         );
     };
+
 
     return (
         <View style={[userInfoStyles.container, { position: "relative" }]}>
@@ -386,7 +407,7 @@ export default function UserInfo() {
                                     style={[
                                         userInfoStyles.genderButton,
                                         userData.gender === g.value &&
-                                            userInfoStyles.genderSelected,
+                                        userInfoStyles.genderSelected,
                                     ]}
                                 >
                                     <Text style={userInfoStyles.buttonText}>
