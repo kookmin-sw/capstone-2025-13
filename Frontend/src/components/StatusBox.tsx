@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPotStatus, useCoupon } from "../API/potAPI";
@@ -17,6 +17,7 @@ export default function StatusBox() {
         coupon: 0,
     });
     const [localCoupon, setLocalCoupon] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const fetchPotStatus = async () => {
         try {
@@ -83,10 +84,7 @@ export default function StatusBox() {
             <TouchableOpacity
                 style={{ position: "absolute", top: 10, right: 10 }}
                 onPress={() => {
-                    Alert.alert(
-                        "나만의 토끼풀 정원을 만들자! 🌸",
-                        "- 물 주기 쿠폰은 다양한 활동(검사, 매일 1주제, 일기, 퀘스트)들을 통해 얻을 수 있어! 😼🎟️\n- 물 주기 쿠폰을 사용해서 레벨업 게이지를 채우면 꽃 한 송이가 완성돼! 🪴💧\n- 꽃을 열심히 가꿔서 나만의 예쁜 클로버 정원을 가꿔보자 - 🏡☘️"
-                    );
+                    setModalVisible(true);
                 }}
             >
                 <MaterialCommunityIcons
@@ -145,6 +143,49 @@ export default function StatusBox() {
                     </View>
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View
+                    style={[
+                        styles.infoModalContainer,
+                        {
+                            alignItems: "flex-start",
+                            paddingTop: 40,
+                            paddingLeft: 10,
+                        },
+                    ]}
+                >
+                    <View style={styles.infoBubble}>
+                        <View style={styles.infoBubbleArrow} />
+                        <Text style={styles.infoBubbleTitle}>
+                            🌸 나만의 토끼풀 정원을 만들자! 🌸
+                        </Text>
+                        <Text style={styles.infoBubbleText}>
+                            {"\n"}• 물 주기 쿠폰은 다양한 활동(검사, 매일 1주제,
+                            {"\n"} 일기, 퀘스트)들을 통해 얻을 수 있어! 😼🎟️
+                            {"\n"}
+                            {"\n"}• 물 주기 쿠폰을 사용해서 레벨업 게이지를
+                            채우면{"\n"} 꽃 한 송이가 완성돼! 🪴💧
+                            {"\n"}
+                            {"\n"}• 꽃을 열심히 가꿔서 나만의 예쁜 클로버 정원을
+                            가꿔보자! 🏡☘️
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(false)}
+                            style={styles.closeButton}
+                        >
+                            <Text style={styles.closeButtonText}>
+                                이해했어!
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
