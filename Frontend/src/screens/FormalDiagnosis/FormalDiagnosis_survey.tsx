@@ -7,7 +7,6 @@ import SurveyQuestion from "../../components/FormalDiagnosis/SurveyQuestion";
 import ConfirmButton from "../../components/FormalDiagnosis/ConfirmButton";
 import styles from "../../styles/FormalDiagnosis/formalSurveyStyles";
 
-
 import {
     fetchDiagnosisDetail,
     putDiagnosisResult,
@@ -16,6 +15,8 @@ import { getCoupon } from "../../API/potAPI";
 import type { DiagnosisList } from "../../API/diagnosisAPI";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+
+import { useLoading } from "../../API/contextAPI";
 
 type Scale = {
     start: number;
@@ -28,6 +29,7 @@ export default function FormalDiagnosisSurvey() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { diagnosisId } = route.params as { diagnosisId: number };
+    const { showLoading, hideLoading } = useLoading();
     const [questions, setQuestions] = useState<DiagnosisList["questions"]>([]);
     const [answers, setAnswers] = useState<number[]>([]);
     const [scales, setScales] = useState<Scale[]>([]);
@@ -36,11 +38,13 @@ export default function FormalDiagnosisSurvey() {
     const [description, setDescription] = useState<string>();
     useEffect(() => {
         const loadDiagnosis = async () => {
+            showLoading();
             const result = await fetchDiagnosisDetail(Number(diagnosisId));
             if (result) {
                 setQuestions(result.questions || []);
                 setScales(result.scale || []);
             }
+            hideLoading();
         };
         loadDiagnosis();
     }, [diagnosisId]);
@@ -54,10 +58,10 @@ export default function FormalDiagnosisSurvey() {
         const matched = sorted.find((s) => totalScore >= s.start);
         return matched
             ? {
-                scaleName: matched.scaleName,
-                description: matched.description,
-                start: matched.start,
-            }
+                  scaleName: matched.scaleName,
+                  description: matched.description,
+                  start: matched.start,
+              }
             : null;
     };
 

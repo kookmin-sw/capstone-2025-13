@@ -33,14 +33,15 @@ import {
 } from "../API/topicAPI";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
+import { useLoading } from "../API/contextAPI";
 
 type ChatItem =
     | { type: "question"; text: string }
     | { type: "answer"; text: string; isLoading?: boolean };
 
 export default function DailyTopic() {
-    const route = useRoute<RouteProp<RootStackParamList, 'DailyTopic'>>();
-    const date = route.params?.date ?? '';
+    const route = useRoute<RouteProp<RootStackParamList, "DailyTopic">>();
+    const date = route.params?.date ?? "";
     const [topicId, setTopicId] = useState<string | null>(null);
     const [answer, setAnswer] = useState<string>("");
     const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
@@ -54,6 +55,7 @@ export default function DailyTopic() {
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [hasShownModal, setHasShownModal] = useState(false);
 
+    const { showLoading, hideLoading } = useLoading();
 
     const showModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
@@ -63,13 +65,17 @@ export default function DailyTopic() {
     };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const data = await getUserInfo();
-            if (data) setUser(data);
+        const loadData = async () => {
+            showLoading();
+            try {
+                const data = await getUserInfo();
+                if (data) setUser(data);
+                await initializeChat();
+            } finally {
+                hideLoading();
+            }
         };
-
-        fetchUser();
-        initializeChat();
+        loadData();
     }, []);
 
     const initializeChat = async () => {
@@ -77,17 +83,17 @@ export default function DailyTopic() {
             const topicData = date
                 ? await getTopicByDate(date)
                 : await getTodayTopic();
-    
+
             const history: ChatItem[] = [
                 { type: "question", text: topicData.data },
             ];
-    
+
             const allFeedbacks = topicData.feedbacks.sort(
                 (a: any, b: any) =>
                     new Date(a.createdAt).getTime() -
                     new Date(b.createdAt).getTime()
             );
-    
+
             allFeedbacks.forEach((feedback: any) => {
                 history.push({ type: "answer", text: feedback.data });
                 if (feedback.status !== TopicFeedbackStatus.NOFEEDBACK) {
@@ -97,17 +103,19 @@ export default function DailyTopic() {
                     });
                 }
             });
-    
+
             setTopicId(topicData.id);
             setChatHistory(history);
 
             if (date) {
                 const [year, month, day] = date.split("-"); // "2025", "05", "04"로 분리
                 setInputDisabled(true);
-                setPlaceholderText(`${year}년 ${month}월 ${day}일의 매일 1주제야-!`);
+                setPlaceholderText(
+                    `${year}년 ${month}월 ${day}일의 매일 1주제야-!`
+                );
                 return;
             }
-    
+
             const lastFeedback = allFeedbacks[allFeedbacks.length - 1];
             if (lastFeedback?.status === TopicFeedbackStatus.NOFEEDBACK) {
                 setInputDisabled(true);
@@ -131,7 +139,6 @@ export default function DailyTopic() {
             }
         }
     };
-    
 
     const handleCreateTopic = async () => {
         try {
@@ -201,7 +208,7 @@ export default function DailyTopic() {
             }
         } catch (error: any) {
             const response = error.response;
-        
+
             if (!response) {
                 // 네트워크 오류나 서버 응답 없음
                 console.error(
@@ -220,13 +227,13 @@ export default function DailyTopic() {
                     );
                 }
             }
-        
+
             // 재시도
             setTimeout(
                 () => fetchFeedbackWithRetry(topicFeedbackId, retryCount + 1),
                 3000
             );
-        }        
+        }
     };
 
     const handleSendFeedback = async (answer: string) => {
@@ -323,7 +330,7 @@ export default function DailyTopic() {
                         if (date) {
                             navigation.navigate("Calendar");
                         } else {
-                            navigation.navigate("Home", {}); 
+                            navigation.navigate("Home", {});
                         }
                     }}
                 >

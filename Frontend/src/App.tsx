@@ -41,7 +41,7 @@ export type RootStackParamList = {
     SignIn: { score?: number; last?: boolean };
     SignUpStep1: undefined;
     Quest: undefined;
-    Quest_stage: { title: string, nickname: string };
+    Quest_stage: { title: string; nickname: string };
     SimpleDiagnosis: {
         initialIndex: number;
         score?: number;
@@ -78,9 +78,26 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+import { View } from "react-native";
 const GlobalSpinner = () => {
     const { isLoading } = useLoading();
-    return isLoading ? <Spinner /> : null;
+    if (!isLoading) return null;
+
+    return (
+        <View
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 999,
+                pointerEvents: "none",
+            }}
+        >
+            <Spinner />
+        </View>
+    );
 };
 
 export default function App() {
@@ -89,37 +106,48 @@ export default function App() {
     const [loading, setLoading] = useState(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
-    const [isIntegrityVerified, setIsIntegrityVerified] = useState<boolean>(true);
+    const [isIntegrityVerified, setIsIntegrityVerified] =
+        useState<boolean>(true);
     const [integrityError, setIntegrityError] = useState<string | null>(null);
 
     useEffect(() => {
         const checkIntegrity = async () => {
             try {
                 if (__DEV__) {
-                    console.log('Development build - skipping integrity check');
+                    console.log("Development build - skipping integrity check");
                     setIsIntegrityVerified(true);
                     return;
                 }
 
                 await requestChallenge();
-                console.log('Device integrity challenge sent');
+                console.log("Device integrity challenge sent");
 
                 const result = await verifyDeviceIntegrity();
-                console.log('Device integrity verification result:', result);
+                console.log("Device integrity verification result:", result);
 
                 if (result.isValid) {
-                    console.log('Device integrity verified');
+                    console.log("Device integrity verified");
                     setIsIntegrityVerified(true);
                 } else {
-                    console.error(`Integrity verification failed: ${result.message} / ${result.details ? JSON.stringify(result.details) : 'No details provided'}`)
-                    setIntegrityError(`${result.message} / ${result.details ?? 'No details provided'}`)
-                    setIsIntegrityVerified(false)
+                    console.error(
+                        `Integrity verification failed: ${result.message} / ${
+                            result.details
+                                ? JSON.stringify(result.details)
+                                : "No details provided"
+                        }`
+                    );
+                    setIntegrityError(
+                        `${result.message} / ${
+                            result.details ?? "No details provided"
+                        }`
+                    );
+                    setIsIntegrityVerified(false);
                 }
             } catch (error: any) {
-                console.error('Integrity check error: ', error);
-                console.debug(error)
-                setIsIntegrityVerified(false)
-                setIntegrityError(`${error}`)
+                console.error("Integrity check error: ", error);
+                console.debug(error);
+                setIsIntegrityVerified(false);
+                setIntegrityError(`${error}`);
             }
         };
 
@@ -169,11 +197,9 @@ export default function App() {
         return () => clearInterval(interval); // cleanup
     }, []);
 
-    // Now define AppContent here with isLoggedIn passed as prop
     const AppContent = () => {
         const fontsLoaded = useCustomFonts();
 
-        // Show Splash while fonts are loading
         if (!fontsLoaded) return <Splash />;
 
         return (
@@ -249,7 +275,7 @@ export default function App() {
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen
-                        name="FormalDiagnosis" // FormalDiagnosis 화면 추가
+                        name="FormalDiagnosis"
                         component={FormalDiagnosis}
                         options={{ headerShown: false }}
                     />
@@ -316,8 +342,10 @@ export default function App() {
 
     return (
         <LoadingProvider>
-            {loading ? <Splash /> : <AppContent />}
+            <>
+                <GlobalSpinner />
+                {loading ? <Splash /> : <AppContent />}
+            </>
         </LoadingProvider>
     );
 }
-
