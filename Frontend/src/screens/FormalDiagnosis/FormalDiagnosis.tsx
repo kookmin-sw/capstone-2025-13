@@ -143,21 +143,21 @@ export default function FormalDiagnosis() {
             />
             <ScrollView contentContainerStyle={styles.scroll}>
                 <SectionLabel text="이런 방법들이 있어요" />
-                {diagnosisList.map((item) => (
-                    <MethodCard
-                        key={item.id}
-                        id={item.id}
-                        label={item.title}
-                        onPress={() => {
-                            console.log(
-                                `🟢 ${item.title} 버튼 클릭됨 (id: ${item.id})`
-                            );
-                            navigation.navigate("FormalDiagnosisSurvey", {
-                                diagnosisId: item.id,
-                            });
-                        }}
-                    />
-                ))}
+                {diagnosisList
+                    .filter((item) => item.title !== "SIMPLE")
+                    .map((item) => (
+                        <MethodCard
+                            key={item.id}
+                            id={item.id}
+                            label={item.title}
+                            onPress={() => {
+                                console.log(`🟢 ${item.title} 버튼 클릭됨 (id: ${item.id})`);
+                                navigation.navigate("FormalDiagnosisSurvey", {
+                                    diagnosisId: item.id,
+                                });
+                            }}
+                        />
+                    ))}
             </ScrollView>
         </View>
     );
