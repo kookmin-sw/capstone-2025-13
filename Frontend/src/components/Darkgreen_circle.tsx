@@ -12,7 +12,7 @@ export default function Darkgreen_circle({ style }: DarkgreenCircleProps) {
       <Image
         source={require("../assets/Images/darkgreen_circle.png")}
         style={questCircleStyles.image}
-        resizeMode="cover"
+        resizeMode="stretch"
       />
     </View>
   );

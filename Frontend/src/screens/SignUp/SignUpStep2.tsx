@@ -11,12 +11,13 @@ import {
     ImageBackground,
     ScrollView
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import signUpStyles from "../../styles/signUpStyles";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { RouteProp } from "@react-navigation/native";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep2NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep2">;
 type SignUpStep2RouteProp = RouteProp<RootStackParamList, "SignUpStep2">;
@@ -34,10 +35,9 @@ const SignUpStep2 = () => {
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
 
-    const handleDateChange = (event: any, selectedDate?: Date) => {
-        if (Platform.OS === "android") hideDatePicker();
-        if (selectedDate) setDate(selectedDate);
-
+    const handleConfirm = (selectedDate: Date) => {
+        setDate(selectedDate);
+        hideDatePicker();
     };
 
     const handleSignUp = () => {
@@ -65,6 +65,8 @@ const SignUpStep2 = () => {
         });
     };
 
+    useBlockBackHandler();
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -76,28 +78,29 @@ const SignUpStep2 = () => {
                     <ScrollView contentContainerStyle={signUpStyles.overlay}>
                         <View style={signUpStyles.container}>
                             <Text style={signUpStyles.title}>회원가입</Text>
-
                             <View style={signUpStyles.inputContainer}>
                                 <Text style={signUpStyles.inputTitle}>생년월일</Text>
-                                <TouchableOpacity onPress={showDatePicker}>
+                                <TouchableOpacity onPress={showDatePicker} activeOpacity={0.8}>
                                     <TextInput
                                         style={signUpStyles.input}
                                         placeholder="YYYY-MM-DD"
+                                        placeholderTextColor="#989898"
                                         value={date ? date.toISOString().slice(0, 10) : ""}
                                         editable={false}
                                         pointerEvents="none"
                                     />
                                 </TouchableOpacity>
-
-                                {isDatePickerVisible && (
-                                    <DateTimePicker
-                                        value={date ?? new Date()}
-                                        mode="date"
-                                        onChange={handleDateChange}
-                                        display="spinner"
-                                    />
-                                )}
                             </View>
+
+                            <DateTimePickerModal
+                                isVisible={isDatePickerVisible}
+                                mode="date"
+                                onConfirm={handleConfirm}
+                                onCancel={hideDatePicker}
+                                date={date ?? new Date()}
+                                display={Platform.OS === "android" ? "spinner" : undefined}
+                            />
+
 
                             <View style={signUpStyles.inputContainer}>
                                 <Text style={signUpStyles.inputTitle}>성별</Text>

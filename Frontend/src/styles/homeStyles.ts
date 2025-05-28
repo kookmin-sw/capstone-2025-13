@@ -13,7 +13,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#0A814C",
     },
     scroll: {
-        paddingTop: hp(6),
     },
     headerWrapper: {
         position: "relative",
@@ -23,7 +22,6 @@ const styles = StyleSheet.create({
     circle: {
         position: "absolute",
         top: hp(20),
-        alignSelf: "center",
         zIndex: 0,
     },
     buttonGroup: {
@@ -33,7 +31,6 @@ const styles = StyleSheet.create({
     },
     calendarBadgeWrapper: {
         position: "absolute",
-        top: hp(12),
         right: wp(5),
         zIndex: 3,
     },
@@ -68,13 +65,13 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingRight: wp(6),
     },
-     simpleResultWrapper: {
-            position: "absolute",
-            top: "40%",
-            alignItems: "center",
-            width:"100%",
-            zIndex: 10,
-        },
+    simpleResultWrapper: {
+        position: "absolute",
+        top: "40%",
+        alignItems: "center",
+        width: "100%",
+        zIndex: 10,
+    },
 });
 
 export default styles;

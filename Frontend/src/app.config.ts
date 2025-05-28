@@ -23,8 +23,8 @@ export default {
       [
         "react-native-maps",
         {
-          iosGoogleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
-          androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY
+          iosGoogleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
+          androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
         }
       ],
       [
@@ -74,7 +74,8 @@ export default {
       permissions: [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.POST_NOTIFICATIONS",
       ]
     },
     web: {

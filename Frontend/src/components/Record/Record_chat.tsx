@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image, Text, ScrollView, } from "react-native";
-import styles from "../styles/recordChatStyles";
+import styles from "../../styles/Record/recordChatStyles";
 
 interface RecordChatProps {
     luckyVicky: string,
@@ -12,7 +12,7 @@ export default function RecordChat({ luckyVicky, isLoading }: RecordChatProps) {
         <View style={styles.container}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={require("../assets/Images/clover_profile.png")}
+                    source={require("../../assets/Images/clover_profile.png")}
                     style={styles.profileImage}
                 />
                 <View style={styles.shadowWrapper}>

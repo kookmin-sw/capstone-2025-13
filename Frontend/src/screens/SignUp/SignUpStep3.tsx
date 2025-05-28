@@ -7,6 +7,7 @@ import type { RootStackParamList } from "../../App";
 import { signUp } from "../../API/signAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TermsModal from "../../components/TermsModal";
+import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
 type SignUpStep3NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep3">;
 type SignUpStep3RouteProp = RouteProp<RootStackParamList, "SignUpStep3">;
@@ -64,7 +65,7 @@ const SignUpStep3 = () => {
         try {
             await AsyncStorage.setItem("@secondPassword", trimmedSecondPassword);
             await signUp(trimmedEmail, trimmedPassword, nickname, birthDate, gender);
-            navigation.navigate("SimpleDiagnosis", { initialIndex: 13 });
+            navigation.navigate("SimpleDiagnosis", { initialIndex: 13, nickname });
         } catch (error) {
             console.error("회원가입 실패:", error);
             if ((error as any).response?.status === 400) {
@@ -75,6 +76,7 @@ const SignUpStep3 = () => {
         }
     };
 
+    useBlockBackHandler();
 
     return (
         <ImageBackground
@@ -102,6 +104,7 @@ const SignUpStep3 = () => {
                                 <Text style={signUpStyles.inputTitle}>이메일</Text>
                                 <TextInput
                                     placeholder="이메일"
+                                    placeholderTextColor="#989898"
                                     style={signUpStyles.input}
                                     value={email}
                                     onChangeText={setEmail} />
@@ -111,6 +114,7 @@ const SignUpStep3 = () => {
                                 <Text style={signUpStyles.inputTitle}>비밀번호</Text>
                                 <TextInput
                                     placeholder="비밀번호"
+                                    placeholderTextColor="#989898"
                                     secureTextEntry
                                     style={signUpStyles.input}
                                     value={password}
@@ -122,6 +126,7 @@ const SignUpStep3 = () => {
                                 <Text style={signUpStyles.inputTitle}>비밀번호 확인</Text>
                                 <TextInput
                                     placeholder="비밀번호 확인"
+                                    placeholderTextColor="#989898"
                                     secureTextEntry
                                     style={signUpStyles.input}
                                     value={confirmPassword}
@@ -132,6 +137,7 @@ const SignUpStep3 = () => {
                                 <Text style={signUpStyles.inputTitle}>2차 비밀번호</Text>
                                 <TextInput
                                     placeholder="2차 비밀번호"
+                                    placeholderTextColor="#989898"
                                     secureTextEntry
                                     keyboardType="numeric"
                                     maxLength={4}

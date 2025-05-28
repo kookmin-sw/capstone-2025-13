@@ -10,9 +10,13 @@ import { cropFaces } from '../../plugins/cropFaces'
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
 
-import EmotionChartBox from '../../components/Quest_emotionBox';
-import styles from '../../styles/questEmotionStyles';
-import {NavigationProp, useNavigation, useRoute} from "@react-navigation/native";
+import EmotionChartBox from "../../components/Quest_emotionBox";
+import styles from "../../styles/questEmotionStyles";
+import {
+    NavigationProp,
+    useNavigation,
+    useRoute,
+} from "@react-navigation/native";
 import customAxios from "../../API/axios";
 import { getCoupon } from "../../API/potAPI";
 
@@ -20,7 +24,7 @@ type RouteParams = {
     questTitle: string;
     questDescription: string;
     questTarget: number;
-    nickname: string,
+    nickname: string;
 };
 
 export default function QuestEmotion() {
@@ -50,26 +54,33 @@ export default function QuestEmotion() {
             const type = "EMOTION";
             const response = await customAxios.get(`/quests/last/${type}`);
             const lastDataID = response.data.data.id;
-    
+
             const postRes = await customAxios.post("/quests", {
                 id: lastDataID,
                 current: 0,
                 status: "COMPLETED",
             });
-    
+
             if (postRes.status === 200 || postRes.status === 201) {
                 await getCoupon();
-                Alert.alert("완료!", "감정 퀘스트가 성공적으로 완료되었어요! 🎉", [
-                    {
-                        text: "확인",
-                        onPress: () =>
-                            navigation.navigate("Quest_stage", {
-                                title: `${nickname}의 숲`,
-                            }),
-                    },
-                ]);
+                Alert.alert(
+                    "완료!",
+                    "감정 퀘스트가 성공적으로 완료되었어요! 🎉",
+                    [
+                        {
+                            text: "확인",
+                            onPress: () =>
+                                navigation.navigate("Quest_stage", {
+                                    title: `${nickname}의 숲`,
+                                }),
+                        },
+                    ]
+                );
             } else {
-                Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
+                Alert.alert(
+                    "오류",
+                    "감정 퀘스트 완료 처리 중 문제가 발생했어요."
+                );
             }
         } catch (error) {
             console.error("감정 퀘스트 완료 처리 중 오류 발생:", error);

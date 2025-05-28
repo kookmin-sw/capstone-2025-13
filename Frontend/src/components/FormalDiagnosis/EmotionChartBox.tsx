@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import styles from "../styles/emotionChartBoxStyles";
-import dialogueStyles from "../styles/formalDialogueStyles";
-import { useDiagnosisColor } from "../hooks/useDiagnosisColor";
+import styles from "../../styles/emotionChartBoxStyles";
+import dialogueStyles from "../../styles/FormalDiagnosis/formalDialogueStyles";
+import { useDiagnosisColor } from "../../hooks/useDiagnosisColor";
 import SectionLabel from "./SectionLabel";
 
 interface EmotionChartData {

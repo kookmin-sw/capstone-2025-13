@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import FlipCard from '../../components/FlipCard';
+import FlipCard from '../../components/Game/FlipCard';
 import { generateShuffledCards } from '../../utils/cardUtils';
-import { gameScreenstyles } from "../../styles/GameScreenStyles";
+import { gameScreenstyles } from "../../styles/Game/GameScreenStyles";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -21,7 +21,7 @@ const GameScreen = () => {
   const [matched, setMatched] = useState<number[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
-
+  const nickname = route.params?.nickname ?? '';
   const matchSound = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
@@ -127,6 +127,7 @@ const GameScreen = () => {
                   navigation.navigate('SimpleDiagnosis', {
                     initialIndex: 33,
                     score: score,
+                    nickname: nickname,
                   });
                 }}
               >

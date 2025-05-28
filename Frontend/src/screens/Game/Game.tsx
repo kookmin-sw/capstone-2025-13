@@ -9,12 +9,12 @@ const Game = () => {
     const navigation = useNavigation<GameNavigationProp>();
     const route = useRoute<RouteProp<RootStackParamList, 'Game'>>();
     const score = route.params?.score ?? 0;
-
+    const nickname = route.params?.nickname ?? "";
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate({ name: "GameScreen", params: { score } })}
+                onPress={() => navigation.navigate({ name: "GameScreen", params: { score, nickname } })}
             >
                 <Text style={styles.buttonText}>게임 스타트</Text>
             </TouchableOpacity>

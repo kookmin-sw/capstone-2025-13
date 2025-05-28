@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/formalDiagnsisResultStyles";
+import styles from "../styles/FormalDiagnosis/formalDiagnsisResultStyles";
 import { getDiagnosisSpecificResult } from "../API/diagnosisAPI";
 
 const { width } = Dimensions.get("window");

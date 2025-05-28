@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import styles from "../styles/recordHeaderStyles";
+import styles from "../../styles/Record/recordHeaderStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 
@@ -21,7 +21,7 @@ export default function RecordHeader({ title, date }: RecordHeaderProps) {
             <TouchableOpacity
                 style={styles.backButtonWrapper}
                 onPress={() => {
-                    navigation.navigate("Home", {})
+                    navigation.goBack();
                 }}
             >
                 <Ionicons name="arrow-back-circle" size={40} color="#349C64" />

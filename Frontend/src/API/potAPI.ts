@@ -18,10 +18,10 @@ export const getPotStatus = async (): Promise<PotStatus> => {
     }
 };
 
-export const useCoupon = async (): Promise<PotStatus> => {
+export const useCoupon = async (count: number): Promise<PotStatus> => {
     try {
-        console.log("💧 [DEBUG] useCoupon 호출 시작");
-        const res = await customAxios.post("/pot/usecoupon");
+        console.log("💧 [DEBUG] useCoupon 호출 시작, count:", count);
+        const res = await customAxios.post(`/pot/usecoupon/${count}`);
         return res.data.data;
     } catch (error) {
         console.error("❌ [DEBUG] useCoupon 실패:", error);

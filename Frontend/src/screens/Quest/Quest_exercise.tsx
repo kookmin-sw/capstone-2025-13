@@ -23,6 +23,7 @@ import {
 } from "@react-navigation/native";
 import customAxios from "../../API/axios";
 import { getCoupon } from "../../API/potAPI";
+import { useLoading } from "../../API/contextAPI";
 
 const { width } = Dimensions.get("window");
 
@@ -68,6 +69,7 @@ export default function QuestExercise() {
     const navigation = useNavigation<NavigationProp<any>>();
     const route = useRoute();
     const [isGoalReached, setIsGoalReached] = useState(false);
+    const { showLoading, hideLoading } = useLoading();
     const { questTitle, questDescription, questTarget } =
         route.params as RouteParams;
     const descriptionLines = questDescription.split("\n");
@@ -96,6 +98,7 @@ export default function QuestExercise() {
     };
 
     const handleComplete = async () => {
+        showLoading();
         try {
             const type = "ACTIVITY";
             const response = await customAxios.get(`/quests/last/${type}`);
@@ -160,58 +163,59 @@ export default function QuestExercise() {
         } catch (error) {
             console.error("산책 완료 처리 중 오류 발생:", error);
             Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
+        } finally {
+            hideLoading();
         }
     };
 
     useEffect(() => {
-      let interval: NodeJS.Timeout;
-      const init = async () => {
-          const type = "ACTIVITY";
-          try {
-              const response = await customAxios.get(`/quests/last/${type}`);
-              const lastData = response.data.data;
-              const lastDataStatus = lastData.status;
-  
-              if (lastDataStatus === "COMPLETED") {
-                  setIsCompleted(true);
-                  setIsGoalReached(true);
-                  if (lastData.photo) setImage(lastData.photo);
-              }
-          } catch (error) {
-              console.error("퀘스트 상태 확인 중 오류:", error);
-          }
-  
-          const isAvailable = await Pedometer.isAvailableAsync();
-          if (!isAvailable) {
-              Alert.alert(
-                  "걸음 수 추적 불가",
-                  "이 기기는 걸음 수 추적을 지원하지 않습니다."
-              );
-              return;
-          }
-  
-          const updateSteps = async () => {
-              const end = new Date();
-              const start = new Date();
-              start.setHours(0, 0, 0, 0);
-              const result = await Pedometer.getStepCountAsync(start, end);
-              setSteps(result.steps);
-              if (result.steps >= questTarget) {
-                  setIsGoalReached(true);
-                  clearInterval(interval);
-              }
-          };
-  
-          await updateSteps();
-          interval = setInterval(updateSteps, 3000);
-  
-          return () => clearInterval(interval);
-      };
-  
-      requestPermissions();
-      init();
-  }, []);
-  
+        let interval: NodeJS.Timeout;
+        const init = async () => {
+            const type = "ACTIVITY";
+            try {
+                const response = await customAxios.get(`/quests/last/${type}`);
+                const lastData = response.data.data;
+                const lastDataStatus = lastData.status;
+
+                if (lastDataStatus === "COMPLETED") {
+                    setIsCompleted(true);
+                    setIsGoalReached(true);
+                    if (lastData.photo) setImage(lastData.photo);
+                }
+            } catch (error) {
+                console.error("퀘스트 상태 확인 중 오류:", error);
+            }
+
+            const isAvailable = await Pedometer.isAvailableAsync();
+            if (!isAvailable) {
+                Alert.alert(
+                    "걸음 수 추적 불가",
+                    "이 기기는 걸음 수 추적을 지원하지 않습니다."
+                );
+                return;
+            }
+
+            const updateSteps = async () => {
+                const end = new Date();
+                const start = new Date();
+                start.setHours(0, 0, 0, 0);
+                const result = await Pedometer.getStepCountAsync(start, end);
+                setSteps(result.steps);
+                if (result.steps >= questTarget) {
+                    setIsGoalReached(true);
+                    clearInterval(interval);
+                }
+            };
+
+            await updateSteps();
+            interval = setInterval(updateSteps, 3000);
+
+            return () => clearInterval(interval);
+        };
+
+        requestPermissions();
+        init();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -262,7 +266,8 @@ export default function QuestExercise() {
                             backgroundGradientFrom: "#000",
                             backgroundGradientTo: "#000",
                             decimalPlaces: 0,
-                            color: (opacity = 1) => `rgba(255, 61, 137, ${opacity})`,
+                            color: (opacity = 1) =>
+                                `rgba(255, 61, 137, ${opacity})`,
                             labelColor: () => "#fff",
                         }}
                         hideLegend={true}
@@ -274,7 +279,11 @@ export default function QuestExercise() {
                             <Text
                                 style={[
                                     dynamic.stepCount,
-                                    { color: "#FF6188", fontSize: 28, textAlign: "center" },
+                                    {
+                                        color: "#FF6188",
+                                        fontSize: 28,
+                                        textAlign: "center",
+                                    },
                                 ]}
                             >
                                 완료!
@@ -282,7 +291,9 @@ export default function QuestExercise() {
                         ) : (
                             <>
                                 <Text style={dynamic.stepCount}>{steps}</Text>
-                                <Text style={dynamic.stepGoal}>/{questTarget}</Text>
+                                <Text style={dynamic.stepGoal}>
+                                    /{questTarget}
+                                </Text>
                             </>
                         )}
                     </View>

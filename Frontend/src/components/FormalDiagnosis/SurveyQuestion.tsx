@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import styles from "../styles/surveyQuestionStyles";
+import styles from "../../styles/FormalDiagnosis/surveyQuestionStyles";
 
 interface SurveyQuestionProps {
     number: number;

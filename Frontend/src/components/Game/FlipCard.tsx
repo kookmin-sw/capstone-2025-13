@@ -7,7 +7,7 @@ import Animated, {
     interpolate,
 } from 'react-native-reanimated';
 import { Audio } from 'expo-av';
-import { cardStyles } from '../styles/FlipCardStyles';
+import { cardStyles } from '../../styles/Game/FlipCardStyles';
 
 interface Props {
     symbol: string;
@@ -17,7 +17,7 @@ interface Props {
 }
 
 const FlipCard = ({ symbol, isFlipped, isMatched, onPress }: Props) => {
-    const flipSoundFile = require('../assets/sounds/flip-card.mp3');
+    const flipSoundFile = require('../../assets/sounds/flip-card.mp3');
 
     const rotation = useSharedValue(0);
 

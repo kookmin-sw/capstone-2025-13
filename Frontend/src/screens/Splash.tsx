@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Image, StyleSheet, Animated, Dimensions } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const Splash = () => {
     const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -25,6 +26,7 @@ const Splash = () => {
 
     return (
         <View style={styles.container}>
+            <StatusBar style="auto" />
             <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
                 <Image
                     source={require("../assets/Images/logo.png")}

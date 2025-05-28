@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import styles from "../styles/surveyHeaderStyles";
+import styles from "../../styles/FormalDiagnosis/surveyHeaderStyles";
 
 export default function SurveyHeader({ title }: { title: string }) {
     return (
