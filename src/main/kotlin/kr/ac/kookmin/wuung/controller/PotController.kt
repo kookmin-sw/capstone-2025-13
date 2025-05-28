@@ -257,4 +257,102 @@ class PotController(
             )
         )
     }
+
+    @PostMapping("/usecoupon/{number}")
+    @Operation(
+        summary = "[en] use multiple coupons [ko] 여러 개의 쿠폰 사용",
+        description = """
+        [en]
+        Uses multiple coupons to gain experience points. If experience points reach the required amount,
+        the pot will level up and experience points will be reset to 0. This can happen multiple times.
+        This endpoint is protected and requires authentication.
+        
+        [ko]
+        여러 개의 쿠폰을 한 번에 사용하여 경험치를 획득합니다. 경험치가 필요량에 도달하면
+        화분의 레벨이 올라가고 경험치가 0으로 초기화됩니다. 이는 여러 번 발생할 수 있습니다.
+        개발자가 정의한 레벨을 초과한 레벨업 시도시 상태값 445를 반환합니다.
+        이 엔드포인트는 보호되어 있으며 사용을 위해서 accessToken이 필요합니다.
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "use coupons successfully",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Unauthorized access",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "pot not found",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "444",
+                description = "Not enough coupons",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "445",
+                description = "Max level reached",
+                content = [Content(schema = Schema(implementation = ApiResponseDTO::class))]
+            ),
+        ]
+    )
+    fun useCouponMultiple(
+        @AuthenticationPrincipal userDetails: User?,
+        @PathVariable number: Int
+    ): ResponseEntity<ApiResponseDTO<PotStatusDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        // 인증 체크
+        val pot = potRepository.findPotByUser(userDetails).orElseThrow { NotFoundException() }
+        
+        // 쿠폰 개수 체크
+        if (pot.coupon < number) throw CouponNotEnoughException()
+
+        // 쿠폰 사용 및 경험치 증가
+        pot.coupon -= number
+        pot.exp += number
+
+        // 레벨업 처리
+        var currentPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { NotFoundException() }
+        
+        // 레벨업이 여러 번 발생할 수 있으므로 while 루프 사용
+        while (pot.exp >= currentPotLevel.need) {
+            pot.level += 1
+            pot.exp -= currentPotLevel.need
+            
+            // 새로운 레벨에 대한 정보 조회
+            try {
+                currentPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
+            } catch (e: PotMaxLevelReachedException) {
+                // 최대 레벨에 도달한 경우 경험치를 0으로 설정
+                pot.exp = 0
+                break
+            }
+        }
+
+        // 저장
+        potRepository.save(pot)
+
+        // 현재 레벨 정보 조회
+        val newPotLevel = potLevelRepository.findPotLevelByLevel(pot.level).orElseThrow { PotMaxLevelReachedException() }
+
+        // 새 레벨 정보를 포함한 pot 정보 반환
+        return ResponseEntity.ok(
+            ApiResponseDTO(
+                data = PotStatusDTO(
+                    level = pot.level,
+                    exp = pot.exp,
+                    need = newPotLevel.need,
+                    coupon = pot.coupon
+                )
+            )
+        )
+    }
 }

@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/../../wuung/configurations.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_diagnosis_questions.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_diagnosis_scale.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_questions.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_questions_diagnosis_text.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_results.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_scales.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/diagnosis_text.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/life_quotes.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/pot_level.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/quests.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/snapadmin_console_query.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/topic_feedback.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/topics.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/topics_topic_feedback.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/user_pot.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/user_quest_stage.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/user_quests.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/user_records.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung/users.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../wuung_localhost-2025_05_26_16_36_16-dump.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>
