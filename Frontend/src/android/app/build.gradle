@@ -94,6 +94,17 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 90
         versionName "1.0.0"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"  // 필요에 따라 C++ 표준 지정
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"  // 위에 만든 CMakeLists.txt 경로
+            // version "3.18.1"  // 필요 시 CMake 버전 명시
+        }
     }
     signingConfigs {
         debug {

@@ -1,12 +1,13 @@
-import { Text, View, Alert, Image } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
-import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
+import { Text, View, Alert } from 'react-native';
+import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
+import { runOnJS } from 'react-native-reanimated';
 
 import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
-import { shouldCaptureFace } from '../../utils/faceChecker';
-import { EmotionModelRunner } from '../../utils/EmotionModelRun';
+import { cropFaces } from '../../plugins/cropFaces'
+import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
 
 import EmotionChartBox from '../../components/Quest_emotionBox';
@@ -27,18 +28,22 @@ export default function QuestEmotion() {
     const route = useRoute();
     const { questTitle, questDescription, nickname } =
         route.params as RouteParams;
+
     const [emotionLog, setEmotionLog] = useState<string[]>([]);
     const device = useCameraDevice('front');
+    const [hasPermission, setHasPermission] = useState(false);
+    const [noFaceWarning, setNoFaceWarning] = useState(false);
+    const { isLoaded, model } = useLoadEmotionModel();
+    const [latestResult, setLatestResult] = useState<number[] | null>(null);
+    const [isPredicting, setIsPredicting] = useState(false);
+    const [success, setSuccess] = useState<boolean>(false);
+
     const cameraRef = useRef<any>(null);
     const { detectFaces } = useFaceDetector();
-    const [hasPermission, setHasPermission] = useState(false);
-    const { isLoaded, model } = useLoadEmotionModel();
-    const [noFaceWarning, setNoFaceWarning] = useState(false);
-    const [photoPath, setPhotoPath] = useState<string | null>(null);
-    const [latestResult, setLatestResult] = useState<number[] | null>(null);
-    const [success, setSuccess] = useState<boolean>(false);
-    const lastPhotoTimeRef = useRef(0);
-    const isPhotoTaken = useRef(false);
+
+    const quest = QUESTS.find(q => q.id === questTitle);
+    const quest_capture_interval = quest?.interval ?? 1000;
+    const quest_save_pre_log = quest?.logLength ?? 20;
 
     const handleComplete = async () => {
         try {
@@ -72,107 +77,88 @@ export default function QuestEmotion() {
         }
     };  
 
-    const quest = QUESTS.find(q => q.id === questTitle);
-    const quest_capture_interval = quest?.interval ?? 1000;
-    const quest_save_pre_log = quest?.logLength ?? 20;
-
-const capturePhoto = async (face: Face | undefined): Promise<string | null> => {
-    if (isPhotoTaken.current) {
-        console.log("📷 캡처 건너뜀: 이전 캡처 중");
-        return null;
-    }
-    isPhotoTaken.current = true;
-
-    const now = Date.now();
-    const { isLargeEnough, now: checkedTime } = shouldCaptureFace(face, lastPhotoTimeRef.current);
-    if (!isLargeEnough || now - lastPhotoTimeRef.current < quest_capture_interval) {
-        isPhotoTaken.current = false;
-        console.log("📏 얼굴이 작거나 캡처 간격 미달");
-        return null;
-    }
-
-    try {
-        const photo = await cameraRef.current.takePhoto();
-        const path = `file://${photo.path}?ts=${Date.now()}`; // 고유 URI 처리
-        console.log("📸 캡처 성공:", path);
-        setPhotoPath(path);
-        lastPhotoTimeRef.current = checkedTime;
-
-        // 최소 캡처 간격 보장 (예: 1초)
-        setTimeout(() => {
-            isPhotoTaken.current = false;
-        }, 1000);
-        return path;
-    } catch (err) {
-        console.error("❌ 사진 캡처 실패:", err);
-        isPhotoTaken.current = false;
-        return null;
-    }
-};
-
-    const handleDetectedFaces = Worklets.createRunOnJS(async (faces: Face[]) => {
-    if (!faces?.length) {
-        setNoFaceWarning(true);
-        return;
-    }
-    setNoFaceWarning(false);
-
-    if (!isLoaded || !model) {
-        console.log("❌ 모델 로드 안됨");
-        return;
-    }
-
-    const face = faces[0];
-    const uri = await capturePhoto(face);
-    if (!uri) {
-        console.log("📛 사진 캡처 실패 or 생략됨");
-        return;
-    }
-
-    const result = await EmotionModelRunner(uri, model);
-
-    if (result) {
-        const labels = ["Happy", "Surprise", "Angry", "Sad", "Disgust", "Fear", "Neutral"];
-        const topIndex = result.indexOf(Math.max(...result));
-        const predictedLabel = labels[topIndex];
-
-        console.log("🎯 예측 감정:", predictedLabel);
-        console.log(result);
-
-        const updated = [...emotionLog, predictedLabel];
-        if (updated.length > quest_save_pre_log) updated.shift();
-
-        setEmotionLog(updated);
-        setLatestResult(Array.from(result)); // ✅ 그대로 사용
-
-        if (quest && quest.check(updated)) {
-            setSuccess(true);
-            console.log("✅ 퀘스트 조건 충족!");
-            handleComplete();
+    const handleDetectedResult = Worklets.createRunOnJS(async (pluginResult: Float32Array) => {
+        if (!isLoaded || !model) {
+        console.log('❌ 모델 로드 안됨')
+        return
         }
-    } else {
-        console.warn("⚠️ 모델 결과 없음");
-    }
-});
 
+        if (isPredicting) {
+            console.log('⏳ 예측 중이므로 스킵');
+            return;
+        }
 
-    const frameProcessor = useFrameProcessor((frame) => {
-        "worklet";
-        const now = Date.now();
-        const last = (globalThis as any).lastProcessTime ?? 0;
-        if (now - last < quest_capture_interval) return;
-        (globalThis as any).lastProcessTime = now;
+        setIsPredicting(true); // ✅ 예측 시작
+        
+        try {
+            const result = await runTFLiteModelRunner(pluginResult, model);
+            if (result) {
+            const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
+            const topIndex = result.indexOf(Math.max(...result));
+            const predictedLabel = labels[topIndex];
 
-        const faces = detectFaces(frame);
-        handleDetectedFaces(faces);
-    }, [handleDetectedFaces]);
+            console.log('🎯 예측 감정:', predictedLabel);
+            console.log(result);
+
+            const updated = [...emotionLog, predictedLabel];
+            if (updated.length > quest_save_pre_log) updated.shift();
+
+            setEmotionLog(updated);
+            setLatestResult(result);
+
+            if (quest && quest.check(updated)) {
+                setSuccess(true);
+                console.log('✅ 퀘스트 조건 충족!');
+                handleComplete();
+            }
+            } else {
+            console.warn('⚠️ 모델 결과 없음');
+            }
+        } catch (err) {
+            console.error('❌ 예측 중 오류:', err);
+        } finally {
+            setIsPredicting(false); // ✅ 예측 완료
+        }
+    });
+
+    const frameProcessor = useFrameProcessor((frame: Frame) => {
+        'worklet'
+        const now = Date.now()
+        const last = (globalThis as any).lastProcessTime ?? 0
+        if (now - last < quest_capture_interval) return
+        ;(globalThis as any).lastProcessTime = now
+
+        // 1) 얼굴 박스 감지
+        const faces: Face[] = detectFaces(frame)
+        if (!faces || faces.length === 0) {
+        setNoFaceWarning(true)
+        return
+        }
+        setNoFaceWarning(false)
+
+        // 2) 첫 얼굴 박스 정보로 네이티브 크롭+전처리
+        const pluginResult = cropFaces(frame, faces[0].bounds);
+
+        let result: number[] = [];
+
+        if (pluginResult instanceof Float32Array) {
+            result = Array.from(pluginResult); // result: number[]
+        } else {
+            console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
+            return;
+        }
+
+        const floatInput = new Float32Array(result);
+        runOnJS(handleDetectedResult)(floatInput);
+
+    }, [detectFaces, handleDetectedResult, quest_capture_interval])
 
     useEffect(() => {
-        (async () => {
-            const status = await Camera.requestCameraPermission();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
+        ;(async () => {
+        const status = await Camera.requestCameraPermission()
+        setHasPermission(status === 'granted')
+        })()
+    }, [])
 
     if (!device || !hasPermission) {
         return (

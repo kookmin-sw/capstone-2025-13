@@ -8,7 +8,7 @@ function softmax(logits: number[], T: number = 1.0): number[] {
   return exps.map(e => e / sumExps);
 }
 
-export async function runTFLiteModel(
+export async function runTFLiteModelRunner(
   input: Float32Array,
   model: TensorflowModel
 ): Promise<number[] | null> {
