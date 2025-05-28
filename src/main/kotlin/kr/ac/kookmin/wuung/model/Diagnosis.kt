@@ -1,6 +1,7 @@
 package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.*
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 // 약식 검사와 정식 검사 종류를 표현한 클래스
@@ -27,6 +28,9 @@ data class Diagnosis(
     @Column(nullable = false, length = 1024)
     var description: String,
 
+    @Column
+    var totalScore: Int = 0,
+
     @OneToMany
     var diagnosisQuestions: List<DiagnosisQuestions> = listOf(),
 
@@ -34,9 +38,11 @@ data class Diagnosis(
     var diagnosisScale: List<DiagnosisScale> = listOf(),
 
     @Column(nullable = false)
+    @DisableEditField
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(nullable = false)
+    @DisableEditField
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor(): this(
@@ -49,5 +55,10 @@ data class Diagnosis(
     @PreUpdate
     private fun onUpdate() {
         updatedAt = LocalDateTime.now()
+        totalScore = diagnosisQuestions.sumOf { question ->
+            question.diagnosisText.maxBy {
+                answer -> answer.score
+            }.score
+        }
     }
 }

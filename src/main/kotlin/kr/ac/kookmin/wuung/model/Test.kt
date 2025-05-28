@@ -1,6 +1,7 @@
 package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.*
+import space.mori.dalbodeule.snapadmin.external.annotations.HiddenEditForm
 import java.time.LocalDateTime
 
 @Entity
@@ -19,6 +20,7 @@ data class Test(
     @Column(nullable = false)
     var result : Long,
 
+    @HiddenEditForm
     @Column(nullable = false)
     var dateAt : LocalDateTime = LocalDateTime.now(),
 

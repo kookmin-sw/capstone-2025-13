@@ -1,11 +1,21 @@
 package kr.ac.kookmin.wuung
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.cdimascio.dotenv.dotenv
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
-import space.mori.dalbodeule.snapadmin.external.SnapAdminAutoConfiguration
+import space.mori.dalbodeule.snapadmin.external.annotations.SnapAdminEnabled
+
 
 val dotenv = dotenv {
 	ignoreIfMissing = true
@@ -13,8 +23,21 @@ val dotenv = dotenv {
 
 @SpringBootApplication
 @EnableScheduling
-@ImportAutoConfiguration(classes = [SnapAdminAutoConfiguration::class])
-class WuungApplication
+@SnapAdminEnabled
+@EnableCaching
+@EnableJpaRepositories(basePackages = ["kr.ac.kookmin.wuung.repository"])
+@EntityScan(basePackages = ["kr.ac.kookmin.wuung.model"])
+class WuungApplication {
+	@Bean
+	@Primary
+	fun objectMapper(): ObjectMapper {
+		val mapper = jacksonObjectMapper()
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		mapper.registerModule(JavaTimeModule())
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+		return mapper
+	}
+}
 
 fun main(args: Array<String>) {
 	val envVars = mapOf(
@@ -23,6 +46,10 @@ fun main(args: Array<String>) {
 		"DB_NAME" to dotenv["DB_NAME"],
 		"DB_USER" to dotenv["DB_USER"],
 		"DB_PASSWORD" to dotenv["DB_PASSWORD"],
+		"REDIS_HOST" to dotenv["REDIS_HOST"],
+		"REDIS_PORT" to (dotenv["REDIS_PORT"]?.toInt() ?: 6379),
+		"REDIS_DB" to (dotenv["REDIS_DB"]?.toInt() ?: 0),
+		"REDIS_PASSWORD" to dotenv["REDIS_PASSWORD"],
 		"JWT_SIGNING_KEY" to dotenv["JWT_SIGNING_KEY"],
 		"JWT_VALIDATE_KEY" to dotenv["JWT_VALIDATE_KEY"],
 		"HOST_NAME" to dotenv["HOST_NAME"],
@@ -43,6 +70,7 @@ fun main(args: Array<String>) {
 		"GOOGLE_ACCOUNT_JSON" to dotenv["GOOGLE_ACCOUNT_JSON"],
 		"APPLE_TEAM_ID" to dotenv["APPLE_TEAM_ID"],
 		"APPLE_KEY_ID" to dotenv["APPLE_KEY_ID"],
+		"OPENAPI_KEY" to dotenv["OPENAPI_KEY"],
 	)
 
 	runApplication<WuungApplication>(*args) {

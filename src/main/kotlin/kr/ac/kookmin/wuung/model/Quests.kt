@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 
@@ -34,9 +35,11 @@ data class Quests(
     @Column(nullable = false)
     var target: Int = 0,
 
+    @DisableEditField
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @DisableEditField
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

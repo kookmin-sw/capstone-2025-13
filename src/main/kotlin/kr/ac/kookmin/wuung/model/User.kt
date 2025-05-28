@@ -1,6 +1,5 @@
 package kr.ac.kookmin.wuung.model
 
-import io.swagger.v3.oas.annotations.Hidden
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -19,6 +18,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import space.mori.dalbodeule.snapadmin.external.annotations.DisplayName
 import space.mori.dalbodeule.snapadmin.external.annotations.HiddenColumn
+import space.mori.dalbodeule.snapadmin.external.annotations.HiddenEditForm
+import space.mori.dalbodeule.snapadmin.external.annotations.ReadOnly
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -59,9 +60,13 @@ data class User(
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
     var pot : Pot? = null,
 
+    @ReadOnly
+    @HiddenEditForm
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @ReadOnly
+    @HiddenEditForm
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ): UserDetails {

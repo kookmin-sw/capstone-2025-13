@@ -10,6 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
+import space.mori.dalbodeule.snapadmin.external.annotations.HiddenEditForm
 import java.time.LocalDateTime
 
 enum class TopicFeedbackStatus(val value: Short) {
@@ -42,9 +43,11 @@ data class TopicFeedback(
     @ManyToOne
     val topic: Topic,
 
+    @HiddenEditForm
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @HiddenEditForm
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

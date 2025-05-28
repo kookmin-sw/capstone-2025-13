@@ -20,8 +20,10 @@ import kr.ac.kookmin.wuung.security.JwtAuthenticationFilter
 import kr.ac.kookmin.wuung.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.Customizer
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutFilter
 
 @Configuration
@@ -35,47 +37,71 @@ class SecurityConfig(
     private val host: String
 ) {
     @Bean
-    fun securityFilterChain(http: HttpSecurity, userDetailsService: UserDetailsService): DefaultSecurityFilterChain {
-        return http
-            .csrf {
-                it.disable()
-            }
+    @Order(1)
+    fun jwtSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .securityMatcher("/api/**") // JWT 인증을 적용할 경로 지정
+            .csrf { it.disable() }
             .cors {
-                val configuration = CorsConfiguration()
-
-                val origins = mutableListOf("http://localhost:3000", "http://localhost:8080")
-                origins.addAll(host.split(",").mapNotNull { it.trim() })
-
-                configuration.allowedOrigins = origins
-                configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                configuration.allowedHeaders = listOf("Authorization", "Content-Type", "X-CSRF-TOKEN")
-                configuration.allowCredentials = true
-
-                val source = UrlBasedCorsConfigurationSource()
-                source.registerCorsConfiguration("/**", configuration)
-
+                val configuration = CorsConfiguration().apply {
+                    allowedOrigins = listOf("http://localhost:3000", "http://localhost:8080") + host.split(",").mapNotNull { it.trim() }
+                    allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    allowedHeaders = listOf("Authorization", "Content-Type", "X-CSRF-TOKEN")
+                    allowCredentials = true
+                }
+                val source = UrlBasedCorsConfigurationSource().apply {
+                    registerCorsConfiguration("/**", configuration)
+                }
                 it.configurationSource(source)
             }
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers(
+                        "/auth/**",
+                        "/api/integrity/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/api-docs/**",
+                        "/v3/api-docs/**",
+                        "/v2/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                    ).permitAll()
+                auth.anyRequest().authenticated()
             }
-            .authorizeHttpRequests {
-                it.requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
-                it.requestMatchers("/login").permitAll()
+            .addFilterBefore(exceptionHandlerFilter, LogoutFilter::class.java)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .authenticationProvider(authenticationProvider())
+            .userDetailsService(userService)
 
-                it.requestMatchers("/auth/**").permitAll()
-                it.requestMatchers("/api/integrity/**").permitAll()
-                it.requestMatchers("/**").permitAll()
-                it.requestMatchers(
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/api-docs/**",
-                    "/v3/api-docs/**",
-                    "/v2/api-docs/**",
-                    "/swagger-resources/**",
-                    "/webjars/**"
-                ).permitAll()
-                it.anyRequest().authenticated()
+        return http.build()
+    }
+
+    @Bean
+    @Order(2)
+    fun basicAuthSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .securityMatcher("/login", "/logout", "/admin/**") // HTTP Basic 인증을 적용할 경로 지정
+            .csrf { it.disable() }
+            .cors {
+                val configuration = CorsConfiguration().apply {
+                    allowedOrigins = listOf("http://localhost:3000", "http://localhost:8080") + host.split(",").mapNotNull { it.trim() }
+                    allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    allowedHeaders = listOf("Authorization", "Content-Type", "X-CSRF-TOKEN")
+                    allowCredentials = true
+                }
+                val source = UrlBasedCorsConfigurationSource().apply {
+                    registerCorsConfiguration("/**", configuration)
+                }
+                it.configurationSource(source)
+            }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 역할을 가진 사용자만 접근 가능
+                    .requestMatchers("/login", "/logout").permitAll() // 로그인 및 로그아웃은 모두 접근 가능
+                    .anyRequest().authenticated()
             }
             .formLogin {
                 it.loginPage("/login")
@@ -88,16 +114,11 @@ class SecurityConfig(
                     .deleteCookies("JSESSIONID")
                     .permitAll()
             }
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            }
-            .httpBasic(Customizer.withDefaults())
-            .addFilterBefore(exceptionHandlerFilter, LogoutFilter::class.java)
-            // JWT 인증 필터는 예외 처리 필터 다음에 배치
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .httpBasic(Customizer.withDefaults()) // HTTP Basic 인증 활성화
             .authenticationProvider(authenticationProvider())
-            .userDetailsService(userDetailsService)
-            .build()
+            .userDetailsService(userService)
+
+        return http.build()
     }
 
     @Bean

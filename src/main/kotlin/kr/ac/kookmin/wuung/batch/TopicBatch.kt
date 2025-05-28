@@ -32,8 +32,12 @@ class TopicBatch(
         private const val CHUNK_SIZE = 10
     }
 
-    @Bean
-    fun topicJob(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): Job {
+    @Bean("topicJob")
+    fun topicJob(
+        jobRepository: JobRepository,
+        transactionManager: PlatformTransactionManager,
+        processTopicStep: Step,
+    ): Job {
         return JobBuilder("topicJob", jobRepository)
             .start(processTopicStep(
                 jobRepository, transactionManager

@@ -1,6 +1,7 @@
 package kr.ac.kookmin.wuung.model
 
 import jakarta.persistence.*
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 enum class LuckyVickyStatus(val value: Short) {
@@ -37,9 +38,11 @@ data class Record(
     @JoinColumn(name = "user_id")
     val user: User,
 
+    @DisableEditField
     @Column(nullable = false)
     val createdAt : LocalDateTime = LocalDateTime.now(),
 
+    @DisableEditField
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

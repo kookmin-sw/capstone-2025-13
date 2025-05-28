@@ -1,5 +1,6 @@
 package kr.ac.kookmin.wuung.controller
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -17,6 +18,8 @@ import kr.ac.kookmin.wuung.model.DiagnosisType
 import kr.ac.kookmin.wuung.model.User
 import kr.ac.kookmin.wuung.repository.DiagnosisRepository
 import kr.ac.kookmin.wuung.repository.DiagnosisResultsRepository
+import kr.ac.kookmin.wuung.service.DiagnosisDTO
+import kr.ac.kookmin.wuung.service.DiagnosisScaleDTO
 import kr.ac.kookmin.wuung.service.DiagnosisService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -37,76 +40,6 @@ data class CreateDiagnosisRequest(
     val createAt: String
 )
 
-// message만 설정해놓긴 했음.
-data class DiagnosisDTO(
-    val id: Long,
-    val type: DiagnosisType,
-    val title: String,
-    val description: String,
-    val questions: List<DiagnosisQuestionDTO> = listOf(),
-    val scale: List<DiagnosisScaleDTO> = listOf(),
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
-data class DiagnosisQuestionDTO(
-    val seq: Int,
-    val text: String,
-    val answers: List<DiagnosisTextDTO> = listOf()
-)
-data class DiagnosisTextDTO(
-    val text: String,
-    val score: Int,
-)
-data class DiagnosisScaleDTO(
-    val start: Int,
-    val scaleName: String,
-    val description: String,
-)
-
-fun Diagnosis.toDTO() = DiagnosisDTO(
-    id = this.id ?: 0,
-    type = this.type ?: DiagnosisType.Simple,
-    title = this.title ?: "",
-    description = this.description ?: "",
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt,
-    questions = this.diagnosisQuestions.map { question ->
-        DiagnosisQuestionDTO(
-            seq = question.seq ?: 0,
-            text = question.text ?: "",
-            answers = question.diagnosisText.map { text ->
-                DiagnosisTextDTO(
-                    text = text.text ?: "",
-                    score = text.score,
-                )
-            }.sortedBy { it.score }
-        )
-    }.sortedBy { it.seq },
-    scale = this.diagnosisScale.map { scale ->
-        DiagnosisScaleDTO(
-            start = scale.start,
-            scaleName = scale.scaleName ?: "",
-            description = scale.description ?: "",
-        )
-    }.sortedBy { it.start },
-)
-fun Diagnosis.toDTOSelf() = DiagnosisDTO(
-    id = this.id ?: 0,
-    type = this.type ?: DiagnosisType.Simple,
-    title = this.title ?: "",
-    description = this.description ?: "",
-    createdAt = this.createdAt,
-    updatedAt = this.updatedAt,
-    questions = listOf(),
-    scale = this.diagnosisScale.map { scale ->
-        DiagnosisScaleDTO(
-            start = scale.start,
-            scaleName = scale.scaleName ?: "",
-            description = scale.description ?: "",
-        )
-    }.sortedBy { it.start },
-)
-
 data class DiagnosisResultSubmitRequest(
     val id: Long,
     val result: Int,
@@ -118,14 +51,26 @@ data class DiagnosisResultDTO(
     val diagnosisId: Long,
     val result: Int,
     val scale: Int,
+    @JsonProperty("scale_description")
+    val scaleDescription: List<DiagnosisScaleDTO> = listOf(),
+    @JsonProperty("max_score")
+    val maxScore: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
 fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
     id = this.id ?: "",
-    diagnosisId = this.diagnosis?.id ?: 0,
-    result = this.result ?: 0,
-    scale = this.scale ?: 0,
+    diagnosisId = this.diagnosis.id ?: 0,
+    result = this.result,
+    scale = this.scale,
+    scaleDescription = this.diagnosis.diagnosisScale.map { scale ->
+        DiagnosisScaleDTO(
+            start = scale.start,
+            scaleName = scale.scaleName,
+            description = scale.description,
+        )
+    },
+    maxScore = this.diagnosis.totalScore,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )
@@ -141,8 +86,6 @@ fun DiagnosisResults.toDTO() = DiagnosisResultDTO(
 """)
 class DiagnosisController(
     @Autowired private val diagnosisService: DiagnosisService,
-    @Autowired private val jwtProvider: JwtProvider,
-    private val diagnosisRepository: DiagnosisRepository,
     private val diagnosisResultsRepository: DiagnosisResultsRepository
 )  {
     @GetMapping("/{id}")
@@ -189,12 +132,12 @@ class DiagnosisController(
         if (userDetails == null)
             throw UnauthorizedException()
 
-        val diagnosis = diagnosisRepository.findDiagnosisById(id.toLong()).getOrNull()
+        val diagnosis = diagnosisService.findById(id.toLong())
 
         if (diagnosis == null) throw NotFoundException()
 
         return ResponseEntity.ok(
-            ApiResponseDTO(data = diagnosis.toDTO())
+            ApiResponseDTO(data = diagnosis)
         )
     }
 
@@ -231,7 +174,7 @@ class DiagnosisController(
     ): ResponseEntity<ApiResponseDTO<List<DiagnosisDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val diagnosisList = diagnosisRepository.findAll().map { it.toDTOSelf() }
+        val diagnosisList = diagnosisService.findAll()
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = diagnosisList)
@@ -280,7 +223,7 @@ class DiagnosisController(
     ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val diagnosis = diagnosisRepository.findDiagnosisById(request.id).getOrNull()
+        val diagnosis = diagnosisService.findByIdWithRaw(request.id)
         if (diagnosis == null) throw NotFoundException()
 
         val diagnosisResult = DiagnosisResults(
@@ -339,6 +282,57 @@ class DiagnosisController(
 
         return ResponseEntity.ok(
             ApiResponseDTO(data = diagnosis.map { it.toDTO() }.sortedByDescending { it.createdAt } )
+        )
+    }
+
+    @GetMapping("/result/{resultId}")
+    @Operation(
+        summary = "Get diagnosis result by ID / ID로 진단 결과 조회",
+        description = """
+        [EN] Retrieve specific diagnosis result for the authenticated user.
+        AccessToken is required for this part of endpoints on Authorization header.
+        
+        [KR] 인증된 사용자의 특정 진단 결과를 조회합니다.
+        이 엔드포인트는 Authorization 헤더에 AccessToken이 필요합니다.
+    """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved diagnosis result",
+                useReturnTypeSchema = true
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Unauthorized - Invalid or missing JWT token",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Diagnosis result not found",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ApiResponseDTO::class)
+                )]
+            )
+        ]
+    )
+    fun getDiagnosisResult(
+        @AuthenticationPrincipal userDetails: User?,
+        @Schema(description = "Diagnosis Result ID")
+        @PathVariable resultId: String,
+    ): ResponseEntity<ApiResponseDTO<DiagnosisResultDTO>> {
+        if (userDetails == null) throw UnauthorizedException()
+
+        val diagnosis = diagnosisResultsRepository.findById(resultId).getOrNull()
+        if (diagnosis == null) throw NotFoundException()
+
+        return ResponseEntity.ok(
+            ApiResponseDTO(data = diagnosis.toDTO())
         )
     }
 }

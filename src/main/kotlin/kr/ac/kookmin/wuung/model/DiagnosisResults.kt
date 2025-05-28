@@ -8,6 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
+import space.mori.dalbodeule.snapadmin.external.annotations.DisableEditField
 import java.time.LocalDateTime
 
 @Entity
@@ -29,9 +30,11 @@ data class DiagnosisResults(
     @Column(nullable = false)
     var scale: Int,
 
+    @DisableEditField
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @DisableEditField
     @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

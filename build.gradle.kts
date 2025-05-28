@@ -6,6 +6,7 @@ plugins {
 	kotlin("plugin.spring") version "2.1.10"
 	id("org.hibernate.orm") version "6.5.2.Final"
 	id("org.springframework.boot") version "3.4.5"
+	id("org.springframework.boot.aot") version "3.4.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.graalvm.buildtools.native") version "0.10.5"
 }
@@ -32,14 +33,19 @@ repositories {
 	google()
 }
 
-extra["springAiVersion"] = "1.0.0-M4"
+extra["springAiVersion"] = "1.0.0-M6"
 extra["springCloudVersion"] = "2023.0.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-batch")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis") // redis
+
+	implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final") // spatial
+	implementation("org.locationtech.jts:jts-core") // spatial
+
+
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
@@ -47,6 +53,9 @@ dependencies {
 
 	implementation("io.swagger.core.v3:swagger-core:2.2.30")
 	implementation("io.swagger.core.v3:swagger-annotations:2.2.30")
+
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
 
 	// https://mvnrepository.com/artifact/jakarta.websocket/jakarta.websocket-api
 	implementation("jakarta.websocket:jakarta.websocket-api:2.2.0")
@@ -62,10 +71,11 @@ dependencies {
 
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-	runtimeOnly("org.postgresql:postgresql:42.7.4")
+	implementation("org.postgresql:postgresql:42.7.4") // postgresql
+	implementation("net.postgis:postgis-jdbc:2024.1.0")
 
-	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
-	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+	// https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter-s3
+	implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.0")
 
 	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 	implementation("javax.xml.bind:jaxb-api:2.3.1")
@@ -85,7 +95,7 @@ dependencies {
 	// HTTP 클라이언트
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-	implementation("space.mori.dalbodeule:snap-admin:0.5.1")
+	implementation("space.mori.dalbodeule:snap-admin:0.6.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -133,6 +143,7 @@ tasks.withType<BootBuildImage> {
 	environment = mapOf(
 		"BP_NATIVE_IMAGE" to "true",
 		"BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-H:+UnlockExperimentalVMOptions",
+		"BPE_APPEND_JAVA_TOOL_OPTIONS" to "-Dspring.aot.enabled=true",
 		"BP_JVM_TYPE" to "JDK",
 		"BP_JVM_VERSION" to "21",
         "SPRING_PROFILES_ACTIVE" to "dev"

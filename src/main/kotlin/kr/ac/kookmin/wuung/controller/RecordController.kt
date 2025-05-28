@@ -31,6 +31,7 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
+import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -53,7 +54,7 @@ data class RecordDTO(
 fun Record.toDTO() = RecordDTO(
     this.id ?: "",
     this.rate,
-    this.data ?: "",
+    this.data,
     this.luckyVicky ?: "",
     this.comment ?: "",
     this.status,
@@ -81,8 +82,8 @@ class RecordController(
     @Autowired private val authenticationManager: AuthenticationManager,
     @Autowired private val recordRepository: RecordRepository,
     @Autowired private val jobLauncher: JobLauncher,
-    @Autowired private val luckyVickyJob: Job
-    ) {
+    @Autowired private val context: ApplicationContext,
+) {
     @GetMapping("/me")
     @Operation(
         summary = "[en] Get record by date\n[ko] 날짜별 기록 조회",
@@ -280,16 +281,17 @@ class RecordController(
 
     @Scheduled(fixedRate = 10000L)
     private fun runJob() {
+        val job = context.getBean("luckyVickyJob", Job::class.java)
         val jobParameters = JobParametersBuilder()
             .addLong("time", System.currentTimeMillis())
             .toJobParameters()
 
         try {
-            jobLauncher.run(luckyVickyJob, jobParameters)
+            jobLauncher.run(job, jobParameters)
         } catch (e: JobInstanceAlreadyCompleteException) {
             // Job already running, wait and retry
             Thread.sleep(1000L)
-            jobLauncher.run(luckyVickyJob, jobParameters)
+            jobLauncher.run(job, jobParameters)
         }
     }
 }

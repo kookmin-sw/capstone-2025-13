@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 data class ChallengeRequest(
+    val platform: String,
     val deviceId: String
 )
 
@@ -53,7 +54,7 @@ class IntegrityController(
         @Valid @RequestBody request: ChallengeRequest
     ): ResponseEntity<ChallengeResponse> {
         try {
-        val challenge = challengeService.generateChallenge(request.deviceId)
+        val challenge = challengeService.generateChallenge(request.platform, request.deviceId)
             return ResponseEntity.ok(
                 ChallengeResponse(
                     challenge = challenge.first ?: "",

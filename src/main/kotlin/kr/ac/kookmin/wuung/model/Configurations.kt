@@ -14,16 +14,16 @@ import jakarta.persistence.Table
 class Configurations(
     @Id
     @GeneratedValue(GenerationType.IDENTITY)
-    val id: Long? = null,
+    var id: Long? = null,
 
     @Enumerated(EnumType.STRING)
-    val key: ConfigurationKey,
+    var key: ConfigurationKey,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    val value: String,
+    var value: String,
 
     @Column(nullable = false)
-    val innerSeq: Int
+    var innerSeq: Int
 ) {
     constructor(): this(
         id = null,

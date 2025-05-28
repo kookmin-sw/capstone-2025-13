@@ -7,6 +7,7 @@ import kr.ac.kookmin.wuung.model.TopicFeedbackStatus
 import kr.ac.kookmin.wuung.model.TopicFeedback
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import java.time.LocalDateTime
 import java.util.Optional
 
 @Repository
@@ -15,4 +16,5 @@ interface TopicFeedbackRepository : JpaRepository<TopicFeedback, String>{
     fun findTopicFeedbackById(id: String): Optional<TopicFeedback>
     fun findTopicFeedbackByStatus(status: TopicFeedbackStatus): Optional<TopicFeedback>
     fun findTopicFeedbacksByStatus(status: TopicFeedbackStatus, page: Pageable): Page<TopicFeedback>
+    //fun findTopicFeedbacksByCreatedAtBetweenAndStatus(start : LocalDateTime, end : LocalDateTime, status : TopicFeedbackStatus): List<TopicFeedback>
 }
