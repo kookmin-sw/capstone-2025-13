@@ -62,7 +62,7 @@ data class TopicDTO(
 fun Topic.toDTO() = TopicDTO(
     this.id ?: "",
     this.rate,
-    this.data ?: "",
+    this.data,
     this.createdAt,
     this.updatedAt
 )
@@ -70,7 +70,7 @@ fun Topic.toDTO() = TopicDTO(
 fun Topic.toFullDTO() = TopicDTO(
     this.id ?: "",
     this.rate,
-    this.data ?: "",
+    this.data,
     this.createdAt,
     this.updatedAt,
     this.topicFeedback.map { it.toDTO() }
@@ -386,11 +386,11 @@ class TopicController(
 
         val feedbackNum = topic.topicFeedback.size
 
-        if (feedbackNum >= 7) throw LimitReachedException()
+        if (feedbackNum >= 6) throw LimitReachedException()
 
 
         // Limit Reached 예외 대신 데이터베이스에 데이터 추가 후 ID 반환
-         if(feedbackNum >= 5) {
+         if(feedbackNum >= 4) {
              val feedback = TopicFeedback(
                  topic = topic,
                  data = request.data,
@@ -534,7 +534,7 @@ class TopicController(
         if (userDetails == null) throw UnauthorizedException()
         val feedback = topicFeedbackRepository.findById(topicFeedbackId).getOrNull() ?: throw NotFoundException()
 
-        if(feedback.topic?.user?.id != userDetails.id) throw UnauthorizedException()
+        if(feedback.topic.user?.id != userDetails.id) throw UnauthorizedException()
 
         when (feedback.status) {
             TopicFeedbackStatus.QUEUED -> throw AiFeedbackNotCompleteException()
