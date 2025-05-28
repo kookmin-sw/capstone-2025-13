@@ -44,9 +44,7 @@ export default function FormalDiagnosisSurvey() {
                 setQuestions(result.questions || []);
                 setScales(result.scale || []);
             }
-            setTimeout(() => {
-                hideLoading();
-            }, 5000); // 5초 딜레이
+            hideLoading();
         };
         loadDiagnosis();
     }, [diagnosisId]);

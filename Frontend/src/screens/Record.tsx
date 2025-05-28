@@ -21,18 +21,18 @@ import { getRecordMe, postRecord } from "../API/recordAPI";
 import { getCoupon } from "../API/potAPI";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../App";
-
-
+import { useLoading } from "../API/contextAPI";
 
 export default function Record() {
-    const route = useRoute<RouteProp<RootStackParamList, 'Record'>>();
+    const route = useRoute<RouteProp<RootStackParamList, "Record">>();
+    const { showLoading, hideLoading } = useLoading();
 
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
-    const date = route.params?.date ?? '';
+    const date = route.params?.date ?? "";
 
     const [recordId, setRecordId] = useState<string>("");
     const [luckyVicky, setLuckyVicky] =
@@ -48,22 +48,25 @@ export default function Record() {
     const finalDate = date || formattedDate;
     const title = finalDate === formattedDate ? "오늘의 하루" : "그날의 하루";
 
-
     const defaultLuckyText = "이거 완전 럭키비키잖아~";
 
     useEffect(() => {
         const fetchRecord = async () => {
+            showLoading();
             try {
-                const targetDate = date || formattedDate
+                const targetDate = date || formattedDate;
                 const response = await getRecordMe(targetDate);
-                console.log(response)
+                console.log(response);
                 setRecordText(response.data || "");
                 setIsSaved(response.status === "COMPLETED");
                 setRecordId(response.id || "");
                 setRating(response.rate || 0);
                 setRecordEtcText(response.comment || "");
                 setLuckyVicky(response.luckyVicky || "");
-            } catch (error) { }
+            } catch (error) {
+            } finally {
+                hideLoading();
+            }
         };
         fetchRecord();
     }, [formattedDate]);
@@ -88,6 +91,7 @@ export default function Record() {
             });
             return;
         }
+        showLoading();
         setIsLoading(true);
         try {
             const response = await postRecord(recordId, rating, recordEtcText);
@@ -99,7 +103,6 @@ export default function Record() {
                     text2: "일기가 성공적으로 저장되었습니다! 🎉",
                     position: "bottom",
                 });
-
                 await getCoupon();
             }
         } catch (error) {
@@ -111,6 +114,7 @@ export default function Record() {
             });
         } finally {
             setIsLoading(false);
+            hideLoading();
         }
     };
 
