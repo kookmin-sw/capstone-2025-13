@@ -6,7 +6,6 @@ import VisionCamera
 // 상수들은 클래스 내부 정적 멤버로 정의합니다.
 @objc(CropFacesFrameProcessorPlugin)
 public class CropFacesFrameProcessorPlugin: FrameProcessorPlugin {
-    
     private static let TARGET_SIZE = 64
     private static let CHANNELS = 3 // R, G, B
     private static let BGRA_BYTES_PER_PIXEL = 4 // iOS CVPixelBuffer 기본 BGRA

@@ -20,17 +20,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { Ionicons } from "@expo/vector-icons";
 import { useLoading } from "../../API/contextAPI";
+import { Region } from "react-native-maps";
 
 export default function HelpCall() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const [location, setLocation] = useState<{
-        latitude: number;
-        longitude: number;
-        latitudeDelta: number;
-        longitudeDelta: number;
-    } | null>(null);
+    const [location, setLocation] = useState<Region>({ latitude: 37.6100588, longitude: 126.9971919, latitudeDelta: 0.05, longitudeDelta: 0.05 });
 
     const [selected, setSelected] = useState("all");
     const [markers, setMarkers] = useState<
@@ -43,6 +39,7 @@ export default function HelpCall() {
             details: any;
         }[]
     >([]);
+    const { showLoading, hideLoading } = useLoading();
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
     const filteredMarkers =
@@ -64,18 +61,19 @@ export default function HelpCall() {
     };
 
     useEffect(() => {
-        (async () => {
-            const { showLoading, hideLoading } = useLoading();
+        const locationFun = async () => {
+            console.log("위치 권한 요청 시작.");
+
             showLoading();
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
+            console.log(`위치 권한 상태: ${status}`)
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
                 hideLoading();
-                return;
             }
 
-            const loc = await Location.getCurrentPositionAsync({});
+            const loc = await Location.getCurrentPositionAsync();
             const { latitude, longitude } = loc.coords;
 
             setLocation({
@@ -84,8 +82,10 @@ export default function HelpCall() {
                 latitudeDelta: 0.05,
                 longitudeDelta: 0.05,
             });
+            console.log(`현재 위치: ${location.latitude}, ${location.longitude} / ${location.latitudeDelta}, ${location.longitudeDelta}`)
+
             try {
-                const centerData = await getCenters();
+                const centerData = await getCenters(location.latitude, location.longitude);
                 const parsedMarkers = centerData
                     .filter(
                         (item: any) =>
@@ -136,9 +136,12 @@ export default function HelpCall() {
             } catch (error) {
                 console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
             } finally {
-                hideLoading();
+                // hideLoading();
             }
-        })();
+            // hideLoading();
+        }
+
+        locationFun();
     }, []);
 
     if (!location) return null;
@@ -206,10 +209,10 @@ export default function HelpCall() {
                         provider={PROVIDER_GOOGLE}
                         style={helpCallStyles.map}
                         region={location}
-                        showsUserLocation={true}
-                        onMapReady={(event) => {
-                            console.log("Google Map Ready!");
-                        }}
+                        initialRegion={location}
+                        // showsUserLocation={true}
+                        onMapReady={() => console.log("Map is ready!")}
+                        onRegionChangeComplete={(region) => console.log("Region changed:", region)}
                     >
                         <Marker coordinate={location} title="내 위치" />
                         {filteredMarkers.map((marker) => (

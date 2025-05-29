@@ -1,20 +1,23 @@
-import axios from 'axios';
+import customAxios from "./axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const getCenters = async (page = 1, rows = 100) => {
-    const SERVICE_KEY = process.env.EXPO_PUBLIC_SERVICE_KEY;
+const getAuthHeaders = async () => {
+    const token = await AsyncStorage.getItem("accessToken");
+    if (!token) throw new Error("❌ 로그인되지 않았습니다.");
+    return { Authorization: `Bearer ${token}` };
+};
 
-    const url = `http://api.data.go.kr/openapi/tn_pubr_public_hp_cnter_api?serviceKey=${SERVICE_KEY}&pageNo=1&numOfRows=100&type=json`;
-
+export const getCenters = async (latitude: Number, longitude: Number, distance: Number = 100) => {
     try {
-        const response = await axios.get(url, {
-            params: {
-                serviceKey: SERVICE_KEY,
-                pageNo: page,
-                numOfRows: rows,
-                type: 'json'
-            }
+        const headers = await getAuthHeaders();
+        const data = await customAxios.get(
+        `/help/hospital?latitude=${latitude}&longitude=${longitude}&distance=${distance}`, {
+            headers
         });
-        return response.data.response?.body?.items || [];
+
+        console.log(data.data)
+
+        return data.data
     } catch (error) {
         if (error instanceof Error) {
             console.error('API 호출 오류:', error.message);
