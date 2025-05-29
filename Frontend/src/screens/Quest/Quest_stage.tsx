@@ -7,7 +7,7 @@ import {
     Dimensions,
     Text,
     TouchableOpacity,
-    Alert,
+    Modal,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import Header_sky from "../../components/Header_sky";
@@ -101,6 +101,14 @@ export default function Quest_stage() {
     const [questStep, setQuestStep] = useState(1);
     const [questStage, setQuestStage] = useState<any>(null);
     const currentStageIndex = useMemo(() => 7 - questStep, [questStep]);
+    const [alertModalVisible, setAlertModalVisible] = useState(false);
+    const [alertModalContent, setAlertModalContent] = useState({
+      title: "",
+      message: "",
+      confirmText: "",
+      onConfirm: () => {},
+    });
+
 
     useEffect(() => {
         const type = getQuestTypeFromTitle(title);
@@ -288,21 +296,32 @@ export default function Quest_stage() {
     };
 
     const navigateToQuestWithCheck = () => {
-        if (displayQuestTitle === "끝! 내일 다시 만나!") {
-            Alert.alert(
-                "오늘의 퀘스트 완료!",
-                title === "명상"
-                    ? "이미 오늘 미션을 완료했어요. \n 다시 진행할까요?"
-                    : "이미 오늘 미션을 완료했어요.",
-                [
-                    { text: "닫기", style: "cancel" },
-                    {
-                        text: title === "명상" ? "한 번 더!" : "다시 볼래",
-                        onPress: navigateToQuest,
-                    },
-                ]
-            );
+      if (displayQuestTitle === "끝! 내일 다시 만나!") {
+        if (title === "명상") {
+            setAlertModalContent({
+                title: "오늘의 퀘스트 완료!",
+                message: "이미 오늘 미션을 완료했어요.\n다시 진행할까요?",
+                confirmText: "한 번 더!",
+                onConfirm: () => {
+                    setAlertModalVisible(false);
+                    navigateToQuest();
+                },
+            });
         } else {
+            setAlertModalContent({
+                title: "오늘의 퀘스트 완료!",
+                message: "이미 오늘 미션을 완료했어요.",
+                confirmText: "다시 볼래",
+                onConfirm: () => {
+                    setAlertModalVisible(false);
+                    navigateToQuest();
+                },
+            });
+        }
+    
+        setAlertModalVisible(true);
+        return;
+    } else {
             navigateToQuest();
         }
     };
@@ -417,6 +436,35 @@ export default function Quest_stage() {
                     );
                 })}
             </ScrollView>
+            <Modal
+  visible={alertModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setAlertModalVisible(false)}
+>
+  <View style={questStyles.modalOverlay}>
+    <View style={questStageStyles.modalContent}>
+      <Text style={questStyles.modalTitle}>{alertModalContent.title}</Text>
+      <Text style={questStyles.modalText}>{alertModalContent.message}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+        <TouchableOpacity
+          onPress={() => setAlertModalVisible(false)}
+          style={[questStyles.closeButton, { backgroundColor: "#ccc" }]}
+        >
+          <Text style={questStyles.closeButtonText}>닫기</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={alertModalContent.onConfirm}
+          style={questStyles.closeButton}
+        >
+          <Text style={questStyles.closeButtonText}>
+            {alertModalContent.confirmText}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
         </View>
     );
 }

@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -47,7 +48,86 @@ const questStyles = StyleSheet.create({
     width: width * 0.3,
     height: width * 0.3,
     zIndex: 10,
-  }
+  },
+  infoIcon: {
+    position: "absolute",
+    left: 130,
+    top: 10,
+  },
+  
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  
+  modalContent: {
+    maxWidth: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+    position: "absolute",
+    top: "30%",  // 화면 위쪽에서 30% 위치
+    left: "8.5%",
+  },
+  
+  modalArrow: {
+    position: "absolute",
+    top: -16,
+    right: "9%",
+    width: 0,
+    height: 0,
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 16,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "#fff",
+    transform: [{ translateX: 12 }],
+  },
+  
+  modalTitle: {
+    fontSize: 16,
+    letterSpacing: 0.8,
+    color: "#333",
+    fontFamily: fonts.laundryBold,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  
+  modalText: {
+    fontSize: 14,
+    color: "#333",
+    letterSpacing: 0.6,
+    lineHeight: 20,
+    fontFamily: fonts.laundry,
+    paddingHorizontal: 8,
+  },
+  
+  closeButton: {
+    marginTop: 20,
+    alignSelf: "flex-end",
+    marginRight: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "#F6914D",
+    borderRadius: 10,
+  },
+  
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    letterSpacing: 0.8,
+    fontFamily: fonts.laundry,
+    textAlign: "center",
+  },  
 });
 
 export default questStyles;

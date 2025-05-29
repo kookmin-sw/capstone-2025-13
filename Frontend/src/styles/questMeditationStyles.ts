@@ -16,7 +16,7 @@ const questMeditationStyles = StyleSheet.create({
   timerText: {
     color: "#fff94f",
     fontFamily: fonts.laundryBold,
-    fontSize: width * 0.08,
+    fontSize: width * 0.1,
     textShadowColor: "#fff",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 4,
@@ -63,7 +63,7 @@ const questMeditationStyles = StyleSheet.create({
   timerWrapper:{
     flexDirection: "row",
     alignItems: "center",
-    position: "relative" 
+    position: "relative", 
   },
   timerDescription: {
     position: "absolute",
@@ -119,6 +119,20 @@ const questMeditationStyles = StyleSheet.create({
     color: "#ccc",
     fontFamily: fonts.laundry,
     fontSize: width * 0.03,
+  },
+  modalContent: {
+    maxWidth: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+    position: "absolute",
+    top: "40%",  // 화면 위쪽에서 30% 위치
   },
 });
 

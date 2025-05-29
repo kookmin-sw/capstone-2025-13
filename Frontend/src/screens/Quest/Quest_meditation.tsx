@@ -7,8 +7,10 @@ import {
     useWindowDimensions,
     Alert,
     TextInput,
+    Modal
 } from "react-native";
 import styles from "../../styles/questMeditationStyles";
+import questStyles from "../../styles/questStyles";
 import Youtube_playlist from "../../components/Youtube_playlist";
 import { dynamic } from "../../styles/questMeditaionDynamicStyles";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,6 +39,9 @@ export default function Quest_meditation() {
     const [customMinutes, setCustomMinutes] = useState("");
     const [customSeconds, setCustomSeconds] = useState("");
     const [isTimeSet, setIsTimeSet] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [completeModalVisible, setCompleteModalVisible] = useState(false);
+    const [completeModalMessage, setCompleteModalMessage] = useState("");
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const { width } = useWindowDimensions();
@@ -62,11 +67,7 @@ export default function Quest_meditation() {
                     "hasVisitedMeditation"
                 );
                 if (!hasVisited) {
-                    Alert.alert(
-                        "명상 타이머 설명",
-                        "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌",
-                        [{ text: "확인" }]
-                    );
+                    setModalVisible(true)
                     await AsyncStorage.setItem("hasVisitedMeditation", "true");
                 }
             } catch (error) {
@@ -121,15 +122,8 @@ export default function Quest_meditation() {
 
                 if (postRes.status === 200 || postRes.status === 201) {
                     await getCoupon();
-                    Alert.alert("완료!", "명상이 성공적으로 완료되었어요! 🎉", [
-                        {
-                            text: "확인",
-                            onPress: () =>
-                                navigation.navigate("Quest_stage", {
-                                    title: "명상",
-                                }),
-                        },
-                    ]);
+                    setCompleteModalMessage("명상이 성공적으로 완료되었어요! 🎉");
+                    setCompleteModalVisible(true);
                     return;
                 } else {
                     Alert.alert("오류", "명상 완료 처리 중 문제가 발생했어요.");
@@ -137,13 +131,8 @@ export default function Quest_meditation() {
                 }
             }
 
-            Alert.alert("알림", "이미 완료된 미션이에요!", [
-                {
-                    text: "확인",
-                    onPress: () =>
-                        navigation.navigate("Quest_stage", { title: "명상" }),
-                },
-            ]);
+            setCompleteModalMessage("이미 완료된 미션이에요!");
+            setCompleteModalVisible(true);
         } catch (error) {
             console.error("명상 완료 처리 중 오류 발생:", error);
             Alert.alert("오류", "서버 통신 중 문제가 발생했어요.");
@@ -299,21 +288,44 @@ export default function Quest_meditation() {
                             {formatTime(timeLeft)}
                         </Text>
                         <TouchableOpacity
-                            onPress={() =>
-                                Alert.alert(
-                                    "명상 타이머 설명",
-                                    "・ 시작 버튼을 누르면 타이머가 바로 시작돼요.\n・ 앱을 강제로 종료하면 타이머가 초기화돼요.\n・ 다른화면으로 나가면 타이머가 멈춰요.\n・ 시간이 다 지나고 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요. 🙌",
-                                    [{ text: "확인" }]
-                                )
-                            }
-                            style={styles.timerDescription}
-                        >
-                            <Ionicons
-                                name="information-circle-outline"
-                                size={22}
-                                color="#fff94f"
-                            />
-                        </TouchableOpacity>
+                        onPress={() => setModalVisible(true)}
+                        style={styles.timerDescription}
+                      >
+                        <Ionicons
+                          name="information-circle-outline"
+                          size={18}
+                          color="#fff"
+                        />
+                      </TouchableOpacity>
+
+                      <Modal
+                        visible={modalVisible}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setModalVisible(false)}
+                      >
+                        <View style={questStyles.modalOverlay}>
+                          <View style={questStyles.modalContent}>
+                            <Text style={questStyles.modalTitle}>
+                              명상 타이머 사용법 🙌
+                            </Text>
+                            <Text style={questStyles.modalText}>
+                              ・ 시작 버튼을 누르면 타이머가 바로 시작돼요.{"\n"}
+                              ・ 앱을 강제로 종료하면 타이머가 초기화돼요.{"\n"}
+                              ・ 다른화면으로 나가면 타이머가 멈춰요.{"\n"}
+                              ・ 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요.
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => setModalVisible(false)}
+                              style={questStyles.closeButton}
+                            >
+                              <Text style={questStyles.closeButtonText}>
+                                이해했어!
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </Modal>
                     </View>
                 )}
 
@@ -337,6 +349,31 @@ export default function Quest_meditation() {
                     mainVideo={mainVideo}
                 />
             </ScrollView>
+
+            <Modal
+              visible={completeModalVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setCompleteModalVisible(false)}
+            >
+              <View style={questStyles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={questStyles.modalTitle}>완료!</Text>
+                  <Text style={questStyles.modalText}>
+                    {completeModalMessage}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCompleteModalVisible(false);
+                      navigation.navigate("Quest_stage", { title: "명상" });
+                    }}
+                    style={questStyles.closeButton}
+                  >
+                    <Text style={questStyles.closeButtonText}>확인</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
 
             {isTimeSet && (
                 <TouchableOpacity
