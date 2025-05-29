@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert, Modal, TouchableOpacity, Dimensions } from 'react-native';
-import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useFrameProcessor, Frame, runAtTargetFps } from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
@@ -34,23 +34,41 @@ type RouteParams = {
 export default function QuestEmotion() {
   const navigation = useNavigation<NavigationProp<any>>();
   const route = useRoute();
-  const { questTitle, questDescription, nickname } =
-    route.params as RouteParams;
+  const { questTitle, questDescription, nickname } = route.params as RouteParams;
 
   const [emotionLog, setEmotionLog] = useState<string[]>([]);
   const [hasPermission, setHasPermission] = useState(false);
   const [noFaceWarning, setNoFaceWarning] = useState(false);
   const [latestResult, setLatestResult] = useState<number[] | null>(null);
-  const [streak, setStreak] = useState(0);
   const [success, setSuccess] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState(true);
   const [completeModalVisible, setCompleteModalVisible] = useState(false);
   const [completeModalMessage, setCompleteModalMessage] = useState("");
 
   const device = useCameraDevice('front');
   const { isLoaded, model } = useLoadEmotionModel();
   const cameraRef = useRef<any>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isPredictingNow = useRef(false);
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      if (!success) {
+        setIsActive(false);
+        Alert.alert("실패", "30초 안에 퀘스트를 완료하지 못했어요. 😢", [{ text: "확인", onPress: () => navigation.goBack() }]);
+      }
+    }, 30 * 1000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (success && timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, [success]);
 
   const faceDetectorOptions: FaceDetectionOptions = {
     performanceMode: 'accurate',
@@ -81,12 +99,8 @@ export default function QuestEmotion() {
 
       if (postRes.status === 200 || postRes.status === 201) {
         await getCoupon();
-        setCompleteModalMessage(
-          "감정 퀘스트가 성공적으로 완료되었어요! 🎉"
-        );
+        setCompleteModalMessage("감정 퀘스트가 성공적으로 완료되었어요! 🎉");
         setCompleteModalVisible(true);
-        return;
-
       } else {
         Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
       }
@@ -103,56 +117,30 @@ export default function QuestEmotion() {
     }
   }, []);
 
-  // async JS 함수는 worklet이 아니어야 함
   const handleDetectedResultJS = async (pluginResult: number[]) => {
-    if (!isLoaded || !model) {
-      console.log('❌ 모델 로드 안됨');
-      return;
-    }
-    if (isPredictingNow.current) return;
-    isPredictingNow.current = true;
+    if (!isLoaded || !model) return;
 
-    try {
-      const input = new Float32Array(pluginResult);
-      const result = await runTFLiteModelRunner(input, model);
-      if (result) {
-        const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
-        const topIndex = result.indexOf(Math.max(...result));
-        const predictedLabel = labels[topIndex];
+    const input = new Float32Array(pluginResult);
+    const result = await runTFLiteModelRunner(input, model);
+    if (!result) return;
 
-        console.log('🎯 예측 감정:', predictedLabel);
-        console.log(result);
+    const labels = ['Happy', 'Surprise', 'Angry', 'Sad', 'Disgust', 'Fear', 'Neutral'];
+    const topIndex = result.indexOf(Math.max(...result));
+    const predictedLabel = labels[topIndex];
 
-        setEmotionLog(prev => {
-          const updated = [...prev, predictedLabel];
-          if (updated.length > quest_save_pre_log) updated.shift();
+    setEmotionLog(prev => {
+      const updated = [...prev, predictedLabel];
+      if (updated.length > quest_save_pre_log) updated.shift();
 
-          let quest_result;
-          if (quest) {
-            console.log(updated);
-            quest_result = quest.check(updated);  // result: { isSuccess, streakCount }
-            console.log(quest_result);
-
-            if (quest_result.isSuccess) {
-              setSuccess(true);
-              setStreak(quest_result.streakCount); // 숫자 상태 업데이트 (별도 state 필요)
-              console.log('RR');
-              handleComplete();
-              console.log('SS');
-            }
-          }
-          return updated;
-        });
-
-        setLatestResult(result);
-      } else {
-        console.warn('⚠️ 모델 결과 없음');
+      const quest_result = quest?.check(updated);
+      if (quest_result?.isSuccess) {
+        setSuccess(true);
+        handleComplete();
       }
-    } catch (err) {
-      console.error('❌ 예측 중 오류:', err);
-    } finally {
-      isPredictingNow.current = false;
-    }
+      return updated;
+    });
+
+    setLatestResult(result);
   };
 
   const jsHandleFaceStatus = Worklets.createRunOnJS(handleFaceStatus);
@@ -160,39 +148,23 @@ export default function QuestEmotion() {
 
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
+    runAtTargetFps(1, () => {
+      'worklet';
+      const last = (globalThis as any).lastProcessTime ?? 0;
+      const now = Date.now();
+      if (now - last < quest_capture_interval) return;
+      (globalThis as any).lastProcessTime = now;
 
-    if ((globalThis as any).lastProcessTime === undefined) {
-      (globalThis as any).lastProcessTime = 0;
-    }
-    if ((globalThis as any).isPredictingNow) return;
+      const faces: Face[] = detectFaces(frame);
+      jsHandleFaceStatus(faces.length > 0);
+      if (!faces || faces.length === 0) return;
 
-    const last = (globalThis as any).lastProcessTime;
-    const now = Date.now();
-    if (now - last < quest_capture_interval) return;
-    (globalThis as any).lastProcessTime = now;
+      const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
+      if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') return;
 
-    const faces: Face[] = detectFaces(frame);
-    if (!faces || faces.length === 0) {
-      jsHandleFaceStatus(false);
-      return;
-    }
-
-    jsHandleFaceStatus(true);
-
-    let pluginResult: number[] | undefined;
-    try {
-      // 좌표 유효성 검사를 원한다면 이곳에서 faces[0].bounds 확인 가능
-      pluginResult = cropFaces(frame, faces[0].bounds) as number[];
-    } catch {
-      return;
-    }
-
-    if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
-      return;
-    }
-
-    jsHandleDetectedResult(pluginResult);
-  }, [detectFaces, quest_capture_interval]);
+      jsHandleDetectedResult(pluginResult);
+    });
+  }, [detectFaces, jsHandleFaceStatus, jsHandleDetectedResult, quest_capture_interval]);
 
   useEffect(() => {
     (async () => {
@@ -218,22 +190,11 @@ export default function QuestEmotion() {
   }
 
   return (
-
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
         <View style={{ marginTop: width * 0.03 }}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Quest_stage", {
-                title: `${nickname}의 숲`,
-              })
-            }
-          >
-            <Ionicons
-              name="arrow-back-circle"
-              size={40}
-              color="#FF9B4B"
-            />
+          <TouchableOpacity onPress={() => navigation.navigate("Quest_stage", { title: `${nickname}의 숲` })}>
+            <Ionicons name="arrow-back-circle" size={40} color="#FF9B4B" />
           </TouchableOpacity>
         </View>
       </View>
@@ -244,34 +205,24 @@ export default function QuestEmotion() {
           style={styles.camera}
           device={device}
           photo
-          isActive
+          isActive={isActive}
           frameProcessor={frameProcessor}
         />
       </View>
-      <Modal
-        visible={completeModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCompleteModalVisible(false)}
-      >
+
+      <Modal visible={completeModalVisible} transparent animationType="fade" onRequestClose={() => setCompleteModalVisible(false)}>
         <View style={questStyles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={questStyles.modalTitle}>완료!</Text>
-            <Text style={questStyles.modalText}>
-              {completeModalMessage}
-            </Text>
+            <Text style={questStyles.modalText}>{completeModalMessage}</Text>
             <TouchableOpacity
               onPress={() => {
                 setCompleteModalVisible(false);
-                navigation.navigate("Quest_stage", {
-                  title: `${nickname}의 숲`,
-                });
+                navigation.navigate("Quest_stage", { title: `${nickname}의 숲` });
               }}
               style={questStyles.closeButton}
             >
-              <Text style={questStyles.closeButtonText}>
-                확인
-              </Text>
+              <Text style={questStyles.closeButtonText}>확인</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -279,12 +230,7 @@ export default function QuestEmotion() {
 
       {latestResult !== null ? (
         <View style={styles.overlay}>
-          <EmotionChartBox
-            result={latestResult}
-            success={success}
-            nickname={nickname}
-            questDescription={questDescription}
-          />
+          <EmotionChartBox result={latestResult} success={success} nickname={nickname} questDescription={questDescription} />
         </View>
       ) : (
         <View style={styles.overlay}>
