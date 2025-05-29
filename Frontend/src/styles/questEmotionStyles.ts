@@ -70,4 +70,9 @@ modalContent: {
   position: "absolute",
   top: "40%",  // 화면 위쪽에서 30% 위치
 },
+backButtonWrapper: {
+  flexDirection: "row",
+  alignItems: "center",
+  alignSelf: "flex-start",
+},
 });

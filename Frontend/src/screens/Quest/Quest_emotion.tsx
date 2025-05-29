@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Text, View, Alert, Modal, TouchableOpacity} from 'react-native';
+import { Text, View, Alert, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -10,6 +10,7 @@ import { cropFaces } from '../../plugins/cropFaces';
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
 import questStyles from "../../styles/questStyles";
+import { Ionicons } from "@expo/vector-icons";
 
 import EmotionChartBox from "../../components/Quest_emotionBox";
 import styles from "../../styles/questEmotionStyles";
@@ -20,6 +21,8 @@ import {
 } from "@react-navigation/native";
 import customAxios from "../../API/axios";
 import { getCoupon } from "../../API/potAPI";
+
+const { width } = Dimensions.get("window");
 
 type RouteParams = {
   questTitle: string;
@@ -215,7 +218,26 @@ export default function QuestEmotion() {
   }
 
   return (
+    
     <View style={styles.container}>
+      <View style={styles.backButtonWrapper}>
+                    <View style={{ marginTop: width * 0.03 }}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate("Quest_stage", {
+                                    title: `${nickname}의 숲`,
+                                })
+                            }
+                        >
+                            <Ionicons
+                                name="arrow-back-circle"
+                                size={40}
+                                color="#6c63ff"
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    </View>
+
       <View style={[styles.half, { flex: 7 }]}>
         <Camera
           ref={cameraRef}
