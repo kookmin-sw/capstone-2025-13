@@ -201,6 +201,22 @@ const DepressionResultScreen = () => {
                             </Text>
                         </TouchableOpacity>
                     )}
+                    {scaleName === "정상" && (
+                        <TouchableOpacity
+                            style={{
+                                marginTop: 20,
+                                padding: 15,
+                                borderRadius: 10,
+                                backgroundColor: "#3CB46E",
+                                alignItems: "center",
+                            }}
+                            onPress={() => navigation.navigate("Record")}
+                        >
+                            <Text style={{ color: "#ffffff", fontSize: 16, fontWeight: "bold" }}>
+                                일기 쓰러 가기
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </ScrollView>
         </View>

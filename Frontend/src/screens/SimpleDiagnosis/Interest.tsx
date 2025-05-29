@@ -24,6 +24,7 @@ const Interest = () => {
     const [showError, setShowError] = useState(false);
     const route = useRoute<RouteProp<RootStackParamList, 'Interest'>>();
     const score = route.params?.score ?? 0;
+    const nickname = route.params?.nickname ?? null;
     return (
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -63,7 +64,8 @@ const Interest = () => {
                                         setShowError(false);
                                         navigation.navigate('SimpleDiagnosis', {
                                             initialIndex: 20,
-                                            score: score
+                                            score: score,
+                                            nickname: nickname,
                                         });
                                     }}
                                 >
