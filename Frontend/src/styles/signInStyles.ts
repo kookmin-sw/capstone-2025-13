@@ -25,7 +25,7 @@ const signInStyles = StyleSheet.create({
         fontFamily: fonts.bold,
         marginBottom: 10,
         textAlign: "left",
-        color: colors.brown,
+        color: "#89673F",
     },
     inputTitle: {
         fontSize: 15
