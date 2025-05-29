@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import fonts from '../constants/fonts';
+import fonts from "../constants/fonts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 
     modalContainer: {
@@ -32,13 +32,17 @@ const styles = StyleSheet.create({
     modalText: {
         fontSize: width * 0.045,
         fontFamily: fonts.extraBold,
-        marginBottom: height * 0.02,
+        marginBottom: height * 0.01,
+        color: "#333",
         textAlign: "center",
     },
 
     modalSubText: {
         fontSize: width * 0.035,
         fontFamily: fonts.primary,
+        color: "#666",
+        letterSpacing: 0.5,
+        lineHeight: height * 0.025,
         textAlign: "center",
         marginBottom: height * 0.03,
     },
@@ -46,6 +50,7 @@ const styles = StyleSheet.create({
     modalButtons: {
         flexDirection: "row",
         justifyContent: "space-evenly",
+
         width: "100%",
     },
 
@@ -67,8 +72,9 @@ const styles = StyleSheet.create({
     modalButtonText: {
         color: "white",
         fontSize: width * 0.04,
-        fontWeight: "bold",
         textAlign: "center",
+        fontFamily: fonts.laundry,
+        letterSpacing: 0.5,
     },
 });
 
