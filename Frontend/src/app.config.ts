@@ -10,7 +10,7 @@ export default {
     orientation: "portrait",
     icon: "./assets/Images/wooong-logo.png",
     userInterfaceStyle: "light",
-    newArchEnabled: true,
+    newArchEnabled: false,
     splash: {
       image: "./assets/Images/wooong-logo.png",
       resizeMode: "contain",
