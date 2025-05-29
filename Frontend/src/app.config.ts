@@ -10,7 +10,7 @@ export default {
     orientation: "portrait",
     icon: "./assets/Images/wooong-logo.png",
     userInterfaceStyle: "light",
-    newArchEnabled: true,
+    newArchEnabled: false,
     splash: {
       image: "./assets/Images/wooong-logo.png",
       resizeMode: "contain",
@@ -21,13 +21,6 @@ export default {
       "expo-video",
       "expo-secure-store",
       "react-native-health-connect",
-      [
-        "react-native-maps",
-        {
-          iosGoogleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
-          androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
-        }
-      ],
       [
         "expo-build-properties",
         {
@@ -69,6 +62,9 @@ export default {
         NSHealthUpdateUsageDescription: "$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.",
         ITSAppUsesNonExemptEncryption: false,
         LSMinimumSystemVersion: "15.1"
+      },
+      config: {
+        googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
       }
     },
     android: {
@@ -86,7 +82,12 @@ export default {
         "android.permission.health.READ_STEPS",
         "android.permission.health.WRITE_STEPS",
         "android.permission.health.READ_ACTIVE_CALORIES_BURNED"
-      ]
+      ],
+      config: {
+        "googleMaps": {
+          "apiKey": process.env.GOOGLE_MAPS_API_KEY
+        }
+      }
     },
     web: {
       favicon: "./assets/Images/wooong-logo.png"

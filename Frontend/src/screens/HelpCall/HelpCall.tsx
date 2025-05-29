@@ -86,7 +86,7 @@ export default function HelpCall() {
 
             try {
                 const centerData = await getCenters(location.latitude, location.longitude);
-                console.log(typeof centerData)
+                console.log(`찾은 센터: ${centerData.length}곳`)
                 const parsedMarkers = centerData
                     .filter(
                         (item: any) =>
@@ -139,11 +139,10 @@ export default function HelpCall() {
             } finally {
                 hideLoading();
             }
-            // hideLoading();
         }
 
         locationFun();
-    }, []);
+    });
 
     if (!location) return null;
 
@@ -210,10 +209,8 @@ export default function HelpCall() {
                         provider={PROVIDER_GOOGLE}
                         style={helpCallStyles.map}
                         region={location}
-                        initialRegion={location}
-                        // showsUserLocation={true}
+                        initialRegion={{ latitude: 37.6100588, longitude: 126.9971919, latitudeDelta: 0.05, longitudeDelta: 0.05 }}
                         onMapReady={() => console.log("Map is ready!")}
-                        onRegionChangeComplete={(region) => console.log("Region changed:", region)}
                     >
                         <Marker coordinate={location} title="내 위치" />
                         {filteredMarkers.map((marker) => (
