@@ -52,16 +52,16 @@ function HomeContent({ navigation }: { navigation: any }) {
 
     // 알림 권한 요청 함수
     async function requestNotificationPermission() {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  if (existingStatus !== "granted") {
-    const { status: newStatus } = await Notifications.requestPermissionsAsync();
-    if (newStatus !== "granted") {
-      Alert.alert("알림 권한이 필요해요!");
-      return false;
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        if (existingStatus !== "granted") {
+            const { status: newStatus } = await Notifications.requestPermissionsAsync();
+            if (newStatus !== "granted") {
+                Alert.alert("알림 권한이 필요해요!");
+                return false;
+            }
+        }
+        return true;
     }
-  }
-  return true;
-}
 
 
     async function sendLocalNotification(title: string, body: string) {
@@ -101,8 +101,10 @@ function HomeContent({ navigation }: { navigation: any }) {
                     await sendLocalNotification("오늘의 명언", quoteData);
                 } catch (error) {
                     console.error("❌ 명언 알림 전송 실패:", error);
+                } finally {
+                    await AsyncStorage.setItem("lastHomeVisit", today);
                 }
-            } 
+            }
             hideLoading();
         };
 
@@ -232,7 +234,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                             name="quest"
                         >
                             <WalkthroughableView>
-                                 <HomeButton
+                                <HomeButton
                                     icon="target"
                                     title="퀘스트"
                                     subtitle="작은 실천 모아 나의 마음 건강 지키기"

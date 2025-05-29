@@ -7,7 +7,7 @@ import {
     useWindowDimensions,
     Alert,
     TextInput,
-    Modal
+    Modal,
 } from "react-native";
 import styles from "../../styles/questMeditationStyles";
 import questStyles from "../../styles/questStyles";
@@ -67,7 +67,7 @@ export default function Quest_meditation() {
                     "hasVisitedMeditation"
                 );
                 if (!hasVisited) {
-                    setModalVisible(true)
+                    setModalVisible(true);
                     await AsyncStorage.setItem("hasVisitedMeditation", "true");
                 }
             } catch (error) {
@@ -122,7 +122,9 @@ export default function Quest_meditation() {
 
                 if (postRes.status === 200 || postRes.status === 201) {
                     await getCoupon();
-                    setCompleteModalMessage("명상이 성공적으로 완료되었어요! 🎉");
+                    setCompleteModalMessage(
+                        "명상이 성공적으로 완료되었어요! 🎉"
+                    );
                     setCompleteModalVisible(true);
                     return;
                 } else {
@@ -288,44 +290,48 @@ export default function Quest_meditation() {
                             {formatTime(timeLeft)}
                         </Text>
                         <TouchableOpacity
-                        onPress={() => setModalVisible(true)}
-                        style={styles.timerDescription}
-                      >
-                        <Ionicons
-                          name="information-circle-outline"
-                          size={18}
-                          color="#fff"
-                        />
-                      </TouchableOpacity>
+                            onPress={() => setModalVisible(true)}
+                            style={styles.timerDescription}
+                        >
+                            <Ionicons
+                                name="information-circle-outline"
+                                size={18}
+                                color="#fff"
+                            />
+                        </TouchableOpacity>
 
-                      <Modal
-                        visible={modalVisible}
-                        transparent
-                        animationType="fade"
-                        onRequestClose={() => setModalVisible(false)}
-                      >
-                        <View style={questStyles.modalOverlay}>
-                          <View style={questStyles.modalContent}>
-                            <Text style={questStyles.modalTitle}>
-                              명상 타이머 사용법 🙌
-                            </Text>
-                            <Text style={questStyles.modalText}>
-                              ・ 시작 버튼을 누르면 타이머가 바로 시작돼요.{"\n"}
-                              ・ 앱을 강제로 종료하면 타이머가 초기화돼요.{"\n"}
-                              ・ 다른화면으로 나가면 타이머가 멈춰요.{"\n"}
-                              ・ 완료 버튼을 꼭 눌러야 미션 성공으로 인정돼요.
-                            </Text>
-                            <TouchableOpacity
-                              onPress={() => setModalVisible(false)}
-                              style={questStyles.closeButton}
-                            >
-                              <Text style={questStyles.closeButtonText}>
-                                이해했어!
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      </Modal>
+                        <Modal
+                            visible={modalVisible}
+                            transparent
+                            animationType="fade"
+                            onRequestClose={() => setModalVisible(false)}
+                        >
+                            <View style={questStyles.modalOverlay}>
+                                <View style={questStyles.modalContent}>
+                                    <Text style={questStyles.modalTitle}>
+                                        명상 타이머 사용법 🙌
+                                    </Text>
+                                    <Text style={questStyles.modalText}>
+                                        ・ 시작 버튼을 누르면 타이머가 바로
+                                        시작돼요.{"\n"}・ 앱을 강제로 종료하면
+                                        타이머가 초기화돼요.{"\n"}・
+                                        다른화면으로 나가면 타이머가 멈춰요.
+                                        {"\n"}・ 완료 버튼을 꼭 눌러야 미션
+                                        성공으로 인정돼요.
+                                    </Text>
+                                    <TouchableOpacity
+                                        onPress={() => setModalVisible(false)}
+                                        style={questStyles.closeButton}
+                                    >
+                                        <Text
+                                            style={questStyles.closeButtonText}
+                                        >
+                                            이해했어!
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </Modal>
                     </View>
                 )}
 
@@ -351,28 +357,32 @@ export default function Quest_meditation() {
             </ScrollView>
 
             <Modal
-              visible={completeModalVisible}
-              transparent
-              animationType="fade"
-              onRequestClose={() => setCompleteModalVisible(false)}
+                visible={completeModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setCompleteModalVisible(false)}
             >
-              <View style={questStyles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <Text style={questStyles.modalTitle}>완료!</Text>
-                  <Text style={questStyles.modalText}>
-                    {completeModalMessage}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCompleteModalVisible(false);
-                      navigation.navigate("Quest_stage", { title: "명상" });
-                    }}
-                    style={questStyles.closeButton}
-                  >
-                    <Text style={questStyles.closeButtonText}>확인</Text>
-                  </TouchableOpacity>
+                <View style={questStyles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={questStyles.modalTitle}>완료!</Text>
+                        <Text style={questStyles.modalText}>
+                            {completeModalMessage}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setCompleteModalVisible(false);
+                                navigation.navigate("Quest_stage", {
+                                    title: "명상",
+                                });
+                            }}
+                            style={questStyles.closeButton}
+                        >
+                            <Text style={questStyles.closeButtonText}>
+                                확인
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-              </View>
             </Modal>
 
             {isTimeSet && (

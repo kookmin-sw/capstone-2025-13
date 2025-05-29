@@ -18,6 +18,7 @@ const questionStyle = StyleSheet.create({
 
     },
     questionText: {
+        color:"#000000",
     },
 })
 

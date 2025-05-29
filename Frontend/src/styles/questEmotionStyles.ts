@@ -56,4 +56,24 @@ export default StyleSheet.create({
   fontSize: 16,
   fontWeight: '600',
 },
+modalContent: {
+  maxWidth: "90%",
+  backgroundColor: "#fff",
+  borderRadius: 20,
+  paddingVertical: 20,
+  paddingHorizontal: 24,
+  shadowColor: "#000",
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 4,
+  position: "absolute",
+  top: "40%",  // 화면 위쪽에서 30% 위치
+},
+backButtonWrapper: {
+  flexDirection: "row",
+  alignItems: "center",
+  alignSelf: "flex-start",
+  marginTop: width * 0.07,
+},
 });

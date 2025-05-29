@@ -45,6 +45,7 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       marginBottom: width * 0.02,
       textAlign: "left",
       alignSelf: "flex-start",
+      color:"#000000"
     },
     name: {
       fontFamily: fonts.semiBold,
@@ -89,6 +90,7 @@ const formalDiagnsisResultStyles = StyleSheet.create({
       fontWeight: "bold",
       fontSize: width * 0.045,
       marginBottom: width * 0.015,
+      color:"#000000"
     },
     sectionText: {
       fontFamily: fonts.primary,

@@ -5,7 +5,6 @@ import {
     Alert,
     Text,
     TouchableOpacity,
-    ScrollView,
     TouchableWithoutFeedback,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -20,17 +19,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { Ionicons } from "@expo/vector-icons";
 import { useLoading } from "../../API/contextAPI";
+import { Region } from "react-native-maps";
 
 export default function HelpCall() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const [location, setLocation] = useState<{
-        latitude: number;
-        longitude: number;
-        latitudeDelta: number;
-        longitudeDelta: number;
-    } | null>(null);
+    const [location, setLocation] = useState<Region>({ latitude: 37.6100588, longitude: 126.9971919, latitudeDelta: 0.05, longitudeDelta: 0.05 });
 
     const [selected, setSelected] = useState("all");
     const [markers, setMarkers] = useState<
@@ -43,7 +38,9 @@ export default function HelpCall() {
             details: any;
         }[]
     >([]);
+    const { showLoading, hideLoading } = useLoading();
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
+    const [mapKey, setMapKey] = useState(0); // 키를 사용하여 맵을 강제로 리렌더링
 
     const filteredMarkers =
         selected === "all"
@@ -64,11 +61,14 @@ export default function HelpCall() {
     };
 
     useEffect(() => {
-        (async () => {
-            const { showLoading, hideLoading } = useLoading();
+        const locationFun = async () => {
+            setMapKey((prevKey) => prevKey + 1); // 맵을 강제로 리렌더링하기 위해 키를 증가시
+            console.log("위치 권한 요청 시작.");
+
             showLoading();
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
+            console.log(`위치 권한 상태: ${status}`)
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
                 hideLoading();
@@ -81,11 +81,14 @@ export default function HelpCall() {
             setLocation({
                 latitude,
                 longitude,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
+                latitudeDelta: location.latitudeDelta ?? 0.05,
+                longitudeDelta: location.longitudeDelta ?? 0.05,
             });
+            console.log(`현재 위치: ${location.latitude}, ${location.longitude} / ${location.latitudeDelta}, ${location.longitudeDelta}`)
+
             try {
-                const centerData = await getCenters();
+                const centerData = await getCenters(location.latitude, location.longitude, 50);
+                console.log(`찾은 센터: ${centerData.length}곳`)
                 const parsedMarkers = centerData
                     .filter(
                         (item: any) =>
@@ -103,15 +106,15 @@ export default function HelpCall() {
                                 (isMental
                                     ? "정신건강센터"
                                     : isHealth
-                                    ? "보건소"
-                                    : "알 수 없음"),
+                                        ? "보건소"
+                                        : "알 수 없음"),
                             latitude: parseFloat(item.latitude),
                             longitude: parseFloat(item.longitude),
                             type: isMental
                                 ? "center"
                                 : isHealth
-                                ? "clinic"
-                                : "unknown",
+                                    ? "clinic"
+                                    : "unknown",
                             details: {
                                 address: item.rdnmadr,
                                 phone: item.phoneNumber,
@@ -138,7 +141,9 @@ export default function HelpCall() {
             } finally {
                 hideLoading();
             }
-        })();
+        }
+
+        locationFun();
     }, []);
 
     if (!location) return null;
@@ -174,8 +179,8 @@ export default function HelpCall() {
                         </Text>
                         <View
                             style={helpCallStyles.scrollContainer}
-                            // // horizontal
-                            // showsHorizontalScrollIndicator={false}
+                        // // horizontal
+                        // showsHorizontalScrollIndicator={false}
                         >
                             {buttons.map((btn) => (
                                 <TouchableOpacity
@@ -203,13 +208,12 @@ export default function HelpCall() {
                         </View>
                     </View>
                     <MapView
+                        key={mapKey} // 키를 사용하여 맵을 강제로 리렌더링
                         provider={PROVIDER_GOOGLE}
                         style={helpCallStyles.map}
                         region={location}
-                        showsUserLocation={true}
-                        onMapReady={(event) => {
-                            console.log("Google Map Ready!");
-                        }}
+                        initialRegion={{ latitude: 37.6100588, longitude: 126.9971919, latitudeDelta: 0.05, longitudeDelta: 0.05 }}
+                        onMapReady={() => console.log("Map is ready!")}
                     >
                         <Marker coordinate={location} title="내 위치" />
                         {filteredMarkers.map((marker) => (

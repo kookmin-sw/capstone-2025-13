@@ -35,6 +35,7 @@ const helpCallStyles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: width * 0.055,
         textAlign: "center",
+        color: "#000000"
   
     },
     scrollContainer: {
@@ -50,6 +51,7 @@ const helpCallStyles = StyleSheet.create({
         borderRadius: width * 0.1,
         marginHorizontal: width * 0.015,
         borderWidth: 1,
+        height: height * 0.055,
     },
     selectedButton: {
         backgroundColor: colors.green,
@@ -90,6 +92,7 @@ const helpCallStyles = StyleSheet.create({
     itemTitle: {
         fontSize: width * 0.04,
         fontWeight: "600",
+        color:"#000000",
     },
     itemPhone: {
         fontSize: width * 0.038,

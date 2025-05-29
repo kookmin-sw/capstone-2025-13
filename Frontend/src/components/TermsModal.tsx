@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
         marginBottom: 10,
+        color: "#000000",
     },
     scrollView: {
         marginBottom: 20,
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
     modalContent: {
         fontSize: 14,
         lineHeight: 20,
+        color: "#000000",
     },
     closeButton: {
         alignSelf: "flex-end",
