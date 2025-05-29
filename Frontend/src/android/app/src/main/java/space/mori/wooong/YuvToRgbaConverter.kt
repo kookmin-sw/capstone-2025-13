@@ -15,29 +15,31 @@ object YuvToRgbaConverter {
         val uvRowStride = image.planes[1].rowStride
         val uvPixelStride = image.planes[1].pixelStride
 
+        val yArray = ByteArray(yBuffer.remaining()).also { yBuffer.get(it) }
+        val uArray = ByteArray(uBuffer.remaining()).also { uBuffer.get(it) }
+        val vArray = ByteArray(vBuffer.remaining()).also { vBuffer.get(it) }
+
         val rgba = ByteArray(width * height * 4)
+        var index = 0
 
         for (j in 0 until height) {
             for (i in 0 until width) {
-                val yIndex = j * yRowStride + i
+                val y = (yArray[j * yRowStride + i].toInt() and 0xFF)
                 val uvIndex = (j shr 1) * uvRowStride + (i shr 1) * uvPixelStride
-
-                val y = (yBuffer.get(yIndex).toInt() and 0xFF)
-                val u = (uBuffer.get(uvIndex).toInt() and 0xFF) - 128
-                val v = (vBuffer.get(uvIndex).toInt() and 0xFF) - 128
+                val u = (uArray[uvIndex].toInt() and 0xFF) - 128
+                val v = (vArray[uvIndex].toInt() and 0xFF) - 128
 
                 val r = (y + 1.370705f * v).toInt().coerceIn(0, 255)
                 val g = (y - 0.337633f * u - 0.698001f * v).toInt().coerceIn(0, 255)
                 val b = (y + 1.732446f * u).toInt().coerceIn(0, 255)
 
-                val index = (j * width + i) * 4
-                rgba[index] = r.toByte()
-                rgba[index + 1] = g.toByte()
-                rgba[index + 2] = b.toByte()
-                rgba[index + 3] = 0xFF.toByte()
+                rgba[index++] = r.toByte()
+                rgba[index++] = g.toByte()
+                rgba[index++] = b.toByte()
+                rgba[index++] = 0xFF.toByte()
             }
         }
-
-        return rgba
+        
+    return rgba
     }
 }
