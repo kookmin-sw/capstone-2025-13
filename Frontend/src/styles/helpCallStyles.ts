@@ -35,7 +35,7 @@ const helpCallStyles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: width * 0.055,
         textAlign: "center",
-        color: "#222222"
+        color: "#000000"
   
     },
     scrollContainer: {
@@ -91,6 +91,7 @@ const helpCallStyles = StyleSheet.create({
     itemTitle: {
         fontSize: width * 0.04,
         fontWeight: "600",
+        color:"#000000",
     },
     itemPhone: {
         fontSize: width * 0.038,
