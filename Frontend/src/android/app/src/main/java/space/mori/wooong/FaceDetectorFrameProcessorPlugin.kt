@@ -25,6 +25,26 @@ class FaceDetectorFrameProcessorPlugin(
         ): FloatArray
     }
 
+    private object RgbaBufferPool {
+        private var buffer: ByteBuffer? = null
+        private var capacity: Int = 0
+
+        @Synchronized
+        fun get(size: Int): ByteBuffer {
+            if (buffer == null || capacity < size) {
+                buffer = ByteBuffer.allocateDirect(size)
+                capacity = size
+            }
+            buffer!!.clear()
+            return buffer!!
+        }
+
+        @Synchronized
+        fun recycle(buf: ByteBuffer) {
+            // 현재는 단일 버퍼만 유지, 필요 시 구현 확장 가능
+        }
+    }
+
     override fun callback(frame: Frame, arguments: Map<String, Any>?): Any? {
         // Get raw image from frame
         val image: Image = frame.getImage()
@@ -36,29 +56,25 @@ class FaceDetectorFrameProcessorPlugin(
         val y = (arguments?.get("y") as Double).toInt()
         val w = (arguments?.get("w") as Double).toInt()
         val h = (arguments?.get("h") as Double).toInt()
-
-        // Extract rotation degrees passed from JS
         val rotation = (arguments?.get("rotation") as? Double)?.toInt() ?: 0
 
-        // Convert YUV to RGBA byte array
-        val rgba = YuvToRgbaConverter.convert(image)
+        return try {
+            val rgba = YuvToRgbaConverter.convert(image)
+            val rgbaBuffer = RgbaBufferPool.get(rgba.size).apply {
+                put(rgba)
+                rewind()
+            }
 
-        // Prepare direct ByteBuffer for native
-        val rgbaBuffer = ByteBuffer.allocateDirect(rgba.size).apply {
-            put(rgba)
-            rewind()
+            // ✅ FloatArray 그대로 반환 (JS로 그대로 전달)
+            cropResizeNormalizeDirect(
+                rgbaBuffer,
+                width, height,
+                x, y, w, h,
+                rotation
+            ).map { it.toDouble() }
+            
+        } finally {
+            image.close() // ✅ 메모리 누수 방지
         }
-
-        // Call native preprocessor with rotation parameter
-        val floatArray = cropResizeNormalizeDirect(
-            rgbaBuffer,
-            width,
-            height,
-            x, y, w, h,
-            rotation
-        )
-
-        // Convert native FloatArray to JS-friendly Double list
-        return floatArray.map { it.toDouble() }
     }
 }
