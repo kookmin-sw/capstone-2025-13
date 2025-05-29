@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert } from 'react-native';
-import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useFrameProcessor, Frame, runAtTargetFps } from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
@@ -38,10 +38,41 @@ export default function QuestEmotion() {
     const [noFaceWarning, setNoFaceWarning] = useState(false);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
+    const [isActive, setIsActive] = useState(true);
 
     const device = useCameraDevice('front');
     const { isLoaded, model } = useLoadEmotionModel();
     const cameraRef = useRef<any>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+      timerRef.current = setTimeout(() => {
+        if (!success) {
+          setIsActive(false);
+          Alert.alert(
+            "실패",
+            "30초 안에 퀘스트를 완료하지 못했어요. 😢",
+            [
+              {
+                text: "확인",
+                onPress: () => navigation.goBack(), 
+              },
+            ]
+          );
+        }
+      }, 20 * 1000);
+
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, []);
+
+    useEffect(() => {
+    if (success && timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, [success]);
 
     const faceDetectorOptions: FaceDetectionOptions = {
       performanceMode: 'accurate',
@@ -148,28 +179,32 @@ export default function QuestEmotion() {
 
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
-    console.log('프레임프로세싱들어옴');
-    if ((globalThis as any).isPredictingNow) return;
+    runAtTargetFps(1, () => {
+      'worklet';
+      console.log('프레임프로세싱들어옴');
+      if ((globalThis as any).isPredictingNow) return;
 
-    const last = (globalThis as any).lastProcessTime ?? 0;
-    const now = Date.now();
-    if (now - last < quest_capture_interval) return;
-    (globalThis as any).lastProcessTime = now;
+      const last = (globalThis as any).lastProcessTime ?? 0;
+      const now = Date.now();
+      if (now - last < quest_capture_interval) return;
+      (globalThis as any).lastProcessTime = now;
 
-    const faces: Face[] = detectFaces(frame);
-    jsHandleFaceStatus(faces.length > 0);
+      const faces: Face[] = detectFaces(frame);
+      jsHandleFaceStatus(faces.length > 0);
 
-    if (!faces || faces.length === 0) return;
+      if (!faces || faces.length === 0) return;
 
-    const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
-    if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
-      console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
-      return;
+      const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
+      if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
+        console.warn('⚠️ Unexpected pluginResult type:', pluginResult);
+        return;
+      }
+
+      const rawArray = Array.from(pluginResult);
+      jsHandleDetectedResult(rawArray);
     }
-
-    const rawArray = Array.from(pluginResult);
-    jsHandleDetectedResult(rawArray);
-  }, [detectFaces, handleDetectedResult, quest_capture_interval]);
+  );
+  }, [detectFaces, jsHandleFaceStatus, jsHandleDetectedResult, quest_capture_interval]);
 
   useEffect(() => {
     (async () => {
@@ -202,7 +237,7 @@ export default function QuestEmotion() {
           style={styles.camera}
           device={device}
           photo
-          isActive
+          isActive={isActive}
           frameProcessor={frameProcessor}
         />
       </View>
