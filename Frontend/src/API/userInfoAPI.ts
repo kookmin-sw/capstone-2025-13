@@ -25,6 +25,7 @@ import axios from "./axios";
 import { AxiosResponse } from "axios";
 import ApiResponseDTO from "./common";
 import Toast from "react-native-toast-message";
+import { useCoupon } from "./potAPI";
 
 export enum GenderEnum {
     MALE = "MALE",
@@ -158,5 +159,28 @@ export const putProfileImg = async (profileImage: {
     } catch (error) {
         console.error("Error during profile image update:", error);
         throw error;
+    }
+};
+
+// 로그아웃 핸들러
+export const handleLogout = async () => {
+    try {
+        const localCoupon = await AsyncStorage.getItem("localCoupon");
+        const couponCount = localCoupon ? Number(localCoupon) : 0;
+
+        if (couponCount > 0) {
+            await useCoupon(couponCount); // ✅ 서버에 반영
+            await AsyncStorage.setItem("localCoupon", "0"); // ✅ 초기화
+        }
+
+        await AsyncStorage.removeItem("accessToken");
+        Toast.show({
+            type: "success",
+            text1: "로그아웃 완료",
+            text2: "정상적으로 로그아웃되었습니다.",
+            position: "bottom",
+        });
+    } catch (error) {
+        console.error("로그아웃 중 오류 발생:", error);
     }
 };

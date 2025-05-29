@@ -168,6 +168,9 @@ export default function HelpCall2() {
     const [selected, setSelected] = useState("all");
 
     const { showLoading, hideLoading } = useLoading();
+    useEffect(() => {
+        // Add your actual API call here
+    }, []);
 
     const buttons = [
         { id: "all", title: "전체보기" },

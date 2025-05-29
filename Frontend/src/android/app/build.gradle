@@ -95,6 +95,11 @@ android {
         versionCode 90
         versionName "1.0.0"
     }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
