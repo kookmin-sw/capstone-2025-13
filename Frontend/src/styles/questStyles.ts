@@ -79,21 +79,6 @@ const questStyles = StyleSheet.create({
         left: "6%",
     },
 
-    modalArrow: {
-        position: "absolute",
-        top: -16,
-        left: "44%",
-        width: 0,
-        height: 0,
-        borderLeftWidth: 8,
-        borderRightWidth: 8,
-        borderBottomWidth: 16,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: "#fff",
-        transform: [{ translateX: 12 }],
-    },
-
     modalTitle: {
         fontSize: 16,
         letterSpacing: 0.8,

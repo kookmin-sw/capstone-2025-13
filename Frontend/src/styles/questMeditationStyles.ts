@@ -129,20 +129,6 @@ const questMeditationStyles = StyleSheet.create({
         position: "absolute",
         top: "30%", // 화면 위쪽에서 30% 위치
     },
-    modalArrow: {
-        position: "absolute",
-        top: "22%",
-        right: "15%",
-        width: 0,
-        height: 0,
-        borderLeftWidth: 8,
-        borderRightWidth: 8,
-        borderBottomWidth: 16,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: "#fff",
-        transform: [{ translateX: 12 }],
-    },
 });
 
 export default questMeditationStyles;

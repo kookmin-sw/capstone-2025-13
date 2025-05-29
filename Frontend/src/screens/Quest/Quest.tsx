@@ -149,11 +149,6 @@ export default function Quest() {
                                                             questStyles.modalContent
                                                         }
                                                     >
-                                                        <View
-                                                            style={
-                                                                questStyles.modalArrow
-                                                            }
-                                                        />
                                                         <Text
                                                             style={
                                                                 questStyles.modalTitle

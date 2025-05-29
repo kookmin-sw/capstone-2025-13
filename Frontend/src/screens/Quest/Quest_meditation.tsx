@@ -307,7 +307,6 @@ export default function Quest_meditation() {
                             onRequestClose={() => setModalVisible(false)}
                         >
                             <View style={questStyles.modalOverlay}>
-                                <View style={styles.modalArrow} />
                                 <View style={questStyles.modalContent}>
                                     <Text style={questStyles.modalTitle}>
                                         명상 타이머 사용법 🙌
