@@ -40,7 +40,6 @@ const wp = (percentage: number) => (width * percentage) / 100;
 const hp = (percentage: number) => (height * percentage) / 100;
 
 function HomeContent({ navigation }: { navigation: any }) {
-    // 컴포넌트 밖
     const getQuote = async () => {
         try {
             const response = await customAxios.get("/quests/quote");
@@ -53,11 +52,17 @@ function HomeContent({ navigation }: { navigation: any }) {
 
     // 알림 권한 요청 함수
     async function requestNotificationPermission() {
-        const settings = await Notifications.getPermissionsAsync();
-        if (!settings.granted) {
-            await Notifications.requestPermissionsAsync();
-        }
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  if (existingStatus !== "granted") {
+    const { status: newStatus } = await Notifications.requestPermissionsAsync();
+    if (newStatus !== "granted") {
+      Alert.alert("알림 권한이 필요해요!");
+      return false;
     }
+  }
+  return true;
+}
+
 
     async function sendLocalNotification(title: string, body: string) {
         await Notifications.scheduleNotificationAsync({
@@ -88,24 +93,16 @@ function HomeContent({ navigation }: { navigation: any }) {
 
             console.log("📆 Today:", today);
             console.log("📆 LastVisit:", lastVisit);
+            const quoteData = await getQuote();
 
-            if (lastVisit !== today) {
-                await AsyncStorage.setItem("lastHomeVisit", today);
+            //if (lastVisit !== today) {
 
-                console.log("🔔 Sending Notification!");
-                await sendLocalNotification(
-                    "반가워요!",
-                    "오늘도 좋은 하루 되세요! 😊"
-                );
-            } else {
                 try {
-                    const quoteData = await getQuote();
                     await sendLocalNotification("오늘의 명언", quoteData);
-                    console.log("✅ 오늘 이미 방문했어요. 명언 알림 전송 완료");
                 } catch (error) {
                     console.error("❌ 명언 알림 전송 실패:", error);
                 }
-            }
+            //} 
             hideLoading();
         };
 
@@ -235,7 +232,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                             name="quest"
                         >
                             <WalkthroughableView>
-                                <HomeButton
+                                 <HomeButton
                                     icon="target"
                                     title="퀘스트"
                                     subtitle="작은 실천 모아 나의 마음 건강 지키기"

@@ -160,7 +160,7 @@ export default function Quest_stage() {
                             );
                         };
 
-                        if (isNextDay(lastUpdatedAt, now)) {
+                        //if (isNextDay(lastUpdatedAt, now)) {
                             if (lastData.step === 7) {
                                 await customAxios.post(`/quests/stage/${type}`);
                                 const firstStep = 1;
@@ -208,14 +208,14 @@ export default function Quest_stage() {
                                 );
                                 return;
                             }
-                        } else {
+                        //} else {
                             await setQuestData(
                                 lastData,
                                 type,
                                 "끝! 내일 다시 만나!"
                             );
                             return;
-                        }
+                        //}
                     }
 
                     await setQuestData(lastData, type);

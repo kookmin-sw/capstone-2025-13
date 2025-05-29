@@ -35,6 +35,17 @@ import Splash from "./screens/Splash";
 import { requestChallenge, verifyDeviceIntegrity } from "./API/IntegrityAPI";
 import { refreshAccessToken } from "./API/common";
 import { StatusBar } from "expo-status-bar";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: false,
+      shouldSetBadge: true,
+    }),
+  });  
+  
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -78,7 +89,7 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 const GlobalSpinner = () => {
     const { isLoading } = useLoading();
     if (!isLoading) return null;
@@ -101,6 +112,16 @@ const GlobalSpinner = () => {
 };
 
 export default function App() {
+
+    useEffect(() => {
+        if (Platform.OS === "android") {
+          Notifications.setNotificationChannelAsync("default", {
+            name: "default",
+            importance: Notifications.AndroidImportance.MAX,
+          });
+        }
+      }, []);
+
     const [loading, setLoading] = useState(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // ← true면 Home, false면 SignIn
