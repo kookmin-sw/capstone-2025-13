@@ -169,7 +169,19 @@ export default function HelpCall2() {
 
     const { showLoading, hideLoading } = useLoading();
     useEffect(() => {
-        // Add your actual API call here
+        const fetchData = async () => {
+            try {
+                showLoading();
+                // Simulate API call delay
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                hideLoading();
+            }
+        };
+
+        fetchData();
     }, []);
 
     const buttons = [

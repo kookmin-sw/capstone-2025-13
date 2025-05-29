@@ -46,7 +46,6 @@ Notifications.setNotificationHandler({
     }),
 });
 
-
 export type RootStackParamList = {
     Home: { simpleScale?: string };
     SignIn: { score?: number; last?: boolean };
@@ -60,13 +59,13 @@ export type RootStackParamList = {
         birthDate?: string;
         gender?: string;
     };
-    Interest: { score?: number, nickname: string };
+    Interest: { score?: number; nickname: string };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
-    Game: { score?: number, nickname: string };
+    Game: { score?: number; nickname: string };
     FormalDiagnosis: undefined;
     FormalDiagnosisSurvey: { diagnosisId: number };
-    GameScreen: { score?: number, nickname: string };
+    GameScreen: { score?: number; nickname: string };
     DailyTopic: { date?: string };
     Spinner: undefined;
     HelpCall: undefined;
@@ -112,7 +111,6 @@ const GlobalSpinner = () => {
 };
 
 export default function App() {
-
     useEffect(() => {
         if (Platform.OS === "android") {
             Notifications.setNotificationChannelAsync("default", {
@@ -149,13 +147,15 @@ export default function App() {
                     setIsIntegrityVerified(true);
                 } else {
                     console.error(
-                        `Integrity verification failed: ${result.message} / ${result.details
-                            ? JSON.stringify(result.details)
-                            : "No details provided"
+                        `Integrity verification failed: ${result.message} / ${
+                            result.details
+                                ? JSON.stringify(result.details)
+                                : "No details provided"
                         }`
                     );
                     setIntegrityError(
-                        `${result.message} / ${result.details ?? "No details provided"
+                        `${result.message} / ${
+                            result.details ?? "No details provided"
                         }`
                     );
                     setIsIntegrityVerified(false);
@@ -353,16 +353,20 @@ export default function App() {
                     />
                 </Stack.Navigator>
                 <Toast />
+                <GlobalSpinner />
             </NavigationContainer>
         );
     };
 
     return (
         <LoadingProvider>
-            <>
-                <GlobalSpinner />
-                {loading ? <Splash /> : <AppContent />}
-            </>
+            {loading ? (
+                <Splash />
+            ) : (
+                <>
+                    <AppContent />
+                </>
+            )}
         </LoadingProvider>
     );
 }
