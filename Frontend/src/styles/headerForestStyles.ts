@@ -26,7 +26,6 @@ export default StyleSheet.create({
     },
     title: {
         fontSize: 40,
-        fontWeight: "bold",
         color: "#fff",
         fontFamily: fonts.laundry,
         marginLeft: 18,
