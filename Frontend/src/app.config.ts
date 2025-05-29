@@ -10,7 +10,7 @@ export default {
     orientation: "portrait",
     icon: "./assets/Images/wooong-logo.png",
     userInterfaceStyle: "light",
-    newArchEnabled: false,
+    newArchEnabled: true,
     splash: {
       image: "./assets/Images/wooong-logo.png",
       resizeMode: "contain",
@@ -45,6 +45,12 @@ export default {
         "react-native-vision-camera",
         {
           cameraPermissionText: "$(PRODUCT_NAME) needs access to your Camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],
