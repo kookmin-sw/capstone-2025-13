@@ -93,24 +93,16 @@ function HomeContent({ navigation }: { navigation: any }) {
 
             console.log("📆 Today:", today);
             console.log("📆 LastVisit:", lastVisit);
+            const quoteData = await getQuote();
 
-            if (lastVisit !== today) {
-                await AsyncStorage.setItem("lastHomeVisit", today);
+            //if (lastVisit !== today) {
 
-                console.log("🔔 Sending Notification!");
-                await sendLocalNotification(
-                    "반가워요!",
-                    "오늘도 좋은 하루 되세요! 😊"
-                );
-            } else {
                 try {
-                    const quoteData = await getQuote();
                     await sendLocalNotification("오늘의 명언", quoteData);
-                    console.log("✅ 오늘 이미 방문했어요. 명언 알림 전송 완료");
                 } catch (error) {
                     console.error("❌ 명언 알림 전송 실패:", error);
                 }
-            }
+            //} 
             hideLoading();
         };
 
