@@ -72,6 +72,7 @@ const dailyTopicstyles = StyleSheet.create({
         backgroundColor: colors.white,
         fontFamily: fonts.primary,
         flex: 1,
+        color: "#000",
     },
     sendButton: {
         backgroundColor: "#258D55",
