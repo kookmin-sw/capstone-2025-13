@@ -60,7 +60,7 @@ export type RootStackParamList = {
         birthDate?: string;
         gender?: string;
     };
-    Interest: { score?: number };
+    Interest: { score?: number, nickname: string };
     SignUpStep2: { nickname: string };
     SignUpStep3: { nickname: string; birthDate: string; gender: string };
     Game: { score?: number, nickname: string };
@@ -149,15 +149,13 @@ export default function App() {
                     setIsIntegrityVerified(true);
                 } else {
                     console.error(
-                        `Integrity verification failed: ${result.message} / ${
-                            result.details
-                                ? JSON.stringify(result.details)
-                                : "No details provided"
+                        `Integrity verification failed: ${result.message} / ${result.details
+                            ? JSON.stringify(result.details)
+                            : "No details provided"
                         }`
                     );
                     setIntegrityError(
-                        `${result.message} / ${
-                            result.details ?? "No details provided"
+                        `${result.message} / ${result.details ?? "No details provided"
                         }`
                     );
                     setIsIntegrityVerified(false);
