@@ -86,6 +86,7 @@ export default function HelpCall() {
 
             try {
                 const centerData = await getCenters(location.latitude, location.longitude);
+                console.log(typeof centerData)
                 const parsedMarkers = centerData
                     .filter(
                         (item: any) =>
@@ -136,7 +137,7 @@ export default function HelpCall() {
             } catch (error) {
                 console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
             } finally {
-                // hideLoading();
+                hideLoading();
             }
             // hideLoading();
         }
