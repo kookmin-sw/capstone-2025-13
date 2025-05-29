@@ -8,6 +8,7 @@ import {
     Alert,
     Dimensions,
     Modal,
+    Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ProgressChart } from "react-native-chart-kit";
@@ -15,7 +16,7 @@ import Youtube_playlist from "../../components/Youtube_playlist";
 import { Pedometer } from "expo-sensors";
 import { dynamic } from "../../styles/questExerciseDynamicStyles";
 import { styles } from "../../styles/questExerciseStyles";
-import questStyles  from "../../styles/questStyles";
+import questStyles from "../../styles/questStyles";
 import { Ionicons } from "@expo/vector-icons";
 import {
     useNavigation,
@@ -25,6 +26,15 @@ import {
 import customAxios from "../../API/axios";
 import { getCoupon } from "../../API/potAPI";
 import { useLoading } from "../../API/contextAPI";
+
+// Health Connect 관련 import
+import {
+    initialize,
+    requestPermission,
+    readRecords,
+    getSdkStatus,
+    SdkAvailabilityStatus,
+} from "react-native-health-connect";
 
 const { width } = Dimensions.get("window");
 
@@ -63,8 +73,10 @@ type RouteParams = {
     questTarget: number;
 };
 
+const delay = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function QuestExercise() {
-    const [steps, setSteps] = useState(0);
+    const [steps, setSteps] = useState<number>(0);
     const [image, setImage] = useState<string | null>(null);
     const [isCompleted, setIsCompleted] = useState(false);
     const navigation = useNavigation<NavigationProp<any>>();
@@ -77,29 +89,121 @@ export default function QuestExercise() {
         route.params as RouteParams;
     const descriptionLines = questDescription.split("\n");
 
+    useEffect(() => {
+        if (Platform.OS === "ios") {
+            let subscription: any;
+            const subscribe = async () => {
+                const isAvailable = await Pedometer.isAvailableAsync();
+                if (!isAvailable) {
+                    Alert.alert("이 기기에서 만보계 센서를 사용할 수 없습니다.");
+                    return;
+                }
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const result = await Pedometer.getStepCountAsync(startOfDay, now);
+                setSteps(result.steps);
+
+                // 실시간 업데이트(앱 켜져있는 동안)
+                subscription = Pedometer.watchStepCount((result) => {
+                    setSteps((prev) => prev + result.steps);
+                });
+            };
+            subscribe();
+            return () => subscription && subscription.remove();
+        } else if (Platform.OS === "android") {
+            // Android: Health Connect
+            const getPermissionAndFetchSteps = async () => {
+                try {
+                    const status = await getSdkStatus();
+                    if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE) {
+                        Alert.alert("Health Connect가 설치되어 있지 않습니다. Google Play 스토어에서 다운로드해주세요.");
+                        return;
+                    }
+                    if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
+                        Alert.alert("Health Connect 제공자의 업데이트가 필요합니다.");
+                        return;
+                    }
+                    await initialize();
+                    await delay(1000);
+                    const granted = await requestPermission([
+                        { accessType: "read", recordType: "Steps" },
+                    ]);
+                    if (granted) {
+                        fetchSteps();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Alert.alert("걸음 수 권한 요청 중 오류가 발생했습니다.");
+                }
+            };
+
+            getPermissionAndFetchSteps();
+            const interval = setInterval(fetchSteps, 3000);
+            return () => clearInterval(interval);
+        }
+    }, []);
+
+
+    // 걸음 수 가져오는 함수 (Health Connect)
+    const fetchSteps = async () => {
+        if (Platform.OS === "ios") {
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const result = await Pedometer.getStepCountAsync(startOfDay, now);
+            setSteps(result.steps);
+            if (result.steps >= questTarget) setIsGoalReached(true);
+        } else if (Platform.OS === "android") {
+            try {
+                const now = new Date();
+                const currentTime = now.toISOString();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+                const stepsData = await readRecords("Steps", {
+                    timeRangeFilter: {
+                        operator: "between",
+                        startTime: startOfDay,
+                        endTime: currentTime,
+                    },
+                });
+
+                const filteredRecords = stepsData.records?.filter(
+                    (entry) => entry.metadata?.dataOrigin === "com.google.android.apps.fitness"
+                );
+                const totalSteps = (filteredRecords ?? []).reduce((sum, entry) => sum + entry.count, 0);
+                console.log("Total Steps:", totalSteps);
+                setSteps(totalSteps);
+                if (totalSteps >= questTarget) setIsGoalReached(true);
+            } catch (error) {
+                console.error(error);
+                Alert.alert("걸음 수를 가져오는 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
+
+    // 사진 권한 요청
     const requestPermissions = async () => {
-        const { status } =
-            await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== "granted") {
             Alert.alert("권한 필요", "사진 접근 권한이 필요합니다.");
         }
     };
 
+    // 사진 선택
     const pickImage = async () => {
         if (isCompleted) return;
-
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ["images"],
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
-
         if (!result.canceled) {
             setImage(result.assets[0].uri);
         }
     };
 
+    // 미션 완료 처리
     const handleComplete = async () => {
         showLoading();
         try {
@@ -135,7 +239,6 @@ export default function QuestExercise() {
                             },
                         }
                     );
-
                     await getCoupon();
                 }
 
@@ -158,52 +261,7 @@ export default function QuestExercise() {
     };
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
-        const init = async () => {
-            const type = "ACTIVITY";
-            try {
-                const response = await customAxios.get(`/quests/last/${type}`);
-                const lastData = response.data.data;
-                const lastDataStatus = lastData.status;
-
-                if (lastDataStatus === "COMPLETED") {
-                    setIsCompleted(true);
-                    setIsGoalReached(true);
-                    if (lastData.photo) setImage(lastData.photo);
-                }
-            } catch (error) {
-                console.error("퀘스트 상태 확인 중 오류:", error);
-            }
-
-            const isAvailable = await Pedometer.isAvailableAsync();
-            if (!isAvailable) {
-                Alert.alert(
-                    "걸음 수 추적 불가",
-                    "이 기기는 걸음 수 추적을 지원하지 않습니다."
-                );
-                return;
-            }
-
-            const updateSteps = async () => {
-                const end = new Date();
-                const start = new Date();
-                start.setHours(0, 0, 0, 0);
-                const result = await Pedometer.getStepCountAsync(start, end);
-                setSteps(result.steps);
-                if (result.steps >= questTarget) {
-                    setIsGoalReached(true);
-                    clearInterval(interval);
-                }
-            };
-
-            await updateSteps();
-            interval = setInterval(updateSteps, 3000);
-
-            return () => clearInterval(interval);
-        };
-
         requestPermissions();
-        init();
     }, []);
 
     return (
@@ -328,30 +386,29 @@ export default function QuestExercise() {
             </ScrollView>
 
             <Modal
-              visible={completeModalVisible}
-              transparent
-              animationType="fade"
-              onRequestClose={() => setCompleteModalVisible(false)}
+                visible={completeModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setCompleteModalVisible(false)}
             >
-              <View style={questStyles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <Text style={questStyles.modalTitle}>완료!</Text>
-                  <Text style={questStyles.modalText}>
-                    {completeModalMessage}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCompleteModalVisible(false);
-                      navigation.navigate("Quest_stage", { title: "산책" });
-                    }}
-                    style={questStyles.closeButton}
-                  >
-                    <Text style={questStyles.closeButtonText}>확인</Text>
-                  </TouchableOpacity>
+                <View style={questStyles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={questStyles.modalTitle}>완료!</Text>
+                        <Text style={questStyles.modalText}>
+                            {completeModalMessage}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setCompleteModalVisible(false);
+                                navigation.navigate("Quest_stage", { title: "산책" });
+                            }}
+                            style={questStyles.closeButton}
+                        >
+                            <Text style={questStyles.closeButtonText}>확인</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-              </View>
             </Modal>
-
 
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity
