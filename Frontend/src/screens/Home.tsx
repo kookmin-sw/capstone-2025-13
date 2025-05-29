@@ -40,7 +40,6 @@ const wp = (percentage: number) => (width * percentage) / 100;
 const hp = (percentage: number) => (height * percentage) / 100;
 
 function HomeContent({ navigation }: { navigation: any }) {
-    // 컴포넌트 밖
     const getQuote = async () => {
         try {
             const response = await customAxios.get("/quests/quote");
@@ -53,11 +52,17 @@ function HomeContent({ navigation }: { navigation: any }) {
 
     // 알림 권한 요청 함수
     async function requestNotificationPermission() {
-        const settings = await Notifications.getPermissionsAsync();
-        if (!settings.granted) {
-            await Notifications.requestPermissionsAsync();
-        }
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  if (existingStatus !== "granted") {
+    const { status: newStatus } = await Notifications.requestPermissionsAsync();
+    if (newStatus !== "granted") {
+      Alert.alert("알림 권한이 필요해요!");
+      return false;
     }
+  }
+  return true;
+}
+
 
     async function sendLocalNotification(title: string, body: string) {
         await Notifications.scheduleNotificationAsync({
@@ -235,7 +240,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                             name="quest"
                         >
                             <WalkthroughableView>
-                                <HomeButton
+                                 <HomeButton
                                     icon="target"
                                     title="퀘스트"
                                     subtitle="작은 실천 모아 나의 마음 건강 지키기"
