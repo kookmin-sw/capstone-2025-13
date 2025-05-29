@@ -7,7 +7,7 @@ import {
     Image,
     Alert,
     Dimensions,
-    StyleSheet,
+    Modal,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ProgressChart } from "react-native-chart-kit";
@@ -15,6 +15,7 @@ import Youtube_playlist from "../../components/Youtube_playlist";
 import { Pedometer } from "expo-sensors";
 import { dynamic } from "../../styles/questExerciseDynamicStyles";
 import { styles } from "../../styles/questExerciseStyles";
+import questStyles  from "../../styles/questStyles";
 import { Ionicons } from "@expo/vector-icons";
 import {
     useNavigation,
@@ -70,6 +71,8 @@ export default function QuestExercise() {
     const route = useRoute();
     const [isGoalReached, setIsGoalReached] = useState(false);
     const { showLoading, hideLoading } = useLoading();
+    const [completeModalVisible, setCompleteModalVisible] = useState(false);
+    const [completeModalMessage, setCompleteModalMessage] = useState("");
     const { questTitle, questDescription, questTarget } =
         route.params as RouteParams;
     const descriptionLines = questDescription.split("\n");
@@ -137,28 +140,14 @@ export default function QuestExercise() {
                 }
 
                 if (postRes.status === 200 || postRes.status === 201) {
-                    Alert.alert("완료!", "산책이 성공적으로 완료되었어요! 🎉", [
-                        {
-                            text: "확인",
-                            onPress: () =>
-                                navigation.navigate("Quest_stage", {
-                                    title: "산책",
-                                }),
-                        },
-                    ]);
+                    setCompleteModalMessage("산책이 성공적으로 완료되었어요! 🎉");
+                    setCompleteModalVisible(true);
                 } else {
                     Alert.alert("오류", "산책 완료 처리 중 문제가 발생했어요.");
                 }
             } else {
-                Alert.alert("알림", "이미 완료된 미션이에요!", [
-                    {
-                        text: "확인",
-                        onPress: () =>
-                            navigation.navigate("Quest_stage", {
-                                title: "산책",
-                            }),
-                    },
-                ]);
+                setCompleteModalMessage("이미 완료된 미션이에요!");
+                setCompleteModalVisible(true);
             }
         } catch (error) {
             console.error("산책 완료 처리 중 오류 발생:", error);
@@ -337,6 +326,32 @@ export default function QuestExercise() {
                     mainVideo={mainVideo}
                 />
             </ScrollView>
+
+            <Modal
+              visible={completeModalVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setCompleteModalVisible(false)}
+            >
+              <View style={questStyles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={questStyles.modalTitle}>완료!</Text>
+                  <Text style={questStyles.modalText}>
+                    {completeModalMessage}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCompleteModalVisible(false);
+                      navigation.navigate("Quest_stage", { title: "산책" });
+                    }}
+                    style={questStyles.closeButton}
+                  >
+                    <Text style={questStyles.closeButtonText}>확인</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
 
             <View style={styles.buttonWrapper}>
                 <TouchableOpacity

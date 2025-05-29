@@ -440,6 +440,7 @@ export default function UserInfo() {
                     maxLength={4}
                 />
                 <View style={userInfoStyles.buttonRow}>
+                {editMode && (
                     <TouchableOpacity
                         style={userInfoStyles.cancelButton}
                         onPress={() => {
@@ -450,6 +451,7 @@ export default function UserInfo() {
                     >
                         <Text style={userInfoStyles.buttonText}>취소</Text>
                     </TouchableOpacity>
+                )}
                     <TouchableOpacity
                         style={userInfoStyles.editButton}
                         onPress={() => {

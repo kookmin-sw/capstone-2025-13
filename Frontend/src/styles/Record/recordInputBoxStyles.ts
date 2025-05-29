@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.7,
         color: "#000",
         fontFamily: fonts.medium,
-        width: "100%",
+        width: "80%",
     },
     button: {
         backgroundColor: "#F6914D",
