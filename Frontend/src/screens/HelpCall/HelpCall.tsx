@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { Ionicons } from "@expo/vector-icons";
+import { useLoading } from "../../API/contextAPI";
 
 export default function HelpCall() {
     const navigation =
@@ -64,10 +65,13 @@ export default function HelpCall() {
 
     useEffect(() => {
         (async () => {
+            const { showLoading, hideLoading } = useLoading();
+            showLoading();
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
+                hideLoading();
                 return;
             }
 
@@ -83,22 +87,31 @@ export default function HelpCall() {
             try {
                 const centerData = await getCenters();
                 const parsedMarkers = centerData
-                    .filter((item: any) => item.hpCnterSe === "정신보건" || item.hpCnterSe === "건강증진")
+                    .filter(
+                        (item: any) =>
+                            item.hpCnterSe === "정신보건" ||
+                            item.hpCnterSe === "건강증진"
+                    )
                     .map((item: any, index: number) => {
                         const isMental = item.hpCnterSe === "정신보건";
                         const isHealth = item.hpCnterSe === "건강증진";
 
                         return {
                             id: `${index}`,
-                            title: item.hpCnterNm
-                                ?? (isMental ? "정신건강센터"
-                                    : isHealth ? "보건소"
-                                        : "알 수 없음"),
+                            title:
+                                item.hpCnterNm ??
+                                (isMental
+                                    ? "정신건강센터"
+                                    : isHealth
+                                    ? "보건소"
+                                    : "알 수 없음"),
                             latitude: parseFloat(item.latitude),
                             longitude: parseFloat(item.longitude),
-                            type: isMental ? "center"
-                                : isHealth ? "clinic"
-                                    : "unknown",
+                            type: isMental
+                                ? "center"
+                                : isHealth
+                                ? "clinic"
+                                : "unknown",
                             details: {
                                 address: item.rdnmadr,
                                 phone: item.phoneNumber,
@@ -117,11 +130,13 @@ export default function HelpCall() {
                                 institution: item.institutionNm,
                             },
                         };
-                    })
+                    });
 
                 setMarkers(parsedMarkers);
             } catch (error) {
                 console.error("센터 데이터를 가져오는 데 실패했습니다.", error);
+            } finally {
+                hideLoading();
             }
         })();
     }, []);
@@ -159,9 +174,8 @@ export default function HelpCall() {
                         </Text>
                         <View
                             style={helpCallStyles.scrollContainer}
-                        // // horizontal
-                        // showsHorizontalScrollIndicator={false}
-
+                            // // horizontal
+                            // showsHorizontalScrollIndicator={false}
                         >
                             {buttons.map((btn) => (
                                 <TouchableOpacity
@@ -194,7 +208,7 @@ export default function HelpCall() {
                         region={location}
                         showsUserLocation={true}
                         onMapReady={(event) => {
-                            console.log("Google Map Ready!")
+                            console.log("Google Map Ready!");
                         }}
                     >
                         <Marker coordinate={location} title="내 위치" />
@@ -206,7 +220,9 @@ export default function HelpCall() {
                                     longitude: marker.longitude,
                                 }}
                                 title={marker.title}
-                                onPress={() => setSelectedMarker(marker.details)}
+                                onPress={() =>
+                                    setSelectedMarker(marker.details)
+                                }
                             >
                                 <Image
                                     source={getMarkerImageByType(marker.type)}

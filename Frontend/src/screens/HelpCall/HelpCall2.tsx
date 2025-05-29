@@ -168,6 +168,20 @@ export default function HelpCall2() {
     const [selected, setSelected] = useState("all");
 
     const { showLoading, hideLoading } = useLoading();
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                showLoading();
+                // Simulate API call with a delay for demonstration (remove or replace with real API)
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+            } catch (error) {
+                console.error("API call error:", error);
+            } finally {
+                hideLoading();
+            }
+        };
+        fetchData();
+    }, []);
 
     const buttons = [
         { id: "all", title: "전체보기" },
