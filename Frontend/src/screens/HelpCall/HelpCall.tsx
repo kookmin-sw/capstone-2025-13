@@ -82,7 +82,6 @@ export default function HelpCall() {
             });
             try {
                 const centerData = await getCenters();
-                console.log("센터 데이터:", centerData);
                 const parsedMarkers = centerData
                     .filter((item: any) => item.hpCnterSe === "정신보건" || item.hpCnterSe === "건강증진")
                     .map((item: any, index: number) => {
