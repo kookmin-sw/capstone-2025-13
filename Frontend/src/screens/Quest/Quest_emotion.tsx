@@ -242,7 +242,7 @@ export default function QuestEmotion() {
                 onPress={() => {
                     setCompleteModalVisible(false);
                     navigation.navigate("Quest_stage", {
-                        title: "명상",
+                        title: `${nickname}의 숲`,
                     });
                 }}
                 style={questStyles.closeButton}
