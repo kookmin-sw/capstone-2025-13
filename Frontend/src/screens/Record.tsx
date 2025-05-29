@@ -17,6 +17,7 @@ import StarRating from "../components/Record/StarRating";
 import RecordChat from "../components/Record/Record_chat";
 import RecordEtc from "../components/Record/Record_etc";
 import styles from "../styles/Record/recordStyles";
+import fonts from "../constants/fonts";
 import { getRecordMe, postRecord } from "../API/recordAPI";
 import { getCoupon } from "../API/potAPI";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -119,11 +120,13 @@ export default function Record() {
     };
 
     return (
-
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                contentContainerStyle={[styles.scroll, { alignItems: "center" }]}
+                contentContainerStyle={[
+                    styles.scroll,
+                    { alignItems: "center" },
+                ]}
             >
                 <View style={styles.container}>
                     <RecordHeader title={title} date={finalDate} />
@@ -131,7 +134,6 @@ export default function Record() {
                         contentContainerStyle={[
                             styles.scroll,
                             { alignItems: "center", flexGrow: 1 },
-
                         ]}
                         keyboardShouldPersistTaps="handled"
                     >
@@ -180,7 +182,12 @@ export default function Record() {
                         >
                             <View style={styles.modalOverlay}>
                                 <View style={styles.modalContainer}>
-                                    <Text style={styles.modalText}>
+                                    <Text
+                                        style={[
+                                            styles.modalText,
+                                            { fontFamily: fonts.laundry },
+                                        ]}
+                                    >
                                         일기 제출은 한 번만 가능해!{"\n"}정말 다
                                         쓴 거 맞지?
                                     </Text>
@@ -193,7 +200,13 @@ export default function Record() {
                                             }}
                                         >
                                             <Text
-                                                style={styles.modalButtonText}
+                                                style={[
+                                                    styles.modalButtonText,
+                                                    {
+                                                        fontFamily:
+                                                            fonts.laundry,
+                                                    },
+                                                ]}
                                             >
                                                 맞아
                                             </Text>
@@ -206,7 +219,13 @@ export default function Record() {
                                             onPress={() => setModalOpen(false)}
                                         >
                                             <Text
-                                                style={styles.modalButtonText}
+                                                style={[
+                                                    styles.modalButtonText,
+                                                    {
+                                                        fontFamily:
+                                                            fonts.laundry,
+                                                    },
+                                                ]}
                                             >
                                                 아니야
                                             </Text>
@@ -219,6 +238,5 @@ export default function Record() {
                 </View>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
-
     );
 }

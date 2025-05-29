@@ -10,10 +10,10 @@ const styles = StyleSheet.create({
     },
     shadowWrapper: {
         width: width * 0.9,
-        height: height * 0.207,  
+        height: height * 0.207,
         marginBottom: 20,
-        backgroundColor: "#E8ECD0", 
-        borderRadius: 30,  
+        backgroundColor: "#E8ECD0",
+        borderRadius: 30,
     },
     inputBox: {
         width: width * 0.9,
@@ -22,11 +22,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#F9FAEC",
         borderRadius: 25,
         padding: 20,
-        zIndex: 1,  // Make sure it appears on top of the shadow
+        zIndex: 1, // Make sure it appears on top of the shadow
     },
     textInput: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 14,
+        letterSpacing: 0.3,
         color: "#000",
         textAlignVertical: "top",
     },

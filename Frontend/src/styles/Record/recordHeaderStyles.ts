@@ -5,7 +5,7 @@ const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     header: {
-        marginTop: height * 0.07, 
+        marginTop: height * 0.07,
         paddingHorizontal: width * 0.05,
         flexDirection: "row",
         alignItems: "flex-start",
@@ -20,15 +20,13 @@ const styles = StyleSheet.create({
         flexShrink: 1,
     },
     dateOnly: {
-        fontSize: width * 0.055,
-        fontWeight: "bold",
+        fontSize: width * 0.045,
         color: "#3CB46E",
         fontFamily: fonts.laundryBold,
         marginLeft: width * 0.01,
     },
     titleText: {
-        fontSize: width * 0.09,
-        fontWeight: "bold",
+        fontSize: width * 0.08,
         color: "#3CB46E",
         fontFamily: fonts.laundryBold,
         marginTop: height * 0.003,

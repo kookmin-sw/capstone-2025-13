@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop:20,
+        marginTop: 20,
     },
     imageContainer: {
         flexDirection: "row", // 이미지 두 개를 가로로 배치
@@ -18,18 +18,19 @@ const styles = StyleSheet.create({
     profileImage: {
         width: width * 0.15, // 카톡 프로필 이미지 크기
         height: width * 0.15, // 정사각형 크기로 만들기
-        borderRadius: width * 0.1, // 반지름을 절반으로 하여 둥글게 만들기
-        marginTop: width * 0.03, 
+        marginTop: width * 0.03,
         marginRight: width * 0.01, // 이미지 사이의 간격
     },
     inputImage: {
         width: width * 0.7, // 입력창 이미지 크기
         height: height * 0.2, // 높이를 동일하게 설정
-        marginTop: width * 0.03, 
+        marginTop: width * 0.03,
         borderRadius: 12, // 둥근 테두리
     },
     overlayText: {
-        fontSize: width * 0.035,
+        fontSize: width * 0.03,
+        letterSpacing: 0.5, // 글자 간격
+        lineHeight: width * 0.045, // 줄 간격
         fontFamily: fonts.medium,
         color: "black", // 텍스트 색상
         textAlign: "left", // 텍스트 왼쪽 정렬
@@ -37,10 +38,10 @@ const styles = StyleSheet.create({
     },
     shadowWrapper: {
         width: width * 0.75,
-        minHeight: height * 0.157,  
+        minHeight: height * 0.157,
         marginBottom: 20,
-        backgroundColor: "#B2C9A6", 
-        borderRadius: 30,  
+        backgroundColor: "#B2C9A6",
+        borderRadius: 30,
     },
     inputBox: {
         flex: 1,
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#EEF7E8",
         borderRadius: 25,
         padding: 20,
-        zIndex: 1, 
+        zIndex: 1,
     },
 });
 
