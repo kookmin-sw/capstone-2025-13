@@ -135,46 +135,91 @@ export default function DailyTopic() {
   };
 
   const fetchFeedbackWithRetry = async (fid: string, retry = 0) => {
-    if (retry > 5) return;
+    if (retry > 5) {
+      // 5번 리트라이 후에도 feedback 안 오면 NOFEEDBACK 처리
+      try {
+        const data = await getFeedbackById(fid);
+        if (data.status === TopicFeedbackStatus.NOFEEDBACK) {
+          setInputDisabled(true);
+          setPlaceholderText("오늘은 충분히 대화했어! 내일 다시 만나-!");
+          setHasShownModal(true);
+          showModal();
+        }
+      } catch (err) {
+        console.error("❌ 최종 상태 확인 실패:", err);
+      }
+      return;
+    }
+  
     try {
       const data: TopicFeedbackResponse = await getFeedbackById(fid);
-      if (data.status === TopicFeedbackStatus.NOFEEDBACK) {
+      if (
+        !data ||
+        typeof data.status === "undefined" ||
+        data.status === null ||
+        data.status === TopicFeedbackStatus.NOFEEDBACK
+      ) {
         setTimeout(() => fetchFeedbackWithRetry(fid, retry + 1), 3000);
         return;
       }
-
+  
+      // 정상적으로 피드백 도착했을 때
       setChatHistory((prev) =>
         prev
           .map((it) => (it.type === "answer" && it.isLoading ? { ...it, isLoading: false } : it))
           .concat({ type: "question", text: data.aiFeedback })
       );
+  
+      setInputDisabled(false);
+      setPlaceholderText("메세지를 입력하세요.");
       await getCoupon();
-    } catch (err: any) {
-      console.error("❌ Feedback fetch failed:", err.message || err);
+    } catch (err) {
       setTimeout(() => fetchFeedbackWithRetry(fid, retry + 1), 3000);
     }
   };
+      
 
   const handleSendFeedback = async (text: string) => {
     if (!topicId) return;
+  
     try {
       const fid = await submitFeedback(topicId, text);
-      setTimeout(() => fetchFeedbackWithRetry(fid), 3000);
-    } catch (err: any) {
-      if (err.response?.status === 403) {
-        setInputDisabled(true);
-        setPlaceholderText("오늘은 충분히 대화했어! 내일 다시 만나-!");
-      } else {
-        console.error("❌ Feedback failed:", err.response?.data || err.message);
+  
+      // 먼저 피드백 상태 한 번 확인
+      try {
+        const data: TopicFeedbackResponse = await getFeedbackById(fid);
+  
+        if (data.status === TopicFeedbackStatus.NOFEEDBACK) {
+          setInputDisabled(true);
+          setPlaceholderText("오늘은 충분히 대화했어! 내일 다시 만나-!");
+          if (!hasShownModal) {
+            setHasShownModal(true);
+            showModal();
+          }
+          return;
+        }
+      } catch (checkError) {
+        console.warn("❗ 사전 상태 확인 실패, 리트라이로 진행:", checkError);
       }
+  
+      // 상태 확인이 안됐거나 NOFEEDBACK 아니면 리트라이 시작
+      setTimeout(() => fetchFeedbackWithRetry(fid), 3000);
+  
+    } catch (err: any) {
+      console.error("❌ submitFeedback 실패:", err.response?.data || err.message);
+      setInputDisabled(true);
+      setPlaceholderText("오늘은 충분히 대화했어! 내일 다시 만나-!");
     }
   };
+  
 
   const handleSend = () => {
     if (!answer.trim()) return;
     const txt = answer;
     setAnswer("");
     setChatHistory((prev) => [...prev, { type: "answer", text: txt, isLoading: true }]);
+    setInputDisabled(true);
+    setPlaceholderText("답변 작성 중이야~ 조금만 기다려줘-!");
     setTimeout(() => handleSendFeedback(txt), 500);
   };
 
@@ -258,6 +303,11 @@ export default function DailyTopic() {
             value={answer}
             onChangeText={setAnswer}
             editable={!inputDisabled}
+            onFocus={() => {
+                setTimeout(() => {
+                  scrollRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }}
           />
           <TouchableOpacity
             style={[dailyTopicstyles.sendButton, inputDisabled && { opacity: 0.5 }]}

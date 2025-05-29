@@ -77,7 +77,6 @@ const dailyTopicstyles = StyleSheet.create({
         backgroundColor: "#258D55",
         paddingHorizontal: width * 0.04,
         paddingVertical: height * 0.015,
-        marginBottom: width * 0.05,
         borderRadius: width * 0.1,
         alignContent: "center",
         justifyContent: "center",
