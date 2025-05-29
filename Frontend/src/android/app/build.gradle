@@ -94,16 +94,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 90
         versionName "1.0.0"
-        externalNativeBuild {
-            cmake {
-            cppFlags ""
-            }
-        }
-    }
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
     }
     signingConfigs {
         debug {
@@ -160,7 +150,9 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
+    implementation "androidx.health.connect:connect-client:1.0.0-alpha11"
+    implementation project(':react-native-health-connect')
+    
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";

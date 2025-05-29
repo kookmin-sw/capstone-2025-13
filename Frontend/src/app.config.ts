@@ -20,6 +20,7 @@ export default {
       "expo-audio",
       "expo-video",
       "expo-secure-store",
+      "react-native-health-connect",
       [
         "react-native-maps",
         {
@@ -76,6 +77,9 @@ export default {
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.CAMERA",
         "android.permission.POST_NOTIFICATIONS",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.WRITE_STEPS",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED"
       ]
     },
     web: {
