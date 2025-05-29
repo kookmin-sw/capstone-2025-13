@@ -132,7 +132,7 @@ function HomeContent({ navigation }: { navigation: any }) {
                 setSimpleScale(""); // 오버레이 닫기
                 console.log("🎯 Copilot 시작");
                 start(); // Copilot 가이드 시작
-            }, 3000);
+            }, 5000);
 
             return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
         }
