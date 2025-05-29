@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Text, View, Alert } from 'react-native';
+import { Text, View, Alert, Modal, TouchableOpacity} from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -9,6 +9,7 @@ import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
 import { cropFaces } from '../../plugins/cropFaces';
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
+import questStyles from "../../styles/questStyles";
 
 import EmotionChartBox from "../../components/Quest_emotionBox";
 import styles from "../../styles/questEmotionStyles";
@@ -39,6 +40,8 @@ export default function QuestEmotion() {
   const [latestResult, setLatestResult] = useState<number[] | null>(null);
   const [streak, setStreak] = useState(0);
   const [success, setSuccess] = useState<boolean>(false);
+  const [completeModalVisible, setCompleteModalVisible] = useState(false);
+  const [completeModalMessage, setCompleteModalMessage] = useState("");
 
   const device = useCameraDevice('front');
   const { isLoaded, model } = useLoadEmotionModel();
@@ -75,19 +78,12 @@ export default function QuestEmotion() {
 
       if (postRes.status === 200 || postRes.status === 201) {
         await getCoupon();
-        Alert.alert(
-          "완료!",
-          "감정 퀘스트가 성공적으로 완료되었어요! 🎉",
-          [
-            {
-              text: "확인",
-              onPress: () =>
-                navigation.navigate("Quest_stage", {
-                  title: `${nickname}의 숲`,
-                }),
-            },
-          ]
+        setCompleteModalMessage(
+            "감정 퀘스트가 성공적으로 완료되었어요! 🎉"
         );
+        setCompleteModalVisible(true);
+        return;
+      
       } else {
         Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
       }
@@ -230,6 +226,34 @@ export default function QuestEmotion() {
           frameProcessor={frameProcessor}
         />
       </View>
+      <Modal
+    visible={completeModalVisible}
+    transparent
+    animationType="fade"
+    onRequestClose={() => setCompleteModalVisible(false)}
+>
+    <View style={questStyles.modalOverlay}>
+        <View style={styles.modalContent}>
+            <Text style={questStyles.modalTitle}>완료!</Text>
+            <Text style={questStyles.modalText}>
+                {completeModalMessage}
+            </Text>
+            <TouchableOpacity
+                onPress={() => {
+                    setCompleteModalVisible(false);
+                    navigation.navigate("Quest_stage", {
+                        title: "명상",
+                    });
+                }}
+                style={questStyles.closeButton}
+            >
+                <Text style={questStyles.closeButtonText}>
+                    확인
+                </Text>
+            </TouchableOpacity>
+        </View>
+    </View>
+</Modal>
 
       {latestResult !== null ? (
         <View style={styles.overlay}>

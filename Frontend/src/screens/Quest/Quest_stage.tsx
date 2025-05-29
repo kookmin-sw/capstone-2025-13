@@ -102,6 +102,8 @@ export default function Quest_stage() {
     const [questStage, setQuestStage] = useState<any>(null);
     const currentStageIndex = useMemo(() => 7 - questStep, [questStep]);
     const [alertModalVisible, setAlertModalVisible] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
+    
     const [alertModalContent, setAlertModalContent] = useState({
       title: "",
       message: "",
@@ -178,6 +180,8 @@ export default function Quest_stage() {
                                     current: 0,
                                     status: "PROCESSING",
                                 });
+
+                                setShowImageModal(true);
 
                                 await setQuestData(
                                     { ...newQuest, step: 1 },
@@ -436,6 +440,37 @@ export default function Quest_stage() {
                     );
                 })}
             </ScrollView>
+
+            <Modal
+              visible={showImageModal}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setShowImageModal(false)}
+          >
+              <View style={{
+                  flex: 1,
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+              }}>
+                  <View style={{
+                      backgroundColor: 'white',
+                      borderRadius: 20,
+                      padding: 20,
+                      alignItems: 'center',
+                  }}>
+                      <Image
+                          source={require('../../assets/Images/clover_goal.png')}
+                          style={{ width: 200, height: 200, marginBottom: 15 }}
+                          resizeMode="contain"
+                      />
+                      <TouchableOpacity onPress={() => setShowImageModal(false)}>
+                          <Text style={questStyles.closeButtonText}>골인-!</Text>
+                      </TouchableOpacity>
+                  </View>
+              </View>
+          </Modal>
+
             <Modal
   visible={alertModalVisible}
   transparent
