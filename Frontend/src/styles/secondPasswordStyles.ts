@@ -33,6 +33,7 @@ backButtonWrapper: {
         fontSize: 16,
         fontFamily: fonts.semiBold,
         marginVertical: 20,
+        color: '#000000',
     },
     passwordContainer: {
         flexDirection: 'row',

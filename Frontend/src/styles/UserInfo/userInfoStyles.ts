@@ -50,6 +50,7 @@ cameraIcon: {
     textAlign: "center",
     fontFamily: fonts.extraBold,
     marginBottom: height * 0.01,
+    color:"#000000"
   },
   row: {
     flexDirection: "row",

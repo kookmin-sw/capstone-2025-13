@@ -27,7 +27,8 @@ const signUpStyles = StyleSheet.create({
         color: colors.brown,
     },
     inputTitle: {
-        fontSize: 15
+        fontSize: 15,
+        color:"#89673F"
     },
     inputContainer: {
         marginBottom: 20,

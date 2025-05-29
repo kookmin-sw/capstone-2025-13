@@ -17,7 +17,7 @@ const dailyTopicstyles = StyleSheet.create({
         zIndex: 11,
     },
     headerText: {
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.laundryBold,
         top: width * 0.15,
         marginBottom: width * 0.2,  
         fontSize: width * 0.055,

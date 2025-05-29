@@ -35,6 +35,7 @@ const helpCallStyles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: width * 0.055,
         textAlign: "center",
+        color: "#222222"
   
     },
     scrollContainer: {

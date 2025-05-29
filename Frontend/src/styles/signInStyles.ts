@@ -28,7 +28,8 @@ const signInStyles = StyleSheet.create({
         color: "#89673F",
     },
     inputTitle: {
-        fontSize: 15
+        fontSize: 15,
+        color:"#89673F"
     },
     inputContainer: {
         marginBottom: 20,
