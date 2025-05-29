@@ -39,13 +39,13 @@ import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: false,
+        shouldSetBadge: true,
     }),
-  });  
-  
+});
+
 
 export type RootStackParamList = {
     Home: { simpleScale?: string };
@@ -115,12 +115,12 @@ export default function App() {
 
     useEffect(() => {
         if (Platform.OS === "android") {
-          Notifications.setNotificationChannelAsync("default", {
-            name: "default",
-            importance: Notifications.AndroidImportance.MAX,
-          });
+            Notifications.setNotificationChannelAsync("default", {
+                name: "default",
+                importance: Notifications.AndroidImportance.MAX,
+            });
         }
-      }, []);
+    }, []);
 
     const [loading, setLoading] = useState(true);
 

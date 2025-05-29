@@ -74,5 +74,6 @@ backButtonWrapper: {
   flexDirection: "row",
   alignItems: "center",
   alignSelf: "flex-start",
+  marginTop: width * 0.07,
 },
 });

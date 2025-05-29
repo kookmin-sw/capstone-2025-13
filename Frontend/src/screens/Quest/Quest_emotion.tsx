@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Text, View, Alert, Modal, TouchableOpacity, Dimensions} from 'react-native';
+import { Text, View, Alert, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
@@ -82,11 +82,11 @@ export default function QuestEmotion() {
       if (postRes.status === 200 || postRes.status === 201) {
         await getCoupon();
         setCompleteModalMessage(
-            "감정 퀘스트가 성공적으로 완료되었어요! 🎉"
+          "감정 퀘스트가 성공적으로 완료되었어요! 🎉"
         );
         setCompleteModalVisible(true);
         return;
-      
+
       } else {
         Alert.alert("오류", "감정 퀘스트 완료 처리 중 문제가 발생했어요.");
       }
@@ -218,25 +218,25 @@ export default function QuestEmotion() {
   }
 
   return (
-    
+
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
-                    <View style={{ marginTop: width * 0.03 }}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate("Quest_stage", {
-                                    title: `${nickname}의 숲`,
-                                })
-                            }
-                        >
-                            <Ionicons
-                                name="arrow-back-circle"
-                                size={40}
-                                color="#6c63ff"
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    </View>
+        <View style={{ marginTop: width * 0.03 }}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Quest_stage", {
+                title: `${nickname}의 숲`,
+              })
+            }
+          >
+            <Ionicons
+              name="arrow-back-circle"
+              size={40}
+              color="#FF9B4B"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <View style={[styles.half, { flex: 7 }]}>
         <Camera
@@ -249,33 +249,33 @@ export default function QuestEmotion() {
         />
       </View>
       <Modal
-    visible={completeModalVisible}
-    transparent
-    animationType="fade"
-    onRequestClose={() => setCompleteModalVisible(false)}
->
-    <View style={questStyles.modalOverlay}>
-        <View style={styles.modalContent}>
+        visible={completeModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCompleteModalVisible(false)}
+      >
+        <View style={questStyles.modalOverlay}>
+          <View style={styles.modalContent}>
             <Text style={questStyles.modalTitle}>완료!</Text>
             <Text style={questStyles.modalText}>
-                {completeModalMessage}
+              {completeModalMessage}
             </Text>
             <TouchableOpacity
-                onPress={() => {
-                    setCompleteModalVisible(false);
-                    navigation.navigate("Quest_stage", {
-                        title: `${nickname}의 숲`,
-                    });
-                }}
-                style={questStyles.closeButton}
+              onPress={() => {
+                setCompleteModalVisible(false);
+                navigation.navigate("Quest_stage", {
+                  title: `${nickname}의 숲`,
+                });
+              }}
+              style={questStyles.closeButton}
             >
-                <Text style={questStyles.closeButtonText}>
-                    확인
-                </Text>
+              <Text style={questStyles.closeButtonText}>
+                확인
+              </Text>
             </TouchableOpacity>
+          </View>
         </View>
-    </View>
-</Modal>
+      </Modal>
 
       {latestResult !== null ? (
         <View style={styles.overlay}>

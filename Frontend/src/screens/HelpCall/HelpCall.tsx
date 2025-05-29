@@ -41,6 +41,7 @@ export default function HelpCall() {
     >([]);
     const { showLoading, hideLoading } = useLoading();
     const [selectedMarker, setSelectedMarker] = useState<any>(null);
+    const [mapKey, setMapKey] = useState(0); // 키를 사용하여 맵을 강제로 리렌더링
 
     const filteredMarkers =
         selected === "all"
@@ -62,6 +63,7 @@ export default function HelpCall() {
 
     useEffect(() => {
         const locationFun = async () => {
+            setMapKey((prevKey) => prevKey + 1); // 맵을 강제로 리렌더링하기 위해 키를 증가시
             console.log("위치 권한 요청 시작.");
 
             showLoading();
@@ -71,9 +73,10 @@ export default function HelpCall() {
             if (status !== "granted") {
                 Alert.alert("위치 권한이 필요합니다.");
                 hideLoading();
+                return;
             }
 
-            const loc = await Location.getCurrentPositionAsync();
+            const loc = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = loc.coords;
 
             setLocation({
@@ -85,7 +88,7 @@ export default function HelpCall() {
             console.log(`현재 위치: ${location.latitude}, ${location.longitude} / ${location.latitudeDelta}, ${location.longitudeDelta}`)
 
             try {
-                const centerData = await getCenters(location.latitude, location.longitude);
+                const centerData = await getCenters(location.latitude, location.longitude, 30);
                 console.log(`찾은 센터: ${centerData.length}곳`)
                 const parsedMarkers = centerData
                     .filter(
@@ -104,15 +107,15 @@ export default function HelpCall() {
                                 (isMental
                                     ? "정신건강센터"
                                     : isHealth
-                                    ? "보건소"
-                                    : "알 수 없음"),
+                                        ? "보건소"
+                                        : "알 수 없음"),
                             latitude: parseFloat(item.latitude),
                             longitude: parseFloat(item.longitude),
                             type: isMental
                                 ? "center"
                                 : isHealth
-                                ? "clinic"
-                                : "unknown",
+                                    ? "clinic"
+                                    : "unknown",
                             details: {
                                 address: item.rdnmadr,
                                 phone: item.phoneNumber,
@@ -142,7 +145,7 @@ export default function HelpCall() {
         }
 
         locationFun();
-    });
+    }, []);
 
     if (!location) return null;
 
@@ -177,8 +180,8 @@ export default function HelpCall() {
                         </Text>
                         <View
                             style={helpCallStyles.scrollContainer}
-                            // // horizontal
-                            // showsHorizontalScrollIndicator={false}
+                        // // horizontal
+                        // showsHorizontalScrollIndicator={false}
                         >
                             {buttons.map((btn) => (
                                 <TouchableOpacity
@@ -206,6 +209,7 @@ export default function HelpCall() {
                         </View>
                     </View>
                     <MapView
+                        key={mapKey} // 키를 사용하여 맵을 강제로 리렌더링
                         provider={PROVIDER_GOOGLE}
                         style={helpCallStyles.map}
                         region={location}

@@ -8,11 +8,12 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 8,
         paddingHorizontal: width * 0.07,
+        width: "100%",
     },
     label: {
         fontSize: 16,
         fontWeight: "bold",
-        color: "#FFFF",
+
     },
 });
 

@@ -46,7 +46,7 @@ export default function EmotionChartBox({ subtitle, data }: EmotionChartBoxProps
     }
     return (
         <View style={styles.wrapper}>
-            <View style={{ width: "85%", alignItems: "flex-start" }}>
+            <View style={{ width: "95%", alignItems: "flex-start", height: "auto" }}>
                 <SectionLabel text="📈 나의 진단 결과" />
             </View>
             <View style={styles.box}>

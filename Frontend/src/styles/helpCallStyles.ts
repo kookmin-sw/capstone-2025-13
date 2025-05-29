@@ -51,6 +51,7 @@ const helpCallStyles = StyleSheet.create({
         borderRadius: width * 0.1,
         marginHorizontal: width * 0.015,
         borderWidth: 1,
+        height: height * 0.055,
     },
     selectedButton: {
         backgroundColor: colors.green,
