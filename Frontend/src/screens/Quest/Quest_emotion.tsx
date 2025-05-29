@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert } from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
 
@@ -43,7 +44,17 @@ export default function QuestEmotion() {
     const device = useCameraDevice('front');
     const { isLoaded, model } = useLoadEmotionModel();
     const cameraRef = useRef<any>(null);
-    const { detectFaces } = useFaceDetector();
+
+    const faceDetectorOptions: FaceDetectionOptions = {
+      performanceMode: 'accurate',
+      landmarkMode: 'none',
+      contourMode: 'none',
+      classificationMode: 'none',
+      minFaceSize: 0.2,
+      trackingEnabled: false,
+      autoMode: false, // 프레임 기준 좌표 사용
+    };
+    const { detectFaces } = useFaceDetector(faceDetectorOptions);
 
     const quest = QUESTS.find(q => q.id === questTitle);
     const quest_capture_interval = quest?.interval ?? 1000;

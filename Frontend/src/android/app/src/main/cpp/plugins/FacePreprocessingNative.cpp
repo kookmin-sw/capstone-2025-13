@@ -6,40 +6,45 @@ JNIEXPORT jfloatArray JNICALL
 Java_space_mori_wooong_FaceDetectorFrameProcessorPlugin_cropResizeNormalizeDirect(
     JNIEnv* env,
     jobject /* this */,
-    jobject byteBuffer,   // DirectByteBuffer
+    jobject byteBuffer,   // RGBA ByteBuffer
     jint imageWidth,
     jint imageHeight,
-    jint x,
-    jint y,
-    jint w,
-    jint h
+    jint x,    // portrait-box.x
+    jint y,    // portrait-box.y
+    jint w,    // portrait-box.width
+    jint h     // portrait-box.height
 ) {
-    // 1) ByteBuffer → native pointer
-    uint8_t* rgba = reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(byteBuffer));
+    auto* rgba = reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(byteBuffer));
     if (!rgba) return nullptr;
-    const int imageSize = imageWidth * imageHeight * 4;
 
-    // 2) 얼굴 영역
-    struct Bounds { int x, y, w, h; } faceBox = { x, y, w, h };
+    // 1) portrait → landscape 회전 보정: (x,y,w,h) 축 교환
+    int boxX = imageWidth-y-h;
+    int boxY = x;
+    int boxW = h;  // portrait height → landscape width
+    int boxH = w;  // portrait width  → landscape height
 
-    // 3) 결과 버퍼 준비
     std::vector<float> output;
     output.reserve(64 * 64 * 3);
 
-    // 4) Crop → Resize(64x64) → Normalize
-    for (int yy = 0; yy < 64; ++yy) {
-        for (int xx = 0; xx < 64; ++xx) {
-            int srcX = faceBox.x + (xx * faceBox.w) / 64;
-            int srcY = faceBox.y + (yy * faceBox.h) / 64;
-            int idx  = (srcY * imageWidth + srcX) * 4;
-            if (idx + 2 >= imageSize) continue;
-            output.push_back(rgba[idx]   / 255.0f);
-            output.push_back(rgba[idx+1] / 255.0f);
-            output.push_back(rgba[idx+2] / 255.0f);
+    for (int xx = 0; xx < 64; ++xx) {
+      for (int yy = 0; yy < 64; ++yy) {
+            // 2) 올바른 매핑: (xx→가로), (yy→세로)
+            int srcX = boxX + boxW - (boxW / 64 * xx) -2;
+            int srcY = boxY + (boxH / 64 * yy);
+
+            // 3) 범위 벗어나지 않게
+            srcX = std::clamp(srcX, 0, imageWidth  - 1);
+            srcY = std::clamp(srcY, 0, imageHeight - 1);
+
+            // 4) stride는 imageWidth
+            int idx = (srcY * imageWidth + srcX) * 4;
+
+            output.push_back(rgba[idx    ] / 255.0f);  // R
+            output.push_back(rgba[idx + 1] / 255.0f);  // G
+            output.push_back(rgba[idx + 2] / 255.0f);  // B
         }
     }
 
-    // 5) std::vector → jfloatArray
     jfloatArray result = env->NewFloatArray(output.size());
     env->SetFloatArrayRegion(result, 0, output.size(), output.data());
     return result;
