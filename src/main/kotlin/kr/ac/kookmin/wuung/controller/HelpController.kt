@@ -77,18 +77,20 @@ class HelpController(
         @AuthenticationPrincipal userDetails: User?,
         @RequestParam latitude: Double,
         @RequestParam longitude: Double,
-        @RequestParam distance: Int = 1
+        @RequestParam distance: Int = 1,
+        @RequestParam centerNum: Int = 100
     ): ResponseEntity<ApiResponseDTO<List<HelpDTO>>> {
         if (userDetails == null) throw UnauthorizedException()
 
-        val scaledLatitude = (latitude * 10000.0).roundToInt() / 10000.0
-        val scaledLongitude = (longitude * 10000.0).roundToInt() / 10000.0
+        val scaledLatitude = (latitude * 100.0).roundToInt() / 100.0
+        val scaledLongitude = (longitude * 100.0).roundToInt() / 100.0
         val scaledDistance = distance.coerceIn(1, 100) * 1000
+        val scaledCenterNum = centerNum.coerceIn(20, 100)
 
         return ResponseEntity.ok(
             ApiResponseDTO(
                 data =
-                    helpCenterService.getCenters(scaledLatitude, scaledLongitude, scaledDistance)
+                    helpCenterService.getCenters(scaledLatitude, scaledLongitude, scaledDistance, scaledCenterNum)
             ))
     }
 }

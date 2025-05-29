@@ -22,12 +22,13 @@ interface HelpCenterRepository : JpaRepository<Help, Long>{
             (:distance)::double precision
         )
         ORDER BY distance
-        limit 100;
+        limit :centerNum;
     """, nativeQuery = true)
     fun findNearbyHelp(
         @Param("latitude") latitude: Double,
         @Param("longitude") longitude: Double,
-        @Param("distance") distance: Int
+        @Param("distance") distance: Int,
+        @Param("centerNum") centerNum: Int,
     ): List<Help>
 
     fun findHelpByHpCnterNm(hpCntNm: String): Optional<Help>
