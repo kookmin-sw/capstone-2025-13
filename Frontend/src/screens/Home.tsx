@@ -95,14 +95,14 @@ function HomeContent({ navigation }: { navigation: any }) {
             console.log("📆 LastVisit:", lastVisit);
             const quoteData = await getQuote();
 
-            //if (lastVisit !== today) {
+            if (lastVisit !== today) {
 
                 try {
                     await sendLocalNotification("오늘의 명언", quoteData);
                 } catch (error) {
                     console.error("❌ 명언 알림 전송 실패:", error);
                 }
-            //} 
+            } 
             hideLoading();
         };
 
