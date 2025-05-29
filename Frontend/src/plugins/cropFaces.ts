@@ -1,24 +1,39 @@
-import { VisionCameraProxy, Frame } from 'react-native-vision-camera'
+import { VisionCameraProxy, Frame } from "react-native-vision-camera"
 
-// 이 이름은 Native 쪽에서 등록한 이름과 반드시 일치해야 합니다.
 const plugin = VisionCameraProxy.initFrameProcessorPlugin("cropFaces", {})
 
-export type Bounds = { x: number; y: number; width: number; height: number }
+export type Bounds = { x: number; y: number; width: number; height: number; }
 
-/**
- * Scans faces via your native Frame Processor Plugin.
- * @param frame - VisionCamera Frame object
- * @returns face data object (whatever your native code returns)
- */
+// 워크릿으로 선언된 매핑 함수
+const orientationToDegrees = (orientation: 
+    "portrait" | "portrait-upside-down" | "landscape-left" | "landscape-right"
+): 0 | 90 | 180 | 270 => {
+  'worklet'
+  switch (orientation) {
+    case "portrait":             return 0
+    case "landscape-left":       return 90
+    case "portrait-upside-down": return 180
+    case "landscape-right":      return 270
+  }
+}
+
 export function cropFaces(frame: Frame, bounds: Bounds) {
   'worklet'
-  if (plugin == null) {
-    throw new Error('Failed to load Frame Processor Plugin "cropFaces"!')
-  }
-  // plugin.call(frame, …args) 의 순서는 native callback 의 파라미터 순서와 동일해야 합니다
-  const result = plugin.call(frame, bounds)
-  if (!result) {
-    throw new Error('cropFaces plugin returned undefined')
-  }
-  return result
+  if (!plugin) throw new Error('Failed to load Frame Processor Plugin "cropFaces"!')
+
+  // 워크릿 컨텍스트에서 orientation 읽고 매핑
+  const ori = (frame as any).orientation as 
+    "portrait"|"portrait-upside-down"|"landscape-left"|"landscape-right"
+  const rotation = orientationToDegrees(ori)
+  const result = plugin.call(frame, {
+    width:    frame.width,
+    height:   frame.height,
+    x:        bounds.x  | 0,
+    y:        bounds.y  | 0,
+    w:        bounds.width  | 0,
+    h:        bounds.height | 0,
+    rotation, 
+  })
+  if (!result) throw new Error('cropFaces plugin returned undefined')
+  return result as number[]
 }

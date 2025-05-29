@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert } from 'react-native';
 import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
 
 import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
-import { shouldCaptureFace } from '../../utils/faceChecker';
 import { cropFaces } from '../../plugins/cropFaces'
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
@@ -37,16 +37,25 @@ export default function QuestEmotion() {
     const [hasPermission, setHasPermission] = useState(false);
     const [noFaceWarning, setNoFaceWarning] = useState(false);
     const [latestResult, setLatestResult] = useState<number[] | null>(null);
-    const [isPredicting, setIsPredicting] = useState(false);
     const [success, setSuccess] = useState<boolean>(false);
 
     const device = useCameraDevice('front');
     const { isLoaded, model } = useLoadEmotionModel();
     const cameraRef = useRef<any>(null);
-    const { detectFaces } = useFaceDetector();
+
+    const faceDetectorOptions: FaceDetectionOptions = {
+      performanceMode: 'accurate',
+      landmarkMode: 'none',
+      contourMode: 'none',
+      classificationMode: 'none',
+      minFaceSize: 0.2,
+      trackingEnabled: false,
+      autoMode: false, // 프레임 기준 좌표 사용
+    };
+    const { detectFaces } = useFaceDetector(faceDetectorOptions);
 
     const quest = QUESTS.find(q => q.id === questTitle);
-    const quest_capture_interval = quest?.interval ?? 1000;
+    const quest_capture_interval = quest?.interval ?? 2000;
     const quest_save_pre_log = quest?.logLength ?? 20;
     
     const handleComplete = async () => {
@@ -98,14 +107,9 @@ export default function QuestEmotion() {
         console.log('❌ 모델 로드 안됨');
         return;
       }
-
-      if (isPredicting) {
-        console.log('⏳ 예측 중이므로 스킵');
-        return;
-      }
-
+      if ((globalThis as any).isPredictingNow) return;
+      (globalThis as any).isPredictingNow = true;
       const input = new Float32Array(pluginResult);
-      setIsPredicting(true);
       try {
         const result = await runTFLiteModelRunner(input, model);
         if (result) {
@@ -133,10 +137,10 @@ export default function QuestEmotion() {
       } catch (err) {
         console.error('❌ 예측 중 오류:', err);
       } finally {
-        setIsPredicting(false);
+        (globalThis as any).isPredictingNow = false;
       }
     }),
-    [isLoaded, model, isPredicting, emotionLog, quest]
+    [isLoaded, model, emotionLog, quest]
   );
 
   const jsHandleFaceStatus = Worklets.createRunOnJS(handleFaceStatus);
@@ -144,17 +148,18 @@ export default function QuestEmotion() {
 
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
+    console.log('프레임프로세싱들어옴');
+    if ((globalThis as any).isPredictingNow) return;
+
+    const last = (globalThis as any).lastProcessTime ?? 0;
+    const now = Date.now();
+    if (now - last < quest_capture_interval) return;
+    (globalThis as any).lastProcessTime = now;
 
     const faces: Face[] = detectFaces(frame);
     jsHandleFaceStatus(faces.length > 0);
 
     if (!faces || faces.length === 0) return;
-
-    const last = (globalThis as any).lastProcessTime ?? 0;
-    const { isLargeEnough, now } = shouldCaptureFace(faces[0], last, 150, 200);
-    if (!isLargeEnough) return;
-    if (now - last < quest_capture_interval) return;
-    (globalThis as any).lastProcessTime = now;
 
     const pluginResult = cropFaces(frame, faces[0].bounds) as number[];
     if (!Array.isArray(pluginResult) || typeof pluginResult[0] !== 'number') {
