@@ -16,7 +16,9 @@ services:
   redis:
     image: 'redis:latest'
     ports:
-      - '6379'
+      - target: 6379
+        published: 6379
+        protocol: tcp
   minio:
     image: minio/minio
     environment:

@@ -10,24 +10,24 @@ import java.util.Optional
 interface HelpCenterRepository : JpaRepository<Help, Long>{
     @Query(
         value = """
-    WITH point AS (
-        SELECT ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography AS ref_point
-    )
-    SELECT h.*,
-           ST_Distance(h.location::geography, p.ref_point) as distance
-    FROM help_center h, point p
-    WHERE ST_DWithin(
-        h.location::geography, 
-        p.ref_point, 
-        :distance
-    )
-    ORDER BY ST_Distance(h.location::geography, p.ref_point)
-    LIMIT 10
-""", nativeQuery = true)
+        select *, 
+           ST_Distance(
+             location::geometry,
+             ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)
+           ) AS distance
+        from help_center
+        where ST_DWITHIN(
+            location::geometry,
+            ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
+            (:distance)::double precision
+        )
+        ORDER BY distance
+        limit 100;
+    """, nativeQuery = true)
     fun findNearbyHelp(
         @Param("latitude") latitude: Double,
         @Param("longitude") longitude: Double,
-        @Param("distance") distance: Double
+        @Param("distance") distance: Int
     ): List<Help>
 
     fun findHelpByHpCnterNm(hpCntNm: String): Optional<Help>

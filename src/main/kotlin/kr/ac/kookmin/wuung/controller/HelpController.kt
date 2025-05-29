@@ -83,7 +83,7 @@ class HelpController(
 
         val scaledLatitude = (latitude * 10000.0).roundToInt() / 10000.0
         val scaledLongitude = (longitude * 10000.0).roundToInt() / 10000.0
-        val scaledDistance = distance.coerceIn(1, 100) * 1000.0;
+        val scaledDistance = distance.coerceIn(1, 100) * 1000
 
         return ResponseEntity.ok(
             ApiResponseDTO(

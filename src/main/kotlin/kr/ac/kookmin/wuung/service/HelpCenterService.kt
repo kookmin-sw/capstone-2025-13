@@ -95,14 +95,15 @@ class HelpCenterService(
     @Autowired private val helpCenterRepository: HelpCenterRepository
 ) {
     private companion object {
-        const val DEFAULT_DISTANCE_METERS = 1000.0
+        const val DEFAULT_DISTANCE_METERS = 1000
     }
 
     @Cacheable(
         value = ["centerCache"],
         key = "'center_' + #latitude + '_' + #longitude + '_distance_' + #distance",
     )
-    fun getCenters(latitude: Double, longitude: Double, distance: Double = DEFAULT_DISTANCE_METERS): List<HelpDTO> {
+    fun getCenters(latitude: Double, longitude: Double, distance: Int = DEFAULT_DISTANCE_METERS): List<HelpDTO> {
+        println("${latitude}/${longitude}/${distance}")
         val nearbyHelps = helpCenterRepository.findNearbyHelp(
             latitude, longitude, DEFAULT_DISTANCE_METERS
         )
