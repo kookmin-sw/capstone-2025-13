@@ -9,7 +9,7 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     ImageBackground,
-    ScrollView
+    ScrollView,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
@@ -17,7 +17,10 @@ import signUpStyles from "../../styles/signUpStyles";
 import type { RootStackParamList } from "../../App";
 import useBlockBackHandler from "../../hooks/useBlockBackHandler";
 
-type SignUpStep1NavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUpStep1">;
+type SignUpStep1NavigationProp = NativeStackNavigationProp<
+    RootStackParamList,
+    "SignUpStep1"
+>;
 
 const SignUpStep1 = () => {
     const navigation = useNavigation<SignUpStep1NavigationProp>();
@@ -27,21 +30,25 @@ const SignUpStep1 = () => {
     useBlockBackHandler();
 
     return (
-
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ImageBackground
                 source={require("../../assets/Images/simple-3-2.png")}
                 style={{ flex: 1 }}
                 resizeMode="cover"
             >
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
                     <ScrollView contentContainerStyle={signUpStyles.overlay}>
                         <View style={signUpStyles.container}>
                             <Text style={signUpStyles.title}>회원가입</Text>
                             <View style={signUpStyles.inputContainer}>
-                                <Text style={signUpStyles.inputTitle}>닉네임</Text>
+                                <Text style={signUpStyles.inputTitle}>
+                                    닉네임
+                                </Text>
                                 <TextInput
-                                    placeholder="닉네임"
+                                    placeholder="내가 너를 뭐라고 부르면 좋을까?"
                                     placeholderTextColor="#989898"
                                     style={signUpStyles.input}
                                     value={nickname}
@@ -49,12 +56,19 @@ const SignUpStep1 = () => {
                                 />
                             </View>
                             <Text style={signUpStyles.errorText}>
-                                {showError && !nickname.trim() ? "닉네임을 입력하세요." : ""}
+                                {showError && !nickname.trim()
+                                    ? "닉네임을 입력하세요."
+                                    : ""}
                             </Text>
 
                             <View style={signUpStyles.row}>
-                                <TouchableOpacity style={signUpStyles.backButton} onPress={() => navigation.goBack()}>
-                                    <Text style={signUpStyles.backText}>뒤로가기</Text>
+                                <TouchableOpacity
+                                    style={signUpStyles.backButton}
+                                    onPress={() => navigation.goBack()}
+                                >
+                                    <Text style={signUpStyles.backText}>
+                                        뒤로가기
+                                    </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={signUpStyles.signUpButton}
@@ -64,22 +78,22 @@ const SignUpStep1 = () => {
                                             return;
                                         }
                                         setShowError(false);
-                                        navigation.navigate('SimpleDiagnosis', {
+                                        navigation.navigate("SimpleDiagnosis", {
                                             initialIndex: 9,
                                             nickname,
                                         });
                                     }}
                                 >
-                                    <Text style={signUpStyles.signUpText}>확인</Text>
+                                    <Text style={signUpStyles.signUpText}>
+                                        확인
+                                    </Text>
                                 </TouchableOpacity>
-
                             </View>
                         </View>
                     </ScrollView>
-                </KeyboardAvoidingView >
+                </KeyboardAvoidingView>
             </ImageBackground>
         </TouchableWithoutFeedback>
-
     );
 };
 

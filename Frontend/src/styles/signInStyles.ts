@@ -22,14 +22,16 @@ const signInStyles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundryBold,
         marginBottom: 10,
         textAlign: "left",
         color: "#89673F",
     },
     inputTitle: {
-        fontSize: 15,
-        color:"#89673F"
+        fontSize: 14,
+        color: "#89673F",
+        fontFamily: fonts.laundry,
+        paddingVertical: 5,
     },
     inputContainer: {
         marginBottom: 20,
@@ -41,7 +43,11 @@ const signInStyles = StyleSheet.create({
         marginTop: 5,
         backgroundColor: colors.white,
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        color: colors.black
+        color: colors.black,
+        borderRadius: 10,
+        fontFamily: fonts.laundry,
+        fontSize: 12,
+        letterSpacing: 0.8,
     },
     row: {
         flexDirection: "row",
@@ -56,17 +62,18 @@ const signInStyles = StyleSheet.create({
         borderRadius: 5,
         width: "45%",
         height: 45,
-        alignItems: "center", 
+        alignItems: "center",
         justifyContent: "center",
-        shadowColor: "#000", 
-        shadowOffset: { width: 0, height: 2 }, 
-        shadowOpacity: 0.2, 
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 5, 
+        elevation: 5,
     },
     backText: {
         color: colors.white,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
+        letterSpacing: 1,
     },
     signInButton: {
         paddingVertical: 10,
@@ -75,7 +82,7 @@ const signInStyles = StyleSheet.create({
         borderRadius: 5,
         width: "45%",
         height: 45,
-        alignItems: "center", 
+        alignItems: "center",
         justifyContent: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -85,7 +92,8 @@ const signInStyles = StyleSheet.create({
     },
     signInText: {
         color: colors.white,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
+        letterSpacing: 1,
     },
     errorText: {
         color: colors.red,

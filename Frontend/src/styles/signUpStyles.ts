@@ -21,17 +21,19 @@ const signUpStyles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
+        marginTop: 10,
         marginBottom: 10,
+        marginLeft: 5,
         textAlign: "left",
         color: colors.brown,
     },
     inputTitle: {
-        fontSize: 15,
-        color:"#89673F"
-    },
-    inputContainer: {
-        marginBottom: 20,
+        fontSize: 14,
+        color: "#89673F",
+        fontFamily: fonts.laundry,
+        paddingVertical: 5,
+        marginLeft: 8,
     },
     input: {
         height: 45,
@@ -40,7 +42,11 @@ const signUpStyles = StyleSheet.create({
         marginTop: 5,
         backgroundColor: colors.white,
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        color: colors.black
+        color: colors.black,
+        borderRadius: 10,
+        fontFamily: fonts.laundry,
+        fontSize: 12,
+        letterSpacing: 0.8,
     },
     row: {
         flexDirection: "row",
@@ -55,17 +61,18 @@ const signUpStyles = StyleSheet.create({
         borderRadius: 5,
         width: "45%",
         height: 45,
-        alignItems: "center", 
+        alignItems: "center",
         justifyContent: "center",
-        shadowColor: "#000", 
-        shadowOffset: { width: 0, height: 2 }, 
-        shadowOpacity: 0.2, 
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 5, 
+        elevation: 5,
     },
     backText: {
         color: colors.white,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
+        letterSpacing: 2,
     },
     signUpButton: {
         paddingVertical: 10,
@@ -74,7 +81,7 @@ const signUpStyles = StyleSheet.create({
         borderRadius: 5,
         width: "45%",
         height: 45,
-        alignItems: "center", 
+        alignItems: "center",
         justifyContent: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -95,39 +102,41 @@ const signUpStyles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         elevation: 5,
-      },
-      
-      maleSelected: {
+    },
+
+    maleSelected: {
         backgroundColor: "#6E7EFF",
-      },
-      
-      maleUnselected: {
+    },
+
+    maleUnselected: {
         backgroundColor: "#BFC8FF",
-      },
-      
-      femaleSelected: {
+    },
+
+    femaleSelected: {
         backgroundColor: "#FF7C7C",
-      },
-      
-      femaleUnselected: {
+    },
+
+    femaleUnselected: {
         backgroundColor: "#FDBABA",
-      },
-      secretSelected: {
+    },
+    secretSelected: {
         backgroundColor: "#F8B12D",
-      },
-      
-      secretUnselected: {
+    },
+
+    secretUnselected: {
         backgroundColor: "#EFC371",
-      },
-      
-      genderText: {
+    },
+
+    genderText: {
         color: "#fff",
-        fontWeight: "bold",
-      },
-      
+        fontFamily: fonts.laundry,
+        letterSpacing: 1,
+    },
+
     signUpText: {
         color: colors.white,
-        fontFamily: fonts.bold,
+        fontFamily: fonts.laundry,
+        letterSpacing: 2,
     },
     errorText: {
         color: colors.red,
@@ -136,30 +145,30 @@ const signUpStyles = StyleSheet.create({
         textAlign: "center",
     },
     termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
-    borderColor: '#89673F',
-    backgroundColor: '#fff',
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#89673F',
-  },
-  checkmark: {
-    color: '#fff',
-  },
-  termsText: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 10,
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderWidth: 1,
+        borderColor: "#89673F",
+        backgroundColor: "#fff",
+        marginRight: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    checkboxChecked: {
+        backgroundColor: "#89673F",
+    },
+    checkmark: {
+        color: "#fff",
+    },
+    termsText: {
+        color: "blue",
+        textDecorationLine: "underline",
+    },
 });
 
 export default signUpStyles;

@@ -7,7 +7,7 @@ const dialogueBoxStyles = StyleSheet.create({
         position: "absolute",
         bottom: 0,
         width: "100%",
-        height: "25%"
+        height: "25%",
     },
     nametag: {
         position: "absolute",
@@ -19,13 +19,14 @@ const dialogueBoxStyles = StyleSheet.create({
         borderRadius: 10,
         alignContent: "center",
         justifyContent: "center",
-        backgroundColor: colors.grey,
+        backgroundColor: "#EDE5CB",
     },
     nametagText: {
         fontSize: 16,
         color: "black",
         textAlign: "center",
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.dialogue,
+        letterSpacing: 1,
     },
     dialogueTextBox: {
         position: "relative",
@@ -33,8 +34,7 @@ const dialogueBoxStyles = StyleSheet.create({
         width: "100%",
         height: "100%",
         backgroundColor: colors.background,
-        borderRadius: 20
-
+        borderRadius: 20,
     },
     dialogueText: {
         fontSize: 16,
@@ -44,7 +44,6 @@ const dialogueBoxStyles = StyleSheet.create({
     button: {
         alignContent: "center",
         justifyContent: "center",
-
     },
     triangle: {
         width: 0,
@@ -63,6 +62,5 @@ const dialogueBoxStyles = StyleSheet.create({
         zIndex: 10,
     },
 });
-
 
 export default dialogueBoxStyles;
