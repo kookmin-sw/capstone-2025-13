@@ -5,7 +5,6 @@ import {
     Alert,
     Text,
     TouchableOpacity,
-    ScrollView,
     TouchableWithoutFeedback,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -82,13 +81,13 @@ export default function HelpCall() {
             setLocation({
                 latitude,
                 longitude,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
+                latitudeDelta: location.latitudeDelta ?? 0.05,
+                longitudeDelta: location.longitudeDelta ?? 0.05,
             });
             console.log(`현재 위치: ${location.latitude}, ${location.longitude} / ${location.latitudeDelta}, ${location.longitudeDelta}`)
 
             try {
-                const centerData = await getCenters(location.latitude, location.longitude, 30);
+                const centerData = await getCenters(location.latitude, location.longitude, 50);
                 console.log(`찾은 센터: ${centerData.length}곳`)
                 const parsedMarkers = centerData
                     .filter(
