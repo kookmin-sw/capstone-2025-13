@@ -35,11 +35,14 @@ const helpCallStyles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: width * 0.055,
         textAlign: "center",
+  
     },
     scrollContainer: {
         flexDirection: "row",
         alignItems: "center",
         paddingVertical: height * 0.015,
+        marginTop: height * 0.02,
+        justifyContent: "center",
     },
     button: {
         paddingVertical: height * 0.015,

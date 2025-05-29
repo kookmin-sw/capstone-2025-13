@@ -80,35 +80,44 @@ export default function HelpCall() {
                 latitudeDelta: 0.05,
                 longitudeDelta: 0.05,
             });
-
             try {
                 const centerData = await getCenters();
                 const parsedMarkers = centerData
-                    .filter((item: any) => item.hpCnterSe === "정신보건")
-                    .map((item: any, index: number) => ({
-                        id: `${index}`,
-                        title: item.hpCnterNm ?? "정신건강센터",
-                        latitude: parseFloat(item.latitude),
-                        longitude: parseFloat(item.longitude),
-                        type: "center",
-                        details: {
-                            address: item.rdnmadr,
-                            phone: item.phoneNumber,
-                            openTime: item.operOpenHhmm,
-                            closeTime: item.operColseHhmm,
-                            restDays: item.rstdeInfo,
-                            area: item.hpCnterAr,
-                            doctors: item.doctrCo,
-                            nurses: item.nurseCo,
-                            psychologists: item.scrcsCo,
-                            jobDesc: item.hpCnterJob,
-                            etcStatus: item.etcHnfSttus,
-                            etcUseInfo: item.etcUseIfno,
-                            operator: item.operInstitutionNm,
-                            referenceDate: item.referenceDate,
-                            institution: item.institutionNm,
-                        },
-                    }));
+                    .filter((item: any) => item.hpCnterSe === "정신보건" || item.hpCnterSe === "건강증진")
+                    .map((item: any, index: number) => {
+                        const isMental = item.hpCnterSe === "정신보건";
+                        const isHealth = item.hpCnterSe === "건강증진";
+
+                        return {
+                            id: `${index}`,
+                            title: item.hpCnterNm
+                                ?? (isMental ? "정신건강센터"
+                                    : isHealth ? "보건소"
+                                        : "알 수 없음"),
+                            latitude: parseFloat(item.latitude),
+                            longitude: parseFloat(item.longitude),
+                            type: isMental ? "center"
+                                : isHealth ? "clinic"
+                                    : "unknown",
+                            details: {
+                                address: item.rdnmadr,
+                                phone: item.phoneNumber,
+                                openTime: item.operOpenHhmm,
+                                closeTime: item.operColseHhmm,
+                                restDays: item.rstdeInfo,
+                                area: item.hpCnterAr,
+                                doctors: item.doctrCo,
+                                nurses: item.nurseCo,
+                                psychologists: item.scrcsCo,
+                                jobDesc: item.hpCnterJob,
+                                etcStatus: item.etcHnfSttus,
+                                etcUseInfo: item.etcUseIfno,
+                                operator: item.operInstitutionNm,
+                                referenceDate: item.referenceDate,
+                                institution: item.institutionNm,
+                            },
+                        };
+                    })
 
                 setMarkers(parsedMarkers);
             } catch (error) {
@@ -121,9 +130,9 @@ export default function HelpCall() {
 
     const buttons = [
         { id: "all", title: "전체보기" },
-        { id: "clinic", title: "정신건강진료" },
+        { id: "clinic", title: "보건소" },
         { id: "center", title: "정신건강복지센터" },
-        { id: "counseling", title: "정신상담센터" },
+        // { id: "counseling", title: "정신상담센터" },
     ];
 
     return (
@@ -148,13 +157,11 @@ export default function HelpCall() {
                         <Text style={helpCallStyles.headerText}>
                             마음 케어 정보 지도
                         </Text>
-                        <ScrollView
-                            style={{ marginTop: 10 }}
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={
-                                helpCallStyles.scrollContainer
-                            }
+                        <View
+                            style={helpCallStyles.scrollContainer}
+                        // // horizontal
+                        // showsHorizontalScrollIndicator={false}
+
                         >
                             {buttons.map((btn) => (
                                 <TouchableOpacity
@@ -179,7 +186,7 @@ export default function HelpCall() {
                                     </Text>
                                 </TouchableOpacity>
                             ))}
-                        </ScrollView>
+                        </View>
                     </View>
                     <MapView
                         provider={PROVIDER_GOOGLE}
