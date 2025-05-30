@@ -49,6 +49,15 @@
       <intent-filter>
         <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
       </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+      </intent-filter>
     </activity>
     <activity android:name=".PermissionsRationaleActivity" android:exported="true">
       <intent-filter>
@@ -62,5 +71,6 @@
       </intent-filter>
     </activity-alias>
     <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+    <uses-native-library android:name="libOpenCL.so" android:required="false"/>
   </application>
 </manifest>

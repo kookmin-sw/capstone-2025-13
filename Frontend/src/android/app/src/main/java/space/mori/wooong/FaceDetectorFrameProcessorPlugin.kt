@@ -10,7 +10,6 @@ class FaceDetectorFrameProcessorPlugin(
     proxy: VisionCameraProxy,
     options: Map<String, Any>?
 ) : FrameProcessorPlugin() {
-
     companion object {
         init {
             System.loadLibrary("face-preprocessing-native")
@@ -72,7 +71,8 @@ class FaceDetectorFrameProcessorPlugin(
                 x, y, w, h,
                 rotation
             ).map { it.toDouble() }
-            
+        } catch(e: Exception) {
+            null
         } finally {
             image.close() // ✅ 메모리 누수 방지
         }
