@@ -33,14 +33,14 @@ const styles = StyleSheet.create({
         fontSize: width * 0.045,
         fontFamily: fonts.extraBold,
         marginBottom: height * 0.01,
-        color: "#333",
+        color: "#333333",
         textAlign: "center",
     },
 
     modalSubText: {
         fontSize: width * 0.035,
         fontFamily: fonts.primary,
-        color: "#666",
+        color: "#666666",
         letterSpacing: 0.5,
         lineHeight: height * 0.025,
         textAlign: "center",
