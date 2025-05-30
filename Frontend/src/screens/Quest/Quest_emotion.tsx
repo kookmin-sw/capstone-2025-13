@@ -1,11 +1,18 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Text, View, Alert, Modal, TouchableOpacity, Dimensions } from 'react-native';
-import { Camera, useCameraDevice, useFrameProcessor, Frame, runAtTargetFps } from 'react-native-vision-camera';
+import {
+  Camera,
+  useCameraDevice,
+  useFrameProcessor,
+  Frame,
+  runAtTargetFps,
+  getCameraFormat
+} from 'react-native-vision-camera';
 import type { FaceDetectionOptions } from 'react-native-vision-camera-face-detector';
 import { Face, useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
 
-import { useLoadEmotionModel } from '../../hooks/useLoadEmotionModel';
+import { useEmotionModel } from '../../hooks/useLoadEmotionModel';
 import { cropFaces } from '../../plugins/cropFaces';
 import { runTFLiteModelRunner } from '../../utils/EmotionModelRun';
 import { QUESTS } from '../../utils/QuestEmotion/quests';
@@ -46,11 +53,12 @@ export default function QuestEmotion() {
   const [completeModalMessage, setCompleteModalMessage] = useState("");
 
   const device = useCameraDevice('front');
-  const { isLoaded, model } = useLoadEmotionModel();
+  const { isLoaded, model, unload, load } = useEmotionModel();
   const cameraRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    load()
     timerRef.current = setTimeout(() => {
       if (!success) {
         setIsActive(false);
@@ -79,6 +87,7 @@ export default function QuestEmotion() {
     trackingEnabled: false,
     autoMode: false,
   };
+
   const { detectFaces } = useFaceDetector(faceDetectorOptions);
 
   const quest = QUESTS.find(q => q.id === questTitle);
@@ -117,8 +126,8 @@ export default function QuestEmotion() {
     }
   }, []);
 
-  const handleDetectedResultJS = async (pluginResult: number[]) => {
-    if (!isLoaded || !model) return;
+  const handleDetectedResultJS = async (pluginResult: number[] | undefined) => {
+    if (!isLoaded || !model || !pluginResult) return;
 
     const input = new Float32Array(pluginResult);
     const result = await runTFLiteModelRunner(input, model);
@@ -189,11 +198,19 @@ export default function QuestEmotion() {
     );
   }
 
+  const cameraFormat = getCameraFormat(device, [{
+    fps: 24,
+  }])
+
   return (
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
         <View style={{ marginTop: width * 0.03 }}>
-          <TouchableOpacity onPress={() => navigation.navigate("Quest_stage", { title: `${nickname}의 숲` })}>
+          <TouchableOpacity onPress={() => {
+              if(timerRef.current) clearTimeout(timerRef.current);
+              unload();
+              navigation.navigate("Quest_stage", { title: `${nickname}의 숲` })
+          }}>
             <Ionicons name="arrow-back-circle" size={40} color="#FF9B4B" />
           </TouchableOpacity>
         </View>
@@ -204,6 +221,7 @@ export default function QuestEmotion() {
           ref={cameraRef}
           style={styles.camera}
           device={device}
+          format={cameraFormat}
           photo
           isActive={isActive}
           frameProcessor={frameProcessor}
@@ -218,6 +236,7 @@ export default function QuestEmotion() {
             <TouchableOpacity
               onPress={() => {
                 setCompleteModalVisible(false);
+                if(timerRef.current) clearTimeout(timerRef.current)
                 navigation.navigate("Quest_stage", { title: `${nickname}의 숲` });
               }}
               style={questStyles.closeButton}

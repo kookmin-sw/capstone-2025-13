@@ -23,8 +23,9 @@ Java_space_mori_wooong_FaceDetectorFrameProcessorPlugin_cropResizeNormalizeDirec
     int boxW = h;  // portrait height → landscape width
     int boxH = w;  // portrait width  → landscape height
 
-    std::vector<float> output;
-    output.reserve(64 * 64 * 3);
+    constexpr int OUTPUT_SIZE = 64 * 64 * 3;
+    float output[OUTPUT_SIZE];
+    int outputIdx = 0;
 
     for (int xx = 0; xx < 64; ++xx) {
       for (int yy = 0; yy < 64; ++yy) {
@@ -39,13 +40,13 @@ Java_space_mori_wooong_FaceDetectorFrameProcessorPlugin_cropResizeNormalizeDirec
             // 4) stride는 imageWidth
             int idx = (srcY * imageWidth + srcX) * 4;
 
-            output.push_back(rgba[idx    ] / 255.0f);  // R
-            output.push_back(rgba[idx + 1] / 255.0f);  // G
-            output.push_back(rgba[idx + 2] / 255.0f);  // B
+            output[outputIdx++] = rgba[idx    ] / 255.0f;  // R
+            output[outputIdx++] = rgba[idx + 1] / 255.0f;  // G
+            output[outputIdx++] = rgba[idx + 2] / 255.0f;  // B
         }
     }
 
-    jfloatArray result = env->NewFloatArray(output.size());
-    env->SetFloatArrayRegion(result, 0, output.size(), output.data());
+    jfloatArray result = env->NewFloatArray(OUTPUT_SIZE);
+    env->SetFloatArrayRegion(result, 0, OUTPUT_SIZE, output);
     return result;
 }

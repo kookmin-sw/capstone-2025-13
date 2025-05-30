@@ -60,6 +60,8 @@ export default {
       infoPlist: {
         NSCameraUsageDescription: "$(PRODUCT_NAME)가 당신의 카메라를 사용합니다.",
         NSHealthUpdateUsageDescription: "$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.",
+        NSHealthShareUsageDescription: "$(PRODUCT_NAME)가 걸음수 추적을 위해 건강 정보를 사용합니다.",
+        UIViewControllerBasedStatusBarAppearance: false,
         ITSAppUsesNonExemptEncryption: false,
         LSMinimumSystemVersion: "15.1"
       },

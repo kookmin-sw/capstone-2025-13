@@ -9,11 +9,34 @@ public class CropFacesFrameProcessorPlugin: FrameProcessorPlugin {
     private static let TARGET_SIZE = 64
     private static let CHANNELS = 3 // R, G, B
     private static let BGRA_BYTES_PER_PIXEL = 4 // iOS CVPixelBuffer 기본 BGRA
+    private static let OUTPUT_SIZE = TARGET_SIZE * TARGET_SIZE * CHANNELS
+    private static var staticOutput: [Double]? = nil
+    private static var isInitialized = false
     private static let PIXEL_MAX: Float = 255.0
 
     public override init(proxy: VisionCameraProxyHolder, options: [AnyHashable: Any]! = [:]) {
         super.init(proxy: proxy, options: options)
+        Self.initializeStaticMemory()
         print("CropFacesFrameProcessorPlugin: Plugin initialized.")
+    }
+
+    private static func initializeStaticMemory() {
+        if !isInitialized {
+            staticOutput = Array(repeating: 0.0, count: OUTPUT_SIZE)
+            isInitialized = true
+        }
+    }
+
+    private static func cleanupStaticMemory() {
+        if isInitialized {
+            staticOutput = nil
+            isInitialized = false
+        }
+    }
+
+    private static func getEmptyDoubleArray() -> [Double]? {
+        if !isInitialized { return nil }
+        return staticOutput
     }
 
     public override func callback(
