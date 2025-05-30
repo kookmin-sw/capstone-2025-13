@@ -76,8 +76,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
         marginBottom: 10,
+        color: "#000000"
     },
     boldText: {
         fontWeight: 'bold',
+        color: "#000000"
     }
 });
