@@ -1502,6 +1502,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - TensorFlowLiteC (= 2.17.0)
+    - TensorFlowLiteC/CoreML (= 2.17.0)
     - Yoga
   - react-native-google-maps (1.20.1):
     - Google-Maps-iOS-Utils (= 5.0.0)
@@ -2094,6 +2095,8 @@ PODS:
   - TensorFlowLiteC (2.17.0):
     - TensorFlowLiteC/Core (= 2.17.0)
   - TensorFlowLiteC/Core (2.17.0)
+  - TensorFlowLiteC/CoreML (2.17.0):
+    - TensorFlowLiteC/Core
   - VisionCamera (4.6.4):
     - VisionCamera/Core (= 4.6.4)
     - VisionCamera/FrameProcessors (= 4.6.4)
@@ -2535,7 +2538,7 @@ SPEC CHECKSUMS:
   React-logger: 8edfcedc100544791cd82692ca5a574240a16219
   React-Mapbuffer: c3f4b608e4a59dd2f6a416ef4d47a14400194468
   React-microtasksnativemodule: 054f34e9b82f02bd40f09cebd4083828b5b2beb6
-  react-native-fast-tflite: 83127d0497830619341e8759db617f00608223ef
+  react-native-fast-tflite: 56aa04cbc8bf6d51642405beca3eb1e124fec3fb
   react-native-google-maps: c4f5c5b2dda17e7cb2cb2b37a81f140b039b3e7e
   react-native-image-resizer: 17b2d73c030975b6543395c7e7368bc8774c5efa
   react-native-maps: 9febd31278b35cd21e4fad2cf6fa708993be5dab
@@ -2588,6 +2591,6 @@ SPEC CHECKSUMS:
   VisionCameraFaceDetector: 5551f77a3c89ef134c68ccc3e896938aa3a58840
   Yoga: c758bfb934100bb4bf9cbaccb52557cee35e8bdf
 
-PODFILE CHECKSUM: a11e45b848ad33a421ce36f098e600a36d5948e6
+PODFILE CHECKSUM: 3dba88a2b59d3e810d1c06ac719390731b36cf46
 
 COCOAPODS: 1.16.2

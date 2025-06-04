@@ -62,9 +62,10 @@ export default function QuestEmotion() {
     timerRef.current = setTimeout(() => {
       if (!success) {
         setIsActive(false);
-        Alert.alert("실패", "30초 안에 퀘스트를 완료하지 못했어요. 😢", [{ text: "확인", onPress: () => navigation.goBack() }]);
+        unload();
+        Alert.alert("실패", "20초 안에 퀘스트를 완료하지 못했어요. 😢", [{ text: "확인", onPress: () => navigation.goBack() }]);
       }
-    }, 30 * 1000);
+    }, 20 * 1000);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);

@@ -1,11 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
-import {useTensorflowModel, loadTensorflowModel, TensorflowModel} from 'react-native-fast-tflite';
+import {
+  loadTensorflowModel,
+  TensorflowModel,
+  TensorflowModelDelegate
+} from 'react-native-fast-tflite';
+import {Platform} from "react-native";
 
 // 전역 싱글톤 관리 객체
 class EmotionModelSingleton {
   private static instance: EmotionModelSingleton;
   public tfModel: TensorflowModel | null = null;
   public state: 'unloaded' | 'unloading' | 'loading' | 'loaded' | 'error' = 'unloaded';
+  public delegate: TensorflowModelDelegate = Platform.OS == 'ios' ? 'core-ml' : 'default';
 
   private constructor() {}
 
@@ -25,9 +31,12 @@ class EmotionModelSingleton {
       // 이미 로딩중이면 기다리지 않고 현재 상태 반환
       return this.tfModel;
     }
+    while(this.state == 'unloading') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     this.state = 'loading';
     try {
-      this.tfModel = await loadTensorflowModel(require('../assets/models/ResEmoteNet_fer2013_dynamic.tflite'));
+      this.tfModel = await loadTensorflowModel(require('../assets/models/ResEmoteNet_fer2013_dynamic.tflite'), this.delegate);
       this.state = 'loaded';
     } catch (e) {
       console.error('EmotionModelSingleton loadModel error:', e);
